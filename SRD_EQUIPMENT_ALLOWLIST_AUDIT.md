@@ -6,8 +6,8 @@ Snapshot date: 2026-04-20
 
 This note records the equipment and feat allowlist audit completed against the current
 SRD-backed reference content in
-`app/src/main/java/com/example/encountertimer/domain/util/EquipmentReference.kt` and
-`app/src/main/java/com/example/encountertimer/domain/util/CharacterCreationReference.kt`.
+`app/src/main/java/com/example/loreweaver/domain/util/EquipmentReference.kt` and
+`app/src/main/java/com/example/loreweaver/domain/util/CharacterCreationReference.kt`.
 
 The goal of the pass was exact allowlist alignment for canonical labels used by the app's
 structured reference data, while preserving searchability through supporting notes where needed.
@@ -146,16 +146,16 @@ If a future entry is not present in the corresponding approved SRD table, it sho
 
 ## Verification anchors
 
-- `app/src/test/java/com/example/encountertimer/domain/util/EquipmentReferenceTest.kt`
-- `app/src/test/java/com/example/encountertimer/ui/screens/ReferenceScreenFocusSearchTest.kt`
-- `app/src/test/java/com/example/encountertimer/ui/screens/ReferenceScreenToolSearchTest.kt`
-- `app/src/test/java/com/example/encountertimer/ui/screens/ReferenceScreenTransportSearchTest.kt`
-- `app/src/test/java/com/example/encountertimer/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
-- `app/src/test/java/com/example/encountertimer/domain/util/ContentSafetyAuditTest.kt`
+- `app/src/test/java/com/example/loreweaver/domain/util/EquipmentReferenceTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenFocusSearchTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenToolSearchTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenTransportSearchTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
+- `app/src/test/java/com/example/loreweaver/domain/util/ContentSafetyAuditTest.kt`
 
 `ContentSafetyAuditTest` already treats
-`java/com/example/encountertimer/domain/util/EquipmentReference.kt` and
-`java/com/example/encountertimer/domain/util/CharacterCreationReference.kt` as reviewed baseline
+`java/com/example/loreweaver/domain/util/EquipmentReference.kt` and
+`java/com/example/loreweaver/domain/util/CharacterCreationReference.kt` as reviewed baseline
 files for prose-safety auditing.
 
 ## Notes for future updates

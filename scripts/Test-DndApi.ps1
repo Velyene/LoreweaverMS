@@ -1,6 +1,6 @@
 ##############################################################
 # Test-DndApi.ps1
-# Verifies every dnd5eapi.co endpoint used by LoreweaverMS.
+# Verifies every dnd5eapi.co endpoint used by Loreweaver.
 # Run: powershell -ExecutionPolicy Bypass -File .\scripts\Test-DndApi.ps1
 ##############################################################
 

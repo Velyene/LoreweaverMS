@@ -4,11 +4,11 @@ if (-not (Test-Path $adb)) {
     exit 1
 }
 
-& $adb shell am force-stop com.example.encountertimer
+& $adb shell am force-stop com.example.loreweaver
 & $adb logcat -c
-& $adb shell am start -n com.example.encountertimer/.MainActivity
+& $adb shell am start -n com.example.loreweaver/.MainActivity
 Start-Sleep -Seconds 3
-$pid = (& $adb shell pidof com.example.encountertimer).Trim()
+$pid = (& $adb shell pidof com.example.loreweaver).Trim()
 "PID=$pid"
 if ($pid) {
     & $adb logcat -d --pid=$pid -v time
@@ -19,5 +19,5 @@ if ($pid) {
 
 '--- TOP RESUMED ---'
 $activities = & $adb shell dumpsys activity activities
-$activities | Select-String -Pattern 'mResumedActivity','topResumedActivity','ResumedActivity','com.example.encountertimer' | ForEach-Object { $_.Line }
+$activities | Select-String -Pattern 'mResumedActivity','topResumedActivity','ResumedActivity','com.example.loreweaver' | ForEach-Object { $_.Line }
 

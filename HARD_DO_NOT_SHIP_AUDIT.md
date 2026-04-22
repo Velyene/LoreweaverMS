@@ -236,7 +236,7 @@ as a claim that those files are still present in the current shipped source tree
 
 ### 1. Quarantine now — bundled reference corpora with explicit risk signals
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/ClassSpellListReference.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/ClassSpellListReference.kt`
 
 **Why flagged**
 
@@ -251,21 +251,21 @@ as a claim that those files are still present in the current shipped source tree
 - do not include this file's embedded spell-name corpus in a bundled release until it is re-proven
   against the approved SRD 5.2.1 source file
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReference.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReference.kt`
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetTwo.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetTwo.kt`
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetThree.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetThree.kt`
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetFour.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetFour.kt`
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetFive.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetFive.kt`
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetSix.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetSix.kt`
 
 ####
 
-`app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSrdAdditions.kt`
+`app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSrdAdditions.kt`
 
 **Why flagged**
 
@@ -283,7 +283,7 @@ as a claim that those files are still present in the current shipped source tree
   file
 - safest replacement is a blank/custom spell-entry flow or a rebuilt SRD-only subset
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/MonsterReference.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/MonsterReference.kt`
 
 **Why flagged**
 
@@ -299,7 +299,7 @@ as a claim that those files are still present in the current shipped source tree
 - do not ship monster stat-block summaries unless each entry is traced back to approved SRD 5.2.1
   source material
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/CharacterClassReference.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/CharacterClassReference.kt`
 
 **Why flagged**
 
@@ -317,7 +317,7 @@ as a claim that those files are still present in the current shipped source tree
 
 ### 2. Re-verify before ship — specific structured entries that conflict with the hard checklist
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/CharacterCreationReference.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/CharacterCreationReference.kt`
 
 **Observed hits**
 
@@ -336,7 +336,7 @@ as a claim that those files are still present in the current shipped source tree
 - if uncertain, normalize bundled data to the exact allowed feat name `Magic Initiate` and move
   list-specific detail into user-entered/custom content or clearly-audited supporting metadata
 
-#### `app/src/main/java/com/example/encountertimer/domain/util/EquipmentReference.kt`
+#### `app/src/main/java/com/example/loreweaver/domain/util/EquipmentReference.kt`
 
 **Observed hits**
 

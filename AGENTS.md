@@ -1,4 +1,4 @@
-# AGENTS.md – LoreweaverMS (EncounterTimer)
+# AGENTS.md – Loreweaver
 
 Android TTRPG combat-tracker app built with Kotlin, Jetpack Compose, Hilt, Room, and a
 local-first MVVM + Clean Architecture structure.
@@ -105,7 +105,7 @@ The current runtime app source under `app/src/main` is local-first.
 
 ## Theme
 
-- `MainActivity` calls `EncounterTimerTheme(darkTheme = true)` so the app stays in dark mode.
+- `MainActivity` calls `LoreweaverTheme(darkTheme = true)` so the app stays in dark mode.
 - Dynamic color is disabled by default to preserve the custom fantasy palette defined in
   `ui/theme/Color.kt`.
 

@@ -22,6 +22,5 @@ dependencyResolutionManagement {
 	}
 }
 
-rootProject.name = "LoreweaverMS"
+rootProject.name = "Loreweaver"
 include(":app")
- 

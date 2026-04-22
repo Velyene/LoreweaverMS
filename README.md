@@ -1,6 +1,6 @@
-# LoreweaverMS
+# Loreweaver
 
-LoreweaverMS is an Android companion app for tabletop RPG groups. It helps Game Masters and
+Loreweaver is an Android companion app for tabletop RPG groups. It helps Game Masters and
 players manage campaigns, characters, encounters, and quick rules lookups from one local-first
 app.
 
@@ -53,13 +53,13 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 
 ## Project Structure
 
-- `app/src/main/java/com/example/encountertimer/ui/` — Compose screens, view models, and UI
+- `app/src/main/java/com/example/loreweaver/ui/` — Compose screens, view models, and UI
   helpers.
-- `app/src/main/java/com/example/encountertimer/domain/` — domain models, repository interfaces,
+- `app/src/main/java/com/example/loreweaver/domain/` — domain models, repository interfaces,
   use cases, and utilities.
-- `app/src/main/java/com/example/encountertimer/data/` — Room database, entities, DAOs, mappers,
+- `app/src/main/java/com/example/loreweaver/data/` — Room database, entities, DAOs, mappers,
   converters, and repository implementations.
-- `app/src/main/java/com/example/encountertimer/di/` — Hilt module bindings.
+- `app/src/main/java/com/example/loreweaver/di/` — Hilt module bindings.
 
 ## Notes on data and networking
 
