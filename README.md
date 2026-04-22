@@ -1,0 +1,90 @@
+# LoreweaverMS
+
+LoreweaverMS is an Android companion app for tabletop RPG groups. It helps Game Masters and
+players manage campaigns, characters, encounters, and quick rules lookups from one local-first
+app.
+
+## App Description
+
+The app is built around encounter flow. It reduces session bookkeeping by keeping combat state,
+campaign notes, character resources, and reference material in one place. The UI uses Jetpack
+Compose with a force-dark fantasy theme for a consistent in-game presentation.
+
+## Key Features
+
+- **Campaign management**: Create campaigns, attach encounters, keep session records, and store
+  campaign notes.
+- **Character management**: Track stats, saves, proficiencies, inventory, resources, conditions,
+  inspiration, spell slots, and challenge rating.
+- **Combat tracker**: Manage initiative order, round state, combatant health, and encounter flow.
+- **Encounter difficulty**: Automatically calculate 5e encounter difficulty from party composition,
+  monster count, CR, and adjusted XP.
+- **Adventure logs**: Persist important session events in a Room-backed log capped to the most
+  recent 100 entries.
+- **Rules reference**: Browse local rules content for traps, poisons, diseases, spellcasting,
+  objects, madness, core rules, and character creation.
+- **Favorites, copy, and share**: Star reference entries, copy prompt/reference text, and share
+  selected reference content with other apps.
+- **Prompt library**: Access a small set of narrative prompts and copy them to the clipboard while
+  running a session.
+
+## Architecture Overview
+
+The project follows an MVVM + Clean Architecture structure with a local-first data layer.
+
+### Architecture at a glance
+
+- **UI layer**: Jetpack Compose screens and `@HiltViewModel` classes expose `StateFlow`-backed UI
+  state.
+- **Domain layer**: Repository interfaces, domain models, and use cases keep business logic
+  separated from framework details.
+- **Data layer**: Room entities, DAOs, Gson-backed mappers, and repository implementations persist
+  application data.
+- **DI layer**: Hilt provides the database, DAOs, repositories, and shared preferences.
+
+### Core technologies
+
+- **Kotlin + Jetpack Compose** for the app UI.
+- **Hilt** for dependency injection.
+- **Room** for local persistence. The current `AppDatabase` version is `8`.
+- **Gson** for JSON-backed Room columns and type conversion helpers.
+- **Navigation Compose + Kotlin Serialization** for type-safe navigation.
+- **Material 3** with a custom dark fantasy palette. Dynamic color is disabled by default.
+
+## Project Structure
+
+- `app/src/main/java/com/example/encountertimer/ui/` — Compose screens, view models, and UI
+  helpers.
+- `app/src/main/java/com/example/encountertimer/domain/` — domain models, repository interfaces,
+  use cases, and utilities.
+- `app/src/main/java/com/example/encountertimer/data/` — Room database, entities, DAOs, mappers,
+  converters, and repository implementations.
+- `app/src/main/java/com/example/encountertimer/di/` — Hilt module bindings.
+
+## Notes on data and networking
+
+The current app source is local-first. The runtime app code in `app/src/main` persists its data in
+Room and `SharedPreferences`; it does not currently include a Retrofit-based remote API layer.
+
+## SRD Notice
+
+See `SRD_NOTICE.md` for the exact SRD 5.2.1 attribution text and current content-audit guardrails.
+
+See `NOTICE` for the scoped repository notice explaining that Creative Commons Attribution 4.0
+coverage applies only to reviewed SRD-derived material intentionally included in the repository.
+
+The full Creative Commons Attribution 4.0 license text is mirrored locally in
+`licenses/CC-BY-4.0.txt`.
+
+Running the content-audit test suite also regenerates
+`EXCLUDED_REFERENCE_CORPUS_AUDIT.md`, which summarizes separately inventoried reference/SRD corpus
+files. In the current audited repo state, that snapshot reports no excluded corpus files under
+`app/src/main`.
+
+The Rules reference still includes monster-running guidance through reviewed Core Rules content,
+but the top-level `Monsters` tab is intentionally an unavailable placeholder instead of a bundled
+local monster corpus.
+
+---
+
+*Developed as part of the Mobile Software Development curriculum.*

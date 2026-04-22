@@ -1,0 +1,76 @@
+package com.example.encountertimer.domain.util
+/**
+ * Utility object for SRD-backed equipment reference content.
+ */
+object EquipmentReference {
+val CHAPTER_SECTIONS get() = EquipmentReferenceSectionsData.CHAPTER_SECTIONS
+val WEAPON_PROPERTY_SECTIONS get() = EquipmentReferenceSectionsData.WEAPON_PROPERTY_SECTIONS
+val WEAPON_MASTERY_SECTIONS get() = EquipmentReferenceSectionsData.WEAPON_MASTERY_SECTIONS
+val ARTISANS_TOOLS get() = EquipmentReferenceToolsData.ARTISANS_TOOLS
+val OTHER_TOOLS get() = EquipmentReferenceToolsData.OTHER_TOOLS
+val ALL_TOOLS get() = EquipmentReferenceToolsData.ALL_TOOLS
+val ARTISANS_TOOLS_TABLE get() = EquipmentReferenceToolsData.ARTISANS_TOOLS_TABLE
+val OTHER_TOOLS_TABLE get() = EquipmentReferenceToolsData.OTHER_TOOLS_TABLE
+val ADVENTURING_GEAR_DETAIL_SECTIONS get() = EquipmentReferenceCoreData.ADVENTURING_GEAR_DETAIL_SECTIONS
+val COIN_VALUES_TABLE get() = EquipmentReferenceCoreData.COIN_VALUES_TABLE
+val WEAPONS get() = EquipmentReferenceCoreData.WEAPONS
+val WEAPONS_TABLE get() = EquipmentReferenceCoreData.WEAPONS_TABLE
+val ARMOR get() = EquipmentReferenceCoreData.ARMOR
+val ARMOR_TABLE get() = EquipmentReferenceCoreData.ARMOR_TABLE
+val ADVENTURING_GEAR get() = EquipmentReferenceCoreData.ADVENTURING_GEAR
+val ADVENTURING_GEAR_TABLE get() = EquipmentReferenceCoreData.ADVENTURING_GEAR_TABLE
+val MAGIC_ITEMS_A_TO_Z get() = EquipmentReferenceMagicItemsData.MAGIC_ITEMS_A_TO_Z
+val AMMUNITION get() = EquipmentReferenceSupplementalData.AMMUNITION
+val AMMUNITION_TABLE get() = EquipmentReferenceSupplementalData.AMMUNITION_TABLE
+val FOCUSES get() = EquipmentReferenceSupplementalData.FOCUSES
+val ARCANE_FOCUSES_TABLE get() = EquipmentReferenceSupplementalData.ARCANE_FOCUSES_TABLE
+val DRUIDIC_FOCUSES_TABLE get() = EquipmentReferenceSupplementalData.DRUIDIC_FOCUSES_TABLE
+val HOLY_SYMBOLS_TABLE get() = EquipmentReferenceSupplementalData.HOLY_SYMBOLS_TABLE
+val MOUNTS get() = EquipmentReferenceSupplementalData.MOUNTS
+val MOUNTS_AND_OTHER_ANIMALS_TABLE get() = EquipmentReferenceSupplementalData.MOUNTS_AND_OTHER_ANIMALS_TABLE
+val TACK_AND_DRAWN_ITEMS get() = EquipmentReferenceSupplementalData.TACK_AND_DRAWN_ITEMS
+val TACK_AND_DRAWN_VEHICLES_TABLE get() = EquipmentReferenceSupplementalData.TACK_AND_DRAWN_VEHICLES_TABLE
+val LARGE_VEHICLES get() = EquipmentReferenceSupplementalData.LARGE_VEHICLES
+val AIRBORNE_AND_WATERBORNE_VEHICLES_TABLE get() = EquipmentReferenceSupplementalData.AIRBORNE_AND_WATERBORNE_VEHICLES_TABLE
+val LIFESTYLES_TABLE get() = EquipmentReferenceSupplementalData.LIFESTYLES_TABLE
+val FOOD_DRINK_AND_LODGING_TABLE get() = EquipmentReferenceSupplementalData.FOOD_DRINK_AND_LODGING_TABLE
+val HIRELINGS_TABLE get() = EquipmentReferenceSupplementalData.HIRELINGS_TABLE
+val MAGIC_ITEM_CATEGORIES_TABLE get() = EquipmentReferenceSupplementalData.MAGIC_ITEM_CATEGORIES_TABLE
+val POTION_MISCIBILITY_TABLE get() = EquipmentReferenceSupplementalData.POTION_MISCIBILITY_TABLE
+val MAGIC_ITEM_RARITIES_AND_VALUES_TABLE get() = EquipmentReferenceSupplementalData.MAGIC_ITEM_RARITIES_AND_VALUES_TABLE
+val MAGIC_ITEM_TOOLS_TABLE get() = EquipmentReferenceSupplementalData.MAGIC_ITEM_TOOLS_TABLE
+val MAGIC_ITEM_CRAFTING_TIME_AND_COST_TABLE get() = EquipmentReferenceSupplementalData.MAGIC_ITEM_CRAFTING_TIME_AND_COST_TABLE
+val SENTIENT_ITEM_ALIGNMENT_TABLE get() = EquipmentReferenceSupplementalData.SENTIENT_ITEM_ALIGNMENT_TABLE
+val SENTIENT_ITEM_COMMUNICATION_TABLE get() = EquipmentReferenceSupplementalData.SENTIENT_ITEM_COMMUNICATION_TABLE
+val SENTIENT_ITEM_SENSES_TABLE get() = EquipmentReferenceSupplementalData.SENTIENT_ITEM_SENSES_TABLE
+val SENTIENT_ITEM_SPECIAL_PURPOSE_TABLE get() = EquipmentReferenceSupplementalData.SENTIENT_ITEM_SPECIAL_PURPOSE_TABLE
+val ALL_TABLES by lazy(LazyThreadSafetyMode.NONE) {
+listOf(
+COIN_VALUES_TABLE,
+WEAPONS_TABLE,
+ARMOR_TABLE,
+ARTISANS_TOOLS_TABLE,
+OTHER_TOOLS_TABLE,
+ADVENTURING_GEAR_TABLE,
+AMMUNITION_TABLE,
+ARCANE_FOCUSES_TABLE,
+DRUIDIC_FOCUSES_TABLE,
+HOLY_SYMBOLS_TABLE,
+MOUNTS_AND_OTHER_ANIMALS_TABLE,
+TACK_AND_DRAWN_VEHICLES_TABLE,
+AIRBORNE_AND_WATERBORNE_VEHICLES_TABLE,
+LIFESTYLES_TABLE,
+FOOD_DRINK_AND_LODGING_TABLE,
+HIRELINGS_TABLE,
+MAGIC_ITEM_CATEGORIES_TABLE,
+POTION_MISCIBILITY_TABLE,
+MAGIC_ITEM_RARITIES_AND_VALUES_TABLE,
+MAGIC_ITEM_TOOLS_TABLE,
+MAGIC_ITEM_CRAFTING_TIME_AND_COST_TABLE,
+SENTIENT_ITEM_ALIGNMENT_TABLE,
+SENTIENT_ITEM_COMMUNICATION_TABLE,
+SENTIENT_ITEM_SENSES_TABLE,
+SENTIENT_ITEM_SPECIAL_PURPOSE_TABLE
+)
+}
+}

@@ -1,0 +1,423 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">LoreweaverMS</string>
+    <string name="home_title">HOME</string>
+    <string name="recent_campaigns">Recent campaigns</string>
+    <string name="quick_actions">Quick actions</string>
+    <string name="start_new_session">Start New Session</string>
+    <string name="resume_encounter">RESUME ENCOUNTER</string>
+    <string name="browse_campaigns">BROWSE CAMPAIGNS</string>
+    <string name="home_footer">Resume or start a session</string>
+    <string name="home_game_rules">Game Rules</string>
+    <string name="home_brand_title">LOREWEAVER</string>
+    <string name="home_brand_subtitle">Fantasy encounter companion</string>
+    <string name="no_campaigns">No campaigns yet.</string>
+    <string name="search_characters_placeholder">Search characters…</string>
+    <string name="characters_title">Characters</string>
+    <string name="initiative_order_title">Initiative Order</string>
+    <string name="round_counter">Round %1$d</string>
+    <string name="next_turn">Next Turn</string>
+    <string name="sort_by_hp">Sort by HP</string>
+    <string name="sort_by_initiative">Sort by Initiative</string>
+    <string name="toggle_initiative">Toggle Initiative Order</string>
+    <string name="add_character">Add Character</string>
+    <string name="campaign_badge_label">CAMPAIGN</string>
+    <string name="all_parties">All Parties</string>
+    <string name="no_search_results">No results for \"%1$s\"</string>
+    <string name="empty_characters_message">The Loreweaver\'s halls are silent…</string>
+    <string name="active_badge">ACTIVE</string>
+    <string name="d20_roll">D20</string>
+    <string name="d20_roll_result">D20: %1$d</string>
+    <string name="dying_label">DYING</string>
+    <string name="dying_accessibility_label">Dying</string>
+    <string name="view_details">View details for %1$s</string>
+    <string name="current_turn">Current turn</string>
+    <string name="initiative_hp_summary">HP: %1$d/%2$d</string>
+    <string name="character_list_item_summary">%1$s • HP: %2$d/%3$d • AC: %4$d</string>
+    <string name="initiative_accessibility_desc">%1$s, Initiative %2$d, HP %3$d of %4$d%5$s</string>
+    <string name="character_accessibility_desc">%1$s, %2$s. HP %3$d of %4$d. AC %5$d%6$s</string>
+    <string name="decrease_hp_desc">Decrease HP for %1$s</string>
+    <string name="increase_hp_desc">Increase HP for %1$s</string>
+    <string name="back_button">Back</string>
+    <string name="search_button">Search</string>
+    <string name="edit_details">Edit details for %1$s</string>
+    <string name="delete_character_desc">Delete %1$s</string>
+    <string name="hp_minus_five">-5 HP</string>
+    <string name="hp_plus_five">+5 HP</string>
+    <string name="character_details_title">Character Details</string>
+    <string name="back_to_characters">Back to characters</string>
+    <string name="edit_character">Edit %1$s</string>
+    <string name="delete_character">Delete %1$s</string>
+    <string name="confirm_delete_character_title">Delete character?</string>
+    <string name="confirm_delete_character_message">%1$s will be permanently removed.</string>
+    <string name="character_not_found">Character not found.</string>
+    <string name="tab_combat">Combat</string>
+    <string name="tab_stats">Stats</string>
+    <string name="tab_journal">Journal</string>
+    <string name="roll_result_desc">Roll result: %1$s is %2$d</string>
+    <string name="clear_button">Clear</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="delete_button">Delete</string>
+    <string name="remove_button">Remove</string>
+    <string name="add_button">Add</string>
+    <string name="create_button">Create</string>
+    <string name="save_button">Save</string>
+    <string name="description_label">Description</string>
+    <string name="loading_label" tools:keep="@string/loading_label">Loading…</string>
+    <string name="ac_label">AC</string>
+    <string name="initiative_label">Initiative</string>
+    <string name="passive_perc_label">Passive Perc.</string>
+    <string name="speed_label">Speed</string>
+    <string name="insp_label">Insp.</string>
+    <string name="inspiration_desc">Inspiration</string>
+    <string name="hp_label">HP</string>
+    <string name="temp_hp_label">Temp HP</string>
+    <string name="death_saves_label">Death Saves</string>
+    <string name="successes_label">Successes: </string>
+    <string name="failures_label">Failures: </string>
+    <string name="survival_resting_label">Survival &amp; Resting</string>
+    <string name="hit_dice_label">Hit Dice (d%1$d): %2$d / %3$d</string>
+    <string name="roll_hd_button">Roll HD</string>
+    <string name="short_rest_button">Short Rest</string>
+    <string name="long_rest_button">Long Rest</string>
+    <string name="spell_slots_label">Spell Slots</string>
+    <string name="spell_slot_level">Level %1$d: %2$d / %3$d</string>
+    <string name="use_spell_slot">Use Level %1$d Slot</string>
+    <string name="recover_spell_slot">Recover Level %1$d Slot</string>
+    <string name="actions_attacks_label">Actions &amp; Attacks</string>
+    <string name="dmg_label">Dmg: %1$s</string>
+    <string name="atk_button">Atk: %1$s%2$d</string>
+    <string name="dmg_button">Dmg</string>
+    <string name="dice_tray_label">Dice Tray</string>
+    <string name="dice_button">D%1$d</string>
+    <string name="situational_bonus_label">Situational Bonus: </string>
+    <string name="attribute_check">%1$s Check</string>
+    <string name="skills_label">Skills</string>
+    <string name="inventory_label">Inventory</string>
+    <string name="empty_label">Empty</string>
+    <string name="none_label">None</string>
+    <string name="conditions_label">Conditions</string>
+    <string name="notes_label">Notes</string>
+    <string name="no_notes_label">No notes.</string>
+    <string name="decrease_stat_desc">Decrease %1$s</string>
+    <string name="increase_stat_desc">Increase %1$s</string>
+    <string name="hit_die_heal_label">Hit Die Heal</string>
+    <string name="action_attack_roll_label">%1$s (Atk)</string>
+    <string name="action_damage_roll_label">%1$s (Dmg)</string>
+    <string name="attack_log_type">Attack</string>
+    <string name="speed_feet_value">%1$dft</string>
+    <string name="stat_value_with_max">%1$s: %2$d / %3$d</string>
+    <string name="inventory_bullet">• %1$s</string>
+    <string name="character_builder_title" tools:keep="@string/character_builder_title">Character Builder</string>
+    <string name="create_character_title">Create Character</string>
+    <string name="edit_character_title">Edit Character</string>
+    <string name="back_to_list" tools:keep="@string/back_to_list">Back to list</string>
+    <string name="name_label">Name</string>
+    <string name="name_required_error">Name is required</string>
+    <string name="class_type_label">Class / Type</string>
+    <string name="max_hp_label">Max HP</string>
+    <string name="mana_label">Mana</string>
+    <string name="max_mana_label">Max Mana</string>
+    <string name="stamina_label">Stamina</string>
+    <string name="max_stamina_label">Max Stamina</string>
+    <string name="hp_required_error">Valid numeric HP is required</string>
+    <string name="adjust_label" tools:keep="@string/adjust_label">Adjust %1$s:</string>
+    <string name="party_group_label" tools:keep="@string/party_group_label">Party / Group</string>
+    <string name="attributes_title">Attributes</string>
+    <string name="level_label">Level</string>
+    <string name="save_prof_label" tools:keep="@string/save_prof_label">Save Prof.</string>
+    <string name="skill_prof_title">Skill Proficiencies</string>
+    <string name="resources_title" tools:keep="@string/resources_title">Resources (Spell Slots, Ki, etc.)</string>
+    <string name="remove_resource_desc">Remove Resource</string>
+    <string name="add_resource_button">Add Resource</string>
+    <string name="inventory_title" tools:keep="@string/inventory_title">Inventory (One item per line)</string>
+    <string name="hit_die_type_title" tools:keep="@string/hit_die_type_title">Hit Die Type (e.g., 8 for d8)</string>
+    <string name="hit_die_input_label">Hit Die (d?)</string>
+    <string name="custom_actions_title" tools:keep="@string/custom_actions_title">Custom Actions &amp; Attacks</string>
+    <string name="action_name_label">Action Name</string>
+    <string name="remove_action_desc">Remove</string>
+    <string name="atk_bonus_label">Atk Bonus</string>
+    <string name="dmg_dice_label" tools:keep="@string/dmg_dice_label">Damage (e.g. 1d8+3)</string>
+    <string name="add_action_button">Add Action</string>
+    <string name="standard_conditions_title" tools:keep="@string/standard_conditions_title">Standard Conditions</string>
+    <string name="status_label">Status</string>
+    <string name="save_character_button">Save Character</string>
+    <string name="mana_stat_label" tools:keep="@string/mana_stat_label">Mana</string>
+    <string name="stamina_stat_label" tools:keep="@string/stamina_stat_label">Stamina</string>
+    <string name="character_form_quick_build">Quick Build</string>
+    <string name="character_form_random_name">Random Name</string>
+    <string name="challenge_rating_input_label">Challenge Rating (CR)</string>
+    <string name="challenge_rating_supporting_text">e.g., 0.125, 0.25, 0.5, 1, 2, 3…</string>
+    <string name="class_info_hit_die_summary">%1$s — d%2$d hit die</string>
+    <string name="class_info_recommended_stats">Recommended: %1$s</string>
+    <string name="class_info_spellcaster_summary">Spellcaster ✦ slots scale with level</string>
+    <string name="randomize_button">Randomize</string>
+    <string name="save_chip_label">Save</string>
+    <string name="hit_points_section_title">Hit Points</string>
+    <string name="mana_spell_energy_title">Mana / Spell Energy</string>
+    <string name="auto_calc_hp_button">⟳ Auto-calc from Class + CON (d%1$s)</string>
+    <string name="auto_calc_mana_button">⟳ Auto-calc from Class + Level</string>
+    <string name="auto_calc_stamina_button">⟳ Set Stamina to CON (%1$s)</string>
+    <string name="initiative_short_label">Init</string>
+    <string name="party_label">Party</string>
+    <string name="resources_section_title">Resources</string>
+    <string name="max_label">Max</string>
+    <string name="inventory_section_title">Inventory</string>
+    <string name="inventory_placeholder_one_per_line">One item per line…</string>
+    <string name="hit_die_section_title">Hit Die</string>
+    <string name="custom_actions_section_title">Custom Actions</string>
+    <string name="damage_label_short">Damage</string>
+
+    <!-- Classes/Types -->
+    <string name="class_rogue" tools:keep="@string/class_rogue">Rogue</string>
+    <string name="class_paladin" tools:keep="@string/class_paladin">Paladin</string>
+    <string name="class_ranger" tools:keep="@string/class_ranger">Ranger</string>
+
+    <!-- Default Values -->
+    <string name="default_party" tools:keep="@string/default_party">Adventurers</string>
+    <string name="new_resource_name">New Resource</string>
+    <string name="new_action_name">New Action</string>
+
+    <!-- Attributes -->
+    <string name="attr_str" tools:keep="@string/attr_str">STR</string>
+    <string name="attr_dex" tools:keep="@string/attr_dex">DEX</string>
+    <string name="attr_con" tools:keep="@string/attr_con">CON</string>
+    <string name="attr_int" tools:keep="@string/attr_int">INT</string>
+    <string name="attr_wis" tools:keep="@string/attr_wis">WIS</string>
+    <string name="attr_cha" tools:keep="@string/attr_cha">CHA</string>
+
+    <!-- Skills -->
+    <string name="skill_acrobatics" tools:keep="@string/skill_acrobatics">Acrobatics</string>
+    <string name="skill_animal_handling" tools:keep="@string/skill_animal_handling">Animal Handling</string>
+    <string name="skill_arcana" tools:keep="@string/skill_arcana">Arcana</string>
+    <string name="skill_athletics" tools:keep="@string/skill_athletics">Athletics</string>
+    <string name="skill_deception" tools:keep="@string/skill_deception">Deception</string>
+    <string name="skill_history" tools:keep="@string/skill_history">History</string>
+    <string name="skill_insight" tools:keep="@string/skill_insight">Insight</string>
+    <string name="skill_intimidation" tools:keep="@string/skill_intimidation">Intimidation</string>
+    <string name="skill_investigation" tools:keep="@string/skill_investigation">Investigation</string>
+    <string name="skill_medicine" tools:keep="@string/skill_medicine">Medicine</string>
+    <string name="skill_nature" tools:keep="@string/skill_nature">Nature</string>
+    <string name="skill_perception" tools:keep="@string/skill_perception">Perception</string>
+    <string name="skill_performance" tools:keep="@string/skill_performance">Performance</string>
+    <string name="skill_persuasion" tools:keep="@string/skill_persuasion">Persuasion</string>
+    <string name="skill_religion" tools:keep="@string/skill_religion">Religion</string>
+    <string name="skill_sleight_of_hand" tools:keep="@string/skill_sleight_of_hand">Sleight of Hand</string>
+    <string name="skill_stealth" tools:keep="@string/skill_stealth">Stealth</string>
+    <string name="skill_survival" tools:keep="@string/skill_survival">Survival</string>
+
+    <!-- Conditions -->
+    <string name="cond_blinded" tools:keep="@string/cond_blinded">Blinded</string>
+    <string name="cond_charmed" tools:keep="@string/cond_charmed">Charmed</string>
+    <string name="cond_deafened" tools:keep="@string/cond_deafened">Deafened</string>
+    <string name="cond_frightened" tools:keep="@string/cond_frightened">Frightened</string>
+    <string name="cond_grappled" tools:keep="@string/cond_grappled">Grappled</string>
+    <string name="cond_incapacitated" tools:keep="@string/cond_incapacitated">Incapacitated</string>
+    <string name="cond_invisible" tools:keep="@string/cond_invisible">Invisible</string>
+    <string name="cond_paralyzed" tools:keep="@string/cond_paralyzed">Paralyzed</string>
+    <string name="cond_petrified" tools:keep="@string/cond_petrified">Petrified</string>
+    <string name="cond_poisoned" tools:keep="@string/cond_poisoned">Poisoned</string>
+    <string name="cond_prone" tools:keep="@string/cond_prone">Prone</string>
+    <string name="cond_restrained" tools:keep="@string/cond_restrained">Restrained</string>
+    <string name="cond_stunned" tools:keep="@string/cond_stunned">Stunned</string>
+    <string name="cond_unconscious" tools:keep="@string/cond_unconscious">Unconscious</string>
+
+    <!-- Prompt Library -->
+    <string name="prompt_library_title">Prompt Library</string>
+    <string name="prompt_whispering_woods_title">The Whispering Woods</string>
+    <string name="prompt_whispering_woods_desc">The air here is thick with a preternatural fog that tastes of old iron and forgotten memories. Every snap of a twig sounds like a dying breath.</string>
+    <string name="prompt_tavern_rumor_title">Tavern Rumor</string>
+    <string name="prompt_tavern_rumor_desc">A mysterious traveler mentioned a crypt where the gold pieces scream if you pick them up.</string>
+    <string name="prompt_crit_desc_title">Critical Hit Description</string>
+    <string name="prompt_crit_desc_desc">The blade finds its mark with a sickening crunch, cleaving through plate and bone alike as a spray of crimson paints the floor.</string>
+    <string name="prompt_cat_environment">Environment</string>
+    <string name="prompt_cat_plot_hook">Plot Hook</string>
+    <string name="prompt_cat_combat">Combat</string>
+    <string name="prompt_copy_to_journal">Copy to Scribe\'s Journal</string>
+    <string name="prompt_copied_to_clipboard">Copied to clipboard!</string>
+    <string name="prompt_image_content_description">Illustration for %1$s</string>
+
+    <!-- Navigation -->
+    <string name="bottom_nav_home">Home</string>
+    <string name="bottom_nav_campaigns">Campaigns</string>
+    <string name="bottom_nav_characters">Characters</string>
+    <string name="bottom_nav_rules">Rules</string>
+
+    <!-- Encounter Difficulty -->
+    <string name="encounter_difficulty_label">Encounter Difficulty:</string>
+    <string name="difficulty_trivial" tools:keep="@string/difficulty_trivial">Trivial</string>
+    <string name="difficulty_easy" tools:keep="@string/difficulty_easy">Easy</string>
+    <string name="difficulty_medium" tools:keep="@string/difficulty_medium">Medium</string>
+    <string name="difficulty_hard" tools:keep="@string/difficulty_hard">Hard</string>
+    <string name="difficulty_deadly" tools:keep="@string/difficulty_deadly">Deadly</string>
+    <string name="difficulty_beyond_deadly" tools:keep="@string/difficulty_beyond_deadly">Beyond Deadly</string>
+    <string name="party_level_label">Party Level: %1$d</string>
+    <string name="party_size_label">Party Size: %1$d</string>
+    <string name="monsters_count_label">Monsters: %1$d</string>
+    <string name="adjusted_xp_label">Adjusted XP: %1$d</string>
+    <string name="challenge_rating_label" tools:keep="@string/challenge_rating_label">CR</string>
+
+    <!-- Adventure Log -->
+    <string name="adventure_log_title">Adventure Log</string>
+    <string name="clear_log_desc">Clear adventure log</string>
+    <string name="clear_log_confirm_title">Clear adventure log?</string>
+    <string name="clear_log_confirm_message">This will remove all saved log entries.</string>
+    <string name="adventure_log_empty_message">The chronicles are empty…</string>
+
+    <!-- Campaigns -->
+    <string name="campaigns_title">Campaigns</string>
+    <string name="create_campaign_desc">Create new campaign</string>
+    <string name="new_campaign_button">New Campaign</string>
+    <string name="campaigns_empty_message">No campaigns found.
+Create one to begin your journey!</string>
+    <string name="campaign_map_desc">Campaign map</string>
+    <string name="view_campaign_details_desc">View campaign details</string>
+    <string name="create_campaign_title">Create Campaign</string>
+    <string name="campaign_name_label">Campaign Name</string>
+    <string name="campaign_loading_title">Loading…</string>
+    <string name="campaign_not_found_message">Campaign not found.</string>
+    <string name="campaign_tab_lore_notes">Lore &amp; Notes</string>
+    <string name="campaign_tab_sessions">Sessions</string>
+    <string name="campaign_tab_encounters">Encounters</string>
+    <string name="notes_list_header">Notes list</string>
+    <string name="notes_quick_actions_title">Quick Actions</string>
+    <string name="new_note_button">New Note</string>
+    <string name="campaign_notes_empty_message">No notes for this campaign.</string>
+    <string name="edit_note_desc">Edit note</string>
+    <string name="delete_note_desc">Delete note</string>
+    <string name="note_label_general">GENERAL</string>
+    <string name="note_label_lore">LORE</string>
+    <string name="note_label_npc">NPC</string>
+    <string name="note_label_location">LOCATION</string>
+    <string name="note_era_detail">Era: %1$s</string>
+    <string name="note_npc_detail">%1$s (%2$s)</string>
+    <string name="note_region_detail">Region: %1$s</string>
+    <string name="edit_note_title">Edit Note</string>
+    <string name="add_note_title">Add Note</string>
+    <string name="note_content_label">Content</string>
+    <string name="note_faction_label">Faction</string>
+    <string name="note_attitude_label">Attitude</string>
+    <string name="note_type_general">General</string>
+    <string name="note_type_lore">Lore</string>
+    <string name="note_type_npc">NPC</string>
+    <string name="note_type_location">Location</string>
+    <string name="note_extra_historical_era_label">Historical Era</string>
+    <string name="note_extra_region_label">Region</string>
+    <string name="sessions_empty_message">No sessions recorded yet.</string>
+    <string name="session_entries_count">%1$d entries</string>
+    <string name="encounters_section_title">Encounters</string>
+    <string name="add_encounter_button">Add Encounter</string>
+    <string name="encounters_empty_message">No encounters yet. Tap "Add Encounter" to create one.</string>
+    <string name="encounter_open_badge">Open</string>
+    <string name="new_encounter_title">New Encounter</string>
+    <string name="encounter_name_label">Encounter Name</string>
+    <string name="monster_import_removed_message">Monster library import has been removed from this build.</string>
+    <string name="create_without_monsters_button">Create Without Monsters</string>
+    <string name="confirm_delete_note_title">Delete note?</string>
+    <string name="confirm_delete_note_message">This note will be permanently removed from the campaign.</string>
+
+    <!-- Session History -->
+    <string name="session_history_title">Session History</string>
+    <string name="search_sessions_label">Search sessions</string>
+    <string name="search_sessions_placeholder">Search sessions…</string>
+    <string name="session_history_empty_message">No sessions found.</string>
+    <string name="session_combat_log_title">Combat Log</string>
+    <string name="session_end_state_title">End State</string>
+    <string name="session_final_round">Final Round: %1$d</string>
+    <string name="session_combatant_hp_summary">%1$s: %2$d/%3$d HP</string>
+    <string name="session_expand_action">Expand session details for %1$s</string>
+    <string name="session_collapse_action">Collapse session details for %1$s</string>
+    <string name="accessibility_state_expanded">Expanded</string>
+    <string name="accessibility_state_collapsed">Collapsed</string>
+
+    <!-- Combat Tracker -->
+    <string name="combat_tracker_live_title">Live Encounter</string>
+    <string name="combat_tracker_setup_title">Encounter Setup</string>
+    <string name="retry_action">Retry</string>
+    <string name="combat_setup_badge_label">SETUP</string>
+    <string name="combat_tracker_badge_label">TRACKER</string>
+    <string name="start_encounter_button">Start Encounter</string>
+    <string name="add_party_button">Add Party</string>
+    <string name="add_party_button_with_count">Add Party (%1$d)</string>
+    <string name="add_enemy_button">Add Enemy</string>
+    <string name="encounter_roster_title">Encounter Roster (%1$d)</string>
+    <string name="encounter_roster_empty_message">No combatants added yet.
+Add your party or individual enemies above.</string>
+    <string name="combatant_setup_summary">HP: %1$d  Init: %2$d</string>
+    <string name="remove_combatant_desc">Remove %1$s from encounter</string>
+    <string name="remove_combatant_confirm_title">Remove combatant?</string>
+    <string name="remove_combatant_confirm_message">Remove %1$s from the encounter roster?</string>
+    <string name="encounter_notes_title">Encounter notes</string>
+    <string name="add_enemy_dialog_title">Add Enemy</string>
+    <string name="end_turn_button">End Turn</string>
+    <string name="end_encounter_button">End Encounter</string>
+    <string name="damage_combatant_desc">Deal 1 damage to %1$s</string>
+    <string name="heal_combatant_desc">Heal %1$s by 1</string>
+    <string name="add_condition_desc">Add condition</string>
+    <string name="remove_condition_desc">Remove condition</string>
+    <string name="combatant_initiative_summary">Init: %1$d</string>
+    <string name="combat_log_bullet">• %1$s</string>
+
+    <!-- Reference Screen -->
+    <string name="reference_screen_title">Fifth-Edition Reference</string>
+    <string name="reference_tab_traps" tools:keep="@string/reference_tab_traps">Traps</string>
+    <string name="reference_tab_poisons" tools:keep="@string/reference_tab_poisons">Poisons</string>
+    <string name="reference_tab_diseases" tools:keep="@string/reference_tab_diseases">Diseases</string>
+    <string name="reference_tab_spellcasting">Spellcasting</string>
+    <string name="reference_tab_objects" tools:keep="@string/reference_tab_objects">Objects</string>
+    <string name="reference_tab_madness">Madness</string>
+    <string name="reference_search_hint">Search…</string>
+    <string name="reference_back_to_list">Back to list</string>
+    <string name="reference_roll_d100">Roll d100</string>
+    <string name="reference_no_results">No results found</string>
+    <string name="reference_search_updating">Updating search results…</string>
+    <string name="reference_search_results_count">%1$d results for “%2$s”</string>
+    <string name="reference_search_results_ready">Showing filtered results for “%1$s”</string>
+    <string name="reference_no_favorite_traps">No favorite traps yet. Star a trap to keep it handy.</string>
+    <string name="reference_no_favorite_poisons">No favorite poisons yet. Star a poison to keep it handy.</string>
+    <string name="reference_no_favorite_diseases">No favorite diseases yet. Star a disease to keep it handy.</string>
+    <string name="reference_no_favorite_search_results">No favorite entries match this search.</string>
+    <string name="reference_save_dc">Save DC</string>
+    <string name="reference_favorites_only">Favorites only</string>
+    <string name="reference_favorites_only_with_count">Favorites only (%1$d)</string>
+    <string name="reference_toggle_favorite">Toggle favorite</string>
+    <string name="reference_copy_to_clipboard">Copy to clipboard</string>
+    <string name="reference_share">Share</string>
+    <string name="reference_share_chooser_title">Share reference</string>
+    <string name="reference_monster_unavailable">Monster reference content has been removed from this build pending provenance review.</string>
+    <string name="reference_monster_search_unavailable">Monster search is unavailable in this build because the bundled monster corpus has been removed pending provenance review.</string>
+    <string name="reference_class_unavailable_title">Class reference unavailable</string>
+    <string name="reference_class_unavailable_body">Bundled class reference content has been removed from this build pending provenance review.</string>
+    <string name="spellcasting_formula_title">Core Spellcasting Formulas</string>
+    <string name="spellcasting_formula_save_dc">Spell Save DC (sample)</string>
+    <string name="spellcasting_formula_attack_bonus">Spell Attack Bonus (sample)</string>
+    <string name="spellcasting_calculator_title">Spell Save / Attack Calculator</string>
+    <string name="spellcasting_slot_calculator_title">Spell Slot Calculator</string>
+    <string name="spellcasting_profile_title">%1$s Spellcasting Profile</string>
+    <string name="spellcasting_ability_modifier_label">Ability Mod</string>
+    <string name="spellcasting_proficiency_bonus_label">Prof. Bonus</string>
+    <string name="spellcasting_misc_bonus_label">Misc. Bonus</string>
+    <string name="spellcasting_caster_level_label">Caster Level</string>
+    <string name="spellcasting_selected_level_summary" tools:keep="@string/spellcasting_selected_level_summary">Using level %1$d full-caster progression</string>
+    <string name="spellcasting_selected_progression_summary">Using %1$s progression at level %2$d</string>
+    <string name="spellcasting_rules_section_title">Core Rules</string>
+    <string name="spellcasting_concentration_section_title">Concentration Breakers</string>
+    <string name="spellcasting_schools_section_title">Schools of Magic</string>
+    <string name="spellcasting_components_section_title">Spell Components</string>
+    <string name="spellcasting_casting_times_section_title">Casting Times</string>
+    <string name="spellcasting_areas_section_title">Areas of Effect</string>
+    <string name="spellcasting_spell_lists_section_title" tools:keep="@string/spellcasting_spell_lists_section_title">Class Spell Lists</string>
+    <string name="spellcasting_spell_list_summary_title" tools:keep="@string/spellcasting_spell_list_summary_title">%1$s Spell List</string>
+    <string name="spellcasting_spell_list_summary_body" tools:keep="@string/spellcasting_spell_list_summary_body">Showing %1$d spells from the selected class list.</string>
+    <string name="spellcasting_spell_list_unavailable_title" tools:keep="@string/spellcasting_spell_list_unavailable_title">Class Spell List Unavailable</string>
+    <string name="spellcasting_spell_count" tools:keep="@string/spellcasting_spell_count">%1$d spells</string>
+    <string name="spellcasting_slots_section_title">Spell Slot Progression</string>
+    <string name="spellcasting_tips_section_title">Quick Tips</string>
+    <string name="spellcasting_weave_section_title">Magic Theory</string>
+    <string name="spellcasting_weave_card_title">Setting-Neutral Primer</string>
+    <string name="spellcasting_level_row">Level %1$d</string>
+    <string name="spellcasting_cantrips_row">Cantrips %1$d</string>
+    <string name="madness_roll_result_title">Roll Result: %1$d</string>
+    <string name="reference_rolling_d100">Rolling…</string>
+    <string name="madness_rolling_preview_title">Rolling: %1$d</string>
+    <string name="madness_rolling_preview_body">The result is still tumbling through the table…</string>
+</resources>

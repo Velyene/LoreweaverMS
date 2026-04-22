@@ -1,0 +1,208 @@
+# AGENTS.md – LoreweaverMS (EncounterTimer)
+
+Android TTRPG combat-tracker app built with Kotlin, Jetpack Compose, Hilt, Room, and a
+local-first MVVM + Clean Architecture structure.
+
+## Architecture Layers
+
+```text
+ui/      -> Compose screens plus @HiltViewModel classes with StateFlow-backed UiState
+domain/  -> Repository interfaces, domain models, use cases, and shared utilities
+data/    -> Room entities, DAOs, mappers, converters, and repository implementations
+di/      -> Single Hilt module: AppModule.kt (SingletonComponent)
+```
+
+### Repository duality
+
+Two `CampaignRepository` files exist at different paths:
+
+- `domain/repository/CampaignRepository.kt` is the interface injected into view models and use
+  cases.
+- `data/repository/CampaignRepositoryImpl.kt` is the Room-backed implementation wired in
+  `di/AppModule.kt`.
+
+> The legacy plain-class `data/repository/CampaignRepository.kt` should not be recreated.
+
+## Navigation
+
+All routes are declared near the top of `MainActivity.kt` as `@Serializable` objects or data
+classes.
+
+Examples:
+
+```kotlin
+@Serializable object HomeRoute
+@Serializable object AdventureLogRoute
+@Serializable data class CampaignDetailRoute(val id: String)
+@Serializable data class ReferenceRoute(
+    val category: ReferenceCategory? = null,
+    val query: String = "",
+    val detailCategory: String? = null,
+    val detailSlug: String? = null,
+)
+```
+
+Navigation is type-safe via calls such as
+`navController.navigate(CampaignDetailRoute(id))` and
+`backStackEntry.toRoute<CampaignDetailRoute>()`.
+
+Key route notes:
+
+- Bottom-bar destinations are Home, Campaigns, Characters, and Rules.
+- `AdventureLogRoute` is a secondary destination launched from `SessionSummaryScreen`.
+- `PromptLibraryRoute` exists, but it is not a bottom-bar destination.
+- `ReferenceRoute` supports initial category selection, free-text search, and deep linking into a
+  specific detail section/slug within `ReferenceScreen`.
+
+## Data Layer Conventions
+
+- **Room DB**: `AppDatabase` uses version **8**, database name `loreweaver_database`, and
+  `exportSchema = false`.
+- **Migrations**: `MIGRATION_4_5`, `MIGRATION_5_6`, `MIGRATION_6_7`, and `MIGRATION_7_8` are all
+  registered in `Room.databaseBuilder()`.
+- **JSON columns**: Complex character fields such as `resources`, `actions`, `proficiencies`,
+  `inventory`, and `spellSlotsJson` are stored as raw JSON strings and mapped with Gson in
+  `data/mapper/DataMappers.kt`.
+- **Type converters**: `data/Converters.kt` handles `List<String>` and `Set<String>` values via
+  Gson.
+- **Note subtype**: `Note` is a sealed class persisted with a `subtype` discriminator such as
+  `General`, `Lore`, `NPC`, or `Location`.
+- **Derived PC flag**: `isPlayerCharacter` is derived from `party == "Adventurers"` when mapping a
+  `CharacterEntry` to its entity.
+- **Spell slots**: Domain `spellSlots` uses `Map<Int, Pair<Int, Int>>`; the mapper serializes it as
+  `Map<Int, List<Int>>` for Gson round-tripping.
+- **Challenge rating**: `challengeRating: Double` was added to `CharacterEntity` in
+  `MIGRATION_7_8`.
+- **Reference favorites**: The rules reference stores trap, poison, and disease favorites in
+  `SharedPreferences` through `ReferencePreferencesRepositoryImpl`.
+- **Log capping**: `CampaignRepositoryImpl.insertLog()` keeps only the most recent 100
+  `LogEntry` rows.
+
+## Error Handling Pattern
+
+Use `Resource<T>` from `domain/util/Resource.kt` for suspend operations that can fail:
+
+```kotlin
+sealed class Resource<out T> {
+    data class Success<out T>(val data: T) : Resource<T>()
+    data class Error(val message: String, ...) : Resource<Nothing>()
+    object Loading : Resource<Nothing>()
+}
+```
+
+View-model UI state commonly carries `error: String?` and optional retry callbacks so screens can
+surface recoverable failures cleanly.
+
+## External Integration
+
+The current runtime app source under `app/src/main` is local-first.
+
+- Data persistence is handled by Room and `SharedPreferences`.
+- No Retrofit, OkHttp service layer, or runtime `ApiService` implementation is currently present in
+  `app/src/main`.
+- `scripts/Test-DndApi.ps1` is a developer utility script for manually verifying external D&D API
+  endpoints; it is not part of the shipped Android app.
+
+## Theme
+
+- `MainActivity` calls `EncounterTimerTheme(darkTheme = true)` so the app stays in dark mode.
+- Dynamic color is disabled by default to preserve the custom fantasy palette defined in
+  `ui/theme/Color.kt`.
+
+## D&D 5e Encounter Difficulty
+
+The app includes a full encounter-balancing implementation based on the DMG rules.
+
+- Monsters store CR as `Double`, including fractional CRs such as `0.125`, `0.25`, and `0.5`.
+- `CombatViewModel.updateEncounterDifficulty()` recalculates difficulty whenever combatants change.
+- Ratings include Trivial, Easy, Medium, Hard, Deadly, and Beyond Deadly.
+- Encounter multipliers are applied from monster count and party size.
+- The setup section of `CombatTrackerScreen` shows a color-coded difficulty card with adjusted XP.
+- `CharacterFormScreen` exposes CR input for non-Adventurer characters.
+
+## D&D 5e Rules Reference UI
+
+`ReferenceScreen` and `ReferenceViewModel` provide a local rules/reference experience with these
+major areas:
+
+- Traps
+- Poisons
+- Diseases
+- Spellcasting
+- Objects
+- Madness
+- Monsters placeholder state
+- Core rules
+- Character creation
+
+Reference behavior notes:
+
+- Trap, poison, and disease sections support favorites, copy, share, and favorites-only filtering.
+- Search is live for the searchable sections and debounced in `ReferenceViewModel`.
+- Spellcasting content includes slot tables, formulas, and caster progression helpers from
+  `domain/util/SpellcastingReference.kt`.
+- The madness section includes a d100 roller backed by `ReferenceViewModel.rollMadness()`.
+
+## Build & Run Commands
+
+```bash
+# Debug build
+./gradlew assembleDebug
+
+# Install on connected device/emulator
+./gradlew installDebug
+
+# JVM unit tests
+./gradlew :app:testDebugUnitTest
+
+# Instrumented tests (requires device/emulator)
+./gradlew connectedAndroidTest
+```
+
+Key versions from `gradle/libs.versions.toml`:
+
+- AGP `9.1.1`
+- Kotlin `2.3.20`
+- Room `2.8.4`
+- KSP `2.3.6`
+- Hilt `2.59.2`
+- Compose BOM `2026.03.01`
+- Lifecycle `2.10.0`
+- Navigation `2.9.7`
+- Activity Compose `1.13.0`
+
+## Known Build Quirks
+
+- AGP 9.x bundles built-in Kotlin Android support, so the old `org.jetbrains.kotlin.android`
+  plugin is intentionally absent.
+- The Kotlin serialization plugin must remain enabled because the nav routes use
+  `@Serializable` types.
+- Room 2.8.x DAO methods return `Long` and `Int`; `CampaignRepositoryImpl` uses block bodies so
+  those return values do not leak through `Unit`-typed repository methods.
+- All four migrations are wired into `Room.databaseBuilder()`.
+- Some IDE `ComposableFunction0/1/2` errors around Compose lambdas in `MainActivity.kt` may be
+  IntelliJ analysis false positives even when Gradle builds successfully.
+- `CampaignDetailScreen.kt` keeps targeted `@Suppress("UNUSED_VALUE")` markers on mutable state
+  assignments inside Compose dismissal callbacks to silence false positives.
+
+## Key Files Reference
+
+- `MainActivity.kt` — route declarations, `LoreweaverApp`, `NavHost`, and bottom-bar setup.
+- `di/AppModule.kt` — Hilt providers for Room, DAOs, repositories, and shared preferences.
+- `data/AppDatabase.kt` — Room database definition, entity list, and migrations.
+- `data/mapper/DataMappers.kt` — domain/entity mapping extensions and Gson conversions.
+- `domain/model/Models.kt` — core campaign, encounter, combat, note, and session models.
+- `domain/util/Resource.kt` — shared success/error/loading wrapper.
+- `domain/util/EncounterDifficulty.kt` — 5e encounter difficulty tables and math.
+- `domain/util/TrapReference.kt` — local trap reference dataset.
+- `domain/util/PoisonReference.kt` — local poison reference dataset.
+- `domain/util/DiseaseReference.kt` — local disease reference dataset.
+- `domain/util/SpellcastingReference.kt` — spellcasting rules, slot tables, and formulas.
+- `domain/util/ObjectStats.kt` — object AC, HP, and threshold tables.
+- `domain/util/MadnessReference.kt` — short-, long-, and indefinite-madness tables.
+- `ui/viewmodels/CombatViewModel.kt` — combat tracker state and difficulty updates.
+- `ui/viewmodels/ReferenceViewModel.kt` — rules-reference state, favorites, search, and madness.
+- `ui/screens/CampaignDetailScreen.kt` — campaign detail UI and note-entry workflow.
+- `ui/screens/CombatTrackerScreen.kt` — combat setup and active combat views.
+- `ui/screens/ReferenceScreen.kt` — rules reference UI, copy/share helpers, and detail screens.
+- `ui/screens/PromptLibraryScreen.kt` — narrative prompt cards with clipboard copy support.

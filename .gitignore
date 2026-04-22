@@ -1,0 +1,71 @@
+# ============================================================
+# Android / Gradle
+# ============================================================
+*.iml
+*.ap_
+.gradle/
+local.properties
+/build/
+/captures/
+.externalNativeBuild/
+**/build/
+.cxx/
+
+# ============================================================
+# IntelliJ / Android Studio
+# ============================================================
+/.idea/caches/
+/.idea/libraries/
+/.idea/modules.xml
+/.idea/modules/
+/.idea/*.iml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/.idea/.gitignore
+/.idea/deploymentTargetSelector.xml
+/.idea/migrations.xml
+/.idea/vcs.xml
+# Personal / machine-specific IDE state (do not share)
+/.idea/appInsightsSettings.xml
+/.idea/deviceManager.xml
+/.idea/emulatorDisplays.xml
+/.idea/markdown.xml
+/.idea/errors/
+/.idea/sessions/
+# Keep: .idea/gradle.xml, .idea/compiler.xml, .idea/misc.xml,
+#        .idea/runConfigurations.xml, .idea/inspectionProfiles/,
+#        .idea/codeStyles/, .idea/dictionaries/, .idea/.name,
+#        .idea/AndroidProjectSystem.xml, .idea/jsonCatalog.xml
+
+# ============================================================
+# Kotlin / KSP / Hilt generated sources
+# ============================================================
+.kotlin/
+# Build outputs are already covered above via /build/ and **/build/
+
+# ============================================================
+# OS artefacts
+# ============================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# Keystore / signing (never commit secrets)
+# ============================================================
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+
+# ============================================================
+# Misc build artefacts & logs
+# ============================================================
+*.hprof
+build_log.txt
+build_output.txt
+long_kotlin_lines.txt
+*.log
+/out/
+EXCLUDED_REFERENCE_CORPUS_AUDIT.md

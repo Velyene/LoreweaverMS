@@ -1,0 +1,7 @@
+# ============================================================
+# App module build outputs
+# ============================================================
+# /build/ covers all generated subdirectories:
+# generated/, kspCaches/, tmp/, kotlin/, intermediates/,
+# outputs/, reports/, test-results/
+/build/

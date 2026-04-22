@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.EncounterTimer" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Match the Compose dark background so the initial window draw isn't white -->
+        <item name="android:windowBackground">#FF120E16</item>
+        <item name="android:colorBackground">#FF120E16</item>
+        <!-- Ensure edge-to-edge draws correctly -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

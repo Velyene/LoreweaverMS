@@ -1,0 +1,27 @@
+LoreweaverMS Notice
+===================
+
+This repository includes material from the System Reference Document 5.2.1 ("SRD 5.2.1").
+
+This work includes material from the System Reference Document 5.2.1 ("SRD 5.2.1") by
+Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2.1 is
+licensed under the Creative Commons Attribution 4.0 International License, available at
+https://creativecommons.org/licenses/by/4.0/legalcode.
+
+Scope of this notice
+--------------------
+
+- This notice applies only to repository content that intentionally incorporates, reproduces, or
+  is derived from SRD 5.2.1 material.
+- This notice does not, by itself, place the entire repository under CC BY 4.0.
+- Original application code, UI, branding, non-SRD writing, third-party dependencies, and any
+  material still pending audit or rewrite are not relicensed by this notice unless a separate file
+  expressly says so.
+- The project's canonical SRD attribution statement remains in `SRD_NOTICE.md`.
+
+Local reference copy
+--------------------
+
+For convenience, a local reference copy of the Creative Commons Attribution 4.0 International
+license text is included at `licenses/CC-BY-4.0.txt`.
+
