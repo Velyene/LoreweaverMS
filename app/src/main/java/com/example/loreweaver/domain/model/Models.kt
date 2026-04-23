@@ -35,7 +35,7 @@ data class Encounter(
 	val activeTrackers: List<TrackerEntity> = emptyList()
 )
 
-enum class EncounterStatus { PENDING, ACTIVE }
+enum class EncounterStatus { PENDING, ACTIVE, COMPLETED }
 
 /**
  * Represents the state of a specific mechanic (HP, Spell Slots, etc.)
@@ -128,6 +128,8 @@ data class Condition(
 
 enum class DurationType {
 	ROUNDS,        // "3 rounds remaining"
+	UNTIL_TURN,    // "until end of this turn"
+	UNTIL_SAVE,    // "until successful save"
 	ENCOUNTER      // "until end of encounter"
 }
 
@@ -149,3 +151,11 @@ data class CharacterAction(
 	val notes: String = ""
 )
 
+/**
+ * A template for an encounter that can be reused.
+ */
+data class SavedEncounter(
+	val id: String = UUID.randomUUID().toString(),
+	val name: String,
+	val participants: List<CombatantState> = emptyList()
+)

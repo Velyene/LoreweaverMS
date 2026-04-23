@@ -2,10 +2,10 @@
  * FILE: ReferenceScreenCoreRules.kt
  *
  * TABLE OF CONTENTS:
- * 1. Core Rules content entry point and derived state
+ * 1. Core rules content entry point and derived state
  * 2. Glossary and table filtering helpers
  * 3. Lazy-list renderers for rules, glossary, and quick tables
- * 4. Core Rules glossary and subtab UI components
+ * 4. Core rules glossary and subtab UI components
  * 5. Search helpers
  */
 
@@ -34,17 +34,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.loreweaver.R
 import com.example.loreweaver.domain.util.CoreGlossaryEntry
 import com.example.loreweaver.domain.util.CoreRuleSection
 import com.example.loreweaver.domain.util.CoreRulesReference
 import com.example.loreweaver.domain.util.ReferenceTable
-
-private const val CORE_RULES_SEARCH_LABEL = "Core Rules"
 
 @Composable
 @Suppress("kotlin:S3776")
@@ -125,7 +121,7 @@ private fun rememberCoreRulesContentState(
 	}
 	val showIntroduction = matchesQuery(
 		normalizedQuery,
-		CORE_RULES_SEARCH_LABEL,
+		CORE_RULES_LABEL,
 		"System Loop",
 		CoreRulesReference.INTRODUCTION
 	) && effectiveSubtab.showsIntroduction()
@@ -193,8 +189,8 @@ private fun LazyListScope.renderCoreRulesItems(state: CoreRulesContentState) {
 private fun LazyListScope.renderCoreRulesIntroduction(state: CoreRulesContentState) {
 	if (!state.showIntroduction) return
 	item {
-		ReferenceSectionHeader(stringResource(R.string.reference_tab_core_rules))
-		InfoCard(title = stringResource(R.string.reference_core_rules_system_loop_title), body = CoreRulesReference.INTRODUCTION)
+		ReferenceSectionHeader(CORE_RULES_LABEL)
+		InfoCard(title = "System Loop", body = CoreRulesReference.INTRODUCTION)
 	}
 }
 
@@ -202,11 +198,7 @@ private fun LazyListScope.renderCoreRulesSections(state: CoreRulesContentState) 
 	if (state.visibleSections.isEmpty()) return
 	item {
 		ReferenceSectionHeader(
-			if (state.effectiveSubtab == CoreRulesSubtab.COMBAT) {
-				stringResource(R.string.reference_core_rules_combat_topics)
-			} else {
-				stringResource(R.string.reference_core_rules_rules_topics)
-			}
+			if (state.effectiveSubtab == CoreRulesSubtab.COMBAT) "Combat Topics" else "Rules Topics"
 		)
 	}
 	items(state.visibleSections, key = { it.title }) { section ->
@@ -216,7 +208,7 @@ private fun LazyListScope.renderCoreRulesSections(state: CoreRulesContentState) 
 
 private fun LazyListScope.renderCoreRulesTables(state: CoreRulesContentState) {
 	if (state.visibleTables.isEmpty()) return
-	item { ReferenceSectionHeader(stringResource(R.string.reference_core_rules_quick_tables)) }
+	item { ReferenceSectionHeader("Quick Tables") }
 	items(state.visibleTables, key = { it.title }) { table ->
 		ReferenceTableCard(table)
 	}
@@ -225,8 +217,8 @@ private fun LazyListScope.renderCoreRulesTables(state: CoreRulesContentState) {
 private fun LazyListScope.renderCoreRulesGlossaryIntro(state: CoreRulesContentState) {
 	if (!state.showGlossaryIntroduction) return
 	item {
-		ReferenceSectionHeader(stringResource(R.string.reference_core_rules_glossary))
-		InfoCard(title = stringResource(R.string.reference_core_rules_glossary_overview), body = CoreRulesReference.GLOSSARY_INTRODUCTION)
+		ReferenceSectionHeader("Rules Glossary")
+		InfoCard(title = "Glossary Overview", body = CoreRulesReference.GLOSSARY_INTRODUCTION)
 	}
 	item {
 		BulletListCard(CoreRulesReference.GLOSSARY_CONVENTIONS)
@@ -235,7 +227,7 @@ private fun LazyListScope.renderCoreRulesGlossaryIntro(state: CoreRulesContentSt
 
 private fun LazyListScope.renderCoreRulesGlossaryTables(state: CoreRulesContentState) {
 	if (state.visibleGlossaryTables.isEmpty()) return
-	item { ReferenceSectionHeader(stringResource(R.string.reference_core_rules_glossary_tables)) }
+	item { ReferenceSectionHeader("Glossary Tables") }
 	items(state.visibleGlossaryTables, key = { it.title }) { table ->
 		ReferenceTableCard(table)
 	}
@@ -243,7 +235,7 @@ private fun LazyListScope.renderCoreRulesGlossaryTables(state: CoreRulesContentS
 
 private fun LazyListScope.renderCoreRulesGlossaryEntries(state: CoreRulesContentState) {
 	if (state.visibleGlossaryEntries.isEmpty()) return
-	item { ReferenceSectionHeader(stringResource(R.string.reference_core_rules_glossary_terms)) }
+	item { ReferenceSectionHeader("Glossary Terms") }
 	items(state.visibleGlossaryEntries, key = { it.title }) { entry ->
 		CoreGlossaryCard(entry)
 	}

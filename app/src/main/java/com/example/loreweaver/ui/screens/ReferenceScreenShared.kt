@@ -244,7 +244,7 @@ internal fun ReferenceDetailHeader(
 @Composable
 internal fun ReferenceTypeBadge(label: String) {
 	Badge(containerColor = MaterialTheme.colorScheme.primaryContainer) {
-		Text(label.uppercase(), modifier = Modifier.padding(4.dp))
+		Text(label, modifier = Modifier.padding(4.dp))
 	}
 }
 

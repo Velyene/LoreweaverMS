@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.example.loreweaver.R
 
 @Composable
-fun SessionSummaryScreen(onDone: () -> Unit, onOpenAdventureLog: () -> Unit = {}) {
+fun SessionSummaryScreen(onDone: () -> Unit, onViewLog: () -> Unit = {}) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
@@ -50,7 +50,7 @@ fun SessionSummaryScreen(onDone: () -> Unit, onOpenAdventureLog: () -> Unit = {}
 	) {
 		Badge(containerColor = MaterialTheme.colorScheme.primary) {
 			Text(
-				stringResource(R.string.session_summary_badge),
+				stringResource(R.string.resume_encounter),
 				color = MaterialTheme.colorScheme.onPrimary,
 				modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
 				fontWeight = FontWeight.Bold
@@ -59,21 +59,9 @@ fun SessionSummaryScreen(onDone: () -> Unit, onOpenAdventureLog: () -> Unit = {}
 
 		Spacer(modifier = Modifier.height(32.dp))
 
-		SummaryItem(
-			stringResource(R.string.session_summary_snapshot_title),
-			stringResource(R.string.session_summary_snapshot_subtitle),
-			Icons.Default.CloudDone
-		)
-		SummaryItem(
-			stringResource(R.string.session_summary_continue_title),
-			stringResource(R.string.session_summary_continue_subtitle),
-			Icons.Default.Update
-		)
-		SummaryItem(
-			stringResource(R.string.session_summary_offline_title),
-			stringResource(R.string.session_summary_offline_subtitle),
-			Icons.Default.SdStorage
-		)
+		SummaryItem("Snapshot state", "Current round and HP preserved", Icons.Default.CloudDone)
+		SummaryItem("Continue later", "Available on Home screen", Icons.Default.Update)
+		SummaryItem("Offline safe", "Data persisted to local storage", Icons.Default.SdStorage)
 
 		Spacer(modifier = Modifier.height(48.dp))
 
@@ -85,7 +73,7 @@ fun SessionSummaryScreen(onDone: () -> Unit, onOpenAdventureLog: () -> Unit = {}
 			contentAlignment = Alignment.Center
 		) {
 			Text(
-				stringResource(R.string.session_summary_persist_state_message),
+				"Persist local state\nfor later pickup",
 				color = MaterialTheme.colorScheme.primary,
 				fontSize = 16.sp,
 				fontWeight = FontWeight.Light,
@@ -103,7 +91,7 @@ fun SessionSummaryScreen(onDone: () -> Unit, onOpenAdventureLog: () -> Unit = {}
 			colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
 		) {
 			Text(
-				stringResource(R.string.session_summary_done_button),
+				stringResource(R.string.home_title),
 				color = MaterialTheme.colorScheme.onPrimary,
 				fontWeight = FontWeight.Bold
 			)
@@ -112,12 +100,12 @@ fun SessionSummaryScreen(onDone: () -> Unit, onOpenAdventureLog: () -> Unit = {}
 		Spacer(modifier = Modifier.height(12.dp))
 
 		OutlinedButton(
-			onClick = onOpenAdventureLog,
+			onClick = onViewLog,
 			modifier = Modifier
 				.fillMaxWidth()
 				.height(48.dp)
 		) {
-			Text(stringResource(R.string.session_summary_open_adventure_log))
+			Text("View Adventure Log")
 		}
 	}
 }

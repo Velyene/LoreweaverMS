@@ -70,8 +70,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.loreweaver.R
 import com.example.loreweaver.domain.model.Campaign
 import com.example.loreweaver.ui.theme.AntiqueGold
@@ -93,7 +93,7 @@ fun HomeScreen(
 	onCampaigns: () -> Unit,
 	onResumeEncounter: () -> Unit,
 	onCampaignClick: (String) -> Unit,
-	onRulesReference: () -> Unit
+	onGameRules: () -> Unit
 ) {
 	val viewModel: CampaignViewModel = hiltViewModel()
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -119,7 +119,7 @@ fun HomeScreen(
 			onResumeEncounter = onResumeEncounter,
 			onCampaigns = onCampaigns,
 			onCampaignClick = onCampaignClick,
-			onRulesReference = onRulesReference
+			onGameRules = onGameRules
 		)
 	}
 }
@@ -136,7 +136,7 @@ private fun HomeScreenContent(
 	onResumeEncounter: () -> Unit,
 	onCampaigns: () -> Unit,
 	onCampaignClick: (String) -> Unit,
-	onRulesReference: () -> Unit
+	onGameRules: () -> Unit
 ) {
 	Column(
 		modifier = Modifier
@@ -190,11 +190,11 @@ private fun HomeScreenContent(
 				horizontalArrangement = Arrangement.spacedBy(12.dp)
 			) {
 				HomeActionCard(
-					title = stringResource(R.string.home_rules_reference),
+					title = stringResource(R.string.home_game_rules),
 					icon = Icons.Default.Info,
 					isPrimary = false,
 					modifier = Modifier.weight(1f),
-					onClick = onRulesReference
+					onClick = onGameRules
 				)
 			}
 

@@ -11,8 +11,8 @@ import com.example.loreweaver.data.dao.NoteDao
 import com.example.loreweaver.data.dao.SessionDao
 import com.example.loreweaver.data.repository.CampaignRepositoryImpl
 import com.example.loreweaver.data.repository.ReferencePreferencesRepositoryImpl
-import com.example.loreweaver.domain.repository.CampaignRepository
 import com.example.loreweaver.domain.repository.CampaignsRepository
+import com.example.loreweaver.domain.repository.CampaignRepository
 import com.example.loreweaver.domain.repository.CharactersRepository
 import com.example.loreweaver.domain.repository.EncountersRepository
 import com.example.loreweaver.domain.repository.LogsRepository
@@ -26,7 +26,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Suppress("unused")
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {

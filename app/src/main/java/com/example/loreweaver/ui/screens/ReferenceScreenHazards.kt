@@ -115,12 +115,7 @@ private fun TrapCard(
 			)
 			Spacer(modifier = Modifier.height(4.dp))
 			Text(
-				stringResource(
-					R.string.reference_trap_card_summary,
-					trap.type,
-					trap.detectionDC,
-					trap.saveDC
-				),
+				"${trap.type} • Detection DC ${trap.detectionDC} • Save DC ${trap.saveDC}",
 				style = MaterialTheme.typography.bodySmall,
 				color = MaterialTheme.colorScheme.onSurfaceVariant
 			)
@@ -187,7 +182,7 @@ private fun TrapDangerGuideCard() {
 			modifier = Modifier.padding(12.dp),
 			verticalArrangement = Arrangement.spacedBy(6.dp)
 		) {
-			Text(stringResource(R.string.reference_trap_danger_guide_title), fontWeight = FontWeight.Bold)
+			Text("Trap Stats by Danger Level", fontWeight = FontWeight.Bold)
 			HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
 			TrapDangerRow(TrapDanger.SETBACK)
 			TrapDangerRow(TrapDanger.DANGEROUS)
@@ -206,18 +201,12 @@ private fun TrapDangerRow(danger: TrapDanger) {
 	Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
 		Text(label, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
 		Text(
-			stringResource(
-				R.string.reference_trap_danger_save_attack_summary,
-				dcRange.first,
-				dcRange.last,
-				attackRange.first,
-				attackRange.last
-			),
+			"Save DC ${dcRange.first}–${dcRange.last}  •  Attack +${attackRange.first}–+${attackRange.last}",
 			style = MaterialTheme.typography.bodySmall,
 			color = MaterialTheme.colorScheme.onSurfaceVariant
 		)
 		Text(
-			stringResource(R.string.reference_trap_danger_damage_summary, damageL1, damageL11),
+			"Damage (lv 1–4) $damageL1  •  (lv 11–16) $damageL11",
 			style = MaterialTheme.typography.bodySmall,
 			color = MaterialTheme.colorScheme.onSurfaceVariant
 		)
@@ -248,9 +237,9 @@ private fun TrapDetailView(
 
 		item { TrapDetailBadges(trap) }
 		item { TrapStatsCard(trap) }
-		item { DetailTextSection(stringResource(R.string.reference_description_title), trap.description) }
-		item { DetailTextSection(stringResource(R.string.reference_effect_title), trap.effect) }
-		item { DetailTextSection(stringResource(R.string.reference_disarm_method_title), trap.disarmMethod) }
+		item { DetailTextSection("Description", trap.description) }
+		item { DetailTextSection("Effect", trap.effect) }
+		item { DetailTextSection("Disarm Method", trap.disarmMethod) }
 	}
 }
 
@@ -334,17 +323,13 @@ private fun PoisonCard(
 			}
 			Spacer(modifier = Modifier.height(4.dp))
 			Text(
-				stringResource(R.string.reference_poison_card_summary, poisonTypeLabel, poison.saveDC),
+				"$poisonTypeLabel • DC ${poison.saveDC}",
 				style = MaterialTheme.typography.bodySmall,
 				color = MaterialTheme.colorScheme.onSurfaceVariant
 			)
 			if (poison.damageOnFail != "0") {
 				Text(
-					stringResource(
-						R.string.reference_poison_damage_summary,
-						poison.damageOnFail,
-						poison.damageType
-					),
+					"Damage: ${poison.damageOnFail} ${poison.damageType}",
 					style = MaterialTheme.typography.bodySmall,
 					color = MaterialTheme.colorScheme.error
 				)
@@ -398,10 +383,10 @@ private fun PoisonDetailView(
 		item { PoisonStatsCard(poison) }
 
 		if (poison.additionalEffect.isNotEmpty()) {
-			item { DetailTextSection(stringResource(R.string.reference_effect_title), poison.additionalEffect) }
+			item { DetailTextSection("Effect", poison.additionalEffect) }
 		}
 
-		item { DetailTextSection(stringResource(R.string.reference_description_title), poison.description) }
+		item { DetailTextSection("Description", poison.description) }
 	}
 }
 
@@ -518,10 +503,10 @@ private fun DiseaseDetailView(
 		}
 
 		item { DiseaseStatsCard(disease) }
-		item { DetailTextSection(stringResource(R.string.reference_symptoms_title), disease.symptoms) }
-		item { DetailTextSection(stringResource(R.string.reference_effects_title), disease.effects) }
-		item { DetailTextSection(stringResource(R.string.reference_progression_title), disease.progression) }
-		item { DetailTextSection(stringResource(R.string.reference_cure_title), disease.cure) }
+		item { DetailTextSection("Symptoms", disease.symptoms) }
+		item { DetailTextSection("Effects", disease.effects) }
+		item { DetailTextSection("Progression", disease.progression) }
+		item { DetailTextSection("Cure", disease.cure) }
 	}
 }
 
@@ -542,13 +527,13 @@ private fun TrapStatsCard(trap: TrapTemplate) {
 			modifier = Modifier.padding(12.dp),
 			verticalArrangement = Arrangement.spacedBy(4.dp)
 		) {
-			DetailRow(stringResource(R.string.reference_trap_detection_dc), trap.detectionDC.toString())
-			DetailRow(stringResource(R.string.reference_trap_disarm_dc), trap.disarmDC.toString())
+			DetailRow("Detection DC", trap.detectionDC.toString())
+			DetailRow("Disarm DC", trap.disarmDC.toString())
 			DetailRow(stringResource(R.string.reference_save_dc), trap.saveDC.toString())
 			if (trap.attackBonus > 0) {
-				DetailRow(stringResource(R.string.reference_trap_attack_bonus), "+${trap.attackBonus}")
+				DetailRow("Attack Bonus", "+${trap.attackBonus}")
 			}
-			DetailRow(stringResource(R.string.reference_damage_label), "${trap.damage} ${trap.damageType}")
+			DetailRow("Damage", "${trap.damage} ${trap.damageType}")
 		}
 	}
 }
@@ -562,14 +547,11 @@ private fun PoisonStatsCard(poison: PoisonTemplate) {
 		) {
 			DetailRow(stringResource(R.string.reference_save_dc), poison.saveDC.toString())
 			if (poison.damageOnFail != "0") {
-				DetailRow(
-					stringResource(R.string.reference_poison_failed_save_damage),
-					"${poison.damageOnFail} ${poison.damageType}"
-				)
-				DetailRow(stringResource(R.string.reference_poison_successful_save_damage), poison.damageOnSuccess)
+				DetailRow("Damage (Failed Save)", "${poison.damageOnFail} ${poison.damageType}")
+				DetailRow("Damage (Success)", poison.damageOnSuccess)
 			}
 			if (poison.duration.isNotEmpty()) {
-				DetailRow(stringResource(R.string.reference_duration_title), poison.duration)
+				DetailRow("Duration", poison.duration)
 			}
 		}
 	}
@@ -583,8 +565,8 @@ private fun DiseaseStatsCard(disease: DiseaseTemplate) {
 			verticalArrangement = Arrangement.spacedBy(4.dp)
 		) {
 			DetailRow(stringResource(R.string.reference_save_dc), disease.saveDC.toString())
-			DetailRow(stringResource(R.string.reference_disease_incubation_time), disease.incubationTime)
-			DetailRow(stringResource(R.string.reference_disease_transmission), disease.transmission)
+			DetailRow("Incubation Time", disease.incubationTime)
+			DetailRow("Transmission", disease.transmission)
 		}
 	}
 }

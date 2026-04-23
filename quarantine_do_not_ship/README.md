@@ -3,7 +3,7 @@
 Anything placed in this folder is **not part of the Android app bundle** because it lives outside
 `app/src/main`.
 
-Use this folder for any file or exported data block that fails the project's hard-ship rule:
+Use this folder for any file or exported data block that fails the project's hard ship rule:
 
 > If I cannot prove this came from SRD 5.2.1, it does not go in the shipped app.
 
@@ -44,18 +44,18 @@ Meaning:
 2. Record the original path.
 3. Record the reason it failed review.
 4. Replace shipped app content with one of:
-    - deletion
-    - SRD-only rebuild
-    - blank custom/homebrew entry
-    - temporary unavailable notice in the UI
+   - deletion
+   - SRD-only rebuild
+   - blank custom/homebrew entry
+   - temporary unavailable notice in the UI
 
 ## Hard decision rules
 
-- If a feat is not in the SRD list -> remove it from shipped app data
-- If a weapon is not in the SRD table -> remove it from shipped app data
-- If an item name came from Basic Rules / core books / legacy imports and lacks approved SRD proof,
+- If feat not in SRD list -> remove from shipped app data
+- If weapon not in SRD table -> remove from shipped app data
+- If item name came from Basic Rules / core books / legacy imports and not approved SRD proof,
   remove from shipped app data
-- If the source is unknown -> quarantine until verified
+- If source unknown -> quarantine until verified
 
 When in doubt, choose quarantine over shipment.
 

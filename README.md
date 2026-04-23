@@ -8,7 +8,7 @@ app.
 
 The app is built around encounter flow. It reduces session bookkeeping by keeping combat state,
 campaign notes, character resources, and reference material in one place. The UI uses Jetpack
-Compose with a fixed dark-fantasy theme for a consistent in-game presentation.
+Compose with a force-dark fantasy theme for a consistent in-game presentation.
 
 ## Key Features
 
@@ -21,7 +21,7 @@ Compose with a fixed dark-fantasy theme for a consistent in-game presentation.
   monster count, CR, and adjusted XP.
 - **Adventure logs**: Persist important session events in a Room-backed log capped to the most
   recent 100 entries.
-- **Reference**: Browse local rules content for traps, poisons, diseases, spellcasting,
+- **Rules reference**: Browse local rules content for traps, poisons, diseases, spellcasting,
   objects, madness, core rules, and character creation.
 - **Favorites, copy, and share**: Star reference entries, copy prompt/reference text, and share
   selected reference content with other apps.
@@ -61,24 +61,6 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
   converters, and repository implementations.
 - `app/src/main/java/com/example/loreweaver/di/` — Hilt module bindings.
 
-## Developer Workflow & Repository Hygiene
-
-- Gradle tasks are the source of truth for build health. JetBrains inspections can still raise
-  false positives around manifest-owned Android components, Hilt providers/constructors, Room
-  converters, and JUnit entry points.
-- Shared JetBrains project settings are intentionally versioned from `.idea/inspectionProfiles/`,
-  `.idea/codeStyles/`, `.idea/compiler.xml`, `.idea/gradle.xml`, `.idea/misc.xml`,
-  `.idea/runConfigurations.xml`, `.idea/dictionaries/`, `.idea/.name`,
-  `.idea/AndroidProjectSystem.xml`, `.idea/jsonCatalog.xml`, and `.idea/.gitignore`.
-- Local-only IDE state stays ignored: `.idea/workspace.xml`, caches, shelves, HTTP requests,
-  device/emulator selectors, preview state, `local.properties`, keystores, and all `build/`
-  directories.
-- Root-level JetBrains inspection-export XML files created from `Problems` / `Inspect Code` runs
-  are treated as disposable local artifacts and should not be committed.
-- Prefer fixing shared inspection entry points in `.idea/inspectionProfiles/` before adding
-  `@Suppress("unused")`; when a suppression is still necessary, keep it declaration-scoped on
-  framework-owned entry points only.
-
 ## Notes on data and networking
 
 The current app source is local-first. The runtime app code in `app/src/main` persists its data in
@@ -99,7 +81,7 @@ Running the content-audit test suite also regenerates
 files. In the current audited repo state, that snapshot reports no excluded corpus files under
 `app/src/main`.
 
-The Reference screen still includes monster-running guidance through reviewed Core Rules content,
+The Rules reference still includes monster-running guidance through reviewed Core Rules content,
 but the top-level `Monsters` tab is intentionally an unavailable placeholder instead of a bundled
 local monster corpus.
 

@@ -1,5 +1,5 @@
 /*
- * FILE: AdventureLogScreen.kt
+ * FILE: LogScreen.kt
  */
 
 package com.example.loreweaver.ui.screens
@@ -32,16 +32,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.loreweaver.R
 import com.example.loreweaver.ui.theme.AntiqueGold
 import com.example.loreweaver.ui.theme.MutedText
-import com.example.loreweaver.ui.viewmodels.AdventureLogViewModel
+import com.example.loreweaver.ui.viewmodels.LogViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdventureLogScreen(
+fun LogScreen(
 	onBack: () -> Unit,
-	viewModel: AdventureLogViewModel = hiltViewModel()
+	viewModel: LogViewModel = hiltViewModel()
 ) {
 	val logs by viewModel.logs.collectAsStateWithLifecycle(initialValue = emptyList())
 	val dateFormat = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
@@ -116,4 +116,3 @@ fun AdventureLogScreen(
 		)
 	}
 }
-

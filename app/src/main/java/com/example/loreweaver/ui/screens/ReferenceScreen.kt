@@ -1,13 +1,16 @@
 /*
  * FILE: ReferenceScreen.kt
- *
- * Fifth-edition reference screen with tabs and search.
+ * Fifth-edition rules reference screen with tabs and search.
+ */
+
+/*
+ * FILE: ReferenceScreen.kt
  *
  * TABLE OF CONTENTS:
  * 1. Screen entry point and category/list state setup
  * 2. Remembered derived content state
  * 3. Category content routing
- * 4. Monster availability placeholder helpers
+ * 4. Monsters placeholder content helpers
  */
 
 package com.example.loreweaver.ui.screens
@@ -31,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.loreweaver.R
@@ -229,6 +233,8 @@ private fun ReferenceCategoryContent(
 			onTrapSelected = viewModel::selectTrap,
 			onToggleFavorite = viewModel::toggleTrapFavorite
 		)
+
+
 		ReferenceCategory.POISONS -> PoisonsContent(
 			poisons = contentState.sortedPoisons,
 			selectedPoison = uiState.selectedPoison,

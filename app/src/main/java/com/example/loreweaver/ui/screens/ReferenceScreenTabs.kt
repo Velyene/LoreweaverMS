@@ -9,12 +9,10 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import com.example.loreweaver.R
 import com.example.loreweaver.ui.viewmodels.ReferenceCategory
+
+internal const val CORE_RULES_LABEL = "Core Rules"
 
 @Composable
 internal fun CategoryTabs(
@@ -45,20 +43,7 @@ private fun ReferenceCategoryTab(
 	favoriteCount: Int,
 	onClick: () -> Unit
 ) {
-	val label = stringResource(category.labelResId())
-	val favoriteCountDescription = if (favoriteCount > 0 && category.supportsFavoritesFilter()) {
-		stringResource(R.string.reference_tab_with_favorites_count, label, favoriteCount)
-	} else {
-		null
-	}
-	val tabModifier = if (favoriteCountDescription != null) {
-		Modifier.semantics { contentDescription = favoriteCountDescription }
-	} else {
-		Modifier
-	}
-
 	Tab(
-		modifier = tabModifier,
 		selected = isSelected,
 		onClick = onClick,
 		text = {
@@ -104,22 +89,22 @@ private fun CategoryTabText(
 	modifier: Modifier = Modifier
 ) {
 	Text(
-		text = stringResource(category.labelResId()),
+		text = category.toDisplayLabel(),
 		fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
 		modifier = modifier
 	)
 }
 
-internal fun ReferenceCategory.labelResId(): Int = when (this) {
-	ReferenceCategory.TRAPS -> R.string.reference_tab_traps
-	ReferenceCategory.POISONS -> R.string.reference_tab_poisons
-	ReferenceCategory.DISEASES -> R.string.reference_tab_diseases
-	ReferenceCategory.SPELLCASTING -> R.string.reference_tab_spellcasting
-	ReferenceCategory.OBJECTS -> R.string.reference_tab_objects
-	ReferenceCategory.MADNESS -> R.string.reference_tab_madness
-	ReferenceCategory.MONSTERS -> R.string.reference_tab_monsters
-	ReferenceCategory.CORE_RULES -> R.string.reference_tab_core_rules
-	ReferenceCategory.CHARACTER_CREATION -> R.string.reference_tab_character_creation
+internal fun ReferenceCategory.toDisplayLabel(): String = when (this) {
+	ReferenceCategory.TRAPS -> "Traps"
+	ReferenceCategory.POISONS -> "Poisons"
+	ReferenceCategory.DISEASES -> "Diseases"
+	ReferenceCategory.SPELLCASTING -> "Spellcasting"
+	ReferenceCategory.OBJECTS -> "Objects"
+	ReferenceCategory.MADNESS -> "Madness"
+	ReferenceCategory.MONSTERS -> "Monsters"
+	ReferenceCategory.CORE_RULES -> CORE_RULES_LABEL
+	ReferenceCategory.CHARACTER_CREATION -> "Character Creation"
 }
 
 internal fun ReferenceCategory.supportsFavoritesFilter(): Boolean =

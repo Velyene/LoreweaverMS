@@ -25,4 +25,9 @@ val SecondaryText = Color(0xFFB9C1C7)
 val MutedText = Color(0xFF7E8A92)
 
 val DangerRed = Color(0xFFD9534F)
+val DebuffPurple = Color(0xFF8E5BD9)
+
+// Legacy aliases (keep existing references compiling)
+val AppBackground = ObsidianBlack
+val LoreTeal = ArcaneTeal
 val LoreGold = AntiqueGold

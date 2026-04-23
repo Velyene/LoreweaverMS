@@ -12,7 +12,7 @@ local.properties
 .cxx/
 
 # ============================================================
-# JetBrains IDEs / Android Studio
+# IntelliJ / Android Studio
 # ============================================================
 /.idea/caches/
 /.idea/libraries/
@@ -22,11 +22,10 @@ local.properties
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/.gitignore
 /.idea/deploymentTargetSelector.xml
 /.idea/migrations.xml
 /.idea/vcs.xml
-/.idea/httpRequests/
-# Track `.idea/.gitignore` so nested local IDE rules are shared with the team.
 # Personal / machine-specific IDE state (do not share)
 /.idea/appInsightsSettings.xml
 /.idea/deviceManager.xml
@@ -34,16 +33,10 @@ local.properties
 /.idea/markdown.xml
 /.idea/errors/
 /.idea/sessions/
-/.idea/shelf/
-/.idea/dataSources/
-/.idea/dataSources.local.xml
-/.idea/sqlDataSources.xml
-/.idea/dynamic.xml
-/.idea/usage.statistics.xml
-# Keep: `.idea/gradle.xml`, `.idea/compiler.xml`, `.idea/misc.xml`,
-#       `.idea/runConfigurations.xml`, `.idea/inspectionProfiles/`,
-#       `.idea/codeStyles/`, `.idea/dictionaries/`, `.idea/.gitignore`, `.idea/.name`,
-#       `.idea/AndroidProjectSystem.xml`, `.idea/jsonCatalog.xml`
+# Keep: .idea/gradle.xml, .idea/compiler.xml, .idea/misc.xml,
+#        .idea/runConfigurations.xml, .idea/inspectionProfiles/,
+#        .idea/codeStyles/, .idea/dictionaries/, .idea/.name,
+#        .idea/AndroidProjectSystem.xml, .idea/jsonCatalog.xml
 
 # ============================================================
 # Kotlin / KSP / Hilt generated sources
@@ -76,26 +69,3 @@ long_kotlin_lines.txt
 *.log
 /out/
 EXCLUDED_REFERENCE_CORPUS_AUDIT.md
-
-# ============================================================
-# Local JetBrains inspection / formatting exports
-# ============================================================
-/.descriptions.xml
-/.xml
-/AndroidLint*.xml
-/EditorConfig*.xml
-/*Inspection*.xml
-/EmptyDirectory.xml
-/InconsistentLineSeparators.xml
-/IncorrectFormatting.xml
-/IntroduceWhenSubject.xml
-/KotlinUnusedImport.xml
-/LongLine.xml
-/MoveVariableDeclarationIntoWhen.xml
-/ProblematicWhitespace.xml
-/RedundantSuppression.xml
-/RemoveRedundantQualifierName.xml
-/SameReturnValue.xml
-/UnusedSymbol.xml
-/unused.xml
-

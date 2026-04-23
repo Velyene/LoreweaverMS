@@ -10,10 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.loreweaver.R
 import com.example.loreweaver.domain.util.ReferenceDetailContent
 import com.example.loreweaver.domain.util.ReferenceDetailSection
 
@@ -48,7 +46,7 @@ internal fun GenericReferenceDetailView(
 		}
 
 		detail.overview?.takeIf { it.isNotBlank() }?.let { overview ->
-			item { DetailTextSection(title = stringResource(R.string.reference_overview_title), body = overview) }
+			item { DetailTextSection(title = "Overview", body = overview) }
 		}
 
 		if (detail.statRows.isNotEmpty()) {
