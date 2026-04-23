@@ -40,7 +40,7 @@ internal fun ObjectsContent(listState: LazyListState) {
 	) {
 		item {
 			ReferenceTitleWithShare(
-				title = "Object AC by Substance",
+				title = stringResource(R.string.reference_objects_ac_by_substance_title),
 				onShare = {
 					shareReferenceText(
 						context = context,
@@ -56,7 +56,7 @@ internal fun ObjectsContent(listState: LazyListState) {
 		item {
 			Spacer(modifier = Modifier.height(8.dp))
 			Text(
-				"Object HP by Size",
+				stringResource(R.string.reference_objects_hp_by_size_title),
 				style = MaterialTheme.typography.titleLarge,
 				fontWeight = FontWeight.Bold
 			)
@@ -67,7 +67,7 @@ internal fun ObjectsContent(listState: LazyListState) {
 		item {
 			Spacer(modifier = Modifier.height(8.dp))
 			Text(
-				"Common Objects",
+				stringResource(R.string.reference_objects_common_objects_title),
 				style = MaterialTheme.typography.titleLarge,
 				fontWeight = FontWeight.Bold
 			)
@@ -83,7 +83,7 @@ internal fun ObjectsContent(listState: LazyListState) {
 		item {
 			Spacer(modifier = Modifier.height(8.dp))
 			Text(
-				"Damage Type Guidance",
+				stringResource(R.string.reference_objects_damage_type_guidance_title),
 				style = MaterialTheme.typography.titleLarge,
 				fontWeight = FontWeight.Bold
 			)
@@ -94,7 +94,7 @@ internal fun ObjectsContent(listState: LazyListState) {
 		item {
 			Spacer(modifier = Modifier.height(8.dp))
 			Text(
-				"Massive Objects",
+				stringResource(R.string.reference_objects_massive_objects_title),
 				style = MaterialTheme.typography.titleLarge,
 				fontWeight = FontWeight.Bold
 			)
@@ -105,7 +105,7 @@ internal fun ObjectsContent(listState: LazyListState) {
 		item {
 			Spacer(modifier = Modifier.height(8.dp))
 			Text(
-				"Damage Thresholds",
+				stringResource(R.string.reference_objects_damage_thresholds_title),
 				style = MaterialTheme.typography.titleLarge,
 				fontWeight = FontWeight.Bold
 			)
@@ -140,7 +140,11 @@ private fun ObjectsHpTableCard() {
 			modifier = Modifier.padding(12.dp),
 			verticalArrangement = Arrangement.spacedBy(4.dp)
 		) {
-			Text("Fragile / Resilient", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+			Text(
+				stringResource(R.string.reference_objects_fragile_resilient),
+				fontWeight = FontWeight.Bold,
+				fontSize = 12.sp
+			)
 			HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 			DetailRow("Tiny (bottle, lock)", "2 (1d4) / 5 (2d4)")
 			DetailRow("Small (chest, lute)", "3 (1d6) / 10 (3d6)")
@@ -157,8 +161,8 @@ private fun ObjectsCommonObjectCard(obj: ObjectStats) {
 			Text(obj.substance, fontWeight = FontWeight.Bold)
 			Spacer(modifier = Modifier.height(4.dp))
 			Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-				Text("AC ${obj.ac}", fontSize = 12.sp)
-				Text("HP ${obj.hitPoints}", fontSize = 12.sp)
+				Text(stringResource(R.string.reference_objects_ac_value, obj.ac), fontSize = 12.sp)
+				Text(stringResource(R.string.reference_objects_hp_value, obj.hitPoints), fontSize = 12.sp)
 				ObjectsThresholdText(obj.damageThreshold)
 			}
 		}
@@ -169,7 +173,11 @@ private fun ObjectsCommonObjectCard(obj: ObjectStats) {
 private fun ObjectsThresholdText(damageThreshold: Int) {
 	if (damageThreshold <= 0) return
 
-	Text("Threshold $damageThreshold", fontSize = 12.sp, color = ArcaneTeal)
+	Text(
+		stringResource(R.string.reference_objects_threshold_value, damageThreshold),
+		fontSize = 12.sp,
+		color = ArcaneTeal
+	)
 }
 
 @Composable

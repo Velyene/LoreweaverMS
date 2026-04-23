@@ -9,7 +9,7 @@
 package com.example.loreweaver.domain.util
 
 /**
- * Summary card for a core rules topic.
+ * Summary card for a Core Rules topic.
  */
 data class CoreRuleSection(
 	val title: String,
@@ -19,7 +19,7 @@ data class CoreRuleSection(
 )
 
 /**
- * Compact glossary entry used by the core rules reference UI.
+ * Compact glossary entry used by the Core Rules reference UI.
  */
 data class CoreGlossaryEntry(
 	val term: String,
@@ -44,7 +44,7 @@ data class CoreGlossaryEntry(
 }
 
 /**
- * Utility object for core rules reference content.
+ * Utility object for Core Rules reference content.
  */
 object CoreRulesReference {
 	// -----------------------------------------------------------------------
@@ -80,12 +80,12 @@ object CoreRulesReference {
 	// -----------------------------------------------------------------------
 	// Section and glossary content
 	// -----------------------------------------------------------------------
-	val INTRODUCTION =
+	const val INTRODUCTION =
 		"This tab condenses the system loop used most often at the table: scene framing, d20 resolution, " +
 			"movement, combat timing, and recovery. It is meant to be a fast rules digest rather than a full " +
 			"rulebook replacement."
 
-	val GLOSSARY_INTRODUCTION =
+	const val GLOSSARY_INTRODUCTION =
 		"This glossary is organized for fast table lookups. Bracket tags group related rule families, search " +
 			"checks both terms and cross-references, and the entries stay concise so they work as a quick reminder " +
 			"rather than a full rulebook transcript."

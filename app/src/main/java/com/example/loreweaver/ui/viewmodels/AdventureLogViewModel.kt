@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LogViewModel @Inject constructor(
+class AdventureLogViewModel @Inject constructor(
 	getAllLogsUseCase: GetAllLogsUseCase,
 	private val clearLogsUseCase: ClearLogsUseCase
 ) : ViewModel() {
@@ -23,3 +23,4 @@ class LogViewModel @Inject constructor(
 		}
 	}
 }
+

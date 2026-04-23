@@ -181,7 +181,7 @@ class CharacterEntryTest {
 	}
 
 	@Test
-	fun shortRest_restoresBardBardicInspiration() {
+	fun shortRest_restoresBardicInspiration() {
 		val bard = CharacterEntry(
 			type = "Bard",
 			resources = listOf(

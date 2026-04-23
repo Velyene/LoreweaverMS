@@ -1,0 +1,9 @@
+# Local Android Studio / JetBrains IDE state inside the shared `.idea` folder
+/shelf/
+/workspace.xml
+/httpRequests/
+/dataSources/
+/dataSources.local.xml
+/sqlDataSources.xml
+/dynamic.xml
+/usage.statistics.xml

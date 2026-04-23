@@ -253,12 +253,6 @@ class ContentSafetyAuditTest {
 			reviewedOn = "2026-04-18",
 			rationale = "Contains reviewed setting-neutral magic theory and spellcasting help text.",
 			followUpNote = "Avoid reintroducing branded lore or long lore-forward explanations."
-		),
-		// Reviewed in this stricter inline-string pass; only short neutral mechanics summaries were surfaced.
-		"java/com/example/loreweaver/ui/screens/GameRulesScreen.kt" to ReviewedProseFile(
-			reviewedOn = "2026-04-18",
-			rationale = "Inline strings found here are concise, neutral rules summaries used directly in the Compose UI.",
-			followUpNote = "Re-review if this screen starts embedding longer prose blocks or copied reference text."
 		)
 	)
 
@@ -641,11 +635,10 @@ class ContentSafetyAuditTest {
 		var quoteChar: Char? = null
 
 		while (index < text.length) {
-			val current = text[index]
-			when {
-				quoteChar != null && current == quoteChar -> quoteChar = null
-				quoteChar == null && (current == '"' || current == '\'') -> quoteChar = current
-				quoteChar == null && current == '>' -> return index
+			when (val current = text[index]) {
+				quoteChar -> quoteChar = null
+				'"', '\'' -> if (quoteChar == null) quoteChar = current
+				'>' -> if (quoteChar == null) return index
 			}
 			index++
 		}
