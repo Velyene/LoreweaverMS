@@ -1,4 +1,4 @@
-# AGENTS.md – LoreweaverMS (EncounterTimer)
+# AGENTS.md – Loreweaver
 
 Android TTRPG combat-tracker app built with Kotlin, Jetpack Compose, Hilt, Room, and a
 local-first MVVM + Clean Architecture structure.
@@ -48,7 +48,7 @@ Navigation is type-safe via calls such as
 
 Key route notes:
 
-- Bottom-bar destinations are Home, Campaigns, Characters, and Rules.
+- Bottom-bar destinations are Home, Campaigns, Characters, and Reference.
 - `AdventureLogRoute` is a secondary destination launched from `SessionSummaryScreen`.
 - `PromptLibraryRoute` exists, but it is not a bottom-bar destination.
 - `ReferenceRoute` supports initial category selection, free-text search, and deep linking into a
@@ -73,7 +73,7 @@ Key route notes:
   `Map<Int, List<Int>>` for Gson round-tripping.
 - **Challenge rating**: `challengeRating: Double` was added to `CharacterEntity` in
   `MIGRATION_7_8`.
-- **Reference favorites**: The rules reference stores trap, poison, and disease favorites in
+- **Reference favorites**: The reference feature stores trap, poison, and disease favorites in
   `SharedPreferences` through `ReferencePreferencesRepositoryImpl`.
 - **Log capping**: `CampaignRepositoryImpl.insertLog()` keeps only the most recent 100
   `LogEntry` rows.
@@ -90,7 +90,7 @@ sealed class Resource<out T> {
 }
 ```
 
-View-model UI state commonly carries `error: String?` and optional retry callbacks so screens can
+ViewModel UI state commonly carries `error: String?` and optional retry callbacks so screens can
 surface recoverable failures cleanly.
 
 ## External Integration
@@ -105,7 +105,7 @@ The current runtime app source under `app/src/main` is local-first.
 
 ## Theme
 
-- `MainActivity` calls `EncounterTimerTheme(darkTheme = true)` so the app stays in dark mode.
+- `MainActivity` calls `LoreweaverTheme(darkTheme = true)` so the app stays in dark mode.
 - Dynamic color is disabled by default to preserve the custom fantasy palette defined in
   `ui/theme/Color.kt`.
 
@@ -120,9 +120,9 @@ The app includes a full encounter-balancing implementation based on the DMG rule
 - The setup section of `CombatTrackerScreen` shows a color-coded difficulty card with adjusted XP.
 - `CharacterFormScreen` exposes CR input for non-Adventurer characters.
 
-## D&D 5e Rules Reference UI
+## D&D 5e Reference UI
 
-`ReferenceScreen` and `ReferenceViewModel` provide a local rules/reference experience with these
+`ReferenceScreen` and `ReferenceViewModel` provide a local reference experience with these
 major areas:
 
 - Traps
@@ -131,7 +131,7 @@ major areas:
 - Spellcasting
 - Objects
 - Madness
-- Monsters placeholder state
+- Monster placeholder state
 - Core rules
 - Character creation
 
@@ -181,9 +181,26 @@ Key versions from `gradle/libs.versions.toml`:
   those return values do not leak through `Unit`-typed repository methods.
 - All four migrations are wired into `Room.databaseBuilder()`.
 - Some IDE `ComposableFunction0/1/2` errors around Compose lambdas in `MainActivity.kt` may be
-  IntelliJ analysis false positives even when Gradle builds successfully.
+  JetBrains IDE analysis false positives even when Gradle builds successfully.
+- JetBrains `unused declaration` inspections can also produce false positives for manifest-owned
+  Android components, Hilt providers/constructors, Room converters, and JUnit entry points even
+  when Gradle builds and tests pass.
 - `CampaignDetailScreen.kt` keeps targeted `@Suppress("UNUSED_VALUE")` markers on mutable state
   assignments inside Compose dismissal callbacks to silence false positives.
+
+## Repository Hygiene
+
+- Shared JetBrains project settings are intentionally versioned from `.idea/inspectionProfiles/`,
+  `.idea/codeStyles/`, `.idea/compiler.xml`, `.idea/gradle.xml`, `.idea/misc.xml`,
+  `.idea/runConfigurations.xml`, `.idea/dictionaries/`, `.idea/.name`,
+  `.idea/AndroidProjectSystem.xml`, `.idea/jsonCatalog.xml`, and `.idea/.gitignore`.
+- Machine-specific IDE state such as `.idea/workspace.xml`, caches, shelves, HTTP requests,
+  device/emulator selectors, preview state, and similar local files should remain ignored.
+- Root-level JetBrains inspection export XML files created from `Problems` / `Inspect Code`
+  workflows are disposable local artifacts and should stay untracked.
+- Prefer adjusting shared inspection entry points for Android/Hilt/Room/JUnit before adding
+  `@Suppress("unused")` in source. If suppression is still required, keep it narrowly scoped to a
+  verified framework-owned declaration.
 
 ## Key Files Reference
 
@@ -201,8 +218,8 @@ Key versions from `gradle/libs.versions.toml`:
 - `domain/util/ObjectStats.kt` — object AC, HP, and threshold tables.
 - `domain/util/MadnessReference.kt` — short-, long-, and indefinite-madness tables.
 - `ui/viewmodels/CombatViewModel.kt` — combat tracker state and difficulty updates.
-- `ui/viewmodels/ReferenceViewModel.kt` — rules-reference state, favorites, search, and madness.
+- `ui/viewmodels/ReferenceViewModel.kt` — reference state, favorites, search, and madness.
 - `ui/screens/CampaignDetailScreen.kt` — campaign detail UI and note-entry workflow.
 - `ui/screens/CombatTrackerScreen.kt` — combat setup and active combat views.
-- `ui/screens/ReferenceScreen.kt` — rules reference UI, copy/share helpers, and detail screens.
+- `ui/screens/ReferenceScreen.kt` — reference UI, copy/share helpers, and detail screens.
 - `ui/screens/PromptLibraryScreen.kt` — narrative prompt cards with clipboard copy support.

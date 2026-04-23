@@ -6,8 +6,8 @@ Snapshot date: 2026-04-20
 
 This note records the magic-item audit completed against the current local reference content in:
 
-- `app/src/main/java/com/example/encountertimer/domain/util/EquipmentReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/SpellcastingReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/EquipmentReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/SpellcastingReference.kt`
 
 The current local equipment reference also includes a dedicated
 `EquipmentReference.MAGIC_ITEMS_A_TO_Z` dataset with condensed searchable summaries for the
@@ -173,13 +173,13 @@ the provided Magic Items excerpt itself.
 
 ## Verification anchors
 
-- `app/src/test/java/com/example/encountertimer/domain/util/MagicItemsSrdAuditTest.kt`
-- `app/src/test/java/com/example/encountertimer/domain/util/EquipmentReferenceTest.kt`
-- `app/src/test/java/com/example/encountertimer/ui/screens/`
+- `app/src/test/java/com/example/loreweaver/domain/util/MagicItemsSrdAuditTest.kt`
+- `app/src/test/java/com/example/loreweaver/domain/util/EquipmentReferenceTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/`
   `ReferenceScreenAdventuringGearSearchTest.kt`
-- `app/src/test/java/com/example/encountertimer/ui/screens/ReferenceScreenMagicItemSearchTest.kt`
-- `app/src/test/java/com/example/encountertimer/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
-- `app/src/test/java/com/example/encountertimer/ui/screens/ReferenceScreenToolSearchTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenMagicItemSearchTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenToolSearchTest.kt`
 
 ## Notes for future updates
 

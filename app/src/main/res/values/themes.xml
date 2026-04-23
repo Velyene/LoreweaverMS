@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.EncounterTimer" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.Loreweaver" parent="android:Theme.Material.Light.NoActionBar">
         <!-- Match the Compose dark background so the initial window draw isn't white -->
         <item name="android:windowBackground">#FF120E16</item>
         <item name="android:colorBackground">#FF120E16</item>

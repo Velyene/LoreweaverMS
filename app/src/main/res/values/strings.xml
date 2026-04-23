@@ -1,13 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">LoreweaverMS</string>
+    <string name="app_name">Loreweaver</string>
     <string name="home_title">HOME</string>
     <string name="recent_campaigns">Recent campaigns</string>
     <string name="quick_actions">Quick actions</string>
     <string name="start_new_session">Start New Session</string>
-    <string name="resume_encounter">RESUME ENCOUNTER</string>
-    <string name="browse_campaigns">BROWSE CAMPAIGNS</string>
+    <string name="resume_encounter">Resume Encounter</string>
+    <string name="browse_campaigns">Browse Campaigns</string>
     <string name="home_footer">Resume or start a session</string>
-    <string name="home_game_rules">Game Rules</string>
+    <string name="home_rules_reference">Reference</string>
     <string name="home_brand_title">LOREWEAVER</string>
     <string name="home_brand_subtitle">Fantasy encounter companion</string>
     <string name="no_campaigns">No campaigns yet.</string>
@@ -104,7 +104,7 @@
     <string name="action_attack_roll_label">%1$s (Atk)</string>
     <string name="action_damage_roll_label">%1$s (Dmg)</string>
     <string name="attack_log_type">Attack</string>
-    <string name="speed_feet_value">%1$dft</string>
+    <string name="speed_feet_value">%1$d ft</string>
     <string name="stat_value_with_max">%1$s: %2$d / %3$d</string>
     <string name="inventory_bullet">• %1$s</string>
     <string name="character_builder_title" tools:keep="@string/character_builder_title">Character Builder</string>
@@ -224,11 +224,15 @@
     <!-- Prompt Library -->
     <string name="prompt_library_title">Prompt Library</string>
     <string name="prompt_whispering_woods_title">The Whispering Woods</string>
-    <string name="prompt_whispering_woods_desc">The air here is thick with a preternatural fog that tastes of old iron and forgotten memories. Every snap of a twig sounds like a dying breath.</string>
+    <string name="prompt_whispering_woods_desc">The air here is thick with a preternatural fog
+        that tastes of old iron and forgotten memories. Every snap of a twig sounds like a dying
+        breath.</string>
     <string name="prompt_tavern_rumor_title">Tavern Rumor</string>
-    <string name="prompt_tavern_rumor_desc">A mysterious traveler mentioned a crypt where the gold pieces scream if you pick them up.</string>
+    <string name="prompt_tavern_rumor_desc">A mysterious traveler mentioned a crypt where the
+        gold pieces scream if you pick them up.</string>
     <string name="prompt_crit_desc_title">Critical Hit Description</string>
-    <string name="prompt_crit_desc_desc">The blade finds its mark with a sickening crunch, cleaving through plate and bone alike as a spray of crimson paints the floor.</string>
+    <string name="prompt_crit_desc_desc">The blade finds its mark with a sickening crunch,
+        cleaving through plate and bone alike as a spray of crimson paints the floor.</string>
     <string name="prompt_cat_environment">Environment</string>
     <string name="prompt_cat_plot_hook">Plot Hook</string>
     <string name="prompt_cat_combat">Combat</string>
@@ -240,7 +244,7 @@
     <string name="bottom_nav_home">Home</string>
     <string name="bottom_nav_campaigns">Campaigns</string>
     <string name="bottom_nav_characters">Characters</string>
-    <string name="bottom_nav_rules">Rules</string>
+    <string name="bottom_nav_rules">Reference</string>
 
     <!-- Encounter Difficulty -->
     <string name="encounter_difficulty_label">Encounter Difficulty:</string>
@@ -306,17 +310,31 @@ Create one to begin your journey!</string>
     <string name="session_entries_count">%1$d entries</string>
     <string name="encounters_section_title">Encounters</string>
     <string name="add_encounter_button">Add Encounter</string>
-    <string name="encounters_empty_message">No encounters yet. Tap "Add Encounter" to create one.</string>
-    <string name="encounter_open_badge">Open</string>
+    <string name="encounters_empty_message">No encounters yet. Tap "Add Encounter" to create
+        one.</string>
+    <string name="encounter_open_badge">OPEN</string>
     <string name="new_encounter_title">New Encounter</string>
     <string name="encounter_name_label">Encounter Name</string>
-    <string name="monster_import_removed_message">Monster library import has been removed from this build.</string>
+    <string name="monster_import_removed_message">Monster library import has been removed from
+        this build.</string>
     <string name="create_without_monsters_button">Create Without Monsters</string>
     <string name="confirm_delete_note_title">Delete note?</string>
-    <string name="confirm_delete_note_message">This note will be permanently removed from the campaign.</string>
+    <string name="confirm_delete_note_message">This note will be permanently removed from the
+        campaign.</string>
 
     <!-- Session History -->
     <string name="session_history_title">Session History</string>
+    <string name="session_summary_badge">ENCOUNTER SAVED</string>
+    <string name="session_summary_snapshot_title">Encounter snapshot</string>
+    <string name="session_summary_snapshot_subtitle">Current round and HP are preserved</string>
+    <string name="session_summary_continue_title">Pick up later</string>
+    <string name="session_summary_continue_subtitle">Resume from Home whenever you’re ready</string>
+    <string name="session_summary_offline_title">Saved on this device</string>
+    <string name="session_summary_offline_subtitle">Your progress stays available offline</string>
+    <string name="session_summary_persist_state_message">Your encounter is saved
+and ready when you return</string>
+    <string name="session_summary_done_button">Return Home</string>
+    <string name="session_summary_open_adventure_log">Open Adventure Log</string>
     <string name="search_sessions_label">Search sessions</string>
     <string name="search_sessions_placeholder">Search sessions…</string>
     <string name="session_history_empty_message">No sessions found.</string>
@@ -365,17 +383,67 @@ Add your party or individual enemies above.</string>
     <string name="reference_tab_spellcasting">Spellcasting</string>
     <string name="reference_tab_objects" tools:keep="@string/reference_tab_objects">Objects</string>
     <string name="reference_tab_madness">Madness</string>
+    <string name="reference_tab_monsters">Monsters</string>
+    <string name="reference_tab_core_rules">Core Rules</string>
+    <string name="reference_tab_character_creation">Character Creation</string>
+    <string name="reference_tab_with_favorites_count">%1$s, %2$d favorites</string>
     <string name="reference_search_hint">Search…</string>
     <string name="reference_back_to_list">Back to list</string>
     <string name="reference_roll_d100">Roll d100</string>
     <string name="reference_no_results">No results found</string>
+    <string name="reference_overview_title">Overview</string>
+    <string name="reference_description_title">Description</string>
+    <string name="reference_effect_title">Effect</string>
+    <string name="reference_effects_title">Effects</string>
+    <string name="reference_duration_title">Duration</string>
+    <string name="reference_symptoms_title">Symptoms</string>
+    <string name="reference_progression_title">Progression</string>
+    <string name="reference_cure_title">Cure</string>
+    <string name="reference_objects_ac_by_substance_title">Object AC by Substance</string>
+    <string name="reference_objects_hp_by_size_title">Object HP by Size</string>
+    <string name="reference_objects_common_objects_title">Common Objects</string>
+    <string name="reference_objects_damage_type_guidance_title">Damage Type Guidance</string>
+    <string name="reference_objects_massive_objects_title">Massive Objects</string>
+    <string name="reference_objects_damage_thresholds_title">Damage Thresholds</string>
+    <string name="reference_objects_fragile_resilient">Fragile / Resilient</string>
+    <string name="reference_objects_ac_value">AC %1$d</string>
+    <string name="reference_objects_hp_value">HP %1$d</string>
+    <string name="reference_objects_threshold_value">Threshold %1$d</string>
+    <string name="reference_trap_card_summary">%1$s • Detection DC %2$d • Save DC %3$d</string>
+    <string name="reference_trap_danger_guide_title">Trap Stats by Danger Level</string>
+    <string name="reference_trap_danger_save_attack_summary">Save DC %1$d–%2$d  •  Attack +%3$d–+%4$d</string>
+    <string name="reference_trap_danger_damage_summary">Damage (Lv 1–4) %1$s  •  (Lv 11–16) %2$s</string>
+    <string name="reference_disarm_method_title">Disarm Method</string>
+    <string name="reference_trap_detection_dc">Detection DC</string>
+    <string name="reference_trap_disarm_dc">Disarm DC</string>
+    <string name="reference_trap_attack_bonus">Attack Bonus</string>
+    <string name="reference_damage_label">Damage</string>
+    <string name="reference_poison_card_summary">%1$s • DC %2$d</string>
+    <string name="reference_poison_damage_summary">Damage: %1$s %2$s</string>
+    <string name="reference_poison_failed_save_damage">Damage (Failed Save)</string>
+    <string name="reference_poison_successful_save_damage">Damage (Success)</string>
+    <string name="reference_disease_incubation_time">Incubation Time</string>
+    <string name="reference_disease_transmission">Transmission</string>
+    <string name="reference_spellcasting_verified_srd_spell_names">Verified SRD Spell Names</string>
+    <string name="reference_core_rules_system_loop_title">System Loop</string>
+    <string name="reference_core_rules_combat_topics">Combat Topics</string>
+    <string name="reference_core_rules_rules_topics">Rules Topics</string>
+    <string name="reference_core_rules_quick_tables">Quick Tables</string>
+    <string name="reference_core_rules_glossary">Rules Glossary</string>
+    <string name="reference_core_rules_glossary_overview">Glossary Overview</string>
+    <string name="reference_core_rules_glossary_tables">Glossary Tables</string>
+    <string name="reference_core_rules_glossary_terms">Glossary Terms</string>
     <string name="reference_search_updating">Updating search results…</string>
     <string name="reference_search_results_count">%1$d results for “%2$s”</string>
     <string name="reference_search_results_ready">Showing filtered results for “%1$s”</string>
-    <string name="reference_no_favorite_traps">No favorite traps yet. Star a trap to keep it handy.</string>
-    <string name="reference_no_favorite_poisons">No favorite poisons yet. Star a poison to keep it handy.</string>
-    <string name="reference_no_favorite_diseases">No favorite diseases yet. Star a disease to keep it handy.</string>
-    <string name="reference_no_favorite_search_results">No favorite entries match this search.</string>
+    <string name="reference_no_favorite_traps">No favorite traps yet. Star a trap to keep it
+        handy.</string>
+    <string name="reference_no_favorite_poisons">No favorite poisons yet. Star a poison to keep
+        it handy.</string>
+    <string name="reference_no_favorite_diseases">No favorite diseases yet. Star a disease to keep
+        it handy.</string>
+    <string name="reference_no_favorite_search_results">No favorite entries match this
+        search.</string>
     <string name="reference_save_dc">Save DC</string>
     <string name="reference_favorites_only">Favorites only</string>
     <string name="reference_favorites_only_with_count">Favorites only (%1$d)</string>
@@ -383,10 +451,13 @@ Add your party or individual enemies above.</string>
     <string name="reference_copy_to_clipboard">Copy to clipboard</string>
     <string name="reference_share">Share</string>
     <string name="reference_share_chooser_title">Share reference</string>
-    <string name="reference_monster_unavailable">Monster reference content has been removed from this build pending provenance review.</string>
-    <string name="reference_monster_search_unavailable">Monster search is unavailable in this build because the bundled monster corpus has been removed pending provenance review.</string>
+    <string name="reference_monster_unavailable">Monster reference content has been removed from
+        this build pending provenance review.</string>
+    <string name="reference_monster_search_unavailable">Monster search is unavailable in this build
+        because the bundled monster corpus has been removed pending provenance review.</string>
     <string name="reference_class_unavailable_title">Class reference unavailable</string>
-    <string name="reference_class_unavailable_body">Bundled class reference content has been removed from this build pending provenance review.</string>
+    <string name="reference_class_unavailable_body">Bundled class reference content has been
+        removed from this build pending provenance review.</string>
     <string name="spellcasting_formula_title">Core Spellcasting Formulas</string>
     <string name="spellcasting_formula_save_dc">Spell Save DC (sample)</string>
     <string name="spellcasting_formula_attack_bonus">Spell Attack Bonus (sample)</string>
@@ -398,7 +469,8 @@ Add your party or individual enemies above.</string>
     <string name="spellcasting_misc_bonus_label">Misc. Bonus</string>
     <string name="spellcasting_caster_level_label">Caster Level</string>
     <string name="spellcasting_selected_level_summary" tools:keep="@string/spellcasting_selected_level_summary">Using level %1$d full-caster progression</string>
-    <string name="spellcasting_selected_progression_summary">Using %1$s progression at level %2$d</string>
+    <string name="spellcasting_selected_progression_summary">Using %1$s progression at level
+        %2$d</string>
     <string name="spellcasting_rules_section_title">Core Rules</string>
     <string name="spellcasting_concentration_section_title">Concentration Breakers</string>
     <string name="spellcasting_schools_section_title">Schools of Magic</string>
@@ -419,5 +491,6 @@ Add your party or individual enemies above.</string>
     <string name="madness_roll_result_title">Roll Result: %1$d</string>
     <string name="reference_rolling_d100">Rolling…</string>
     <string name="madness_rolling_preview_title">Rolling: %1$d</string>
-    <string name="madness_rolling_preview_body">The result is still tumbling through the table…</string>
+    <string name="madness_rolling_preview_body">The result is still tumbling through the
+        table…</string>
 </resources>

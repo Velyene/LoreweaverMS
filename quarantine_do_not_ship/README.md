@@ -3,7 +3,7 @@
 Anything placed in this folder is **not part of the Android app bundle** because it lives outside
 `app/src/main`.
 
-Use this folder for any file or exported data block that fails the project's hard ship rule:
+Use this folder for any file or exported data block that fails the project's hard-ship rule:
 
 > If I cannot prove this came from SRD 5.2.1, it does not go in the shipped app.
 
@@ -44,18 +44,18 @@ Meaning:
 2. Record the original path.
 3. Record the reason it failed review.
 4. Replace shipped app content with one of:
-   - deletion
-   - SRD-only rebuild
-   - blank custom/homebrew entry
-   - temporary unavailable notice in the UI
+    - deletion
+    - SRD-only rebuild
+    - blank custom/homebrew entry
+    - temporary unavailable notice in the UI
 
 ## Hard decision rules
 
-- If feat not in SRD list -> remove from shipped app data
-- If weapon not in SRD table -> remove from shipped app data
-- If item name came from Basic Rules / core books / legacy imports and not approved SRD proof,
+- If a feat is not in the SRD list -> remove it from shipped app data
+- If a weapon is not in the SRD table -> remove it from shipped app data
+- If an item name came from Basic Rules / core books / legacy imports and lacks approved SRD proof,
   remove from shipped app data
-- If source unknown -> quarantine until verified
+- If the source is unknown -> quarantine until verified
 
 When in doubt, choose quarantine over shipment.
 
@@ -92,17 +92,17 @@ examples of the kinds of corpora that should be moved or rebuilt when provenance
 
 They should not be assumed to still exist under `app/src/main` in the current repo snapshot.
 
-- `app/src/main/java/com/example/encountertimer/domain/util/ClassSpellListReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetTwo.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetThree.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetFour.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetFive.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/SpellDescriptionReferenceSetSix.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/`
+- `app/src/main/java/com/example/loreweaver/domain/util/ClassSpellListReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetTwo.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetThree.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetFour.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetFive.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetSix.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/`
   `SpellDescriptionReferenceSrdAdditions.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/MonsterReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/CharacterClassReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/MonsterReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/CharacterClassReference.kt`
 
 See `HARD_DO_NOT_SHIP_AUDIT.md` for the repo-specific rationale behind those flags.
 

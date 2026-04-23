@@ -1,6 +1,6 @@
-# LoreweaverMS
+# Loreweaver
 
-LoreweaverMS is an Android companion app for tabletop RPG groups. It helps Game Masters and
+Loreweaver is an Android companion app for tabletop RPG groups. It helps Game Masters and
 players manage campaigns, characters, encounters, and quick rules lookups from one local-first
 app.
 
@@ -8,7 +8,7 @@ app.
 
 The app is built around encounter flow. It reduces session bookkeeping by keeping combat state,
 campaign notes, character resources, and reference material in one place. The UI uses Jetpack
-Compose with a force-dark fantasy theme for a consistent in-game presentation.
+Compose with a fixed dark-fantasy theme for a consistent in-game presentation.
 
 ## Key Features
 
@@ -21,7 +21,7 @@ Compose with a force-dark fantasy theme for a consistent in-game presentation.
   monster count, CR, and adjusted XP.
 - **Adventure logs**: Persist important session events in a Room-backed log capped to the most
   recent 100 entries.
-- **Rules reference**: Browse local rules content for traps, poisons, diseases, spellcasting,
+- **Reference**: Browse local rules content for traps, poisons, diseases, spellcasting,
   objects, madness, core rules, and character creation.
 - **Favorites, copy, and share**: Star reference entries, copy prompt/reference text, and share
   selected reference content with other apps.
@@ -53,13 +53,31 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 
 ## Project Structure
 
-- `app/src/main/java/com/example/encountertimer/ui/` — Compose screens, view models, and UI
+- `app/src/main/java/com/example/loreweaver/ui/` — Compose screens, view models, and UI
   helpers.
-- `app/src/main/java/com/example/encountertimer/domain/` — domain models, repository interfaces,
+- `app/src/main/java/com/example/loreweaver/domain/` — domain models, repository interfaces,
   use cases, and utilities.
-- `app/src/main/java/com/example/encountertimer/data/` — Room database, entities, DAOs, mappers,
+- `app/src/main/java/com/example/loreweaver/data/` — Room database, entities, DAOs, mappers,
   converters, and repository implementations.
-- `app/src/main/java/com/example/encountertimer/di/` — Hilt module bindings.
+- `app/src/main/java/com/example/loreweaver/di/` — Hilt module bindings.
+
+## Developer Workflow & Repository Hygiene
+
+- Gradle tasks are the source of truth for build health. JetBrains inspections can still raise
+  false positives around manifest-owned Android components, Hilt providers/constructors, Room
+  converters, and JUnit entry points.
+- Shared JetBrains project settings are intentionally versioned from `.idea/inspectionProfiles/`,
+  `.idea/codeStyles/`, `.idea/compiler.xml`, `.idea/gradle.xml`, `.idea/misc.xml`,
+  `.idea/runConfigurations.xml`, `.idea/dictionaries/`, `.idea/.name`,
+  `.idea/AndroidProjectSystem.xml`, `.idea/jsonCatalog.xml`, and `.idea/.gitignore`.
+- Local-only IDE state stays ignored: `.idea/workspace.xml`, caches, shelves, HTTP requests,
+  device/emulator selectors, preview state, `local.properties`, keystores, and all `build/`
+  directories.
+- Root-level JetBrains inspection-export XML files created from `Problems` / `Inspect Code` runs
+  are treated as disposable local artifacts and should not be committed.
+- Prefer fixing shared inspection entry points in `.idea/inspectionProfiles/` before adding
+  `@Suppress("unused")`; when a suppression is still necessary, keep it declaration-scoped on
+  framework-owned entry points only.
 
 ## Notes on data and networking
 
@@ -81,7 +99,7 @@ Running the content-audit test suite also regenerates
 files. In the current audited repo state, that snapshot reports no excluded corpus files under
 `app/src/main`.
 
-The Rules reference still includes monster-running guidance through reviewed Core Rules content,
+The Reference screen still includes monster-running guidance through reviewed Core Rules content,
 but the top-level `Monsters` tab is intentionally an unavailable placeholder instead of a bundled
 local monster corpus.
 

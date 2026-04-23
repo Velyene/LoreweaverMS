@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
 	repositories {
 		google {
@@ -22,6 +24,5 @@ dependencyResolutionManagement {
 	}
 }
 
-rootProject.name = "LoreweaverMS"
+rootProject.name = "Loreweaver"
 include(":app")
- 

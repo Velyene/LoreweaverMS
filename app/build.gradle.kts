@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-	namespace = "com.example.encountertimer"
+	namespace = "com.example.loreweaver"
 	compileSdk = 37
 
 	defaultConfig {
-		applicationId = "com.example.encountertimer"
+		applicationId = "com.example.loreweaver"
 		minSdk = 24
 		targetSdk = 36
 		versionCode = 1

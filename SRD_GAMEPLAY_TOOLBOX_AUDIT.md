@@ -7,13 +7,13 @@ Snapshot date: 2026-04-20
 This note records the Gameplay Toolbox audit completed against the current structured reference
 content in:
 
-- `app/src/main/java/com/example/encountertimer/domain/util/CoreRulesReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/CharacterCreationReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/PoisonReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/TrapReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/DiseaseReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/MadnessReference.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/EncounterDifficulty.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/CoreRulesReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/CharacterCreationReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/PoisonReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/TrapReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/DiseaseReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/MadnessReference.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/EncounterDifficulty.kt`
 
 The audit baseline is the user-provided SRD 5.2.1 Gameplay Toolbox excerpt covering:
 
@@ -201,10 +201,10 @@ adjacent/original reference material rather than excerpt-backed structured conte
 
 ## Verification anchors
 
-- `app/src/test/java/com/example/encountertimer/domain/util/GameplayToolboxSrdAuditTest.kt`
-- `app/src/test/java/com/example/encountertimer/domain/util/CharacterCreationReferenceTest.kt`
-- `app/src/test/java/com/example/encountertimer/domain/util/CoreRulesReferenceTest.kt`
-- `app/src/test/java/com/example/encountertimer/domain/util/ContentSafetyAuditTest.kt`
+- `app/src/test/java/com/example/loreweaver/domain/util/GameplayToolboxSrdAuditTest.kt`
+- `app/src/test/java/com/example/loreweaver/domain/util/CharacterCreationReferenceTest.kt`
+- `app/src/test/java/com/example/loreweaver/domain/util/CoreRulesReferenceTest.kt`
+- `app/src/test/java/com/example/loreweaver/domain/util/ContentSafetyAuditTest.kt`
 
 ## Notes for future updates
 

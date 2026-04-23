@@ -16,9 +16,9 @@ Use this folder for items such as:
 
 ## Do not use this folder for shipped app content
 
-This folder lives outside `app/src/main`, so it is suitable for review-only material.
+This folder lives outside `app/src/main`, so it is suitable for review-only materials.
 
-Do **not** treat files here as automatically bundle-safe. A file can live here for proof
+Do **not** treat files here as automatically safe to bundle. A file can live here for proof
 purposes and still be rejected from the shipped app.
 
 ## Relationship to other folders

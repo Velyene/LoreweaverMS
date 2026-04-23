@@ -1,0 +1,28 @@
+package com.example.loreweaver.data
+
+import androidx.room.TypeConverter
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+
+@Suppress("unused")
+class Converters {
+	private val gson = Gson()
+
+	@TypeConverter
+	fun fromStringList(value: List<String>?): String = gson.toJson(value)
+
+	@TypeConverter
+	fun toStringList(value: String): List<String> {
+		val listType = object : TypeToken<List<String>>() {}.type
+		return gson.fromJson(value, listType) ?: emptyList()
+	}
+
+	@TypeConverter
+	fun fromStringSet(value: Set<String>?): String = gson.toJson(value)
+
+	@TypeConverter
+	fun toStringSet(value: String): Set<String> {
+		val setType = object : TypeToken<Set<String>>() {}.type
+		return gson.fromJson(value, setType) ?: emptySet()
+	}
+}

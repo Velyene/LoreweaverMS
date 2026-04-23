@@ -8,8 +8,8 @@ This note records the **post-quarantine shipped state** for monster-related refe
 
 Current local behavior is centered on:
 
-- `app/src/main/java/com/example/encountertimer/ui/screens/ReferenceScreen.kt`
-- `app/src/main/java/com/example/encountertimer/domain/util/CoreRulesReference.kt`
+- `app/src/main/java/com/example/loreweaver/ui/screens/ReferenceScreen.kt`
+- `app/src/main/java/com/example/loreweaver/domain/util/CoreRulesReference.kt`
 
 The previously bundled local `Monsters A–Z` corpus is **no longer present under `app/src/main`**.
 
@@ -68,10 +68,10 @@ Related tables and glossary content remain available through the audited core-ru
 
 ## Verification anchors
 
-- `app/src/test/java/com/example/encountertimer/ui/screens/ReferenceScreenMonsterSearchTest.kt`
-- `app/src/test/java/com/example/encountertimer/domain/util/CoreRulesReferenceTest.kt`
-- `app/src/test/java/com/example/encountertimer/ui/screens/ReferenceScreenNavigationTest.kt`
-- `app/src/test/java/com/example/encountertimer/domain/util/ContentSafetyAuditTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenMonsterSearchTest.kt`
+- `app/src/test/java/com/example/loreweaver/domain/util/CoreRulesReferenceTest.kt`
+- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
+- `app/src/test/java/com/example/loreweaver/domain/util/ContentSafetyAuditTest.kt`
 - `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
 
 ## Notes for future updates
