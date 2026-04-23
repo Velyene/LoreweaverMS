@@ -13,6 +13,7 @@
 
 package com.example.loreweaver.ui.viewmodels
 
+import androidx.annotation.Keep
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.loreweaver.domain.repository.ReferencePreferencesRepository
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
@@ -43,6 +45,8 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * Reference categories
  */
+@Keep
+@Serializable
 enum class ReferenceCategory {
 	TRAPS,
 	POISONS,

@@ -46,6 +46,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.loreweaver.domain.util.ReferenceDetailResolver
+import com.example.loreweaver.ui.screens.AdventureLogScreen
 import com.example.loreweaver.ui.screens.CampaignDetailScreen
 import com.example.loreweaver.ui.screens.CampaignListScreen
 import com.example.loreweaver.ui.screens.CharacterDetailScreen
@@ -53,7 +54,6 @@ import com.example.loreweaver.ui.screens.CharacterFormScreen
 import com.example.loreweaver.ui.screens.CharacterListScreen
 import com.example.loreweaver.ui.screens.CombatTrackerScreen
 import com.example.loreweaver.ui.screens.HomeScreen
-import com.example.loreweaver.ui.screens.LogScreen
 import com.example.loreweaver.ui.screens.PromptLibraryScreen
 import com.example.loreweaver.ui.screens.ReferenceScreen
 import com.example.loreweaver.ui.screens.SessionHistoryScreen
@@ -64,6 +64,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
+@Suppress("unused")
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +91,7 @@ object CharacterListRoute
 object PromptLibraryRoute
 
 @Serializable
-object LogRoute
+object SessionHistoryRoute
 
 @Serializable
 object AdventureLogRoute
@@ -107,10 +108,10 @@ data class ReferenceRoute(
 data class CampaignDetailRoute(val id: String)
 
 @Serializable
-data class TrackerRoute(val encounterId: String? = null)
+data class CombatTrackerRoute(val encounterId: String? = null)
 
 @Serializable
-object SummaryRoute
+object SessionSummaryRoute
 
 @Serializable
 data class CharacterDetailRoute(val id: String)
@@ -175,9 +176,9 @@ fun LoreweaverApp() {
 		) {
 			composable<HomeRoute> {
 				HomeScreen(
-					onNewEncounter = { navController.navigate(TrackerRoute()) },
+					onNewEncounter = { navController.navigate(CombatTrackerRoute()) },
 					onCampaigns = { navController.navigate(CampaignListRoute) },
-					onResumeEncounter = { navController.navigate(TrackerRoute()) },
+					onResumeEncounter = { navController.navigate(CombatTrackerRoute()) },
 					onCampaignClick = { id -> navController.navigate(CampaignDetailRoute(id)) }
 				) { navController.navigate(ReferenceRoute()) }
 			}
@@ -193,26 +194,26 @@ fun LoreweaverApp() {
 					campaignId = dest.id,
 					onBack = { navController.popBackStack() },
 					onEncounterClick = { encounterId ->
-						navController.navigate(TrackerRoute(encounterId))
+						navController.navigate(CombatTrackerRoute(encounterId))
 					}
 				)
 			}
-			composable<TrackerRoute> { backStackEntry: NavBackStackEntry ->
-				val dest = backStackEntry.toRoute<TrackerRoute>()
+			composable<CombatTrackerRoute> { backStackEntry: NavBackStackEntry ->
+				val dest = backStackEntry.toRoute<CombatTrackerRoute>()
 				CombatTrackerScreen(
 					encounterId = dest.encounterId,
 					onBack = { navController.popBackStack() },
-					onEndEncounter = { navController.navigate(SummaryRoute) }
+					onEndEncounter = { navController.navigate(SessionSummaryRoute) }
 				)
 			}
-			composable<SummaryRoute> {
+			composable<SessionSummaryRoute> {
 				SessionSummaryScreen(
 					onDone = {
 						navController.navigate(HomeRoute) {
 							popUpTo<HomeRoute> { inclusive = true }
 						}
 					},
-					onViewLog = { navController.navigate(AdventureLogRoute) }
+					onOpenAdventureLog = { navController.navigate(AdventureLogRoute) }
 				)
 			}
 			composable<CharacterListRoute> {
@@ -228,11 +229,11 @@ fun LoreweaverApp() {
 					onBack = { navController.popBackStack() }
 				)
 			}
-			composable<LogRoute> {
+			composable<SessionHistoryRoute> {
 				SessionHistoryScreen(onBack = { navController.popBackStack() })
 			}
 			composable<AdventureLogRoute> {
-				LogScreen(onBack = { navController.popBackStack() })
+				AdventureLogScreen(onBack = { navController.popBackStack() })
 			}
 			composable<PromptLibraryRoute> {
 				PromptLibraryScreen()
@@ -283,10 +284,10 @@ private fun NavDestination?.isBottomBarSelected(screen: BottomBarScreen): Boolea
 
 	return when (screen) {
 		is BottomBarScreen.Home -> hasAnyRoute(
-			TrackerRoute::class,
-			SummaryRoute::class,
+			CombatTrackerRoute::class,
+			SessionSummaryRoute::class,
 			AdventureLogRoute::class,
-			LogRoute::class
+			SessionHistoryRoute::class
 		)
 
 		is BottomBarScreen.CampaignList -> hasAnyRoute(CampaignDetailRoute::class)

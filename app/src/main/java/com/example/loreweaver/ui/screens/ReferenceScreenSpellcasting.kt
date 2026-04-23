@@ -377,7 +377,7 @@ private fun SpellcastingProgressionSection(
 		}
 
 		if (state.spellNames.isNotEmpty()) {
-			ReferenceSectionHeader("Verified SRD Spell Names")
+			ReferenceSectionHeader(stringResource(R.string.reference_spellcasting_verified_srd_spell_names))
 			SpellNameListCard(
 				spellNames = state.spellNames,
 				onOpenSpellDetail = onOpenSpellDetail
