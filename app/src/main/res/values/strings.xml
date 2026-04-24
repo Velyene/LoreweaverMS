@@ -15,6 +15,10 @@
     <string name="characters_title">Characters</string>
     <string name="initiative_order_title">Initiative Order</string>
     <string name="round_counter">Round %1$d</string>
+    <string name="combat_action_strike">Strike</string>
+    <string name="combat_action_cast">Cast</string>
+    <string name="combat_action_sneak">Sneak</string>
+    <string name="combat_action_dodge">Dodge</string>
     <string name="next_turn">Next Turn</string>
     <string name="sort_by_hp">Sort by HP</string>
     <string name="sort_by_initiative">Sort by Initiative</string>

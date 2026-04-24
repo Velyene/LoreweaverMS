@@ -1,3 +1,11 @@
+/*
+ * FILE: SessionHistoryScreen.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Session History Screen (SessionHistoryScreen)
+ * 2. Expandable Session Item (SessionExpandableItem)
+ */
+
 package com.example.loreweaver.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
@@ -44,7 +52,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.loreweaver.R
 import com.example.loreweaver.domain.model.SessionRecord
-import com.example.loreweaver.ui.viewmodels.CampaignViewModel
+import com.example.loreweaver.ui.viewmodels.CampaignListViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -53,11 +61,13 @@ import java.util.Locale
 @Composable
 fun SessionHistoryScreen(
 	onBack: () -> Unit,
-	viewModel: CampaignViewModel = hiltViewModel()
+	viewModel: CampaignListViewModel = hiltViewModel()
 ) {
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	var searchQuery by rememberSaveable { mutableStateOf("") }
 	val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()) }
+	// Filtering stays derived from the view-model snapshot so the screen can offer
+	// responsive local search without duplicating session state in the view model.
 	val filteredSessions = remember(uiState.sessions, searchQuery) {
 		if (searchQuery.isEmpty()) uiState.sessions
 		else uiState.sessions.filter { it.title.contains(searchQuery, ignoreCase = true) }
