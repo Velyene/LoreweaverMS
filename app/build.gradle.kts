@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-	namespace = "com.example.loreweaver"
+	namespace = "io.github.velyene.loreweaver"
 	compileSdk = 37
 
 	defaultConfig {
-		applicationId = "com.example.loreweaver"
+		applicationId = "io.github.velyene.loreweaver"
 		minSdk = 24
 		targetSdk = 36
 		versionCode = 1

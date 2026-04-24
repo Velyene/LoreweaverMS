@@ -6,8 +6,8 @@ Snapshot date: 2026-04-20
 
 This note records the magic-item audit completed against the current local reference content in:
 
-- `app/src/main/java/com/example/loreweaver/domain/util/EquipmentReference.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/SpellcastingReference.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/EquipmentReference.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/SpellcastingReference.kt`
 
 The current local equipment reference also includes a dedicated
 `EquipmentReference.MAGIC_ITEMS_A_TO_Z` dataset with condensed searchable summaries for the
@@ -146,10 +146,10 @@ condensed local reference cards, including item-specific embedded tables for ent
 - `Magic Item Rarities and Values`
 - `Magic Item Tools`
 - `Magic Item Crafting Time and Cost`
-- `Sentient Item’s Alignment`
-- `Sentient Item’s Communication`
-- `Sentient Item’s Senses`
-- `Sentient Item’s Special Purpose`
+- `Sentient Itemâ€™s Alignment`
+- `Sentient Itemâ€™s Communication`
+- `Sentient Itemâ€™s Senses`
+- `Sentient Itemâ€™s Special Purpose`
 
 The prior adjacent tables outside the excerpt are no longer surfaced through `ALL_TABLES`:
 
@@ -173,22 +173,25 @@ the provided Magic Items excerpt itself.
 
 ## Verification anchors
 
-- `app/src/test/java/com/example/loreweaver/domain/util/MagicItemsSrdAuditTest.kt`
-- `app/src/test/java/com/example/loreweaver/domain/util/EquipmentReferenceTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/MagicItemsSrdAuditTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/EquipmentReferenceTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/`
   `ReferenceScreenAdventuringGearSearchTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenMagicItemSearchTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenToolSearchTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenMagicItemSearchTest.kt`
+-
+
+`app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
+
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenToolSearchTest.kt`
 
 ## Notes for future updates
 
 - Treat the provided Magic Items excerpt as the allowlist for local magic-item-specific reference
   content unless a later re-audited SRD excerpt expands it.
 - If new local magic-item content is added, classify it explicitly as either:
-	- in the audited excerpt,
-	- related but outside the excerpt, or
-	- app-authored guidance.
+    - in the audited excerpt,
+    - related but outside the excerpt, or
+    - app-authored guidance.
 - Keep canonical item/category labels exact when the goal is SRD alignment.
 - If the source of a magic-item name is unknown, treat that as a quarantine case, not as a
   temporary ship-safe default.

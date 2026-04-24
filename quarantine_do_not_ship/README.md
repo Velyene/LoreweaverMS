@@ -92,17 +92,17 @@ examples of the kinds of corpora that should be moved or rebuilt when provenance
 
 They should not be assumed to still exist under `app/src/main` in the current repo snapshot.
 
-- `app/src/main/java/com/example/loreweaver/domain/util/ClassSpellListReference.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReference.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetTwo.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetThree.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetFour.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetFive.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/SpellDescriptionReferenceSetSix.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/ClassSpellListReference.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/SpellDescriptionReference.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/SpellDescriptionReferenceSetTwo.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/SpellDescriptionReferenceSetThree.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/SpellDescriptionReferenceSetFour.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/SpellDescriptionReferenceSetFive.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/SpellDescriptionReferenceSetSix.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/`
   `SpellDescriptionReferenceSrdAdditions.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/MonsterReference.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/CharacterClassReference.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReference.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/CharacterClassReference.kt`
 
 See `HARD_DO_NOT_SHIP_AUDIT.md` for the repo-specific rationale behind those flags.
 
