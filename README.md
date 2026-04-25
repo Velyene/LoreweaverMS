@@ -84,6 +84,10 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 The current app source is local-first. The runtime app code in `app/src/main` persists its data in
 Room and `SharedPreferences`; it does not currently include a Retrofit-based remote API layer.
 
+Android backup is intentionally explicit: cloud backup restores only
+`reference_preferences.xml`, while device-to-device transfer preserves the full
+`loreweaver_database` store, its SQLite sidecars, and `reference_preferences.xml`.
+
 ## SRD Notice
 
 See `SRD_NOTICE.md` for the exact SRD 5.2.1 attribution text and current content-audit guardrails.

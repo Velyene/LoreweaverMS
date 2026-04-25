@@ -26,6 +26,7 @@ local.properties
 /.idea/migrations.xml
 /.idea/vcs.xml
 /.idea/httpRequests/
+/.idea/copilotDiffState.xml
 # Track `.idea/.gitignore` so nested local IDE rules are shared with the team.
 # Personal / machine-specific IDE state (do not share)
 /.idea/appInsightsSettings.xml
@@ -80,6 +81,7 @@ EXCLUDED_REFERENCE_CORPUS_AUDIT.md
 # ============================================================
 # Local JetBrains inspection / formatting exports
 # ============================================================
+/AI_INTERACTION_LOG.md
 /.descriptions.xml
 /.xml
 /AndroidLint*.xml
