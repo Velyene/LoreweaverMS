@@ -7,8 +7,8 @@ Snapshot date: 2026-04-20
 This note records the monster stat-block audit completed against the current local reference
 content in:
 
-- `app/src/main/java/com/example/loreweaver/domain/util/CoreRulesReference.kt`
-- `app/src/main/java/com/example/loreweaver/ui/screens/ReferenceScreenNavigation.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/CoreRulesReference.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenNavigation.kt`
 
 The audit baseline is the user-provided SRD 5.2.1 excerpt covering:
 
@@ -80,10 +80,10 @@ The existing `Proficiency Bonus` table already covers the same CR bands used by 
 
 ## Verification anchors
 
-- `app/src/test/java/com/example/loreweaver/domain/util/CoreRulesReferenceTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenGlossarySearchTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
-- `app/src/test/java/com/example/loreweaver/domain/util/ContentSafetyAuditTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenGlossarySearchTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/ContentSafetyAuditTest.kt`
 
 ## Notes for future updates
 

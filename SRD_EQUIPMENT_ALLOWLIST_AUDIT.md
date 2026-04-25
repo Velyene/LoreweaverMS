@@ -6,8 +6,8 @@ Snapshot date: 2026-04-20
 
 This note records the equipment and feat allowlist audit completed against the current
 SRD-backed reference content in
-`app/src/main/java/com/example/loreweaver/domain/util/EquipmentReference.kt` and
-`app/src/main/java/com/example/loreweaver/domain/util/CharacterCreationReference.kt`.
+`app/src/main/java/io/github/velyene/loreweaver/domain/util/EquipmentReference.kt` and
+`app/src/main/java/io/github/velyene/loreweaver/domain/util/CharacterCreationReference.kt`.
 
 The goal of the pass was exact allowlist alignment for canonical labels used by the app's
 structured reference data, while preserving searchability through supporting notes where needed.
@@ -45,36 +45,36 @@ This file should be treated as an allowlist document, not merely a normalization
 
 ### Focus types
 
-- `Staff (also a Quarterstaff)` → `Staff`
-- `Wooden staff (also a Quarterstaff)` → `Wooden Staff`
-- `Amulet (worn or held)` → `Amulet`
-- `Emblem (borne on fabric or a Shield)` → `Emblem`
-- `Reliquary (held)` → `Reliquary`
+- `Staff (also a Quarterstaff)` â†’ `Staff`
+- `Wooden staff (also a Quarterstaff)` â†’ `Wooden Staff`
+- `Amulet (worn or held)` â†’ `Amulet`
+- `Emblem (borne on fabric or a Shield)` â†’ `Emblem`
+- `Reliquary (held)` â†’ `Reliquary`
 
 The removed explanatory wording was retained in `notes` so focus search remains discoverable.
 
 ### Tack and vehicle labels
 
-- `Feed per day` → `Feed`
-- `Stabling per day` → `Stabling`
+- `Feed per day` â†’ `Feed`
+- `Stabling per day` â†’ `Stabling`
 
 ### Food, drink, and lodging labels
 
-- `Ale (mug)` → `Ale`
-- `Bread (loaf)` → `Bread`
-- `Cheese (wedge)` → `Cheese`
-- summarized inn rows → `Inn Stay`
-- summarized meal rows → `Meal`
+- `Ale (mug)` â†’ `Ale`
+- `Bread (loaf)` â†’ `Bread`
+- `Cheese (wedge)` â†’ `Cheese`
+- summarized inn rows â†’ `Inn Stay`
+- summarized meal rows â†’ `Meal`
 - retained exact labels `Wine, Common` and `Wine, Fine`
 
 ### Spellcasting service categories
 
-- `1` → `Level 1`
-- `2` → `Level 2`
-- `3` → `Level 3`
-- `4–5` → `Level 4–5`
-- `6–8` → `Level 6–8`
-- `9` → `Level 9`
+- `1` â†’ `Level 1`
+- `2` â†’ `Level 2`
+- `3` â†’ `Level 3`
+- `4â€“5` â†’ `Level 4â€“5`
+- `6â€“8` â†’ `Level 6â€“8`
+- `9` â†’ `Level 9`
 
 ### Tool variant normalization
 
@@ -104,16 +104,16 @@ Variant price and weight details were moved into notes instead of remaining insi
 
 Supporting craft/reference strings were normalized where they diverged from the allowlist:
 
-- `Portable Ram` → `Ram, Portable`
-- `Glass Bottle` → `Bottle, Glass`
-- `Crossbow Bolt Case` → `Case, Crossbow Bolt`
-- `Map or Scroll Case` → `Case, Map or Scroll`
-- `Firearm Bullets` → `Bullets, Firearm`
-- `Sling Bullets` → `Bullets, Sling`
-- `Iron Pot` → `Pot, Iron`
-- `Iron Spikes` → `Spikes, Iron`
-- `Bullseye Lantern` → `Lantern, Bullseye`
-- `Hooded Lantern` → `Lantern, Hooded`
+- `Portable Ram` â†’ `Ram, Portable`
+- `Glass Bottle` â†’ `Bottle, Glass`
+- `Crossbow Bolt Case` â†’ `Case, Crossbow Bolt`
+- `Map or Scroll Case` â†’ `Case, Map or Scroll`
+- `Firearm Bullets` â†’ `Bullets, Firearm`
+- `Sling Bullets` â†’ `Bullets, Sling`
+- `Iron Pot` â†’ `Pot, Iron`
+- `Iron Spikes` â†’ `Spikes, Iron`
+- `Bullseye Lantern` â†’ `Lantern, Bullseye`
+- `Hooded Lantern` â†’ `Lantern, Hooded`
 
 ## Already aligned
 
@@ -146,16 +146,19 @@ If a future entry is not present in the corresponding approved SRD table, it sho
 
 ## Verification anchors
 
-- `app/src/test/java/com/example/loreweaver/domain/util/EquipmentReferenceTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenFocusSearchTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenToolSearchTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenTransportSearchTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
-- `app/src/test/java/com/example/loreweaver/domain/util/ContentSafetyAuditTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/EquipmentReferenceTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenFocusSearchTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenToolSearchTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenTransportSearchTest.kt`
+-
+
+`app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
+
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/ContentSafetyAuditTest.kt`
 
 `ContentSafetyAuditTest` already treats
-`java/com/example/loreweaver/domain/util/EquipmentReference.kt` and
-`java/com/example/loreweaver/domain/util/CharacterCreationReference.kt` as reviewed baseline
+`java/io/github/velyene/loreweaver/domain/util/EquipmentReference.kt` and
+`java/io/github/velyene/loreweaver/domain/util/CharacterCreationReference.kt` as reviewed baseline
 files for prose-safety auditing.
 
 ## Notes for future updates

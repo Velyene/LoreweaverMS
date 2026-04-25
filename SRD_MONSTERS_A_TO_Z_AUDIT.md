@@ -1,4 +1,4 @@
-# SRD Monsters A–Z Audit
+# SRD Monsters Aâ€“Z Audit
 
 Snapshot date: 2026-04-21
 
@@ -8,10 +8,10 @@ This note records the **post-quarantine shipped state** for monster-related refe
 
 Current local behavior is centered on:
 
-- `app/src/main/java/com/example/loreweaver/ui/screens/ReferenceScreen.kt`
-- `app/src/main/java/com/example/loreweaver/domain/util/CoreRulesReference.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreen.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/CoreRulesReference.kt`
 
-The previously bundled local `Monsters A–Z` corpus is **no longer present under `app/src/main`**.
+The previously bundled local `Monsters Aâ€“Z` corpus is **no longer present under `app/src/main`**.
 
 Goal: document that Loreweaver currently ships **monster-running guidance and monster-stat-block
 explanations only**, not a bundled searchable monster corpus.
@@ -41,7 +41,7 @@ There is **no bundled local monster corpus** under `app/src/main` at this snapsh
 That means the app no longer ships:
 
 - `MonsterReference.kt`
-- local `Monsters A–Z` searchable summaries
+- local `Monsters Aâ€“Z` searchable summaries
 - local spell-linked monster supplement cards
 - local monster alias tables tied to that removed corpus
 
@@ -52,8 +52,8 @@ The top-level `Monsters` tab still exists in `ReferenceScreen`, but it is now an
 
 Current behavior:
 
-- blank query → `reference_monster_unavailable`
-- active query → `reference_monster_search_unavailable`
+- blank query â†’ `reference_monster_unavailable`
+- active query â†’ `reference_monster_search_unavailable`
 
 ### Still-shipped monster guidance
 
@@ -68,10 +68,10 @@ Related tables and glossary content remain available through the audited core-ru
 
 ## Verification anchors
 
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenMonsterSearchTest.kt`
-- `app/src/test/java/com/example/loreweaver/domain/util/CoreRulesReferenceTest.kt`
-- `app/src/test/java/com/example/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
-- `app/src/test/java/com/example/loreweaver/domain/util/ContentSafetyAuditTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenMonsterSearchTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/ContentSafetyAuditTest.kt`
 - `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
 
 ## Notes for future updates

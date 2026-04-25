@@ -53,13 +53,13 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 
 ## Project Structure
 
-- `app/src/main/java/com/example/loreweaver/ui/` — Compose screens, view models, and UI
+- `app/src/main/java/io/github/velyene/loreweaver/ui/` — Compose screens, view models, and UI
   helpers.
-- `app/src/main/java/com/example/loreweaver/domain/` — domain models, repository interfaces,
+- `app/src/main/java/io/github/velyene/loreweaver/domain/` — domain models, repository interfaces,
   use cases, and utilities.
-- `app/src/main/java/com/example/loreweaver/data/` — Room database, entities, DAOs, mappers,
+- `app/src/main/java/io/github/velyene/loreweaver/data/` — Room database, entities, DAOs, mappers,
   converters, and repository implementations.
-- `app/src/main/java/com/example/loreweaver/di/` — Hilt module bindings.
+- `app/src/main/java/io/github/velyene/loreweaver/di/` — Hilt module bindings.
 
 ## Developer Workflow & Repository Hygiene
 
@@ -83,6 +83,10 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 
 The current app source is local-first. The runtime app code in `app/src/main` persists its data in
 Room and `SharedPreferences`; it does not currently include a Retrofit-based remote API layer.
+
+Android backup is intentionally explicit: cloud backup restores only
+`reference_preferences.xml`, while device-to-device transfer preserves the full
+`loreweaver_database` store, its SQLite sidecars, and `reference_preferences.xml`.
 
 ## SRD Notice
 

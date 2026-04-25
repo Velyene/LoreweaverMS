@@ -4,11 +4,11 @@ if (-not (Test-Path $adb)) {
     exit 1
 }
 
-& $adb shell am force-stop com.example.loreweaver
+& $adb shell am force-stop io.github.velyene.loreweaver
 & $adb logcat -c
-& $adb shell am start -n com.example.loreweaver/.MainActivity
+& $adb shell am start -n io.github.velyene.loreweaver/io.github.velyene.loreweaver.MainActivity
 Start-Sleep -Seconds 3
-$pid = (& $adb shell pidof com.example.loreweaver).Trim()
+$pid = (& $adb shell pidof io.github.velyene.loreweaver).Trim()
 "PID=$pid"
 if ($pid) {
     & $adb logcat -d --pid=$pid -v time
@@ -19,5 +19,5 @@ if ($pid) {
 
 '--- TOP RESUMED ---'
 $activities = & $adb shell dumpsys activity activities
-$activities | Select-String -Pattern 'mResumedActivity','topResumedActivity','ResumedActivity','com.example.loreweaver' | ForEach-Object { $_.Line }
+$activities | Select-String -Pattern 'mResumedActivity','topResumedActivity','ResumedActivity','io.github.velyene.loreweaver','io.github.velyene.loreweaver.MainActivity' | ForEach-Object { $_.Line }
 

@@ -98,6 +98,9 @@ surface recoverable failures cleanly.
 The current runtime app source under `app/src/main` is local-first.
 
 - Data persistence is handled by Room and `SharedPreferences`.
+- Backup policy is intentionally split: cloud backup keeps only `reference_preferences.xml`, while
+  device-to-device transfer preserves `loreweaver_database` plus its SQLite sidecars and
+  `reference_preferences.xml`.
 - No Retrofit, OkHttp service layer, or runtime `ApiService` implementation is currently present in
   `app/src/main`.
 - `scripts/Test-DndApi.ps1` is a developer utility script for manually verifying external D&D API

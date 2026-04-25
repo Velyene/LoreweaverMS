@@ -1,0 +1,386 @@
+/*
+ * FILE: SrdSpellIndexReference.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. SrdSpellIndexReference singleton â€” alphabetically ordered SRD spell names list
+ */
+
+package io.github.velyene.loreweaver.domain.util
+
+object SrdSpellIndexReference {
+	private val apostropheVariantRegex = Regex("â€™|â€˜|`|Â´")
+	private val punctuationRegex = Regex("[^a-z0-9]+")
+	private val whitespaceRegex = Regex("\\s+")
+
+	val SPELL_NAMES: List<String> = """
+		Acid Arrow
+		Acid Splash
+		Aid
+		Alarm
+		Alter Self
+		Animal Friendship
+		Animal Messenger
+		Animal Shapes
+		Animate Dead
+		Animate Objects
+		Antimagic Field
+		Antipathy/Sympathy
+		Antilife Shell
+		Arcane Eye
+		Arcane Hand
+		Arcane Lock
+		Arcane Sword
+		Arcanistâ€™s Magic Aura
+		Astral Projection
+		Augury
+		Aura of Life
+		Awaken
+		Bane
+		Banishment
+		Barkskin
+		Beacon of Hope
+		Befuddlement
+		Bestow Curse
+		Black Tentacles
+		Blade Barrier
+		Bless
+		Blight
+		Blindness/Deafness
+		Blink
+		Blur
+		Burning Hands
+		Call Lightning
+		Calm Emotions
+		Chain Lightning
+		Charm Monster
+		Charm Person
+		Chill Touch
+		Chromatic Orb
+		Circle of Death
+		Clairvoyance
+		Clone
+		Cloudkill
+		Color Spray
+		Command
+		Commune
+		Commune with Nature
+		Comprehend Languages
+		Compulsion
+		Cone of Cold
+		Confusion
+		Conjure Animals
+		Conjure Celestial
+		Conjure Elemental
+		Conjure Fey
+		Conjure Minor Elementals
+		Conjure Woodland Beings
+		Contact Other Plane
+		Contagion
+		Contingency
+		Continual Flame
+		Control Water
+		Control Weather
+		Counterspell
+		Create Food and Water
+		Create or Destroy Water
+		Create Undead
+		Creation
+		Cure Wounds
+		Dancing Lights
+		Darkness
+		Darkvision
+		Daylight
+		Death Ward
+		Delayed Blast Fireball
+		Demiplane
+		Detect Evil and Good
+		Detect Magic
+		Detect Poison and Disease
+		Detect Thoughts
+		Dimension Door
+		Disguise Self
+		Disintegrate
+		Dispel Evil and Good
+		Dispel Magic
+		Dissonant Whispers
+		Divination
+		Divine Favor
+		Divine Smite
+		Divine Word
+		Dominate Beast
+		Dominate Monster
+		Dominate Person
+		Dragonâ€™s Breath
+		Dream
+		Druidcraft
+		Earthquake
+		Eldritch Blast
+		Elementalism
+		Enhance Ability
+		Enlarge/Reduce
+		Ensnaring Strike
+		Entangle
+		Enthrall
+		Etherealness
+		Expeditious Retreat
+		Eyebite
+		Fabricate
+		Faerie Fire
+		Faithful Hound
+		False Life
+		Fear
+		Feather Fall
+		Find Familiar
+		Find Steed
+		Find Traps
+		Finger of Death
+		Fireball
+		Find the Path
+		Fire Bolt
+		Fire Shield
+		Fire Storm
+		Flame Blade
+		Flame Strike
+		Flaming Sphere
+		Flesh to Stone
+		Floating Disk
+		Fly
+		Fog Cloud
+		Forbiddance
+		Forcecage
+		Foresight
+		Freedom of Movement
+		Freezing Sphere
+		Gaseous Form
+		Gate
+		Geas
+		Gentle Repose
+		Giant Insect
+		Glibness
+		Globe of Invulnerability
+		Glyph of Warding
+		Goodberry
+		Grease
+		Greater Invisibility
+		Greater Restoration
+		Guardian of Faith
+		Guards and Wards
+		Guidance
+		Guiding Bolt
+		Gust of Wind
+		Hallow
+		Hallucinatory Terrain
+		Harm
+		Haste
+		Heal
+		Healing Word
+		Heat Metal
+		Hellish Rebuke
+		Heroesâ€™ Feast
+		Heroism
+		Hex
+		Hideous Laughter
+		Hold Monster
+		Hold Person
+		Holy Aura
+		Hunterâ€™s Mark
+		Hypnotic Pattern
+		Ice Knife
+		Ice Storm
+		Identify
+		Illusory Script
+		Imprisonment
+		Incendiary Cloud
+		Inflict Wounds
+		Insect Plague
+		Instant Summons
+		Irresistible Dance
+		Invisibility
+		Jump
+		Knock
+		Legend Lore
+		Lesser Restoration
+		Levitate
+		Light
+		Lightning Bolt
+		Locate Animals or Plants
+		Locate Creature
+		Locate Object
+		Longstrider
+		Mage Armor
+		Mage Hand
+		Magic Circle
+		Magic Jar
+		Magic Missile
+		Magic Mouth
+		Magic Weapon
+		Magnificent Mansion
+		Major Image
+		Mass Cure Wounds
+		Mass Heal
+		Mass Healing Word
+		Mass Suggestion
+		Maze
+		Meld into Stone
+		Mending
+		Message
+		Meteor Swarm
+		Mind Blank
+		Mind Spike
+		Minor Illusion
+		Mirage Arcane
+		Mirror Image
+		Mislead
+		Misty Step
+		Modify Memory
+		Moonbeam
+		Move Earth
+		Nondetection
+		Passwall
+		Pass without Trace
+		Phantasmal Force
+		Phantasmal Killer
+		Phantom Steed
+		Planar Ally
+		Planar Binding
+		Plane Shift
+		Plant Growth
+		Poison Spray
+		Polymorph
+		Power Word Heal
+		Power Word Kill
+		Power Word Stun
+		Prayer of Healing
+		Prestidigitation
+		Prismatic Spray
+		Prismatic Wall
+		Private Sanctum
+		Produce Flame
+		Programmed Illusion
+		Project Image
+		Protection from Energy
+		Protection from Evil and Good
+		Protection from Poison
+		Purify Food and Drink
+		Raise Dead
+		Ray of Enfeeblement
+		Ray of Frost
+		Regenerate
+		Ray of Sickness
+		Reincarnate
+		Remove Curse
+		Resilient Sphere
+		Resistance
+		Resurrection
+		Reverse Gravity
+		Revivify
+		Rope Trick
+		Sacred Flame
+		Sanctuary
+		Scorching Ray
+		Scrying
+		Searing Smite
+		Secret Chest
+		See Invisibility
+		Seeming
+		Sending
+		Sequester
+		Shapechange
+		Shatter
+		Shield
+		Shield of Faith
+		Shillelagh
+		Shining Smite
+		Shocking Grasp
+		Silence
+		Silent Image
+		Simulacrum
+		Sleep
+		Sleet Storm
+		Slow
+		Sorcerous Burst
+		Spare the Dying
+		Speak with Animals
+		Speak with Dead
+		Speak with Plants
+		Spider Climb
+		Spike Growth
+		Spirit Guardians
+		Spiritual Weapon
+		Starry Wisp
+		Stinking Cloud
+		Stone Shape
+		Stoneskin
+		Storm of Vengeance
+		Suggestion
+		Summon Dragon
+		Sunbeam
+		Sunburst
+		Symbol
+		Telekinesis
+		Telepathic Bond
+		Teleport
+		Teleportation Circle
+		Thaumaturgy
+		Thunderwave
+		Time Stop
+		Tiny Hut
+		Tongues
+		Transport via Plants
+		Tree Stride
+		True Polymorph
+		True Resurrection
+		True Seeing
+		True Strike
+		Tsunami
+		Unseen Servant
+		Vampiric Touch
+		Vicious Mockery
+		Vitriolic Sphere
+		Wall of Fire
+		Wall of Force
+		Wall of Ice
+		Wall of Stone
+		Wall of Thorns
+		Warding Bond
+		Water Breathing
+		Water Walk
+		Web
+		Weird
+		Wind Walk
+		Wind Wall
+		Wish
+		Word of Recall
+		Zone of Truth
+	""".trimIndent()
+		.lineSequence()
+		.map(String::trim)
+		.filter(String::isNotBlank)
+		.toList()
+
+	fun search(query: String): List<String> {
+		val normalizedQuery = query.trim()
+		if (normalizedQuery.isBlank()) return emptyList()
+		return SPELL_NAMES.filter { spellName ->
+			spellName.contains(normalizedQuery, ignoreCase = true)
+		}
+	}
+
+	fun canonicalNameFor(value: String): String? {
+		val normalizedValue = normalizeKey(value)
+		return SPELL_NAMES.firstOrNull { spellName ->
+			normalizeKey(spellName) == normalizedValue
+		}
+	}
+
+	private fun normalizeKey(value: String): String {
+		return value
+			.trim()
+			.replace(apostropheVariantRegex, "'")
+			.replace("&", " and ")
+			.lowercase()
+			.replace(punctuationRegex, " ")
+			.replace(whitespaceRegex, " ")
+			.trim()
+	}
+}

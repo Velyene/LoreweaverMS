@@ -1,9 +1,29 @@
 # Local Android Studio / JetBrains IDE state inside the shared `.idea` folder
-/shelf/
+# Keep shared settings versioned: `codeStyles/`, `inspectionProfiles/`, `compiler.xml`,
+# `gradle.xml`, `misc.xml`, `runConfigurations.xml`, `dictionaries/`,
+# `AndroidProjectSystem.xml`, `jsonCatalog.xml`, and this `.gitignore` file.
+/*.iml
+/modules.xml
 /workspace.xml
+/vcs.xml
+/navEditor.xml
+/assetWizardSettings.xml
+/deploymentTargetSelector.xml
+/migrations.xml
+/appInsightsSettings.xml
+/deviceManager.xml
+/emulatorDisplays.xml
+/markdown.xml
+/caches/
+/libraries/
+/modules/
+/errors/
+/sessions/
+/shelf/
 /httpRequests/
 /dataSources/
 /dataSources.local.xml
 /sqlDataSources.xml
 /dynamic.xml
 /usage.statistics.xml
+/copilotDiffState.xml
