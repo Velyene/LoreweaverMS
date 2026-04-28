@@ -1,8 +1,6 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.EquipmentReference
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceScreenAmmunitionSearchTest {
@@ -18,40 +16,40 @@ class ReferenceScreenAmmunitionSearchTest {
 		val firearmBullets = EquipmentReference.AMMUNITION.first { it.type == "Bullets, Firearm" }
 		val needles = EquipmentReference.AMMUNITION.first { it.type == NEEDLES }
 
-		assertTrue(arrows.matchesSearchQuery(QUIVER))
-		assertTrue(arrows.matchesSearchQuery("20"))
-		assertTrue(firearmBullets.matchesSearchQuery("Pouch"))
-		assertTrue(firearmBullets.matchesSearchQuery("3 GP"))
-		assertTrue(needles.matchesSearchQuery("50"))
+		assertMatchesAll(arrows::matchesSearchQuery, QUIVER, "20")
+		assertMatchesAll(firearmBullets::matchesSearchQuery, "Pouch", "3 GP")
+		assertMatchesAll(needles::matchesSearchQuery, "50")
 	}
 
 	@Test
 	fun filterEquipmentAmmunition_returnsExpectedMatchesForQuery() {
-		assertEquals(listOf(ARROWS), filterEquipmentAmmunition(QUIVER).map { it.type })
-		assertEquals(
+		assertQueryResults(listOf(ARROWS), QUIVER, ::filterEquipmentAmmunition) { it.type }
+		assertQueryResults(
 			listOf("Bullets, Firearm", "Bullets, Sling", "Needles"),
-			filterEquipmentAmmunition("Pouch").map { it.type })
-		assertEquals(listOf(NEEDLES), filterEquipmentAmmunition("50").map { it.type })
-		assertTrue(filterEquipmentAmmunition("Nonexistent Ammunition Term").isEmpty())
+			"Pouch",
+			::filterEquipmentAmmunition
+		) { it.type }
+		assertQueryResults(listOf(NEEDLES), "50", ::filterEquipmentAmmunition) { it.type }
+		assertNoQueryResults("Nonexistent Ammunition Term", ::filterEquipmentAmmunition)
 	}
 
 	@Test
 	fun visibleEquipmentAmmunition_respectsEquipmentSubsectionWhenQueryBlank() {
-		assertEquals(
+		assertVisibleWhenBlankInSubsection(
 			EquipmentReference.AMMUNITION.map { it.type },
-			visibleEquipmentAmmunition("", CharacterCreationSubsection.EQUIPMENT).map { it.type }
-		)
-		assertTrue(visibleEquipmentAmmunition("", CharacterCreationSubsection.CLASSES).isEmpty())
+			CharacterCreationSubsection.EQUIPMENT,
+			::visibleEquipmentAmmunition
+		) { it.type }
+		assertHiddenWhenBlankInSubsection(CharacterCreationSubsection.CLASSES, ::visibleEquipmentAmmunition)
 	}
 
 	@Test
 	fun visibleEquipmentAmmunition_usesSearchAcrossSubsections() {
-		assertEquals(
+		assertVisibleForSearch(
 			listOf(ARROWS),
-			visibleEquipmentAmmunition(
-				QUIVER,
-				CharacterCreationSubsection.SPECIES_ORIGIN
-			).map { it.type }
-		)
+			QUIVER,
+			CharacterCreationSubsection.SPECIES_ORIGIN,
+			::visibleEquipmentAmmunition
+		) { it.type }
 	}
 }
