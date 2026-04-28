@@ -111,7 +111,8 @@ internal fun CharacterFormContent(
 				.fillMaxSize()
 				.padding(padding)
 				.padding(16.dp)
-				.verticalScroll(scrollState),
+				.verticalScroll(scrollState)
+				.visibleVerticalScrollbar(scrollState),
 			verticalArrangement = Arrangement.spacedBy(12.dp)
 		) {
 			CharacterBasicsSection(

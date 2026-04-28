@@ -6,6 +6,7 @@ local-first MVVM + Clean Architecture structure.
 ## Architecture Layers
 
 ```text
+navigation/ -> @Serializable route types, bottom-bar metadata, and NavHost wiring
 ui/      -> Compose screens plus @HiltViewModel classes with StateFlow-backed UiState
 domain/  -> Repository interfaces, domain models, use cases, and shared utilities
 data/    -> Room entities, DAOs, mappers, converters, and repository implementations
@@ -23,10 +24,16 @@ Two `CampaignRepository` files exist at different paths:
 
 > The legacy plain-class `data/repository/CampaignRepository.kt` should not be recreated.
 
+`CampaignRepository` is now a composite interface that extends `CampaignsRepository`,
+`EncountersRepository`, `SessionsRepository`, `NotesRepository`, `CharactersRepository`, and
+`LogsRepository`; `AppModule.kt` fans the same `CampaignRepositoryImpl` out to those narrower
+interfaces.
+
 ## Navigation
 
-All routes are declared near the top of `MainActivity.kt` as `@Serializable` objects or data
-classes.
+Route types live in `navigation/Routes.kt`, while `navigation/LoreweaverNavGraph.kt` owns
+`LoreweaverApp`, the `NavHost`, and bottom-bar wiring. `MainActivity.kt` now just applies
+`LoreweaverTheme(darkTheme = true)` and hosts `LoreweaverApp()`.
 
 Examples:
 
@@ -53,6 +60,10 @@ Key route notes:
 - `PromptLibraryRoute` exists, but it is not a bottom-bar destination.
 - `ReferenceRoute` supports initial category selection, free-text search, and deep linking into a
   specific detail section/slug within `ReferenceScreen`.
+- `BottomBarScreen.kt` is the source of truth for bottom-bar items, and
+  `NavDestination?.isBottomBarSelected()` in `LoreweaverNavGraph.kt` keeps Home selected while the
+  user is in combat/session flow routes such as `CombatTrackerRoute`, `SessionSummaryRoute`,
+  `AdventureLogRoute`, and `SessionHistoryRoute`.
 
 ## Data Layer Conventions
 
@@ -145,6 +156,13 @@ Reference behavior notes:
 - Spellcasting content includes slot tables, formulas, and caster progression helpers from
   `domain/util/SpellcastingReference.kt`.
 - The madness section includes a d100 roller backed by `ReferenceViewModel.rollMadness()`.
+- Deep-link/detail content is centralized in `domain/util/ReferenceDetailResolver.kt`, which
+  resolves spells, conditions, feats, weapons, armor, tools, adventuring gear, magic items,
+  ammunition, spellcasting focuses, mounts/vehicles, lifestyles, food/lodging, and hirelings.
+- The reference datasets now also rely on `domain/util/CoreRulesReference.kt`,
+  `domain/util/CharacterCreationReference.kt`, `domain/util/EquipmentReference.kt`, and
+  `domain/util/SrdSpellIndexReference.kt` in addition to the trap/poison/disease/spellcasting
+  helpers.
 
 ## Build & Run Commands
 
@@ -161,6 +179,10 @@ Reference behavior notes:
 # Instrumented tests (requires device/emulator)
 ./gradlew connectedAndroidTest
 ```
+
+`ContentSafetyAuditTest`, `GameplayToolboxSrdAuditTest`, and `MagicItemsSrdAuditTest` all run as
+part of `:app:testDebugUnitTest`; the audit suite can rewrite `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
+when the long-prose/reference-corpus inventory changes.
 
 Key versions from `gradle/libs.versions.toml`:
 
@@ -183,13 +205,16 @@ Key versions from `gradle/libs.versions.toml`:
 - Room 2.8.x DAO methods return `Long` and `Int`; `CampaignRepositoryImpl` uses block bodies so
   those return values do not leak through `Unit`-typed repository methods.
 - All four migrations are wired into `Room.databaseBuilder()`.
-- Some IDE `ComposableFunction0/1/2` errors around Compose lambdas in `MainActivity.kt` may be
-  JetBrains IDE analysis false positives even when Gradle builds successfully.
+- Some IDE `ComposableFunction0/1/2` errors around Compose lambdas in files such as
+  `MainActivity.kt` and `navigation/LoreweaverNavGraph.kt` may be JetBrains IDE analysis false
+  positives even when Gradle builds successfully.
 - JetBrains `unused declaration` inspections can also produce false positives for manifest-owned
   Android components, Hilt providers/constructors, Room converters, and JUnit entry points even
   when Gradle builds and tests pass.
-- `CampaignDetailScreen.kt` keeps targeted `@Suppress("UNUSED_VALUE")` markers on mutable state
-  assignments inside Compose dismissal callbacks to silence false positives.
+- Targeted `@Suppress("UNUSED_VALUE")` markers now appear across split Compose screen files such as
+  `CampaignDetailEncountersSection.kt`, `CharacterListScreen.kt`, `ReferenceScreenMadness.kt`, and
+  `ui/screens/tracker/setup/EncounterSetupView.kt` to silence false positives on state writes
+  inside callbacks.
 
 ## Repository Hygiene
 
@@ -201,13 +226,22 @@ Key versions from `gradle/libs.versions.toml`:
   device/emulator selectors, preview state, and similar local files should remain ignored.
 - Root-level JetBrains inspection export XML files created from `Problems` / `Inspect Code`
   workflows are disposable local artifacts and should stay untracked.
+- Root-level markdown audit artifacts such as `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`,
+  `HARD_DO_NOT_SHIP_AUDIT.md`, and the `SRD_*_AUDIT.md` files are intentional repo-owned
+  documentation, not disposable inspection exports.
 - Prefer adjusting shared inspection entry points for Android/Hilt/Room/JUnit before adding
   `@Suppress("unused")` in source. If suppression is still required, keep it narrowly scoped to a
   verified framework-owned declaration.
 
 ## Key Files Reference
 
-- `MainActivity.kt` — route declarations, `LoreweaverApp`, `NavHost`, and bottom-bar setup.
+- `MainActivity.kt` — Android entry activity; applies `LoreweaverTheme(darkTheme = true)` and
+  hosts `LoreweaverApp()`.
+- `LoreweaverApplication.kt` — `@HiltAndroidApp` application entry point declared in the manifest.
+- `navigation/Routes.kt` — type-safe `@Serializable` route declarations.
+- `navigation/LoreweaverNavGraph.kt` — `LoreweaverApp`, `NavHost`, animated transitions, and
+  bottom-bar setup/selection rules.
+- `navigation/BottomBarScreen.kt` — bottom-navigation destination metadata.
 - `di/AppModule.kt` — Hilt providers for Room, DAOs, repositories, and shared preferences.
 - `data/AppDatabase.kt` — Room database definition, entity list, and migrations.
 - `data/mapper/DataMappers.kt` — domain/entity mapping extensions and Gson conversions.
@@ -217,12 +251,21 @@ Key versions from `gradle/libs.versions.toml`:
 - `domain/util/TrapReference.kt` — local trap reference dataset.
 - `domain/util/PoisonReference.kt` — local poison reference dataset.
 - `domain/util/DiseaseReference.kt` — local disease reference dataset.
+- `domain/util/CoreRulesReference.kt` — condensed core-rules glossary and lookup content.
+- `domain/util/CharacterCreationReference.kt` — character-building reference content and feat data.
+- `domain/util/EquipmentReference.kt` — local weapons, armor, tools, gear, mounts, vehicles, and
+  magic-item reference datasets.
+- `domain/util/SrdSpellIndexReference.kt` — verified SRD spell-name index used when detailed spell
+  text is intentionally unavailable.
 - `domain/util/SpellcastingReference.kt` — spellcasting rules, slot tables, and formulas.
 - `domain/util/ObjectStats.kt` — object AC, HP, and threshold tables.
 - `domain/util/MadnessReference.kt` — short-, long-, and indefinite-madness tables.
+- `domain/util/ReferenceDetailResolver.kt` — detail/deep-link resolution across core rules,
+  character creation, equipment, and spell index datasets.
 - `ui/viewmodels/CombatViewModel.kt` — combat tracker state and difficulty updates.
 - `ui/viewmodels/ReferenceViewModel.kt` — reference state, favorites, search, and madness.
 - `ui/screens/CampaignDetailScreen.kt` — campaign detail UI and note-entry workflow.
-- `ui/screens/CombatTrackerScreen.kt` — combat setup and active combat views.
+- `ui/screens/CombatTrackerRoute.kt` — combat tracker route entry; setup/live views are split under
+  `ui/screens/tracker/`.
 - `ui/screens/ReferenceScreen.kt` — reference UI, copy/share helpers, and detail screens.
 - `ui/screens/PromptLibraryScreen.kt` — narrative prompt cards with clipboard copy support.

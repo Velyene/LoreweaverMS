@@ -12,8 +12,10 @@
 
 package io.github.velyene.loreweaver.ui.screens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -121,12 +123,18 @@ fun ReferenceScreen(
 				)
 			}
 
-			ReferenceCategoryContent(
-				uiState = uiState,
-				contentState = contentState,
-				categoryListStates = categoryListStates,
-				viewModel = viewModel
-			)
+			Box(
+				modifier = Modifier
+					.fillMaxWidth()
+					.weight(1f)
+			) {
+				ReferenceCategoryContent(
+					uiState = uiState,
+					contentState = contentState,
+					categoryListStates = categoryListStates,
+					viewModel = viewModel
+				)
+			}
 		}
 	}
 }

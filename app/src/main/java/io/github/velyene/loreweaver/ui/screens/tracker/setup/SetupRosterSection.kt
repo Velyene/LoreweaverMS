@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CombatantState
+import io.github.velyene.loreweaver.ui.screens.visibleVerticalScrollbar
 
 @Composable
 internal fun SetupRosterSection(
@@ -58,7 +60,12 @@ internal fun SetupRosterSection(
 				lineHeight = 20.sp
 			)
 		} else {
-			LazyColumn {
+			val listState = rememberLazyListState()
+
+			LazyColumn(
+				state = listState,
+				modifier = Modifier.visibleVerticalScrollbar(listState)
+			) {
 				items(combatants, key = { it.characterId }) { combatant ->
 					SetupCombatantRow(combatant = combatant, onRemoveCombatant = onRemoveCombatant)
 				}

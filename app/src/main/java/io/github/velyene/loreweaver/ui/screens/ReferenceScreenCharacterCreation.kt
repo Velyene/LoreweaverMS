@@ -87,7 +87,10 @@ internal fun CharacterCreationContent(
 
 		LazyColumn(
 			state = listState,
-			modifier = Modifier.fillMaxSize(),
+			modifier = Modifier
+				.fillMaxWidth()
+				.weight(1f)
+				.visibleVerticalScrollbar(listState),
 			contentPadding = PaddingValues(16.dp),
 			verticalArrangement = Arrangement.spacedBy(12.dp)
 		) {
