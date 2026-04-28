@@ -254,6 +254,41 @@ class ContentSafetyAuditTest {
 			rationale = "Supplemental equipment tables include compact descriptive cells that were reviewed during the split stabilization pass.",
 			followUpNote = "Keep future table prose terse and mechanically descriptive."
 		),
+		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataAtoC.kt" to ReviewedProseFile(
+			reviewedOn = "2026-04-27",
+			rationale = "Restored local monster-reference entries for the shipped A-C slice were reviewed in this chat as mechanical SRD-backed content.",
+			followUpNote = "Keep future imports sectioned, searchable, and limited to reviewed SRD-backed monster data."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataAnimals.kt" to ReviewedProseFile(
+			reviewedOn = "2026-04-28",
+			rationale = "Animal stat blocks added from reviewed SRD-backed reference content are parsed into the local monster corpus for search and encounter use.",
+			followUpNote = "Keep future animal additions limited to reviewed SRD-backed stat blocks or similarly concise mechanics-forward content."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataDtoG.kt" to ReviewedProseFile(
+			reviewedOn = "2026-04-27",
+			rationale = "Restored local monster-reference entries for the shipped D-G slice were reviewed in this chat as mechanical SRD-backed content.",
+			followUpNote = "Keep future imports sectioned, searchable, and limited to reviewed SRD-backed monster data."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataHtoN.kt" to ReviewedProseFile(
+			reviewedOn = "2026-04-27",
+			rationale = "Restored local monster-reference entries for the shipped H-N slice were reviewed in this chat as mechanical SRD-backed content.",
+			followUpNote = "Keep future imports sectioned, searchable, and limited to reviewed SRD-backed monster data."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataOtoR.kt" to ReviewedProseFile(
+			reviewedOn = "2026-04-27",
+			rationale = "Restored local monster-reference entries for the shipped O-R slice were reviewed in this chat as mechanical SRD-backed content.",
+			followUpNote = "Keep future imports sectioned, searchable, and limited to reviewed SRD-backed monster data."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataStoW.kt" to ReviewedProseFile(
+			reviewedOn = "2026-04-27",
+			rationale = "Restored local monster-reference entries for the shipped S-W slice were reviewed in this chat as mechanical SRD-backed content.",
+			followUpNote = "Keep future imports sectioned, searchable, and limited to reviewed SRD-backed monster data."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataXtoZ.kt" to ReviewedProseFile(
+			reviewedOn = "2026-04-28",
+			rationale = "Restored local monster-reference entries for the shipped X-Z slice were reviewed in this chat as mechanical SRD-backed content.",
+			followUpNote = "Keep future imports sectioned, searchable, and limited to reviewed SRD-backed monster data."
+		),
 		// Mental strain tables and GM guidance were rewritten into more original summaries.
 		"java/io/github/velyene/loreweaver/domain/util/MadnessReference.kt" to ReviewedProseFile(
 			reviewedOn = REVIEWED_ON_2026_04_18,

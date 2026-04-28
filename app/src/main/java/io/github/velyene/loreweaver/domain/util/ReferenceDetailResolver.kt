@@ -27,6 +27,7 @@ data class ReferenceDetailContent(
 object ReferenceDetailResolver {
 	const val CATEGORY_CONDITIONS = "Conditions"
 	const val CATEGORY_FEATS = "Feats"
+	const val CATEGORY_MONSTERS = "Monsters"
 	const val CATEGORY_SPELLS = "Spells"
 	const val CATEGORY_WEAPONS = "Weapons"
 	const val CATEGORY_ARMOR = "Armor"
@@ -56,6 +57,9 @@ object ReferenceDetailResolver {
 		return when {
 			matchesCategory(category, CATEGORY_CONDITIONS, "Condition") -> resolveCondition(slug)
 			matchesCategory(category, CATEGORY_FEATS, "Feat") -> resolveFeat(slug)
+			matchesCategory(category, CATEGORY_MONSTERS, "Monster", "Monster Reference") -> MonsterReferenceCatalog.resolve(
+				slug
+			)
 			matchesCategory(category, CATEGORY_SPELLS, "Spell") -> resolveSpell(slug)
 			matchesCategory(category, CATEGORY_WEAPONS, "Weapon") -> resolveWeapon(slug)
 			matchesCategory(category, CATEGORY_ARMOR, "Armour") -> resolveArmor(slug)
