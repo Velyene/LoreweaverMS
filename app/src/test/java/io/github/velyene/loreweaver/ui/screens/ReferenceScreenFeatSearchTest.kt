@@ -1,8 +1,6 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.CharacterCreationReference
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceScreenFeatSearchTest {
@@ -14,68 +12,58 @@ class ReferenceScreenFeatSearchTest {
 		val archery = CharacterCreationReference.FEATS.first { it.name == "Archery" }
 		val truesight = CharacterCreationReference.FEATS.first { it.name == "Boon of Truesight" }
 
-		assertTrue(magicInitiate.matchesSearchQuery("Origin"))
-		assertTrue(magicInitiate.matchesSearchQuery("Two Cantrips"))
-		assertTrue(grappler.matchesSearchQuery("Strength or Dexterity 13+"))
-		assertTrue(archery.matchesSearchQuery("Ranged weapons"))
-		assertTrue(truesight.matchesSearchQuery("60 feet"))
-		assertTrue(magicInitiate.matchesSearchQuery("Repeatable"))
+		assertMatchesAll(magicInitiate::matchesSearchQuery, "Origin", "Two Cantrips", "Repeatable")
+		assertMatchesAll(grappler::matchesSearchQuery, "Strength or Dexterity 13+")
+		assertMatchesAll(archery::matchesSearchQuery, "Ranged weapons")
+		assertMatchesAll(truesight::matchesSearchQuery, "60 feet")
 	}
 
 	@Test
 	fun filterCharacterCreationFeats_returnsExpectedMatchesForQuery() {
-		assertEquals(
-			listOf("Magic Initiate"),
-			filterCharacterCreationFeats("Two Cantrips").map { it.name })
-		assertEquals(
-			listOf("Archery"),
-			filterCharacterCreationFeats("Ranged weapons").map { it.name })
-		assertEquals(
-			listOf("Boon of Spell Recall"),
-			filterCharacterCreationFeats("Spellcasting Feature").map { it.name })
-		assertEquals(
+		assertQueryResults(listOf("Magic Initiate"), "Two Cantrips", ::filterCharacterCreationFeats) { it.name }
+		assertQueryResults(listOf("Archery"), "Ranged weapons", ::filterCharacterCreationFeats) { it.name }
+		assertQueryResults(listOf("Boon of Spell Recall"), "Spellcasting Feature", ::filterCharacterCreationFeats) { it.name }
+		assertQueryResults(
 			CharacterCreationReference.FEATS.filter { it.category == "Epic Boon" }.map { it.name },
-			filterCharacterCreationFeats("Epic Boon").map { it.name }
-		)
-		assertTrue(filterCharacterCreationFeats("Nonexistent Feat Term").isEmpty())
+			"Epic Boon",
+			::filterCharacterCreationFeats
+		) { it.name }
+		assertNoQueryResults("Nonexistent Feat Term", ::filterCharacterCreationFeats)
 	}
 
 	@Test
 	fun visibleCharacterCreationFeats_respectsSubsectionWhenQueryBlank() {
-		assertEquals(
+		assertVisibleWhenBlankInSubsection(
 			CharacterCreationReference.FEATS.filter { it.category == "Origin" }.map { it.name },
-			visibleCharacterCreationFeats(
-				"",
-				CharacterCreationSubsection.SPECIES_ORIGIN
-			).map { it.name }
-		)
-		assertEquals(
+			CharacterCreationSubsection.SPECIES_ORIGIN,
+			::visibleCharacterCreationFeats
+		) { it.name }
+		assertVisibleWhenBlankInSubsection(
 			CharacterCreationReference.FEATS.filter { it.category == "General" }.map { it.name },
-			visibleCharacterCreationFeats("", CharacterCreationSubsection.ABILITIES).map { it.name }
-		)
-		assertEquals(
+			CharacterCreationSubsection.ABILITIES,
+			::visibleCharacterCreationFeats
+		) { it.name }
+		assertVisibleWhenBlankInSubsection(
 			CharacterCreationReference.FEATS.filter { it.category == "Fighting Style" }
 				.map { it.name },
-			visibleCharacterCreationFeats("", CharacterCreationSubsection.CLASSES).map { it.name }
-		)
-		assertEquals(
+			CharacterCreationSubsection.CLASSES,
+			::visibleCharacterCreationFeats
+		) { it.name }
+		assertVisibleWhenBlankInSubsection(
 			CharacterCreationReference.FEATS.filter { it.category == "Epic Boon" }.map { it.name },
-			visibleCharacterCreationFeats(
-				"",
-				CharacterCreationSubsection.ADVANCEMENT
-			).map { it.name }
-		)
-		assertTrue(visibleCharacterCreationFeats("", CharacterCreationSubsection.FLAVOR).isEmpty())
+			CharacterCreationSubsection.ADVANCEMENT,
+			::visibleCharacterCreationFeats
+		) { it.name }
+		assertHiddenWhenBlankInSubsection(CharacterCreationSubsection.FLAVOR, ::visibleCharacterCreationFeats)
 	}
 
 	@Test
 	fun visibleCharacterCreationFeats_usesAllSubsectionForActiveSearch() {
-		assertEquals(
+		assertVisibleForSearch(
 			listOf("Boon of Fate"),
-			visibleCharacterCreationFeats(
-				"Improve Fate",
-				CharacterCreationSubsection.SPECIES_ORIGIN
-			).map { it.name }
-		)
+			"Improve Fate",
+			CharacterCreationSubsection.SPECIES_ORIGIN,
+			::visibleCharacterCreationFeats
+		) { it.name }
 	}
 }

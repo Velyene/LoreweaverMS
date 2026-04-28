@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,6 +48,11 @@ import io.github.velyene.loreweaver.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PromptLibraryScreen() {
+	val listState = rememberLazyListState()
+	val listModifier = Modifier
+		.fillMaxSize()
+		.padding(16.dp)
+		.visibleVerticalScrollbar(listState)
 
 	val displayPrompts = listOf(
 		LorePrompt(
@@ -82,16 +88,15 @@ fun PromptLibraryScreen() {
 		}
 	) { padding ->
 		LazyColumn(
-			modifier = Modifier
-				.padding(padding)
-				.fillMaxSize()
-				.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(16.dp)
-		) {
-			items(displayPrompts, key = { it.id }) { prompt ->
-				PromptCard(prompt)
+			modifier = listModifier.padding(padding),
+			state = listState,
+			verticalArrangement = Arrangement.spacedBy(16.dp),
+			content = {
+				items(displayPrompts, key = { it.id }) { prompt ->
+					PromptCard(prompt)
+				}
 			}
-		}
+		)
 	}
 }
 

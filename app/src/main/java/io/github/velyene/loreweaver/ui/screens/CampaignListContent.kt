@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -31,6 +32,8 @@ internal fun CampaignListContent(
 	onCampaignClick: (String) -> Unit,
 	onShowCreateDialog: () -> Unit
 ) {
+	val listState = rememberLazyListState()
+
 	Scaffold(
 		snackbarHost = { SnackbarHost(snackbarHostState) },
 		topBar = {
@@ -73,9 +76,11 @@ internal fun CampaignListContent(
 
 			else -> {
 				LazyColumn(
+					state = listState,
 					modifier = Modifier
 						.fillMaxSize()
 						.padding(padding)
+						.visibleVerticalScrollbar(listState)
 				) {
 					items(uiState.campaigns, key = { it.id }) { campaign ->
 						CampaignListItem(

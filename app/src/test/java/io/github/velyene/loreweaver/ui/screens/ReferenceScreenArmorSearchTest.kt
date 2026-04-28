@@ -1,8 +1,6 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.EquipmentReference
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceScreenArmorSearchTest {
@@ -19,23 +17,22 @@ class ReferenceScreenArmorSearchTest {
 		val chainMail = EquipmentReference.ARMOR.first { it.name == CHAIN_MAIL }
 		val shield = EquipmentReference.ARMOR.first { it.name == SHIELD }
 
-		assertTrue(leatherArmor.matchesSearchQuery(LIGHT))
-		assertTrue(leatherArmor.matchesSearchQuery("11 + Dex modifier"))
-		assertTrue(chainMail.matchesSearchQuery("Str 13"))
-		assertTrue(chainMail.matchesSearchQuery("Disadvantage"))
-		assertTrue(shield.matchesSearchQuery(UTILIZE_ACTION))
+		assertMatchesAll(leatherArmor::matchesSearchQuery, LIGHT, "11 + Dex modifier")
+		assertMatchesAll(chainMail::matchesSearchQuery, "Str 13", "Disadvantage")
+		assertMatchesAll(shield::matchesSearchQuery, UTILIZE_ACTION)
 	}
 
 	@Test
 	fun filterEquipmentArmor_returnsExpectedMatchesForQuery() {
-		assertEquals(listOf(CHAIN_MAIL), filterEquipmentArmor("Str 13").map { it.name })
-		assertEquals(listOf(SHIELD), filterEquipmentArmor(UTILIZE_ACTION).map { it.name })
-		assertEquals(
+		assertQueryResults(listOf(CHAIN_MAIL), "Str 13", ::filterEquipmentArmor) { it.name }
+		assertQueryResults(listOf(SHIELD), UTILIZE_ACTION, ::filterEquipmentArmor) { it.name }
+		assertQueryResults(
 			EquipmentReference.ARMOR.filter { it.categoryDonDoff.startsWith(LIGHT) }
 				.map { it.name },
-			filterEquipmentArmor(LIGHT).map { it.name }
-		)
-		assertEquals(
+			LIGHT,
+			::filterEquipmentArmor
+		) { it.name }
+		assertQueryResults(
 			listOf(
 				"Padded Armor",
 				"Scale Mail",
@@ -45,28 +42,29 @@ class ReferenceScreenArmorSearchTest {
 				"Splint Armor",
 				"Plate Armor"
 			),
-			filterEquipmentArmor("Disadvantage").map { it.name }
-		)
-		assertTrue(filterEquipmentArmor("Nonexistent Armor Term").isEmpty())
+			"Disadvantage",
+			::filterEquipmentArmor
+		) { it.name }
+		assertNoQueryResults("Nonexistent Armor Term", ::filterEquipmentArmor)
 	}
 
 	@Test
 	fun visibleEquipmentArmor_respectsEquipmentSubsectionWhenQueryBlank() {
-		assertEquals(
+		assertVisibleWhenBlankInSubsection(
 			EquipmentReference.ARMOR.map { it.name },
-			visibleEquipmentArmor("", CharacterCreationSubsection.EQUIPMENT).map { it.name }
-		)
-		assertTrue(visibleEquipmentArmor("", CharacterCreationSubsection.CLASSES).isEmpty())
+			CharacterCreationSubsection.EQUIPMENT,
+			::visibleEquipmentArmor
+		) { it.name }
+		assertHiddenWhenBlankInSubsection(CharacterCreationSubsection.CLASSES, ::visibleEquipmentArmor)
 	}
 
 	@Test
 	fun visibleEquipmentArmor_usesSearchAcrossSubsections() {
-		assertEquals(
+		assertVisibleForSearch(
 			listOf(SHIELD),
-			visibleEquipmentArmor(
-				UTILIZE_ACTION,
-				CharacterCreationSubsection.SPECIES_ORIGIN
-			).map { it.name }
-		)
+			UTILIZE_ACTION,
+			CharacterCreationSubsection.SPECIES_ORIGIN,
+			::visibleEquipmentArmor
+		) { it.name }
 	}
 }

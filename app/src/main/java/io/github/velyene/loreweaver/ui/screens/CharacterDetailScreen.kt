@@ -350,6 +350,8 @@ private fun CharacterDetailContent(
 			Text(stringResource(R.string.character_not_found))
 		}
 	} else {
+		val scrollState = rememberScrollState()
+
 		Column(
 			modifier = Modifier
 				.fillMaxSize()
@@ -366,9 +368,11 @@ private fun CharacterDetailContent(
 			}
 			Column(
 				modifier = Modifier
-					.fillMaxSize()
+					.fillMaxWidth()
+					.weight(1f)
 					.padding(16.dp)
-					.verticalScroll(rememberScrollState())
+					.verticalScroll(scrollState)
+					.visibleVerticalScrollbar(scrollState)
 			) {
 				when (state.selectedTab) {
 					0 -> CombatTab(

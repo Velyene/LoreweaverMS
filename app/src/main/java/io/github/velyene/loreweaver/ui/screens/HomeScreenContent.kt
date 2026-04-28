@@ -50,11 +50,14 @@ internal fun HomeScreenContent(
 	onCampaignClick: (String) -> Unit,
 	onRulesReference: () -> Unit
 ) {
+	val scrollState = rememberScrollState()
+
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
 			.padding(padding)
-			.verticalScroll(rememberScrollState()),
+			.verticalScroll(scrollState)
+			.visibleVerticalScrollbar(scrollState),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		if (uiState.isLoading) {

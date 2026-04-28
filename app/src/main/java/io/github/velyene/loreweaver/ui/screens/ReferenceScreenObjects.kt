@@ -44,7 +44,9 @@ internal fun ObjectsContent(listState: LazyListState) {
 	val shareChooserTitle = stringResource(R.string.reference_share_chooser_title)
 	LazyColumn(
 		state = listState,
-		modifier = Modifier.fillMaxSize(),
+		modifier = Modifier
+			.fillMaxSize()
+			.visibleVerticalScrollbar(listState),
 		contentPadding = PaddingValues(16.dp),
 		verticalArrangement = Arrangement.spacedBy(12.dp)
 	) {

@@ -7,6 +7,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceDetailResolverTest {
+	private companion object {
+		const val ALLOSAURUS = "Allosaurus"
+		const val SWARM_OF_BATS = "Swarm of Bats"
+	}
 
 	@Test
 	fun resolve_returnsFeatDetailsForSrdFeatSlug() {
@@ -47,6 +51,86 @@ class ReferenceDetailResolverTest {
 		assertTrue(
 			detail?.overview.orEmpty().contains("verified SRD spell-name index", ignoreCase = true)
 		)
+	}
+
+	@Test
+	fun resolve_returnsMonsterDetailsForRestoredMonsterCorpus() {
+		val detail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_MONSTERS,
+			ReferenceDetailResolver.slugFor("Aboleth")
+		)
+
+		assertNotNull(detail)
+		assertEquals("Aboleth", detail?.title)
+		assertTrue(detail?.statRows?.contains("CR" to "10 (XP 5,900, or 7,200 in lair; PB +4)") == true)
+		assertTrue(detail?.sections?.any { it.title == "Actions" && it.body.orEmpty().contains("Dominate Mind", ignoreCase = true) } == true)
+	}
+
+	@Test
+	fun resolve_returnsAnimalMonsterDetailsForAllosaurus() {
+		val detail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_MONSTERS,
+			ReferenceDetailResolver.slugFor(ALLOSAURUS)
+		)
+
+		assertNotNull(detail)
+		assertEquals(ALLOSAURUS, detail?.title)
+		assertTrue(detail?.subtitle?.contains(MonsterReferenceCatalog.ANIMAL_GROUP) == true)
+		assertTrue(detail?.statRows?.contains(MONSTER_STAT_AC to "13") == true)
+		assertTrue(detail?.sections?.any { it.title == MONSTER_SECTION_ACTIONS && it.body.orEmpty().contains("Claws", ignoreCase = true) } == true)
+	}
+
+	@Test
+	fun resolve_returnsAnimalMonsterDetailsForSwarmOfBats() {
+		val detail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_MONSTERS,
+			ReferenceDetailResolver.slugFor(SWARM_OF_BATS)
+		)
+
+		assertNotNull(detail)
+		assertEquals(SWARM_OF_BATS, detail?.title)
+		assertTrue(detail?.subtitle?.contains(MonsterReferenceCatalog.ANIMAL_GROUP) == true)
+		assertTrue(detail?.sections?.any { it.title == MONSTER_SECTION_TRAITS && it.body.orEmpty().contains("Swarm", ignoreCase = true) } == true)
+		assertTrue(detail?.sections?.any { it.title == MONSTER_SECTION_ACTIONS && it.body.orEmpty().contains("Bites", ignoreCase = true) } == true)
+	}
+
+	@Test
+	fun resolve_returnsMonsterDetailsForExpandedHNMonsterSlice() {
+		val detail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_MONSTERS,
+			ReferenceDetailResolver.slugFor("Kraken")
+		)
+
+		assertNotNull(detail)
+		assertEquals("Kraken", detail?.title)
+		assertTrue(detail?.statRows?.contains("AC" to "18") == true)
+		assertTrue(detail?.sections?.any { it.title == "Actions" && it.body.orEmpty().contains("Lightning Strike", ignoreCase = true) } == true)
+	}
+
+	@Test
+	fun resolve_returnsMonsterDetailsForExpandedOWMonsterSlice() {
+		val detail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_MONSTERS,
+			ReferenceDetailResolver.slugFor("Adult White Dragon")
+		)
+
+		assertNotNull(detail)
+		assertEquals("Adult White Dragon", detail?.title)
+		assertTrue(detail?.statRows?.contains("CR" to "13 (XP 10,000, or 11,500 in lair; PB +5)") == true)
+		assertTrue(detail?.sections?.any { it.title == "Legendary Actions" && it.body.orEmpty().contains("Freezing Burst", ignoreCase = true) } == true)
+	}
+
+	@Test
+	fun resolve_returnsMonsterDetailsForFinalXZMonsterSlice() {
+		val detail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_MONSTERS,
+			ReferenceDetailResolver.slugFor("Zombie")
+		)
+
+		assertNotNull(detail)
+		assertEquals("Zombie", detail?.title)
+		assertTrue(detail?.statRows?.contains("AC" to "8") == true)
+		assertTrue(detail?.sections?.any { it.title == "Traits" && it.body.orEmpty().contains("Undead Fortitude", ignoreCase = true) } == true)
 	}
 
 	@Test

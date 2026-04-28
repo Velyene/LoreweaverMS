@@ -46,6 +46,28 @@ private val resourceListType = object : TypeToken<List<CharacterResource>>() {}.
 private val actionListType = object : TypeToken<List<CharacterAction>>() {}.type
 private val spellSlotsMapType = object : TypeToken<Map<Int, List<Int>>>() {}.type
 
+private fun normalizedCharacterTypeForDomain(
+	type: String,
+	party: String,
+	isPlayerCharacter: Boolean
+): String {
+	val trimmedType = type.trim()
+	return if (party == CharacterParty.ADVENTURERS || isPlayerCharacter) {
+		normalizeClassName(trimmedType)
+	} else {
+		trimmedType.ifBlank { "Monster" }
+	}
+}
+
+private fun normalizedCharacterTypeForStorage(type: String, party: String): String {
+	val trimmedType = type.trim()
+	return if (party == CharacterParty.ADVENTURERS) {
+		normalizeClassName(trimmedType)
+	} else {
+		trimmedType.ifBlank { "Monster" }
+	}
+}
+
 /**
  * Converts a LogEntryEntity from the database to a domain LogEntry model.
  * @return Domain model representation of the log entry
@@ -110,7 +132,7 @@ fun CharacterEntity.toDomain(): CharacterEntry {
 	return CharacterEntry(
 		id = id,
 		name = name,
-		type = normalizeClassName(type),
+		type = normalizedCharacterTypeForDomain(type = type, party = party, isPlayerCharacter = isPlayerCharacter),
 		hp = hp,
 		maxHp = maxHp,
 		tempHp = tempHp,
@@ -155,7 +177,7 @@ fun CharacterEntry.toEntity(): CharacterEntity {
 	return CharacterEntity(
 		id = id,
 		name = name,
-		type = normalizeClassName(type),
+		type = normalizedCharacterTypeForStorage(type = type, party = party),
 		hp = hp,
 		maxHp = maxHp,
 		tempHp = tempHp,
@@ -167,6 +189,7 @@ fun CharacterEntry.toEntity(): CharacterEntity {
 		speed = speed,
 		initiative = initiative,
 		level = level,
+		challengeRating = challengeRating,
 		strength = strength,
 		dexterity = dexterity,
 		constitution = constitution,

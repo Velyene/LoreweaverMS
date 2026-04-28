@@ -111,7 +111,10 @@ private fun MadnessContentLayout(
 
 		LazyColumn(
 			state = state.listState,
-			modifier = Modifier.fillMaxSize(),
+			modifier = Modifier
+				.fillMaxWidth()
+				.weight(1f)
+				.visibleVerticalScrollbar(state.listState),
 			contentPadding = PaddingValues(16.dp),
 			verticalArrangement = Arrangement.spacedBy(12.dp)
 		) {

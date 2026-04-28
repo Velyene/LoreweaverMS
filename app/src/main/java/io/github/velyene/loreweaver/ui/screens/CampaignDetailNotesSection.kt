@@ -1,10 +1,12 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,8 +29,15 @@ internal fun LoreAndNotesSection(
 	// with the note list rendering instead of leaking modal coordination to the screen.
 	var dialogMode by remember { mutableStateOf<NoteDialogMode>(NoteDialogMode.Hidden) }
 	var pendingDeleteNote by remember { mutableStateOf<Note?>(null) }
+	val listState = rememberLazyListState()
 
-	LazyColumn(modifier = Modifier.padding(16.dp)) {
+	LazyColumn(
+		state = listState,
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(16.dp)
+			.visibleVerticalScrollbar(listState)
+	) {
 		item {
 			NotesQuickActions(onAddNoteClick = { dialogMode = NoteDialogMode.Adding })
 			Spacer(modifier = Modifier.size(16.dp))

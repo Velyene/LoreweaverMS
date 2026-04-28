@@ -90,10 +90,16 @@ internal fun CampaignDetailContent(
 			selectedTab = state.selectedTab,
 			onSelectedTabChange = onSelectedTabChange
 		)
-		CampaignDetailTabContent(
-			state = state,
-			actions = actions
-		)
+		Box(
+			modifier = Modifier
+				.fillMaxWidth()
+				.weight(1f)
+		) {
+			CampaignDetailTabContent(
+				state = state,
+				actions = actions
+			)
+		}
 	}
 }
 
