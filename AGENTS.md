@@ -224,6 +224,8 @@ Key versions from `gradle/libs.versions.toml`:
   `.idea/AndroidProjectSystem.xml`, `.idea/jsonCatalog.xml`, and `.idea/.gitignore`.
 - Machine-specific IDE state such as `.idea/workspace.xml`, caches, shelves, HTTP requests,
   device/emulator selectors, preview state, and similar local files should remain ignored.
+- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` is a locally regenerated audit artifact used for developer
+  review; it should remain ignored and uncommitted unless the project policy explicitly changes.
 - Root-level JetBrains inspection export XML files created from `Problems` / `Inspect Code`
   workflows are disposable local artifacts and should stay untracked.
 - Root-level markdown audit artifacts such as `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`,

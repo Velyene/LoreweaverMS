@@ -40,9 +40,9 @@ auditable.
 
 ### Current audit classification
 
-- `ContentSafetyAuditTest` continues to discover **zero** excluded reference-corpus files.
-- The restored monster files are tracked through `reviewedLongProseFiles` rather than the
-  excluded-corpus inventory.
+- `ContentSafetyAuditTest` currently discovers **zero** excluded SRD/reference corpus files.
+- If regenerated locally, the ignored `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` snapshot should report
+  **0 discovered excluded corpus files** and **0 findings**.
 
 ## Current alignment status
 
@@ -94,7 +94,7 @@ Related tables and glossary content remain available through the audited core-ru
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/ContentSafetyAuditTest.kt`
-- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
+- optional local corroboration: ignored `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` if regenerated
 
 ## Notes for future updates
 
