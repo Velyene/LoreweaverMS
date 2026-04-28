@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
@@ -96,7 +97,9 @@ internal fun <T> ReferenceMasterDetailContent(
 
 	LazyColumn(
 		state = listState,
-		modifier = Modifier.fillMaxSize(),
+		modifier = Modifier
+			.fillMaxSize()
+			.visibleVerticalScrollbar(listState),
 		contentPadding = PaddingValues(16.dp),
 		verticalArrangement = Arrangement.spacedBy(8.dp),
 		content = listContent
@@ -167,6 +170,8 @@ internal fun ReferenceDetailLayout(
 	onBack: () -> Unit,
 	content: LazyListScope.() -> Unit
 ) {
+	val detailListState = rememberLazyListState()
+
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
@@ -174,7 +179,15 @@ internal fun ReferenceDetailLayout(
 	) {
 		BackToReferenceListButton(onBack)
 		Spacer(modifier = Modifier.height(8.dp))
-		LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), content = content)
+		LazyColumn(
+			state = detailListState,
+			modifier = Modifier
+				.fillMaxWidth()
+				.weight(1f)
+				.visibleVerticalScrollbar(detailListState),
+			verticalArrangement = Arrangement.spacedBy(12.dp),
+			content = content
+		)
 	}
 }
 

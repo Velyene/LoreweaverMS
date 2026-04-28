@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
@@ -41,7 +42,12 @@ internal fun EncounterListBody(
 	if (encounters.isEmpty()) {
 		EncountersEmptyState()
 	} else {
-		LazyColumn(modifier = modifier) {
+		val listState = rememberLazyListState()
+
+		LazyColumn(
+			state = listState,
+			modifier = modifier.visibleVerticalScrollbar(listState)
+		) {
 			items(encounters, key = { it.id }) { encounter ->
 				EncounterListItem(encounter = encounter, onEncounterClick = onEncounterClick)
 			}

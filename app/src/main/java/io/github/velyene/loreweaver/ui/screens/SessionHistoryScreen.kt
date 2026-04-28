@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExpandLess
@@ -66,6 +67,7 @@ fun SessionHistoryScreen(
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	var searchQuery by rememberSaveable { mutableStateOf("") }
 	val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()) }
+	val listState = rememberLazyListState()
 	// Filtering stays derived from the view-model snapshot so the screen can offer
 	// responsive local search without duplicating session state in the view model.
 	val filteredSessions = remember(uiState.sessions, searchQuery) {
@@ -108,10 +110,18 @@ fun SessionHistoryScreen(
 			if (filteredSessions.isEmpty()) {
 				CenteredEmptyState(
 					message = stringResource(R.string.session_history_empty_message),
-					modifier = Modifier.fillMaxSize()
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f)
 				)
 			} else {
-				LazyColumn(modifier = Modifier.fillMaxSize()) {
+				LazyColumn(
+					state = listState,
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f)
+						.visibleVerticalScrollbar(listState)
+				) {
 					items(filteredSessions, key = { session -> session.id }) { session ->
 						SessionExpandableItem(session = session, dateFormat = dateFormat)
 						HorizontalDivider()

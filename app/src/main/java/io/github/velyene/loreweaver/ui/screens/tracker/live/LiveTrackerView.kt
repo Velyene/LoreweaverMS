@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,6 +52,7 @@ import io.github.velyene.loreweaver.ui.screens.CombatTrackerConstants.HP_QUICK_A
 import io.github.velyene.loreweaver.ui.screens.CombatTrackerConstants.LOG_HEIGHT_DP
 import io.github.velyene.loreweaver.ui.screens.CombatTrackerConstants.QUICK_HP_BUTTON_HEIGHT_DP
 import io.github.velyene.loreweaver.ui.screens.tracker.components.TrackerModeBadge
+import io.github.velyene.loreweaver.ui.screens.visibleVerticalScrollbar
 
 @Composable
 internal fun LiveTrackerView(
@@ -129,10 +131,14 @@ private fun CombatantHpList(
 	onRemoveCondition: (characterId: String, conditionName: String) -> Unit,
 	modifier: Modifier = Modifier
 ) {
+	val listState = rememberLazyListState()
+
 	LazyColumn(
+		state = listState,
 		modifier = modifier
 			.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
 			.padding(8.dp)
+			.visibleVerticalScrollbar(listState)
 	) {
 		itemsIndexed(combatants, key = { _, combatant -> combatant.characterId }) { index, combatant ->
 			CombatantListItem(
@@ -224,6 +230,8 @@ private fun QuickHpControls(
 
 @Composable
 private fun CombatLogSection(statuses: List<String>) {
+	val listState = rememberLazyListState()
+
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -239,7 +247,10 @@ private fun CombatLogSection(statuses: List<String>) {
 		)
 		// Newest statuses are shown first so a long encounter log keeps the most recent
 		// action announcements within the default viewport.
-		LazyColumn {
+		LazyColumn(
+			state = listState,
+			modifier = Modifier.visibleVerticalScrollbar(listState)
+		) {
 			itemsIndexed(statuses.reversed(), key = { index, status -> "$index-$status" }) { _, status ->
 				Text(
 					stringResource(R.string.combat_log_bullet, status),

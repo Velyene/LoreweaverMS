@@ -73,7 +73,9 @@ internal fun SpellcastingContent(
 
 	LazyColumn(
 		state = listState,
-		modifier = Modifier.fillMaxSize(),
+		modifier = Modifier
+			.fillMaxSize()
+			.visibleVerticalScrollbar(listState),
 		contentPadding = PaddingValues(16.dp),
 		verticalArrangement = Arrangement.spacedBy(12.dp)
 	) {

@@ -1,6 +1,7 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -27,7 +28,11 @@ internal fun LinkedEncounterList(
 	var showAddDialog by remember { mutableStateOf(false) }
 	var encounterName by remember { mutableStateOf("") }
 
-	Column(modifier = Modifier.padding(16.dp)) {
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(16.dp)
+	) {
 		EncounterListHeader(onAddEncounterClick = {
 			encounterName = ""
 			showAddDialog = true
@@ -35,7 +40,9 @@ internal fun LinkedEncounterList(
 		EncounterListBody(
 			encounters = encounters,
 			onEncounterClick = onEncounterClick,
-			modifier = Modifier.fillMaxWidth(),
+			modifier = Modifier
+				.fillMaxWidth()
+				.weight(1f),
 		)
 	}
 

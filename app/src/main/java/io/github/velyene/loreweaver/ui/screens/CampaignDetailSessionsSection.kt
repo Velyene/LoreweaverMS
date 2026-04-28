@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
@@ -30,7 +32,15 @@ internal fun SessionHistoryList(sessions: List<SessionRecord>) {
 	if (sessions.isEmpty()) {
 		CenteredEmptyState(stringResource(R.string.sessions_empty_message))
 	} else {
-		LazyColumn(modifier = Modifier.padding(16.dp)) {
+		val listState = rememberLazyListState()
+
+		LazyColumn(
+			state = listState,
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(16.dp)
+				.visibleVerticalScrollbar(listState)
+		) {
 			items(sessions, key = { it.id }) { session ->
 				Box(
 					modifier = Modifier

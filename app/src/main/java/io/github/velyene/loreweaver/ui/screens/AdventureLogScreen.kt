@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -46,6 +47,7 @@ fun AdventureLogScreen(
 	val logs by viewModel.logs.collectAsStateWithLifecycle(initialValue = emptyList())
 	val dateFormat = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
 	var showClearConfirmation by remember { mutableStateOf(false) }
+	val listState = rememberLazyListState()
 
 	Scaffold(
 		topBar = {
@@ -79,9 +81,11 @@ fun AdventureLogScreen(
 			)
 		} else {
 			LazyColumn(
+				state = listState,
 				modifier = Modifier
 					.fillMaxSize()
 					.padding(padding)
+					.visibleVerticalScrollbar(listState)
 			) {
 				items(logs, key = { it.id }) { entry ->
 					ListItem(

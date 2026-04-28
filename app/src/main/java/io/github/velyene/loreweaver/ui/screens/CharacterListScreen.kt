@@ -35,6 +35,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -279,6 +280,8 @@ private fun CharacterListScaffoldContent(
 	onUpdateHP: (CharacterEntry, Int) -> Unit,
 	onDelete: (CharacterEntry) -> Unit
 ) {
+	val listState = rememberLazyListState()
+
 	Column(
 		modifier = Modifier
 			.padding(padding)
@@ -294,7 +297,12 @@ private fun CharacterListScaffoldContent(
 		if (viewState.filteredCharacters.isEmpty()) {
 			EmptyCharactersMessage(searchQuery = viewState.searchQuery)
 		} else {
-			LazyColumn(modifier = Modifier.weight(1f)) {
+			LazyColumn(
+				state = listState,
+				modifier = Modifier
+					.weight(1f)
+					.visibleVerticalScrollbar(listState)
+			) {
 				if (viewState.showInitiativeOrder) {
 					initiativeOrderItems(
 						characters = viewState.filteredCharacters,
