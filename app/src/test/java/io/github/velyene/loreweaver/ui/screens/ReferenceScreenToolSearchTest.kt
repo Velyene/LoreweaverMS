@@ -1,8 +1,6 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.EquipmentReference
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceScreenToolSearchTest {
@@ -18,44 +16,45 @@ class ReferenceScreenToolSearchTest {
 		val gamingSet = EquipmentReference.OTHER_TOOLS.first { it.name == GAMING_SET }
 		val herbalismKit = EquipmentReference.OTHER_TOOLS.first { it.name == "Herbalism Kit" }
 
-		assertTrue(calligrapher.matchesSearchQuery("Dexterity"))
-		assertTrue(calligrapher.matchesSearchQuery("Ink"))
-		assertTrue(gamingSet.matchesSearchQuery(DRAGONCHESS))
-		assertTrue(gamingSet.matchesSearchQuery("Variants require separate proficiency"))
-		assertTrue(herbalismKit.matchesSearchQuery("Antitoxin"))
+		assertMatchesAll(calligrapher::matchesSearchQuery, "Dexterity", "Ink")
+		assertMatchesAll(gamingSet::matchesSearchQuery, DRAGONCHESS, "Variants require separate proficiency")
+		assertMatchesAll(herbalismKit::matchesSearchQuery, "Antitoxin")
 	}
 
 	@Test
 	fun filterEquipmentTools_returnsExpectedMatchesForQuery() {
-		assertEquals(
+		assertQueryResults(
 			listOf("Calligrapher's Supplies"),
-			filterEquipmentTools("impressive flourishes").map { it.name })
-		assertEquals(listOf(GAMING_SET), filterEquipmentTools(DRAGONCHESS).map { it.name })
-		assertEquals(listOf("Thieves' Tools"), filterEquipmentTools("Pick a lock").map { it.name })
-		assertEquals(
+			"impressive flourishes",
+			::filterEquipmentTools
+		) { it.name }
+		assertQueryResults(listOf(GAMING_SET), DRAGONCHESS, ::filterEquipmentTools) { it.name }
+		assertQueryResults(listOf("Thieves' Tools"), "Pick a lock", ::filterEquipmentTools) { it.name }
+		assertQueryResults(
 			EquipmentReference.ARTISANS_TOOLS.map { it.name },
-			filterEquipmentTools("Artisan's Tools").map { it.name }
-		)
-		assertTrue(filterEquipmentTools("Nonexistent Tool Term").isEmpty())
+			"Artisan's Tools",
+			::filterEquipmentTools
+		) { it.name }
+		assertNoQueryResults("Nonexistent Tool Term", ::filterEquipmentTools)
 	}
 
 	@Test
 	fun visibleEquipmentTools_respectsEquipmentSubsectionWhenQueryBlank() {
-		assertEquals(
+		assertVisibleWhenBlankInSubsection(
 			EquipmentReference.ALL_TOOLS.map { it.name },
-			visibleEquipmentTools("", CharacterCreationSubsection.EQUIPMENT).map { it.name }
-		)
-		assertTrue(visibleEquipmentTools("", CharacterCreationSubsection.SPECIES_ORIGIN).isEmpty())
+			CharacterCreationSubsection.EQUIPMENT,
+			::visibleEquipmentTools
+		) { it.name }
+		assertHiddenWhenBlankInSubsection(CharacterCreationSubsection.SPECIES_ORIGIN, ::visibleEquipmentTools)
 	}
 
 	@Test
 	fun visibleEquipmentTools_usesSearchAcrossSubsections() {
-		assertEquals(
+		assertVisibleForSearch(
 			listOf(GAMING_SET),
-			visibleEquipmentTools(
-				DRAGONCHESS,
-				CharacterCreationSubsection.CLASSES
-			).map { it.name }
-		)
+			DRAGONCHESS,
+			CharacterCreationSubsection.CLASSES,
+			::visibleEquipmentTools
+		) { it.name }
 	}
 }
