@@ -175,7 +175,6 @@ See `quarantine_do_not_ship/README.md` for the tiny audit template and quarantin
 	- `SRD_EQUIPMENT_ALLOWLIST_AUDIT.md`
 	- `SRD_GAMEPLAY_TOOLBOX_AUDIT.md`
 	- `SRD_MAGIC_ITEMS_AUDIT.md`
-	- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
 - current shipped source under `app/src/main`
 - targeted text searches for:
 	- `2014`
@@ -201,7 +200,9 @@ At the current repo snapshot:
 
 - the previously flagged bundled monster/class/spell corpora are no longer present under
   `app/src/main`
-- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` reports **0** discovered excluded-corpus files
+- the local `ContentSafetyAuditTest` audit path currently discovers **0** excluded-corpus files
+- if a developer regenerates the ignored local `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` snapshot, it
+  should likewise report **0** discovered excluded-corpus files
 - the `Monsters` tab in `ReferenceScreen.kt` is an unavailable-state placeholder rather than a
   bundled local corpus
 - concise monster-running guidance still ships through reviewed `CoreRulesReference` content
