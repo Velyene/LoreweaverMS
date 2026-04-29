@@ -67,6 +67,8 @@ fun ReferenceScreen(
 	val categoryListStates = rememberReferenceCategoryListStates()
 
 	uiState.selectedReferenceDetail?.let { detail ->
+		// Detail views temporarily take over the screen instead of nesting inside the tab scaffold so
+		// deep links and in-app detail opens share one consistent back path.
 		GenericReferenceDetailView(
 			detail = detail,
 			onBack = viewModel::clearReferenceDetail
@@ -160,6 +162,8 @@ private fun rememberReferenceCategoryListStates(): Map<ReferenceCategory, LazyLi
 		coreRulesListState,
 		characterCreationListState
 	) {
+		// Keep a dedicated list state per category so switching tabs preserves each section's scroll
+		// position instead of snapping every category back to the top.
 		mapOf(
 			ReferenceCategory.TRAPS to trapsListState,
 			ReferenceCategory.POISONS to poisonsListState,

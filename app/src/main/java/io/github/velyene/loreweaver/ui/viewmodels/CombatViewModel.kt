@@ -20,6 +20,7 @@ package io.github.velyene.loreweaver.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.domain.model.Condition
@@ -40,6 +41,7 @@ import io.github.velyene.loreweaver.domain.util.CharacterParty
 import io.github.velyene.loreweaver.domain.util.EncounterDifficulty
 import io.github.velyene.loreweaver.domain.util.EncounterDifficultyResult
 import io.github.velyene.loreweaver.domain.util.Resource
+import io.github.velyene.loreweaver.ui.util.AppText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,6 +50,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
+
+private const val NO_ACTIVE_ENCOUNTER_ERROR_MESSAGE = "No active encounter found"
 
 data class CombatUiState(
 	val isCombatActive: Boolean = false,
@@ -73,7 +77,8 @@ class CombatViewModel @Inject constructor(
 	private val insertEncounterUseCase: InsertEncounterUseCase,
 	private val setActiveEncounterUseCase: SetActiveEncounterUseCase,
 	private val insertLogUseCase: InsertLogUseCase,
-	private val insertSessionRecordUseCase: InsertSessionRecordUseCase
+	private val insertSessionRecordUseCase: InsertSessionRecordUseCase,
+	private val appText: AppText
 ) : ViewModel() {
 	private val _uiState = MutableStateFlow(CombatUiState())
 	val uiState: StateFlow<CombatUiState> = _uiState.asStateFlow()
@@ -191,7 +196,7 @@ class CombatViewModel @Inject constructor(
 	 */
 	private fun handleActiveEncounterError(message: String?) {
 		reportError(
-			message = if (message == "No active encounter found") null else message,
+			message = if (message == NO_ACTIVE_ENCOUNTER_ERROR_MESSAGE) null else message,
 			onRetry = retryLoadEncounter(null)
 		)
 	}
@@ -204,7 +209,7 @@ class CombatViewModel @Inject constructor(
 		try {
 			val encounter = getEncounterByIdUseCase(encounterId)
 				?: run {
-					reportError("Encounter not found")
+					reportError(appText.getString(R.string.encounter_not_found_message))
 					return
 				}
 
@@ -213,35 +218,27 @@ class CombatViewModel @Inject constructor(
 			showEncounter(encounter.id, lastSession)
 		} catch (e: Exception) {
 			reportError(
-				message = formatError("Failed to load encounter", e),
+				message = formatCampaignError(appText, R.string.encounter_error_load, e),
 				onRetry = retryLoadEncounter(encounterId)
 			)
 		}
 	}
 
 	private fun beginLoading() {
-		_uiState.update { it.copy(isLoading = true, error = null, onRetry = null) }
+		_uiState.update { it.beginLoading() }
 	}
 
 	private fun retryLoadEncounter(encounterId: String?): () -> Unit =
 		{ loadEncounter(encounterId) }
 
-	private fun formatError(prefix: String, exception: Exception): String {
-		return "$prefix: ${exceptionDetail(exception)}"
-	}
-
 	private fun reportError(message: String?, onRetry: (() -> Unit)? = null) {
-		_uiState.update {
-			it.copy(
-				isLoading = false,
-				error = message,
-				onRetry = onRetry
-			)
-		}
+		_uiState.update { it.withError(message, onRetry) }
 	}
 
 	private fun showEncounter(encounterId: String, lastSession: SessionRecord?) {
 		if (lastSession?.snapshot != null) {
+			// A saved snapshot is the source of truth for an in-progress encounter because it preserves
+			// turn order, HP, and conditions that the bare encounter record does not store.
 			restoreCombatFromSnapshot(encounterId, lastSession)
 			return
 		}
@@ -257,7 +254,7 @@ class CombatViewModel @Inject constructor(
 	}
 
 	fun clearError() {
-		_uiState.update { it.copy(error = null) }
+		_uiState.update { it.clearErrorState() }
 	}
 
 	fun updateNotes(newNotes: String) {
@@ -280,6 +277,8 @@ class CombatViewModel @Inject constructor(
 							)
 						)
 					}
+					// Mark the encounter active before publishing UI state so repository-backed screens and
+					// process restores observe the same active encounter ID the tracker is about to use.
 					setActiveEncounterUseCase(id)
 					_uiState.update {
 						it.copy(
@@ -289,7 +288,7 @@ class CombatViewModel @Inject constructor(
 						)
 					}
 				} catch (e: Exception) {
-					reportError(formatError("Failed to start encounter", e))
+					reportError(formatCampaignError(appText, R.string.encounter_error_start, e))
 				}
 			}
 		}
@@ -435,6 +434,8 @@ class CombatViewModel @Inject constructor(
 		}
 
 		val (updatedCombatants, expiredMessages) = decrementConditionDurations(combatants)
+		// Conditions tick only when the round wraps, matching the encounter-wide notion of
+		// "one round has passed" instead of decrementing on every individual combatant turn.
 		return copy(
 			currentTurnIndex = 0,
 			currentRound = currentRound + 1,

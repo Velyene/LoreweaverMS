@@ -375,6 +375,8 @@ class ReferenceViewModel @Inject constructor(
 			searchQuery = query,
 			appliedSearchQuery = query,
 			isSearchPending = false,
+			// Favorites-only survives category switches only on sections that actually expose stored
+			// favorites; other tabs reset to their normal full-content view.
 			showFavoritesOnly = category.supportsFavoritesFilter() && showFavoritesOnly
 		).clearSelectedDetails()
 	}

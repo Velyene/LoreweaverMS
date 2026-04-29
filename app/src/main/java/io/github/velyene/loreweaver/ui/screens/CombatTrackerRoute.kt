@@ -91,6 +91,8 @@ fun CombatTrackerScreen(
 	val retryActionLabel = stringResource(R.string.retry_action)
 
 	LaunchedEffect(encounterId) {
+		// Reload when navigation targets a different encounter, but avoid restarting the load on
+		// ordinary recompositions of the same route instance.
 		viewModel.loadEncounter(encounterId)
 	}
 
@@ -104,6 +106,8 @@ fun CombatTrackerScreen(
 			if (result == SnackbarResult.ActionPerformed) {
 				uiState.onRetry?.invoke()
 			}
+			// Clear the consumed error after the snackbar finishes so restored compositions do not keep
+			// replaying the same message.
 			viewModel.clearError()
 		}
 	}

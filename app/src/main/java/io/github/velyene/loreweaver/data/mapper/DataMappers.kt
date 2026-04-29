@@ -54,6 +54,8 @@ private val spellSlotsMapType = object : TypeToken<Map<Int, List<Int>>>() {}.typ
 private fun parseEncounterSnapshot(snapshotJson: String): EncounterSnapshot? {
 	return runCatching {
 		val snapshotObject = JsonParser.parseString(snapshotJson).asJsonObject
+		// Session snapshots have evolved over time. Normalize older payloads before Gson reads them
+		// so saved encounters from previous builds still restore into the current domain model.
 		normalizeLegacyCombatantSnapshots(snapshotObject)
 		gson.fromJson(snapshotObject, EncounterSnapshot::class.java)
 	}.getOrNull()
@@ -80,6 +82,8 @@ private fun normalizeLegacyConditionArray(combatant: JsonObject) {
 		when {
 			conditionElement.isJsonObject -> normalizedConditions.add(conditionElement)
 			conditionElement.isJsonPrimitive -> {
+				// Older builds stored conditions as bare names. Rebuild the missing fields with safe
+				// defaults so duration handling can treat restored and newly created conditions the same.
 				val legacyCondition = JsonObject().apply {
 					addProperty("name", conditionElement.asString)
 					add("duration", JsonNull.INSTANCE)
@@ -212,6 +216,8 @@ fun CharacterEntity.toDomain(): CharacterEntry {
 		proficiencies = proficiencies,
 		inventory = inventory,
 		hasInspiration = hasInspiration,
+		// Spell slots are persisted as simple integer lists for stable JSON round-tripping, then
+		// reconstructed into the domain-friendly Pair<current, max> shape on read.
 		spellSlots = gson.fromJson<Map<Int, List<Int>>>(
 			spellSlotsJson,
 			spellSlotsMapType
@@ -258,6 +264,8 @@ fun CharacterEntry.toEntity(): CharacterEntity {
 		inventory = inventory,
 		isPlayerCharacter = party == CharacterParty.ADVENTURERS,
 		hasInspiration = hasInspiration,
+		// Persist spell slots as raw lists instead of Kotlin Pair JSON so older snapshots and Room
+		// rows keep a stable, library-agnostic wire shape.
 		spellSlotsJson = gson.toJson(spellSlots.mapValues {
 			listOf(
 				it.value.first,
