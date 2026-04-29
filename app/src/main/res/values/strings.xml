@@ -12,6 +12,7 @@
     <string name="home_brand_subtitle">Fantasy encounter companion</string>
     <string name="no_campaigns">No campaigns yet.</string>
     <string name="search_characters_placeholder">Search characters…</string>
+    <string name="search_characters_label">Search characters</string>
     <string name="characters_title">Characters</string>
     <string name="initiative_order_title">Initiative Order</string>
     <string name="round_counter">Round %1$d</string>
@@ -73,6 +74,8 @@
     <string name="speed_label">Speed</string>
     <string name="insp_label">Insp.</string>
     <string name="inspiration_desc">Inspiration</string>
+    <string name="inspiration_state_on">Inspiration active</string>
+    <string name="inspiration_state_off">Inspiration inactive</string>
     <string name="hp_label">HP</string>
     <string name="temp_hp_label">Temp HP</string>
     <string name="death_saves_label">Death Saves</string>
@@ -224,6 +227,26 @@
     <string name="cond_restrained" tools:keep="@string/cond_restrained">Restrained</string>
     <string name="cond_stunned" tools:keep="@string/cond_stunned">Stunned</string>
     <string name="cond_unconscious" tools:keep="@string/cond_unconscious">Unconscious</string>
+    <string name="cond_bleeding">Bleeding</string>
+    <string name="cond_blessed">Blessed</string>
+    <string name="cond_burning">Burning</string>
+    <string name="cond_concentrating">Concentrating</string>
+    <string name="cond_cursed">Cursed</string>
+    <string name="cond_dodging">Dodging</string>
+    <string name="cond_hasted">Hasted</string>
+    <string name="cond_hexed">Hexed</string>
+    <string name="cond_hidden">Hidden</string>
+    <string name="cond_inspired">Inspired</string>
+    <string name="cond_marked">Marked</string>
+    <string name="cond_raging">Raging</string>
+    <string name="cond_slowed">Slowed</string>
+
+    <!-- Add Condition Dialog -->
+    <string name="add_condition_dialog_title">Add Condition</string>
+    <string name="add_condition_dialog_condition_label">Condition</string>
+    <string name="add_condition_dialog_has_duration_label">Has duration (in rounds)</string>
+    <string name="add_condition_dialog_duration_label">Duration (rounds)</string>
+    <string name="add_condition_dialog_duration_placeholder">e.g., 3</string>
 
     <!-- Prompt Library -->
     <string name="prompt_library_title">Prompt Library</string>
@@ -270,9 +293,13 @@
     <string name="clear_log_confirm_title">Clear adventure log?</string>
     <string name="clear_log_confirm_message">This will remove all saved log entries.</string>
     <string name="adventure_log_empty_message">The chronicles are empty…</string>
+    <string name="adventure_log_error_load">Failed to load adventure log</string>
+    <string name="adventure_log_error_clear">Failed to clear adventure log</string>
 
     <!-- Campaigns -->
     <string name="campaigns_title">Campaigns</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="message_with_detail">%1$s: %2$s</string>
     <string name="create_campaign_desc">Create new campaign</string>
     <string name="new_campaign_button">New Campaign</string>
     <string name="campaigns_empty_message">No campaigns found.
@@ -283,6 +310,16 @@ Create one to begin your journey!</string>
     <string name="campaign_name_label">Campaign Name</string>
     <string name="campaign_loading_title">Loading…</string>
     <string name="campaign_not_found_message">Campaign not found.</string>
+    <string name="campaign_error_critical">Critical error</string>
+    <string name="campaign_error_load_campaigns">Failed to load campaigns</string>
+    <string name="campaign_error_load_sessions">Failed to load sessions</string>
+    <string name="campaign_error_load_encounters">Failed to load encounters</string>
+    <string name="campaign_error_load_notes">Failed to load notes</string>
+    <string name="campaign_error_add_campaign">Failed to add campaign</string>
+    <string name="campaign_error_add_encounter">Failed to add encounter</string>
+    <string name="campaign_error_add_note">Failed to add note</string>
+    <string name="campaign_error_update_note">Failed to update note</string>
+    <string name="campaign_error_delete_note">Failed to delete note</string>
     <string name="campaign_tab_lore_notes">Lore &amp; Notes</string>
     <string name="campaign_tab_sessions">Sessions</string>
     <string name="campaign_tab_encounters">Encounters</string>
@@ -319,6 +356,9 @@ Create one to begin your journey!</string>
     <string name="encounter_open_badge">OPEN</string>
     <string name="new_encounter_title">New Encounter</string>
     <string name="encounter_name_label">Encounter Name</string>
+    <string name="encounter_not_found_message">Encounter not found.</string>
+    <string name="encounter_error_load">Failed to load encounter</string>
+    <string name="encounter_error_start">Failed to start encounter</string>
     <string name="monster_import_removed_message">Monster library import has been removed from
         this build.</string>
     <string name="encounter_monster_picker_helper">Add monsters from the local library below. Selected creatures will be imported into the encounter with their reference stats.</string>
@@ -349,12 +389,23 @@ Create one to begin your journey!</string>
         <item quantity="one">%d matching monster</item>
         <item quantity="other">%d matching monsters</item>
     </plurals>
+    <plurals name="encounter_created_with_monsters_message">
+        <item quantity="one">Encounter created with %d monster!</item>
+        <item quantity="other">Encounter created with %d monsters!</item>
+    </plurals>
     <string name="confirm_delete_note_title">Delete note?</string>
     <string name="confirm_delete_note_message">This note will be permanently removed from the
         campaign.</string>
 
     <!-- Session History -->
     <string name="session_history_title">Session History</string>
+
+    <!-- Character errors -->
+    <string name="character_error_load">Failed to load characters</string>
+    <string name="character_error_not_found">Character not found</string>
+    <string name="character_error_add">Failed to add character</string>
+    <string name="character_error_update">Failed to update character</string>
+    <string name="character_error_delete">Failed to delete character</string>
     <string name="session_summary_badge">ENCOUNTER SAVED</string>
     <string name="session_summary_snapshot_title">Encounter snapshot</string>
     <string name="session_summary_snapshot_subtitle">Current round and HP are preserved</string>
@@ -395,6 +446,7 @@ Add your party or individual enemies above.</string>
     <string name="remove_combatant_desc">Remove %1$s from encounter</string>
     <string name="remove_combatant_confirm_title">Remove combatant?</string>
     <string name="remove_combatant_confirm_message">Remove %1$s from the encounter roster?</string>
+    <string name="combatant_setup_content_description">%1$s. %2$s</string>
     <string name="encounter_notes_title">Encounter notes</string>
     <string name="add_enemy_dialog_title">Add Enemy</string>
     <string name="end_turn_button">End Turn</string>
@@ -403,10 +455,14 @@ Add your party or individual enemies above.</string>
     <string name="heal_combatant_desc">Heal %1$s by 1</string>
     <string name="add_condition_desc">Add condition</string>
     <string name="remove_condition_desc">Remove condition</string>
+    <string name="remove_condition_desc_with_name">Remove condition %1$s</string>
+    <string name="conditions_state_description">Conditions: %1$s</string>
     <string name="combatant_initiative_summary">Init: %1$d</string>
     <string name="combatant_turn">Turn: %1$s</string>
     <string name="combatant_hp_label">HP: %1$d/%2$d</string>
     <string name="combatant_hp_label_with_temp">HP: %1$d/%2$d +%3$d</string>
+    <string name="combatant_header_state_description">%1$s, %2$s</string>
+    <string name="encounter_difficulty_accessibility_desc">Encounter Difficulty: %1$s. Adjusted XP: %2$d</string>
     <string name="combat_log_bullet">• %1$s</string>
 
     <!-- Reference Screen -->
@@ -426,6 +482,7 @@ Add your party or individual enemies above.</string>
     <string name="reference_tab_core_rules">Core Rules</string>
     <string name="reference_tab_character_creation">Character Creation</string>
     <string name="reference_tab_with_favorites_count">%1$s, %2$d favorites</string>
+    <string name="reference_search_label">Search reference</string>
     <string name="reference_search_hint">Search…</string>
     <string name="reference_back_to_list">Back to list</string>
     <string name="reference_roll_d100">Roll d100</string>

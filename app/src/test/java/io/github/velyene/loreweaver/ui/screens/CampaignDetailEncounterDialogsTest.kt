@@ -1,3 +1,12 @@
+/*
+ * FILE: CampaignDetailEncounterDialogsTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Monster filtering and sorting tests
+ * 2. Monster selection summary tests
+ * 3. Detail-preview and helper-behavior tests
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.MonsterReferenceCatalog

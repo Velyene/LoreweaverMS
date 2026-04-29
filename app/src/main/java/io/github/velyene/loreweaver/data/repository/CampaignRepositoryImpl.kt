@@ -1,3 +1,14 @@
+/*
+ * FILE: CampaignRepositoryImpl.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Campaign queries and writes
+ * 2. Encounter persistence and combatant snapshots
+ * 3. Character persistence
+ * 4. Session and note persistence
+ * 5. Log persistence and retention
+ */
+
 package io.github.velyene.loreweaver.data.repository
 
 import io.github.velyene.loreweaver.data.dao.CampaignDao

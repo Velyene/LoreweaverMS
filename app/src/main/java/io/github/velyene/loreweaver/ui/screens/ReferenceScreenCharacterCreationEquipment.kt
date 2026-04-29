@@ -159,7 +159,7 @@ private fun LazyListScope.renderAdventuringGearItems(
 private fun LazyListScope.renderMagicItemItems(sectionData: CharacterCreationEquipmentSectionData) {
 	if (sectionData.visibleMagicItems.isEmpty() || !sectionData.showEquipment) return
 
-	item { ReferenceSectionHeader("Magic Items Aâ€“Z") }
+	item { ReferenceSectionHeader("Magic Items A–Z") }
 	items(sectionData.visibleMagicItems, key = { it.name }) { item ->
 		MagicItemReferenceCard(
 			item = item,

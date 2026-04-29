@@ -22,19 +22,19 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 private val LoreweaverDarkColorScheme = darkColorScheme(
-	// Primary â€“ Arcane Teal
+	// Primary – Arcane Teal
 	primary = ArcaneTeal,
 	onPrimary = ObsidianBlack,
 	primaryContainer = MutedAqua.copy(alpha = 0.25f),
 	onPrimaryContainer = SoftCyanGlow,
 
-	// Secondary â€“ Gold
+	// Secondary – Gold
 	secondary = AntiqueGold,
 	onSecondary = ObsidianBlack,
 	secondaryContainer = SoftBrass.copy(alpha = 0.25f),
 	onSecondaryContainer = WarmGold,
 
-	// Tertiary â€“ Soft Cyan glow (magic emphasis)
+	// Tertiary – Soft Cyan glow (magic emphasis)
 	tertiary = SoftCyanGlow,
 	onTertiary = ObsidianBlack,
 	tertiaryContainer = ArcaneTeal.copy(alpha = 0.15f),
@@ -80,7 +80,7 @@ val LoreweaverShapes = Shapes(
 @Composable
 fun LoreweaverTheme(
 	darkTheme: Boolean = true,          // force dark per AGENTS.md
-	dynamicColor: Boolean = false,      // disabled â€“ preserve fantasy palette
+	dynamicColor: Boolean = false,      // disabled – preserve fantasy palette
 	content: @Composable () -> Unit
 ) {
 	val colorScheme = when {

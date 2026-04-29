@@ -84,6 +84,11 @@ private fun SetupCombatantRow(
 		combatant.maxHp,
 		combatant.initiative
 	)
+	val rowDescription = stringResource(
+		R.string.combatant_setup_content_description,
+		combatant.name,
+		combatantSummary
+	)
 
 	Row(
 		modifier = Modifier
@@ -91,7 +96,7 @@ private fun SetupCombatantRow(
 			.padding(vertical = 4.dp)
 			.background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(6.dp))
 			.semantics {
-				contentDescription = "${combatant.name}. $combatantSummary"
+				contentDescription = rowDescription
 			}
 			.padding(horizontal = 12.dp, vertical = 8.dp),
 		verticalAlignment = Alignment.CenterVertically,

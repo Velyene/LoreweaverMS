@@ -351,7 +351,7 @@ private fun ClassInfoCard(classInfo: ClassInfo) {
 			Text(
 				stringResource(
 					R.string.class_info_recommended_stats,
-					classInfo.primaryStats.joinToString(" â€º ")
+					classInfo.primaryStats.joinToString(" › ")
 				),
 				color = MutedText,
 				style = MaterialTheme.typography.bodySmall
@@ -426,7 +426,7 @@ private fun AttributeSection(
 						singleLine = true,
 						supportingText = {
 							Text(
-								"${CharacterFormConstants.MIN_ATTRIBUTE}â€“${CharacterFormConstants.MAX_ATTRIBUTE}",
+								"${CharacterFormConstants.MIN_ATTRIBUTE}–${CharacterFormConstants.MAX_ATTRIBUTE}",
 								style = MaterialTheme.typography.labelSmall,
 								color = MutedText
 							)

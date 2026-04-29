@@ -1,5 +1,15 @@
+/*
+ * FILE: CampaignEditorViewModelTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Campaign and encounter validation tests
+ * 2. Note creation and update validation tests
+ * 3. Monster-linking and success-path tests
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.MainDispatcherRule
 import io.github.velyene.loreweaver.domain.model.Note
 import io.github.velyene.loreweaver.domain.model.RemoteItem
@@ -43,7 +53,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_CAMPAIGN_ERROR_PREFIX: $CAMPAIGN_NAME_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_campaign, CAMPAIGN_NAME_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -59,7 +69,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX: $ENCOUNTER_NAME_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_encounter, ENCOUNTER_NAME_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -79,7 +89,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX: $ENCOUNTER_NAME_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_encounter, ENCOUNTER_NAME_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -113,7 +123,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				formatEncounterAddedWithMonstersMessage(selectedMonsters.size),
+				expectedEncounterAddedWithMonstersMessage(selectedMonsters.size),
 				viewModel.uiState.value.message
 			)
 		}
@@ -186,7 +196,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_CONTENT_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_note, NOTE_CONTENT_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -207,7 +217,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_note, NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -228,7 +238,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_NPC_FACTION_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_note, NOTE_NPC_FACTION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -249,7 +259,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_LOCATION_REGION_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_note, NOTE_LOCATION_REGION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -265,7 +275,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_CONTENT_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_update_note, NOTE_CONTENT_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -281,7 +291,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_update_note, NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -297,7 +307,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_NPC_FACTION_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_update_note, NOTE_NPC_FACTION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -313,7 +323,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_LOCATION_REGION_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_update_note, NOTE_LOCATION_REGION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}

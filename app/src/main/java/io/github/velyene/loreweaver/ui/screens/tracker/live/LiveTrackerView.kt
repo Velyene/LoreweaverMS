@@ -183,24 +183,24 @@ private fun ActionChipsRow(onAction: (String) -> Unit) {
 		horizontalArrangement = Arrangement.spacedBy(8.dp)
 	) {
 		combatActionChipSpecs.forEach { action ->
+			val actionLabel = stringResource(action.labelRes)
 			ActionChip(
-				label = stringResource(action.labelRes),
-				onClick = { onAction(action.actionKey) }
+				label = actionLabel,
+				onClick = { onAction(actionLabel) }
 			)
 		}
 	}
 }
 
 private val combatActionChipSpecs = listOf(
-	CombatActionChipSpec(labelRes = R.string.combat_action_strike, actionKey = "Strike"),
-	CombatActionChipSpec(labelRes = R.string.combat_action_cast, actionKey = "Cast"),
-	CombatActionChipSpec(labelRes = R.string.combat_action_sneak, actionKey = "Sneak"),
-	CombatActionChipSpec(labelRes = R.string.combat_action_dodge, actionKey = "Dodge")
+	CombatActionChipSpec(labelRes = R.string.combat_action_strike),
+	CombatActionChipSpec(labelRes = R.string.combat_action_cast),
+	CombatActionChipSpec(labelRes = R.string.combat_action_sneak),
+	CombatActionChipSpec(labelRes = R.string.combat_action_dodge)
 )
 
 private data class CombatActionChipSpec(
-	val labelRes: Int,
-	val actionKey: String
+	val labelRes: Int
 )
 
 @Composable

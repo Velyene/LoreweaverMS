@@ -1,3 +1,12 @@
+/*
+ * FILE: CombatantConditionsRow.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Combatant conditions row composable
+ * 2. Condition chip rendering helpers
+ * 3. Condition duration formatting helpers
+ */
+
 package io.github.velyene.loreweaver.ui.screens.tracker.live
 
 import androidx.compose.foundation.BorderStroke
@@ -38,19 +47,17 @@ internal fun CombatantConditionsRow(
 	onAddConditionClick: () -> Unit
 ) {
 	val addConditionDescription = stringResource(R.string.add_condition_desc)
-	val conditionsStateDescription = buildString {
-		append(stringResource(R.string.conditions_label))
-		append(": ")
-		append(
-			if (combatant.conditions.isEmpty()) {
-				stringResource(R.string.empty_label)
-			} else {
-				combatant.conditions.joinToString { condition ->
-					condition.name + conditionDurationText(condition)
-				}
-			}
-		)
+	val conditionsStateValue = if (combatant.conditions.isEmpty()) {
+		stringResource(R.string.empty_label)
+	} else {
+		combatant.conditions.joinToString { condition ->
+			condition.name + conditionDurationText(condition)
+		}
 	}
+	val conditionsStateDescription = stringResource(
+		R.string.conditions_state_description,
+		conditionsStateValue
+	)
 
 	FlowRow(
 		modifier = Modifier
@@ -99,15 +106,15 @@ private fun ConditionChip(
 	condition: Condition,
 	onRemove: () -> Unit
 ) {
-	val removeConditionDescription = buildString {
-		append(stringResource(R.string.remove_condition_desc))
-		append(' ')
-		append(condition.name)
-	}
+	val removeConditionDescription = stringResource(
+		R.string.remove_condition_desc_with_name,
+		condition.name
+	)
 
 	FilterChip(
 		selected = true,
 		onClick = {},
+		enabled = false,
 		label = {
 			Text(
 				"${condition.name}${conditionDurationText(condition)}",

@@ -1,5 +1,9 @@
 /*
  * FILE: Models.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Core campaign, encounter, session, and note models
+ * 2. Snapshot and combat-state helper models
  */
 
 package io.github.velyene.loreweaver.domain.model

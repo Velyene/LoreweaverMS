@@ -15,6 +15,7 @@ import io.github.velyene.loreweaver.domain.model.Campaign
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.domain.model.Encounter
+import io.github.velyene.loreweaver.domain.model.EncounterSnapshot
 import io.github.velyene.loreweaver.domain.model.EncounterStatus
 import io.github.velyene.loreweaver.domain.model.LogEntry
 import io.github.velyene.loreweaver.domain.model.Note
@@ -295,6 +296,49 @@ class CombatViewModelTest {
 		}
 	}
 
+	@Test
+	fun loadEncounter_restoresRoundTurnAndCombatantsFromSnapshot() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			val encounter = Encounter(
+				id = "encounter-restore",
+				name = "Ruined Keep",
+				status = EncounterStatus.ACTIVE
+			)
+			val snapshotCombatants = listOf(
+				combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 9),
+				combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 3)
+			)
+			val session = SessionRecord(
+				encounterId = encounter.id,
+				title = "Saved encounter",
+				log = listOf("$HERO_NAME uses Strike!"),
+				snapshot = EncounterSnapshot(
+					combatants = snapshotCombatants,
+					currentTurnIndex = 1,
+					currentRound = 4
+				)
+			)
+
+			repository.setEncounter(encounter)
+			repository.setSessionsForEncounter(encounter.id, listOf(session))
+			val viewModel = createViewModel(repository)
+			advanceUntilIdle()
+
+			viewModel.loadEncounter(encounter.id)
+			advanceUntilIdle()
+
+			with(viewModel.uiState.value) {
+				assertTrue(isCombatActive)
+				assertEquals(encounter.id, currentEncounterId)
+				assertEquals(snapshotCombatants, combatants)
+				assertEquals(1, currentTurnIndex)
+				assertEquals(4, currentRound)
+				assertEquals(session.log, activeStatuses)
+			}
+		}
+	}
+
 	private fun createViewModel(repository: FakeCombatCampaignRepository): CombatViewModel {
 		return CombatViewModel(
 			getCharactersUseCase = GetCharactersUseCase(repository),
@@ -304,7 +348,8 @@ class CombatViewModelTest {
 			insertEncounterUseCase = InsertEncounterUseCase(repository),
 			setActiveEncounterUseCase = SetActiveEncounterUseCase(repository),
 			insertLogUseCase = InsertLogUseCase(repository),
-			insertSessionRecordUseCase = InsertSessionRecordUseCase(repository)
+			insertSessionRecordUseCase = InsertSessionRecordUseCase(repository),
+			appText = fakeAppText
 		)
 	}
 
@@ -324,6 +369,14 @@ private class FakeCombatCampaignRepository : CampaignRepository {
 	private val charactersFlow = MutableStateFlow<List<CharacterEntry>>(emptyList())
 	private val allSessionsFlow = MutableStateFlow<List<SessionRecord>>(emptyList())
 	private val logsFlow = MutableStateFlow<List<LogEntry>>(emptyList())
+	private val encountersById = mutableMapOf<String, Encounter>()
+	private val sessionsByEncounterId = mutableMapOf<String, List<SessionRecord>>()
+	private var activeEncounter: Encounter? = Encounter(
+		id = "encounter-1",
+		name = "Fallback",
+		status = EncounterStatus.ACTIVE
+	)
+	private var recentSession: SessionRecord? = null
 
 	override fun getAllCampaigns(): Flow<List<Campaign>> = campaignsFlow
 
@@ -337,9 +390,11 @@ private class FakeCombatCampaignRepository : CampaignRepository {
 	override fun getEncountersForCampaign(campaignId: String): Flow<List<Encounter>> =
 		flowOf(emptyList())
 
-	override suspend fun getEncounterById(encounterId: String): Encounter? = null
+	override suspend fun getEncounterById(encounterId: String): Encounter? = encountersById[encounterId]
 
-	override suspend fun insertEncounter(encounter: Encounter) = Unit
+	override suspend fun insertEncounter(encounter: Encounter) {
+		encountersById[encounter.id] = encounter
+	}
 
 	override suspend fun addCombatantsToEncounter(
 
@@ -349,12 +404,16 @@ private class FakeCombatCampaignRepository : CampaignRepository {
 	) = Unit
 
 	override fun getSessionsForEncounter(encounterId: String): Flow<List<SessionRecord>> =
-		flowOf(emptyList())
+		flowOf(sessionsByEncounterId[encounterId].orEmpty())
 
 	override fun getAllSessions(): Flow<List<SessionRecord>> = allSessionsFlow
 
 	override suspend fun insertSessionRecord(session: SessionRecord) {
 		allSessionsFlow.value += session
+		session.encounterId?.let { encounterId ->
+			sessionsByEncounterId[encounterId] = listOf(session) + sessionsByEncounterId[encounterId].orEmpty()
+		}
+		recentSession = session
 	}
 
 	override fun getNotesForCampaign(campaignId: String): Flow<List<Note>> = flowOf(emptyList())
@@ -376,17 +435,13 @@ private class FakeCombatCampaignRepository : CampaignRepository {
 
 	override suspend fun deleteCharacter(character: CharacterEntry) = Unit
 
-	override suspend fun getActiveEncounter(): Encounter {
-		return Encounter(
-			id = "encounter-1",
-			name = "Fallback",
-			status = EncounterStatus.ACTIVE
-		)
+	override suspend fun getActiveEncounter(): Encounter? = activeEncounter
+
+	override suspend fun setActiveEncounter(encounterId: String) {
+		activeEncounter = encountersById[encounterId]
 	}
 
-	override suspend fun setActiveEncounter(encounterId: String) = Unit
-
-	override suspend fun getRecentSession(): SessionRecord? = null
+	override suspend fun getRecentSession(): SessionRecord? = recentSession
 
 	override fun getAllLogs(): Flow<List<LogEntry>> = logsFlow
 
@@ -400,5 +455,15 @@ private class FakeCombatCampaignRepository : CampaignRepository {
 
 	fun setCharacters(characters: List<CharacterEntry>) {
 		charactersFlow.value = characters
+	}
+
+	fun setEncounter(encounter: Encounter) {
+		encountersById[encounter.id] = encounter
+	}
+
+	fun setSessionsForEncounter(encounterId: String, sessions: List<SessionRecord>) {
+		sessionsByEncounterId[encounterId] = sessions
+		allSessionsFlow.value = sessions
+		recentSession = sessions.firstOrNull()
 	}
 }

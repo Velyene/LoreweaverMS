@@ -1,3 +1,12 @@
+/*
+ * FILE: NoteContentValidationUseCaseTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Add-note validation tests
+ * 2. Update-note validation tests
+ * 3. Fake notes repository
+ */
+
 package io.github.velyene.loreweaver.domain.use_case
 
 import io.github.velyene.loreweaver.domain.model.Note
