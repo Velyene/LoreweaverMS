@@ -63,11 +63,13 @@ object ReferenceDetailResolver {
 				tag = "Action",
 				subtitle = CATEGORY_ACTIONS
 			)
+
 			matchesCategory(category, CATEGORY_HAZARDS, "Hazard") -> resolveGlossary(
 				slug = slug,
 				tag = "Hazard",
 				subtitle = CATEGORY_HAZARDS
 			)
+
 			matchesCategory(category, CATEGORY_GLOSSARY, "Glossary", "Core Rule", "Rule") ->
 				resolveGlossary(slug = slug, subtitle = CATEGORY_GLOSSARY)
 			matchesCategory(category, CATEGORY_FEATS, "Feat") -> resolveFeat(slug)

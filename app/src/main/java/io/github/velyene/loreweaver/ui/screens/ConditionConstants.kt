@@ -349,24 +349,26 @@ object ConditionConstants {
 	fun shouldAllowOfficialConditionLookup(label: String): Boolean = isOfficialCondition(label)
 
 	fun referenceTargetFor(label: String): StatusLookupTarget? {
-		val canonicalLabel = metadataFor(label).label
-		return when (canonicalLabel) {
+		return when (val canonicalLabel = metadataFor(label).label) {
 			in OFFICIAL_CONDITIONS -> officialConditionTarget(canonicalLabel)
 			"Blessed" -> spellTarget("Bless")
 			"Concentrating" -> glossaryTarget(
 				term = "Concentration",
 				detailCategory = ReferenceDetailResolver.CATEGORY_GLOSSARY
 			)
+
 			"Dodging" -> glossaryTarget(
 				term = "Dodge",
 				detailCategory = ReferenceDetailResolver.CATEGORY_ACTIONS
 			)
+
 			"Hexed" -> spellTarget("Hex")
 			"Hasted" -> spellTarget("Haste")
 			"Burning" -> glossaryTarget(
 				term = "Burning",
 				detailCategory = ReferenceDetailResolver.CATEGORY_HAZARDS
 			)
+
 			"Cursed" -> spellSearchTarget("Curse")
 			"Diseased" -> StatusLookupTarget(category = ReferenceCategory.DISEASES)
 			"Hidden" -> glossaryTarget(
@@ -374,6 +376,7 @@ object ConditionConstants {
 				detailCategory = ReferenceDetailResolver.CATEGORY_ACTIONS,
 				query = canonicalLabel
 			)
+
 			"Shielded" -> spellSearchTarget("Shield")
 			"Slowed" -> spellTarget("Slow")
 			else -> null
@@ -412,7 +415,7 @@ object ConditionConstants {
 		)
 	}
 
-	private fun spellTarget(spellName: String): StatusLookupTarget? {
+	private fun spellTarget(spellName: String): StatusLookupTarget {
 		val canonicalSpellName = SrdSpellIndexReference.canonicalNameFor(spellName)
 			?: return spellSearchTarget(spellName)
 		val slug = ReferenceDetailResolver.slugFor(canonicalSpellName)

@@ -618,17 +618,17 @@ private fun classifyCharacterStatusSections(activeConditions: Set<String>): Char
 	val persistentEffects = mutableListOf<StatusChipModel>()
 
 	normalizedStatusLabels(activeConditions).forEach { conditionName ->
-			val metadata = ConditionConstants.metadataFor(conditionName)
-			val chip = statusChipModel(
-				name = conditionName,
-				isPersistent = metadata.persistsAcrossEncounters
-			)
-			when {
-				metadata.persistsAcrossEncounters -> persistentEffects += chip
-				metadata.category in afflictionCategories -> ongoingAfflictions += chip
-				else -> encounterConditions += chip
-			}
+		val metadata = ConditionConstants.metadataFor(conditionName)
+		val chip = statusChipModel(
+			name = conditionName,
+			isPersistent = metadata.persistsAcrossEncounters
+		)
+		when {
+			metadata.persistsAcrossEncounters -> persistentEffects += chip
+			metadata.category in afflictionCategories -> ongoingAfflictions += chip
+			else -> encounterConditions += chip
 		}
+	}
 
 	return CharacterStatusSections(
 		encounterConditions = encounterConditions,

@@ -51,12 +51,12 @@ import io.github.velyene.loreweaver.ui.screens.CombatTrackerConstants.INITIATIVE
 import io.github.velyene.loreweaver.ui.screens.tracker.live.LiveTrackerCallbacks
 import io.github.velyene.loreweaver.ui.screens.tracker.live.LiveTrackerView
 import io.github.velyene.loreweaver.ui.screens.tracker.live.LiveTrackerViewState
-import io.github.velyene.loreweaver.ui.viewmodels.ActionResolutionType
-import io.github.velyene.loreweaver.ui.viewmodels.EncounterLifecycle
-import io.github.velyene.loreweaver.ui.viewmodels.CombatTurnStep
-import io.github.velyene.loreweaver.ui.viewmodels.PendingTurnAction
 import io.github.velyene.loreweaver.ui.screens.tracker.setup.EncounterSetupView
+import io.github.velyene.loreweaver.ui.viewmodels.ActionResolutionType
+import io.github.velyene.loreweaver.ui.viewmodels.CombatTurnStep
 import io.github.velyene.loreweaver.ui.viewmodels.CombatViewModel
+import io.github.velyene.loreweaver.ui.viewmodels.EncounterLifecycle
+import io.github.velyene.loreweaver.ui.viewmodels.PendingTurnAction
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -137,31 +137,31 @@ fun CombatTrackerScreen(
 		snackbarHost = { SnackbarHost(snackbarHostState) },
 		topBar = {
 			TopAppBar(
-					title = {
-						if (uiState.isCombatActive) {
-							Column {
-								Text(uiState.currentEncounterName.ifBlank { defaultLiveTitle })
-								Text(
-									text = stringResource(
-										R.string.encounter_top_bar_active_subtitle,
-										uiState.currentRound,
-										formatEncounterLifecycleLabel(uiState.encounterLifecycle)
-									),
-									style = MaterialTheme.typography.labelSmall,
-									color = MaterialTheme.colorScheme.onSurfaceVariant
-								)
-							}
-						} else {
-							Column {
-								Text(setupTitle)
-								Text(
-									text = formatEncounterLifecycleLabel(uiState.encounterLifecycle),
-									style = MaterialTheme.typography.labelSmall,
-									color = MaterialTheme.colorScheme.onSurfaceVariant
-								)
-							}
+				title = {
+					if (uiState.isCombatActive) {
+						Column {
+							Text(uiState.currentEncounterName.ifBlank { defaultLiveTitle })
+							Text(
+								text = stringResource(
+									R.string.encounter_top_bar_active_subtitle,
+									uiState.currentRound,
+									formatEncounterLifecycleLabel(uiState.encounterLifecycle)
+								),
+								style = MaterialTheme.typography.labelSmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
 						}
-					},
+					} else {
+						Column {
+							Text(setupTitle)
+							Text(
+								text = formatEncounterLifecycleLabel(uiState.encounterLifecycle),
+								style = MaterialTheme.typography.labelSmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+					}
+				},
 				navigationIcon = {
 					IconButton(onClick = onBack) {
 						Icon(
@@ -169,43 +169,43 @@ fun CombatTrackerScreen(
 							contentDescription = stringResource(R.string.back_button)
 						)
 					}
-					},
-					actions = {
-						if (uiState.isCombatActive) {
-										IconButton(onClick = { viewModel.saveAndPauseEncounter(onEndEncounter) }) {
+				},
+				actions = {
+					if (uiState.isCombatActive) {
+						IconButton(onClick = { viewModel.saveAndPauseEncounter(onEndEncounter) }) {
+							Icon(
+								Icons.Default.Save,
+								contentDescription = stringResource(R.string.encounter_save_exit_button)
+							)
+						}
+						Box {
+							IconButton(onClick = { showEncounterMenu = true }) {
 								Icon(
-									Icons.Default.Save,
-									contentDescription = stringResource(R.string.encounter_save_exit_button)
+									Icons.Default.MoreVert,
+									contentDescription = stringResource(R.string.encounter_options_button)
 								)
 							}
-							Box {
-								IconButton(onClick = { showEncounterMenu = true }) {
-									Icon(
-										Icons.Default.MoreVert,
-										contentDescription = stringResource(R.string.encounter_options_button)
-									)
-								}
-								DropdownMenu(
-									expanded = showEncounterMenu,
-									onDismissRequest = { showEncounterMenu = false }
-								) {
-									DropdownMenuItem(
-										text = { Text(stringResource(R.string.encounter_save_exit_button)) },
-										onClick = {
-											showEncounterMenu = false
-														viewModel.saveAndPauseEncounter(onEndEncounter)
-										}
-									)
-									DropdownMenuItem(
-										text = { Text(stringResource(R.string.end_encounter_button)) },
-										onClick = {
-											showEncounterMenu = false
-														viewModel.saveAndPauseEncounter(onEndEncounter)
-										}
-									)
-								}
+							DropdownMenu(
+								expanded = showEncounterMenu,
+								onDismissRequest = { showEncounterMenu = false }
+							) {
+								DropdownMenuItem(
+									text = { Text(stringResource(R.string.encounter_save_exit_button)) },
+									onClick = {
+										showEncounterMenu = false
+										viewModel.saveAndPauseEncounter(onEndEncounter)
+									}
+								)
+								DropdownMenuItem(
+									text = { Text(stringResource(R.string.end_encounter_button)) },
+									onClick = {
+										showEncounterMenu = false
+										viewModel.saveAndPauseEncounter(onEndEncounter)
+									}
+								)
 							}
 						}
+					}
 				}
 			)
 		}

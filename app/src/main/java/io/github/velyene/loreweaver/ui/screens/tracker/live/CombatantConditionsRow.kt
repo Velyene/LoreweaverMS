@@ -21,11 +21,11 @@ import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.domain.model.Condition
+import io.github.velyene.loreweaver.ui.screens.StatusChipFlowRow
+import io.github.velyene.loreweaver.ui.screens.StatusChipModel
 import io.github.velyene.loreweaver.ui.screens.canonicalStatusLabel
 import io.github.velyene.loreweaver.ui.screens.persistentStatusChipModels
 import io.github.velyene.loreweaver.ui.screens.statusChipModel
-import io.github.velyene.loreweaver.ui.screens.StatusChipFlowRow
-import io.github.velyene.loreweaver.ui.screens.StatusChipModel
 
 @Composable
 internal fun CombatantConditionsRow(

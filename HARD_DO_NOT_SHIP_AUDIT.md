@@ -12,18 +12,18 @@ must not ship from `app/src/main`.
 
 - [ ] **Feat rule:** if a feat is not one of the exact approved SRD feat names, remove it from
   shipped data.
-  - Current approved feat set is the 17-name subset already represented in
-    `CharacterCreationReference.FEATS` and verified by `CharacterCreationReferenceTest`.
+    - Current approved feat set is the 17-name subset already represented in
+      `CharacterCreationReference.FEATS` and verified by `CharacterCreationReferenceTest`.
 - [ ] **Weapon rule:** if a weapon is not in the approved SRD weapons table, remove it from shipped
   data.
-  - Canonical weapon labels live in `EquipmentReference.WEAPONS` and should be treated as an exact
-    allowlist, not a suggestion.
+    - Canonical weapon labels live in `EquipmentReference.WEAPONS` and should be treated as an exact
+      allowlist, not a suggestion.
 - [ ] **Named item provenance rule:** if an item name came from Basic Rules / core books / legacy
   imports and is not proven against the approved SRD source, remove it.
-  - This applies to structured item rows, embedded example names, and searchable aliases.
+    - This applies to structured item rows, embedded example names, and searchable aliases.
 - [ ] **Unknown-source rule:** if the source is unknown, mixed, legacy, or cannot be re-proven
   quickly, quarantine it until verified.
-  - Quarantine target: `quarantine_do_not_ship/`
+    - Quarantine target: `quarantine_do_not_ship/`
 
 ### One-line decision rule
 
@@ -63,23 +63,23 @@ Do not ship a feat if any of the following are true:
 - the feat name is not one of the approved SRD feat names
 - the feat text was copied from outside the SRD
 - the feat exists in the app but is not one of:
-  - `Alert`
-  - `Magic Initiate`
-  - `Savage Attacker`
-  - `Skilled`
-  - `Ability Score Improvement`
-  - `Grappler`
-  - `Archery`
-  - `Defense`
-  - `Great Weapon Fighting`
-  - `Two-Weapon Fighting`
-  - `Boon of Combat Prowess`
-  - `Boon of Dimensional Travel`
-  - `Boon of Fate`
-  - `Boon of Irresistible Offense`
-  - `Boon of Spell Recall`
-  - `Boon of the Night Spirit`
-  - `Boon of Truesight`
+    - `Alert`
+    - `Magic Initiate`
+    - `Savage Attacker`
+    - `Skilled`
+    - `Ability Score Improvement`
+    - `Grappler`
+    - `Archery`
+    - `Defense`
+    - `Great Weapon Fighting`
+    - `Two-Weapon Fighting`
+    - `Boon of Combat Prowess`
+    - `Boon of Dimensional Travel`
+    - `Boon of Fate`
+    - `Boon of Irresistible Offense`
+    - `Boon of Spell Recall`
+    - `Boon of the Night Spirit`
+    - `Boon of Truesight`
 
 ### 4. Weapons
 
@@ -96,19 +96,19 @@ Do not ship an armor entry if any of the following are true:
 - the armor name is not one of the approved SRD armor names
 - the armor table values came from somewhere other than SRD 5.2.1
 - the armor is not one of:
-  - `Padded Armor`
-  - `Leather Armor`
-  - `Studded Leather Armor`
-  - `Hide Armor`
-  - `Chain Shirt`
-  - `Scale Mail`
-  - `Breastplate`
-  - `Half Plate Armor`
-  - `Ring Mail`
-  - `Chain Mail`
-  - `Splint Armor`
-  - `Plate Armor`
-  - `Shield`
+    - `Padded Armor`
+    - `Leather Armor`
+    - `Studded Leather Armor`
+    - `Hide Armor`
+    - `Chain Shirt`
+    - `Scale Mail`
+    - `Breastplate`
+    - `Half Plate Armor`
+    - `Ring Mail`
+    - `Chain Mail`
+    - `Splint Armor`
+    - `Plate Armor`
+    - `Shield`
 
 ### 6. Tools
 
@@ -172,23 +172,23 @@ See `quarantine_do_not_ship/README.md` for the tiny audit template and quarantin
 ## Audit basis used for this snapshot
 
 - existing repo audit notes:
-  - `SRD_EQUIPMENT_ALLOWLIST_AUDIT.md`
-  - `SRD_GAMEPLAY_TOOLBOX_AUDIT.md`
-  - `SRD_MAGIC_ITEMS_AUDIT.md`
-  - `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
+    - `SRD_EQUIPMENT_ALLOWLIST_AUDIT.md`
+    - `SRD_GAMEPLAY_TOOLBOX_AUDIT.md`
+    - `SRD_MAGIC_ITEMS_AUDIT.md`
+    - `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
 - current shipped source under `app/src/main`
 - targeted text searches for:
-  - `2014`
-  - `SpellDescriptionReference`
-  - `MonsterReference`
-  - `CharacterClassReference`
-  - `ClassSpellListReference`
-  - `Magic Initiate (Cleric)` / `Magic Initiate (Wizard)`
-  - `Musket` / `Pistol`
-  - `Three-Dragon Ante`
-  - `Energy Bow`
-  - `Hat of Many Spells`
-  - `Arcanist’s Magic Aura`
+    - `2014`
+    - `SpellDescriptionReference`
+    - `MonsterReference`
+    - `CharacterClassReference`
+    - `ClassSpellListReference`
+    - `Magic Initiate (Cleric)` / `Magic Initiate (Wizard)`
+    - `Musket` / `Pistol`
+    - `Three-Dragon Ante`
+    - `Energy Bow`
+    - `Hat of Many Spells`
+    - `Arcanist’s Magic Aura`
 
 ## Current repo state note
 
