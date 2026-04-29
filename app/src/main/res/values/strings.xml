@@ -329,7 +329,34 @@ Create one to begin your journey!</string>
     <string name="encounter_creation_setup_message">Create the encounter shell now, then choose saved party members, add enemies, and add notes from the setup screen.</string>
     <string name="monster_import_removed_message">Monster library import has been removed from
         this build.</string>
+    <string name="encounter_monster_picker_helper">Add monsters from the local library below. Selected creatures will be imported into the encounter with their reference stats.</string>
+    <string name="encounter_monster_picker_empty">No monsters match the current search and filters.</string>
+    <string name="encounter_selected_monsters_count">%1$d monsters selected</string>
+    <string name="encounter_selected_monsters_more">+%1$d more</string>
+    <string name="encounter_no_monsters_selected">No monsters selected yet.</string>
+    <string name="encounter_add_monster_button">Add</string>
+    <string name="encounter_remove_all_button">Remove</string>
+    <string name="encounter_monster_sort_label">Sort monsters</string>
+    <string name="encounter_monster_sort_name">Name</string>
+    <string name="encounter_monster_sort_cr">CR</string>
+    <string name="encounter_animals_shortcut_button">Animals</string>
+    <string name="encounter_selected_only_button">Selected only</string>
+    <string name="encounter_clear_filters_button">Clear filters</string>
+    <string name="encounter_clear_selection_button">Clear selection</string>
+    <string name="create_encounter_with_monsters_button">Create Encounter (%1$d)</string>
     <string name="create_without_monsters_button">Create Without Monsters</string>
+    <string name="encounter_picker_count_header">%1$s • %2$s</string>
+    <string name="encounter_increment_selected_monster">Add one %1$s to selection</string>
+    <string name="encounter_decrement_selected_monster">Remove one %1$s from selection</string>
+    <string name="encounter_remove_selected_monster">Remove all %1$s from selection</string>
+    <plurals name="encounter_selected_monsters_quantity">
+        <item quantity="one">%d monster selected</item>
+        <item quantity="other">%d monsters selected</item>
+    </plurals>
+    <plurals name="encounter_matching_monsters_quantity">
+        <item quantity="one">%d matching monster</item>
+        <item quantity="other">%d matching monsters</item>
+    </plurals>
     <string name="confirm_delete_note_title">Delete note?</string>
     <string name="confirm_delete_note_message">This note will be permanently removed from the
         campaign.</string>
@@ -470,6 +497,9 @@ Add your party or individual enemies above.</string>
     <string name="status_chip_reference_available">Reference details available</string>
     <string name="status_chip_status_only">Status only</string>
     <string name="combatant_initiative_summary">Init: %1$d</string>
+    <string name="combatant_turn">Turn: %1$s</string>
+    <string name="combatant_hp_label">HP: %1$d/%2$d</string>
+    <string name="combatant_hp_label_with_temp">HP: %1$d/%2$d +%3$d</string>
     <string name="combat_log_bullet">• %1$s</string>
 
     <!-- Reference Screen -->
@@ -481,6 +511,11 @@ Add your party or individual enemies above.</string>
     <string name="reference_tab_objects" tools:keep="@string/reference_tab_objects">Objects</string>
     <string name="reference_tab_madness">Madness</string>
     <string name="reference_tab_monsters">Monsters</string>
+    <string name="reference_monster_filter_all">All</string>
+    <string name="reference_monster_filter_shortcuts">Shortcuts</string>
+    <string name="reference_monster_filter_animals">Animals</string>
+    <string name="reference_monster_filter_cr">CR</string>
+    <string name="reference_monster_filter_type">Type</string>
     <string name="reference_tab_core_rules">Core Rules</string>
     <string name="reference_tab_character_creation">Character Creation</string>
     <string name="reference_tab_with_favorites_count">%1$s, %2$d favorites</string>

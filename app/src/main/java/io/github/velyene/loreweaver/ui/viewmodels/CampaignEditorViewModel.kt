@@ -15,6 +15,7 @@ import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LOCATION
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LORE
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_NPC
 import io.github.velyene.loreweaver.ui.util.parseNpcExtra
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,6 +69,8 @@ class CampaignEditorViewModel @Inject constructor(
 						)
 					}
 				}
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
 				_uiState.update { it.copy(message = formatCampaignError(errorPrefix, e)) }
 			}
@@ -100,6 +103,8 @@ class CampaignEditorViewModel @Inject constructor(
 		viewModelScope.launch {
 			try {
 				action()
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
 				_uiState.update { it.copy(message = formatCampaignError(errorPrefix, e)) }
 			}

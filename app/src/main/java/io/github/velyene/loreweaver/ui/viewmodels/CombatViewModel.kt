@@ -143,13 +143,11 @@ class CombatViewModel @Inject constructor(
 		}
 		val partyMembers = selectedCharacters.filter { it.isAdventurer() }
 		val enemies = state.combatants.filter { combatant ->
-			charactersById[combatant.characterId]?.isAdventurer() == false
+			charactersById[combatant.characterId]?.isAdventurer() != true
 		}
-		val enemyCRMap = enemies.mapNotNull { combatant ->
-			charactersById[combatant.characterId]?.challengeRating?.let { cr ->
-				combatant.characterId to cr
-			}
-		}.toMap()
+		val enemyCRMap = enemies.associate { combatant ->
+			combatant.characterId to (charactersById[combatant.characterId]?.challengeRating ?: 0.0)
+		}
 
 		_uiState.update {
 			it.copy(

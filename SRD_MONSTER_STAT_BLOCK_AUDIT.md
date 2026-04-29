@@ -1,6 +1,6 @@
 # SRD Monster Stat Block Audit
 
-Snapshot date: 2026-04-20
+Snapshot date: 2026-04-27
 
 ## Summary
 
@@ -9,6 +9,12 @@ content in:
 
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/CoreRulesReference.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenNavigation.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataAtoC.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataDtoG.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataHtoN.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataOtoR.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataStoW.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataXtoZ.kt`
 
 The audit baseline is the user-provided SRD 5.2.1 excerpt covering:
 
@@ -24,7 +30,7 @@ The audit baseline is the user-provided SRD 5.2.1 excerpt covering:
   Challenge Rating` tables
 
 Goal: treat the pasted monster excerpt as the current SRD-backed allowlist for concise monster
-stat-block reference content in the core-rules UI.
+stat-block reference content in both the core-rules UI and the restored monster-reference dataset.
 
 ## Scope reviewed
 
@@ -33,6 +39,9 @@ stat-block reference content in the core-rules UI.
 - `CoreRulesReference.SECTIONS`
 - `CoreRulesReference.GLOSSARY_ENTRIES`
 - `CoreRulesReference.ALL_TABLES`
+- `MonsterReferenceCatalog.ALL`
+- `MonsterReferenceEntry.statRows`
+- `MonsterReferenceEntry.body`
 
 ### UI routing
 
@@ -49,6 +58,16 @@ stat-block reference content in the core-rules UI.
 - `Monster Attack and Usage Notation`
 
 These are routed through the Core Rules **Combat** subtab.
+
+### Restored monster stat blocks
+
+The local `Monsters` reference now stores the uploaded A-Z slice as searchable stat-block entries.
+
+Current storage pattern:
+
+- compact card summary fields in `statRows`
+- full mechanical monster text in `body`
+- generic detail rendering through `ReferenceDetailResolver.CATEGORY_MONSTERS`
 
 ### Monster tables modeled locally
 
@@ -81,6 +100,8 @@ The existing `Proficiency Bonus` table already covers the same CR bands used by 
 ## Verification anchors
 
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenMonsterSearchTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/ReferenceDetailResolverTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenGlossarySearchTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/ContentSafetyAuditTest.kt`

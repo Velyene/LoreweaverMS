@@ -154,7 +154,7 @@ data class CharacterEntry(
 
 	/**
 	 * Automates a 5e Long Rest:
-	tw	 * - Restores all HP/Resources/Spell Slots.
+	 * - Restores all HP/Resources/Spell Slots.
 	 * - Resets Death Saves.
 	 * - Recovers half of max Hit Dice.
 	 */
@@ -175,7 +175,7 @@ data class CharacterEntry(
 	 * Automates a 5e Short Rest:
 	 * - Warlocks recover all Pact Magic spell slots.
 	 * - Monks recover all Ki Points.
-	ee	 * - Fighters recover Action Surge, Second Wind, etc.
+	 * - Fighters recover Action Surge, Second Wind, etc.
 	 * - Bards recover Bardic Inspiration.
 	 * - Warlocks recover Invocations that recharge on short rest.
 	 * - HP recovery is done manually via the Hit Dice section.

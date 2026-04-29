@@ -24,12 +24,13 @@ import io.github.velyene.loreweaver.domain.model.calcMaxMana
 import io.github.velyene.loreweaver.domain.model.classInfoFor
 import io.github.velyene.loreweaver.domain.model.normalizeClassName
 import io.github.velyene.loreweaver.domain.model.roll4d6DropLowest
+import io.github.velyene.loreweaver.domain.util.CharacterParty
 
 internal fun CharacterEntry.toFormState(): CharacterFormState {
 	return CharacterFormState()
 		.copy(
 			name = name,
-			type = normalizeClassName(type),
+			type = if (party == CharacterParty.ADVENTURERS) normalizeClassName(type) else type.ifBlank { "Monster" },
 			party = party,
 			level = level.toString(),
 			challengeRating = challengeRating.toString()

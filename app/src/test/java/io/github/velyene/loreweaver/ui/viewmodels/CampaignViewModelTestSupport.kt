@@ -58,8 +58,10 @@ internal class SplitFakeCampaignRepository : CampaignRepository {
 	private val notesByCampaign = mutableMapOf<String, MutableStateFlow<List<Note>>>()
 	private val sessionsByEncounter = mutableMapOf<String, MutableStateFlow<List<SessionRecord>>>()
 
+	val insertedCharacters = mutableListOf<CharacterEntry>()
 	val insertedNotes = mutableListOf<Note>()
 	val updatedNotes = mutableListOf<Note>()
+	val combatantsByEncounterId = mutableMapOf<String, List<CombatantState>>()
 
 	override fun getAllCampaigns(): Flow<List<Campaign>> = campaignsFlow
 
@@ -90,7 +92,9 @@ internal class SplitFakeCampaignRepository : CampaignRepository {
 	override suspend fun addCombatantsToEncounter(
 		encounterId: String,
 		combatants: List<CombatantState>
-	) = Unit
+	) {
+		combatantsByEncounterId[encounterId] = combatants
+	}
 
 	override fun getSessionsForEncounter(encounterId: String): Flow<List<SessionRecord>> {
 		return sessionsByEncounter.getOrPut(encounterId) { MutableStateFlow(emptyList()) }
@@ -128,7 +132,9 @@ internal class SplitFakeCampaignRepository : CampaignRepository {
 
 	override suspend fun getCharacterById(id: String): CharacterEntry? = null
 
-	override suspend fun insertCharacter(character: CharacterEntry) = Unit
+	override suspend fun insertCharacter(character: CharacterEntry) {
+		insertedCharacters += character
+	}
 
 	override suspend fun updateCharacter(character: CharacterEntry) = Unit
 

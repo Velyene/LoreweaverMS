@@ -8,8 +8,10 @@ import io.github.velyene.loreweaver.domain.model.ATTRIBUTE_WISDOM
 import io.github.velyene.loreweaver.domain.model.CLASS_FIGHTER
 import io.github.velyene.loreweaver.domain.model.CLASS_WIZARD
 import io.github.velyene.loreweaver.domain.model.CharacterAction
+import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CharacterResource
 import io.github.velyene.loreweaver.domain.model.ClassInfo
+import io.github.velyene.loreweaver.domain.util.CharacterParty
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -146,5 +148,19 @@ class CharacterFormMappingsTest {
 		val nameParts = generatedName.split(" ")
 		assertEquals(2, nameParts.size)
 		assertTrue(nameParts.all { it.isNotBlank() })
+	}
+
+	@Test
+	fun toFormState_preservesMonsterType_forNonAdventurerEntries() {
+		val formState = CharacterEntry(
+			name = "Ancient White Dragon",
+			type = "Dragon",
+			party = CharacterParty.MONSTERS,
+			hp = 333,
+			maxHp = 333,
+			ac = 20
+		).toFormState()
+
+		assertEquals("Dragon", formState.type)
 	}
 }

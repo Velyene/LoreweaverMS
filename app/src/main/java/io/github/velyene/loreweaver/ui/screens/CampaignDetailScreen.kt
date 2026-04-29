@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -43,6 +44,7 @@ fun CampaignDetailScreen(
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val editorUiState by editorViewModel.uiState.collectAsStateWithLifecycle()
 	val snackbarHostState = remember { SnackbarHostState() }
+	val retryActionLabel = stringResource(R.string.retry_action)
 
 	LaunchedEffect(campaignId) {
 		viewModel.selectCampaign(campaignId)
@@ -50,7 +52,13 @@ fun CampaignDetailScreen(
 
 	LaunchedEffect(uiState.error) {
 		uiState.error?.let {
-			snackbarHostState.showSnackbar(it)
+			val result = snackbarHostState.showSnackbar(
+				message = it,
+				actionLabel = if (uiState.onRetry != null) retryActionLabel else null,
+			)
+			if (result == SnackbarResult.ActionPerformed) {
+				uiState.onRetry?.invoke()
+			}
 			viewModel.clearError()
 		}
 	}

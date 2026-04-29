@@ -1,6 +1,6 @@
-# SRD Monsters Aâ€“Z Audit
+# SRD Monsters A-Z Audit
 
-Snapshot date: 2026-04-21
+Snapshot date: 2026-04-28
 
 ## Summary
 
@@ -27,7 +27,9 @@ alongside monster-running guidance and monster-stat-block explanations.
 ### Current shipped monster-facing surfaces
 
 - `ReferenceCategory.MONSTERS`
-- `MonstersContent(searchQuery: String)`
+- `MonstersContent(monsters, listState, onOpenDetail)`
+- `filterMonsterEntries(query: String)`
+- `ReferenceDetailResolver.CATEGORY_MONSTERS`
 - `CoreRulesReference.SECTIONS`
 - `CoreRulesReference.ALL_TABLES`
 - `CoreRulesReference.GLOSSARY_ENTRIES`
@@ -35,8 +37,8 @@ alongside monster-running guidance and monster-stat-block explanations.
 ### Current audit classification
 
 - `ContentSafetyAuditTest` currently discovers **zero** excluded SRD/reference corpus files.
-- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` currently reports **0 discovered excluded corpus files**
-  and **0 findings**.
+- If regenerated locally, the ignored `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` snapshot should report
+  **0 discovered excluded corpus files** and **0 findings**.
 
 ## Current alignment status
 
@@ -62,7 +64,7 @@ content rather than an unavailable-state placeholder.
 
 ### Still-shipped monster guidance
 
-Monster-related guidance still ships through the **Core Rules** reference content, including
+Monster-related guidance still also ships through the **Core Rules** reference content, including
 concise reviewed sections such as:
 
 - `Monster Stat Blocks`
@@ -80,7 +82,7 @@ Related tables and glossary content remain available through the audited core-ru
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/ContentSafetyAuditTest.kt`
-- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
+- optional local corroboration: ignored `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` if regenerated
 
 ## Notes for future updates
 

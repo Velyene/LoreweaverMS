@@ -107,7 +107,12 @@ internal fun Modifier.visibleVerticalScrollbar(
 		if (viewportHeight <= 0f || visibleItems.isEmpty() || totalItemsCount <= 0) return@drawWithContent
 		if (!listState.canScrollBackward && !listState.canScrollForward) return@drawWithContent
 
-		val averageItemHeight = visibleItems.map { it.size }.average().toFloat().coerceAtLeast(1f)
+		var visibleItemsTotalHeight = 0
+		for (item in visibleItems) {
+			visibleItemsTotalHeight += item.size
+		}
+		val averageItemHeight = (visibleItemsTotalHeight.toFloat() / visibleItems.size)
+			.coerceAtLeast(1f)
 		val estimatedTotalContentHeight = (
 			(averageItemHeight * totalItemsCount) +
 				layoutInfo.beforeContentPadding +
@@ -132,7 +137,7 @@ internal fun Modifier.visibleVerticalScrollbar(
 			thumbHeight = thumbHeight,
 			thicknessPx = params.thicknessPx,
 			endPaddingPx = params.endPaddingPx,
-			viewportHeight = size.height
+			viewportHeight = viewportHeight
 		)
 	}
 }

@@ -1,8 +1,39 @@
-$adb = 'C:\Users\tsang\AppData\Local\Android\Sdk\platform-tools\adb.exe'
-if (-not (Test-Path $adb)) {
-    Write-Error "ADB not found at $adb"
-    exit 1
+param(
+    [string]$AdbPath
+)
+
+function Resolve-AdbExecutable {
+    param(
+        [string]$ExplicitPath
+    )
+
+    $candidates = @()
+
+    if ($ExplicitPath) {
+        $candidates += $ExplicitPath
+    }
+
+    foreach ($sdkRoot in @($Env:ANDROID_SDK_ROOT, $Env:ANDROID_HOME)) {
+        if ($sdkRoot) {
+            $candidates += (Join-Path $sdkRoot 'platform-tools\adb.exe')
+        }
+    }
+
+    foreach ($candidate in $candidates) {
+        if ($candidate -and (Test-Path $candidate)) {
+            return $candidate
+        }
+    }
+
+    $adbCommand = Get-Command adb -ErrorAction SilentlyContinue
+    if ($adbCommand) {
+        return $adbCommand.Source
+    }
+
+    throw "ADB not found. Set ANDROID_SDK_ROOT/ANDROID_HOME, put adb on PATH, or pass -AdbPath."
 }
+
+$adb = Resolve-AdbExecutable -ExplicitPath $AdbPath
 
 & $adb shell am force-stop io.github.velyene.loreweaver
 & $adb logcat -c

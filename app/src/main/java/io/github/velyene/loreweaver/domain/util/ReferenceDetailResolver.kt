@@ -30,6 +30,7 @@ object ReferenceDetailResolver {
 	const val CATEGORY_ACTIONS = "Actions"
 	const val CATEGORY_HAZARDS = "Hazards"
 	const val CATEGORY_FEATS = "Feats"
+	const val CATEGORY_MONSTERS = "Monsters"
 	const val CATEGORY_SPELLS = "Spells"
 	const val CATEGORY_WEAPONS = "Weapons"
 	const val CATEGORY_ARMOR = "Armor"
@@ -73,6 +74,9 @@ object ReferenceDetailResolver {
 			matchesCategory(category, CATEGORY_GLOSSARY, "Glossary", "Core Rule", "Rule") ->
 				resolveGlossary(slug = slug, subtitle = CATEGORY_GLOSSARY)
 			matchesCategory(category, CATEGORY_FEATS, "Feat") -> resolveFeat(slug)
+			matchesCategory(category, CATEGORY_MONSTERS, "Monster", "Monster Reference") -> MonsterReferenceCatalog.resolve(
+				slug
+			)
 			matchesCategory(category, CATEGORY_SPELLS, "Spell") -> resolveSpell(slug)
 			matchesCategory(category, CATEGORY_WEAPONS, "Weapon") -> resolveWeapon(slug)
 			matchesCategory(category, CATEGORY_ARMOR, "Armour") -> resolveArmor(slug)

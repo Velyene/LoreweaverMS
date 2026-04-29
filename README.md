@@ -98,10 +98,10 @@ coverage applies only to reviewed SRD-derived material intentionally included in
 The full Creative Commons Attribution 4.0 license text is mirrored locally in
 `licenses/CC-BY-4.0.txt`.
 
-Running the content-audit test suite also regenerates
+Running the content-audit test suite can also regenerate the ignored local file
 `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`, which summarizes separately inventoried reference/SRD corpus
-files. In the current audited repo state, that snapshot reports no excluded corpus files under
-`app/src/main`.
+files for developer review. In the current audited repo state, the audit suite reports no
+excluded corpus files under `app/src/main`.
 
 The Reference screen includes reviewed SRD-derived monster reference content.
 
