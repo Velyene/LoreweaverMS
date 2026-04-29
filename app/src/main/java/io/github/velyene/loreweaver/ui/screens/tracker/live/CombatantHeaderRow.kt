@@ -96,7 +96,21 @@ private fun combatantNameWeight(isActive: Boolean): FontWeight {
 	return if (isActive) FontWeight.Bold else FontWeight.Normal
 }
 
+@Composable
 private fun formatCombatantHpLabel(combatant: CombatantState): String {
-	return "HP: ${combatant.currentHp}/${combatant.maxHp}${if (combatant.tempHp > 0) " +${combatant.tempHp}" else ""}"
+	return if (combatant.tempHp > 0) {
+		stringResource(
+			R.string.combatant_hp_label_with_temp,
+			combatant.currentHp,
+			combatant.maxHp,
+			combatant.tempHp
+		)
+	} else {
+		stringResource(
+			R.string.combatant_hp_label,
+			combatant.currentHp,
+			combatant.maxHp
+		)
+	}
 }
 

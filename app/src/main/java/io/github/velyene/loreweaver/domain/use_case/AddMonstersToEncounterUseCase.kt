@@ -1,6 +1,7 @@
 package io.github.velyene.loreweaver.domain.use_case
 
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
+import io.github.velyene.loreweaver.domain.model.CombatRules
 import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.domain.model.Condition
 import io.github.velyene.loreweaver.domain.model.RemoteItem
@@ -12,7 +13,6 @@ import io.github.velyene.loreweaver.domain.util.MonsterReferenceCatalog
 import io.github.velyene.loreweaver.domain.util.MonsterReferenceEntry
 import io.github.velyene.loreweaver.domain.util.parseMonsterChallengeRatingValue
 import javax.inject.Inject
-import kotlin.random.Random
 
 /**
  * Use case for adding selected monsters to an encounter.
@@ -62,7 +62,7 @@ class AddMonstersToEncounterUseCase @Inject constructor(
 				maxHp = DEFAULT_MONSTER_HP,
 				ac = DEFAULT_MONSTER_AC,
 				speed = DEFAULT_MONSTER_SPEED,
-				initiative = Random.nextInt(1, 21),
+				initiative = DEFAULT_MONSTER_INITIATIVE_MODIFIER,
 				notes = fullDescription.ifBlank { detail }
 			)
 	}
@@ -77,7 +77,7 @@ class AddMonstersToEncounterUseCase @Inject constructor(
 			maxHp = hpValue,
 			ac = statValue(STAT_AC).leadingIntOr(defaultValue = DEFAULT_MONSTER_AC),
 			speed = statValue(STAT_SPEED).leadingIntOr(defaultValue = DEFAULT_MONSTER_SPEED),
-			initiative = statValue(STAT_INITIATIVE).leadingSignedIntOrNull() ?: Random.nextInt(1, 21),
+			initiative = statValue(STAT_INITIATIVE).leadingSignedIntOrNull() ?: DEFAULT_MONSTER_INITIATIVE_MODIFIER,
 			challengeRating = parseMonsterChallengeRatingValue(challengeRating),
 			notes = buildList {
 				add(subtitle)
@@ -90,7 +90,7 @@ class AddMonstersToEncounterUseCase @Inject constructor(
 		return CombatantState(
 			characterId = id,
 			name = name,
-			initiative = initiative,
+			initiative = CombatRules.rollInitiative(initiative),
 			currentHp = hp,
 			maxHp = maxHp,
 			conditions = emptyList<Condition>(),
@@ -114,6 +114,7 @@ class AddMonstersToEncounterUseCase @Inject constructor(
 		const val DEFAULT_MONSTER_TYPE = "Monster"
 		const val DEFAULT_MONSTER_HP = 50
 		const val DEFAULT_MONSTER_AC = 10
+		const val DEFAULT_MONSTER_INITIATIVE_MODIFIER = 0
 		const val DEFAULT_MONSTER_SPEED = 30
 		const val STAT_AC = "AC"
 		const val STAT_INITIATIVE = "Initiative"

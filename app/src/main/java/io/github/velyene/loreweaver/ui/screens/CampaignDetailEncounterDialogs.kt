@@ -9,10 +9,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -70,7 +69,6 @@ private val encounterPickerMaxHeight = 320.dp
 private val encounterPickerHeaderBottomPadding = 8.dp
 private val encounterPickerTopPadding = 24.dp
 private val encounterSectionCardPadding = 12.dp
-private val encounterPickerRowSpacing = 6.dp
 private val encounterSelectedCountHorizontalPadding = 8.dp
 private val encounterSelectedCountVerticalPadding = 12.dp
 private val encounterHelperTextSize = 12.sp
@@ -140,6 +138,19 @@ private data class EncounterMonsterFilterSectionActions(
 	val onClearFilters: () -> Unit
 )
 
+private data class NewEncounterDialogContentState(
+	val filterSectionState: EncounterMonsterFilterSectionState,
+	val filterSectionActions: EncounterMonsterFilterSectionActions,
+	val selectedSummaryFocusRequester: FocusRequester,
+	val pickerHeaderFocusRequester: FocusRequester,
+	val selectedCountText: String,
+	val visibleSelectedSummaries: List<EncounterSelectedMonsterSummary>,
+	val remainingSelectedSummaryCount: Int,
+	val selectedMonsterTotal: Int,
+	val filteredMonsters: List<MonsterReferenceEntry>,
+	val monsterListState: LazyListState,
+)
+
 @Composable
 internal fun EncounterCreationDialogs(
 	state: EncounterCreationDialogState,
@@ -172,6 +183,7 @@ private fun NewEncounterDialog(
 	)
 	val selectedMonsterSummary = selectedEncounterMonsterSummaries(state.selectedMonsterCounts)
 	val selectedMonsterTotal = state.selectedMonsterCounts.values.sum()
+	val hasSelectedMonsters = selectedMonsterTotal > 0
 	val canCreateEncounter = state.encounterName.isNotBlank()
 	val hasActiveFilters = hasActiveEncounterMonsterFilters(
 		query = state.monsterSearchQuery,
@@ -186,11 +198,13 @@ private fun NewEncounterDialog(
 	} else {
 		stringResource(R.string.create_button)
 	}
-	val selectedCountText = stringResource(
-		R.string.encounter_selected_monsters_count,
+	val selectedCountText = pluralStringResource(
+		R.plurals.encounter_selected_monsters_quantity,
+		selectedMonsterTotal,
 		selectedMonsterTotal
 	)
-	val compactSelection = compactSelectedEncounterMonsterSummary(selectedMonsterSummary)
+	val (visibleSelectedSummaries, remainingSelectedSummaryCount) =
+		compactSelectedEncounterMonsterSummary(selectedMonsterSummary)
 	val filterSectionState = EncounterMonsterFilterSectionState(
 		showAnimalsOnly = state.showAnimalsOnly,
 		selectedCreatureType = state.selectedMonsterCreatureType,
@@ -207,15 +221,25 @@ private fun NewEncounterDialog(
 		onSelectedOnlyChange = actions.onSelectedOnlyChange,
 		onClearFilters = actions.onClearMonsterFilters
 	)
+	val contentState = NewEncounterDialogContentState(
+		filterSectionState = filterSectionState,
+		filterSectionActions = filterSectionActions,
+		selectedSummaryFocusRequester = selectedSummaryFocusRequester,
+		pickerHeaderFocusRequester = pickerHeaderFocusRequester,
+		selectedCountText = selectedCountText,
+		visibleSelectedSummaries = visibleSelectedSummaries,
+		remainingSelectedSummaryCount = remainingSelectedSummaryCount,
+		selectedMonsterTotal = selectedMonsterTotal,
+		filteredMonsters = filteredMonsters,
+		monsterListState = monsterListState,
+	)
 
 	LaunchedEffect(state.showSelectedMonstersOnly) {
 		if (state.showSelectedMonstersOnly) {
 			if (filteredMonsters.isNotEmpty()) {
 				monsterListState.scrollToItem(0)
 			}
-			when (
-				encounterPickerFocusTarget(hasSelectedMonsters = selectedMonsterTotal > 0)
-			) {
+			when (encounterPickerFocusTarget(hasSelectedMonsters = hasSelectedMonsters)) {
 				EncounterPickerFocusTarget.SELECTED_SUMMARY -> selectedSummaryFocusRequester.requestFocus()
 				EncounterPickerFocusTarget.PICKER_HEADER -> pickerHeaderFocusRequester.requestFocus()
 			}
@@ -229,15 +253,7 @@ private fun NewEncounterDialog(
 			NewEncounterDialogContent(
 				state = state,
 				actions = actions,
-				filterSectionState = filterSectionState,
-				filterSectionActions = filterSectionActions,
-				selectedSummaryFocusRequester = selectedSummaryFocusRequester,
-				pickerHeaderFocusRequester = pickerHeaderFocusRequester,
-				selectedCountText = selectedCountText,
-				compactSelection = compactSelection,
-				selectedMonsterTotal = selectedMonsterTotal,
-				filteredMonsters = filteredMonsters,
-				monsterListState = monsterListState
+				contentState = contentState,
 			)
 		},
 		confirmButton = {
@@ -262,15 +278,7 @@ private fun NewEncounterDialog(
 private fun NewEncounterDialogContent(
 	state: EncounterCreationDialogState,
 	actions: EncounterCreationDialogActions,
-	filterSectionState: EncounterMonsterFilterSectionState,
-	filterSectionActions: EncounterMonsterFilterSectionActions,
-	selectedSummaryFocusRequester: FocusRequester,
-	pickerHeaderFocusRequester: FocusRequester,
-	selectedCountText: String,
-	compactSelection: Pair<List<EncounterSelectedMonsterSummary>, Int>,
-	selectedMonsterTotal: Int,
-	filteredMonsters: List<MonsterReferenceEntry>,
-	monsterListState: LazyListState
+	contentState: NewEncounterDialogContentState,
 ) {
 	Column(verticalArrangement = LayoutArrangement.spacedBy(encounterDialogSectionSpacing)) {
 		OutlinedTextField(
@@ -287,25 +295,25 @@ private fun NewEncounterDialogContent(
 			singleLine = true
 		)
 		MonsterEncounterFilterSection(
-			state = filterSectionState,
-			actions = filterSectionActions
+			state = contentState.filterSectionState,
+			actions = contentState.filterSectionActions
 		)
 		SelectedEncounterMonsterSummarySection(
-			modifier = Modifier.focusRequester(selectedSummaryFocusRequester),
-			selectedCountText = selectedCountText,
-			summaries = compactSelection.first,
-			remainingCount = compactSelection.second,
+			modifier = Modifier.focusRequester(contentState.selectedSummaryFocusRequester),
+			selectedCountText = contentState.selectedCountText,
+			summaries = contentState.visibleSelectedSummaries,
+			remainingCount = contentState.remainingSelectedSummaryCount,
 			onDecrementSummary = actions.onDecrementSelectedMonster,
 			onRemoveSummary = actions.onRemoveSelectedMonster,
 			onClearSelection = actions.onClearMonsterSelection,
-			hasSelection = selectedMonsterTotal > 0
+			hasSelection = contentState.selectedMonsterTotal > 0
 		)
 		EncounterMonsterPickerSection(
-			filteredMonsters = filteredMonsters,
+			filteredMonsters = contentState.filteredMonsters,
 			selectedMonsterCounts = state.selectedMonsterCounts,
-			selectedMonsterTotal = selectedMonsterTotal,
-			monsterListState = monsterListState,
-			pickerHeaderFocusRequester = pickerHeaderFocusRequester,
+			selectedMonsterTotal = contentState.selectedMonsterTotal,
+			monsterListState = contentState.monsterListState,
+			pickerHeaderFocusRequester = contentState.pickerHeaderFocusRequester,
 			onMonsterCountChange = actions.onMonsterCountChange
 		)
 		Text(
@@ -359,13 +367,15 @@ private fun EncounterMonsterPickerSection(
 						.padding(top = encounterPickerTopPadding),
 					verticalArrangement = LayoutArrangement.spacedBy(encounterChipSpacing)
 				) {
-					items(visibleMonsters, key = ::encounterMonsterKey) { monster ->
-						val monsterKey = encounterMonsterKey(monster)
-						EncounterMonsterPickerRow(
-							monster = monster,
-							count = selectedEncounterMonsterCount(selectedMonsterCounts, monsterKey),
-							onCountChange = { delta -> onMonsterCountChange(monsterKey, delta) }
-						)
+					visibleMonsters.forEach { monster ->
+						item(key = encounterMonsterKey(monster)) {
+							val monsterKey = encounterMonsterKey(monster)
+							EncounterMonsterPickerRow(
+								monster = monster,
+								count = selectedEncounterMonsterCount(selectedMonsterCounts, monsterKey),
+								onCountChange = { delta -> onMonsterCountChange(monsterKey, delta) }
+							)
+						}
 					}
 				}
 			}
@@ -426,12 +436,14 @@ private fun MonsterEncounterFilterSection(
 			}
 		}
 		MonsterSingleSelectFilterRow(
+			keyPrefix = ENCOUNTER_FILTER_CR_KEY_PREFIX,
 			label = stringResource(R.string.reference_monster_filter_cr),
 			selectedOption = state.selectedChallengeRating,
 			options = MonsterReferenceCatalog.CHALLENGE_RATING_OPTIONS,
 			onOptionSelected = actions.onChallengeRatingSelected
 		)
 		MonsterSingleSelectFilterRow(
+			keyPrefix = ENCOUNTER_FILTER_TYPE_KEY_PREFIX,
 			label = stringResource(R.string.reference_monster_filter_type),
 			selectedOption = state.selectedCreatureType,
 			options = MonsterReferenceCatalog.CREATURE_TYPE_OPTIONS,
@@ -499,9 +511,9 @@ private fun SelectedEncounterMonsterSummarySection(
 				onDecrementSummary = onDecrementSummary,
 				onRemoveSummary = onRemoveSummary
 			)
+		}
 	}
 }
-	}
 
 
 @Composable
@@ -521,12 +533,14 @@ private fun SelectedEncounterMonsterSummaryContent(
 	}
 
 	LazyRow(horizontalArrangement = LayoutArrangement.spacedBy(encounterChipSpacing)) {
-		items(summaries, key = { it.key }) { summary ->
-			SelectedEncounterMonsterSummaryChipRow(
-				summary = summary,
-				onDecrementSummary = onDecrementSummary,
-				onRemoveSummary = onRemoveSummary
-			)
+		summaries.forEach { summary ->
+			item(key = summary.key) {
+				SelectedEncounterMonsterSummaryChipRow(
+					summary = summary,
+					onDecrementSummary = onDecrementSummary,
+					onRemoveSummary = onRemoveSummary
+				)
+			}
 		}
 		if (remainingCount > 0) {
 			item(key = ENCOUNTER_SELECTED_SUMMARY_OVERFLOW_KEY) {
@@ -576,6 +590,7 @@ private fun SelectedEncounterMonsterSummaryChipRow(
 		)
 	}
 }
+
 @Composable
 private fun EncounterMonsterPickerRow(
 	modifier: Modifier = Modifier,
@@ -615,6 +630,7 @@ private fun EncounterMonsterPickerRow(
 				horizontalArrangement = LayoutArrangement.End
 			) {
 				EncounterMonsterCountControls(
+					monsterName = monster.name,
 					count = count,
 					onCountChange = onCountChange
 				)
@@ -625,11 +641,19 @@ private fun EncounterMonsterPickerRow(
 
 @Composable
 private fun EncounterMonsterCountControls(
+	monsterName: String,
 	count: Int,
 	onCountChange: (Int) -> Unit
 ) {
+	val decrementLabel = decrementSelectedEncounterMonsterLabel(monsterName)
+	val incrementLabel = stringResource(R.string.encounter_increment_selected_monster, monsterName)
 	if (count > 0) {
-		IconButton(onClick = { onCountChange(-1) }) {
+		IconButton(
+			onClick = { onCountChange(-1) },
+			modifier = Modifier.semantics {
+				contentDescription = decrementLabel
+			}
+		) {
 			Text("-")
 		}
 		Text(
@@ -640,7 +664,12 @@ private fun EncounterMonsterCountControls(
 				vertical = encounterSelectedCountVerticalPadding
 			)
 		)
-		IconButton(onClick = { onCountChange(1) }) {
+		IconButton(
+			onClick = { onCountChange(1) },
+			modifier = Modifier.semantics {
+				contentDescription = incrementLabel
+			}
+		) {
 			Text("+")
 		}
 	} else {

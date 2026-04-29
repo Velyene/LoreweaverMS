@@ -10,6 +10,7 @@ import io.github.velyene.loreweaver.domain.use_case.GetEncountersForCampaignUseC
 import io.github.velyene.loreweaver.domain.use_case.GetNotesForCampaignUseCase
 import io.github.velyene.loreweaver.domain.use_case.GetSessionsForEncounterUseCase
 import io.github.velyene.loreweaver.ui.util.CAMPAIGN_NOT_FOUND_MESSAGE
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +50,8 @@ class CampaignDetailViewModel @Inject constructor(
 				_uiState.update { it.copy(selectedCampaign = campaign) }
 				observeSelectedCampaign(campaignId)
 				_uiState.update { it.copy(isLoading = false) }
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
 				reportError(
 					message = formatCampaignError("Critical error", e),
@@ -97,6 +100,8 @@ class CampaignDetailViewModel @Inject constructor(
 		val job = viewModelScope.launch {
 			try {
 				collector()
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
 				reportError(
 					message = formatCampaignError(errorPrefix, e),

@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Badge
@@ -87,7 +87,10 @@ private fun LazyListScope.monsterListItems(
 
 	items(monsters, key = { it.name }) { monster ->
 		MonsterCard(monster = monster) {
-			onOpenDetail(ReferenceDetailResolver.CATEGORY_MONSTERS, ReferenceDetailResolver.slugFor(monster.name))
+			onOpenDetail(
+				ReferenceDetailResolver.CATEGORY_MONSTERS,
+				ReferenceDetailResolver.slugFor(monster.name)
+			)
 		}
 	}
 }
@@ -107,12 +110,14 @@ private fun MonsterFilterSection(
 			onGroupSelected = onGroupSelected
 		)
 		MonsterSingleSelectFilterRow(
+			keyPrefix = MONSTER_FILTER_CR_KEY_PREFIX,
 			label = stringResource(R.string.reference_monster_filter_cr),
 			selectedOption = selectedChallengeRating,
 			options = MonsterReferenceCatalog.CHALLENGE_RATING_OPTIONS,
 			onOptionSelected = onChallengeRatingSelected
 		)
 		MonsterSingleSelectFilterRow(
+			keyPrefix = MONSTER_FILTER_TYPE_KEY_PREFIX,
 			label = stringResource(R.string.reference_monster_filter_type),
 			selectedOption = selectedCreatureType,
 			options = MonsterReferenceCatalog.CREATURE_TYPE_OPTIONS,
@@ -153,9 +158,12 @@ private fun AnimalShortcutFilterChip(
 	)
 }
 
-private fun nextMonsterGroupSelection(selectedGroup: String?): String? {
-	return if (selectedGroup == MonsterReferenceCatalog.ANIMAL_GROUP) null else MonsterReferenceCatalog.ANIMAL_GROUP
-}
+private fun nextMonsterGroupSelection(selectedGroup: String?): String? =
+	if (selectedGroup == MonsterReferenceCatalog.ANIMAL_GROUP) {
+		null
+	} else {
+		MonsterReferenceCatalog.ANIMAL_GROUP
+	}
 
 @Composable
 private fun MonsterCard(monster: MonsterReferenceEntry, onClick: () -> Unit) {
@@ -204,7 +212,9 @@ private fun MonsterCardDetails(monster: MonsterReferenceEntry) {
 			color = MaterialTheme.colorScheme.primary
 		)
 	}
-	monster.monsterCardSummaryLine(MONSTER_CARD_SUMMARY_STAT_LABELS).takeIf { it.isNotBlank() }?.let { summary ->
+	monster.monsterCardSummaryLine(MONSTER_CARD_SUMMARY_STAT_LABELS)
+		.takeIf { it.isNotBlank() }
+		?.let { summary ->
 		Text(
 			text = summary,
 			color = MaterialTheme.colorScheme.onSurfaceVariant

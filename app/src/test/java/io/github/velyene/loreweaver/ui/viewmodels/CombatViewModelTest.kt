@@ -216,6 +216,85 @@ class CombatViewModelTest {
 		}
 	}
 
+	@Test
+	fun removeCombatant_recalculatesEncounterDifficultyFromActivePartyRosterOnly() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			val heroOne = CharacterEntry(
+				id = HERO_ID,
+				name = "Aria",
+				party = "Adventurers",
+				level = 3,
+				hp = 20,
+				maxHp = 20
+			)
+			val heroTwo = CharacterEntry(
+				id = "hero-2",
+				name = "Bram",
+				party = "Adventurers",
+				level = 3,
+				hp = 18,
+				maxHp = 18
+			)
+			val monster = CharacterEntry(
+				id = MONSTER_ID,
+				name = "Ogre",
+				party = "Monsters",
+				challengeRating = 2.0,
+				hp = 59,
+				maxHp = 59
+			)
+			repository.setCharacters(listOf(heroOne, heroTwo, monster))
+			val viewModel = createViewModel(repository)
+			advanceUntilIdle()
+
+			viewModel.addParty(
+				listOf(
+					combatant(id = heroOne.id, name = heroOne.name, initiative = 14, hp = heroOne.hp),
+					combatant(id = heroTwo.id, name = heroTwo.name, initiative = 13, hp = heroTwo.hp),
+					combatant(id = monster.id, name = monster.name, initiative = 8, hp = monster.hp),
+				)
+			)
+			advanceUntilIdle()
+			assertEquals(2, viewModel.uiState.value.encounterDifficulty?.partySize)
+
+			viewModel.removeCombatant(heroTwo.id)
+			advanceUntilIdle()
+
+			assertEquals(1, viewModel.uiState.value.encounterDifficulty?.partySize)
+		}
+	}
+
+	@Test
+	fun addEnemy_countsManualEnemyInDifficultyEvenWithoutCharacterEntry() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			val hero = CharacterEntry(
+				id = HERO_ID,
+				name = HERO_NAME,
+				party = "Adventurers",
+				level = 3,
+				hp = 20,
+				maxHp = 20
+			)
+			repository.setCharacters(listOf(hero))
+			val viewModel = createViewModel(repository)
+			advanceUntilIdle()
+
+			viewModel.addParty(listOf(combatant(id = hero.id, name = hero.name, initiative = 15, hp = hero.hp)))
+			advanceUntilIdle()
+			viewModel.addEnemy(name = "Bandit Captain", hp = 65, initiative = 11)
+			advanceUntilIdle()
+
+			val difficulty = viewModel.uiState.value.encounterDifficulty
+			assertNotNull(difficulty)
+			assertEquals(1, difficulty?.partySize)
+			assertEquals(1, difficulty?.monsterCount)
+			assertEquals(0, difficulty?.totalMonsterXp)
+			assertEquals(DifficultyRating.TRIVIAL, difficulty?.rating)
+		}
+	}
+
 	private fun createViewModel(repository: FakeCombatCampaignRepository): CombatViewModel {
 		return CombatViewModel(
 			getCharactersUseCase = GetCharactersUseCase(repository),

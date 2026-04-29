@@ -97,15 +97,15 @@ class CombatViewModel @Inject constructor(
 	private fun updateEncounterDifficulty() {
 		val state = _uiState.value
 		val charactersById = state.availableCharacters.associateBy(CharacterEntry::id)
-		val partyMembers = state.availableCharacters.filter { it.isAdventurer() }
-		val enemies = state.combatants.filter { combatant ->
-			charactersById[combatant.characterId]?.isAdventurer() == false
+		val partyMembers = state.combatants.mapNotNull { combatant ->
+			charactersById[combatant.characterId]?.takeIf { it.isAdventurer() }
 		}
-		val enemyCRMap = enemies.mapNotNull { combatant ->
-			charactersById[combatant.characterId]?.challengeRating?.let { cr ->
-				combatant.characterId to cr
-			}
-		}.toMap()
+		val enemies = state.combatants.filter { combatant ->
+			charactersById[combatant.characterId]?.isAdventurer() != true
+		}
+		val enemyCRMap = enemies.associate { combatant ->
+			combatant.characterId to (charactersById[combatant.characterId]?.challengeRating ?: 0.0)
+		}
 
 		_uiState.update {
 			it.copy(

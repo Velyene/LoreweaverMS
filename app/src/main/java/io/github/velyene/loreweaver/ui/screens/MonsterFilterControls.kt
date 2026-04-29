@@ -25,6 +25,10 @@ internal const val MONSTER_CARD_VALUE_SEPARATOR = " • "
 internal const val MONSTER_FILTERS_ITEM_KEY = "monster-filters"
 internal const val MONSTER_NO_RESULTS_ITEM_KEY = "monster-no-results"
 internal const val MONSTER_SHORTCUT_KEY_PREFIX = "shortcut-"
+internal const val MONSTER_FILTER_CR_KEY_PREFIX = "monster-filter-cr"
+internal const val MONSTER_FILTER_TYPE_KEY_PREFIX = "monster-filter-type"
+internal const val ENCOUNTER_FILTER_CR_KEY_PREFIX = "encounter-filter-cr"
+internal const val ENCOUNTER_FILTER_TYPE_KEY_PREFIX = "encounter-filter-type"
 internal val MONSTER_CARD_SUMMARY_STAT_LABELS_NO_CR =
 	MONSTER_CARD_SUMMARY_STAT_LABELS.filterNot { it == MONSTER_STAT_CR }
 
@@ -45,6 +49,7 @@ internal fun MonsterFilterSectionBlock(
 
 @Composable
 internal fun MonsterSingleSelectFilterRow(
+	keyPrefix: String,
 	label: String,
 	selectedOption: String?,
 	options: List<String>,
@@ -55,14 +60,14 @@ internal fun MonsterSingleSelectFilterRow(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.spacedBy(monsterFilterChipSpacing)
 		) {
-			item(key = "$label-all") {
+			item(key = "$keyPrefix-all") {
 				FilterChip(
 					selected = selectedOption == null,
 					onClick = { onOptionSelected(null) },
 					label = { Text(stringResource(R.string.reference_monster_filter_all)) }
 				)
 			}
-			items(options, key = { "$label-$it" }) { option ->
+			items(options, key = { "$keyPrefix-$it" }) { option ->
 				FilterChip(
 					selected = selectedOption == option,
 					onClick = { onOptionSelected(option) },
@@ -73,31 +78,31 @@ internal fun MonsterSingleSelectFilterRow(
 	}
 }
 
-internal fun formatMonsterChallengeRatingLabel(challengeRating: String): String? {
-	return challengeRating.takeIf { it.isNotBlank() }?.let { "$MONSTER_STAT_CR $it" }
-}
+internal fun formatMonsterChallengeRatingLabel(challengeRating: String): String? =
+	challengeRating.takeIf { it.isNotBlank() }?.let { "$MONSTER_STAT_CR $it" }
 
-internal fun MonsterReferenceEntry.monsterCardSubtitleChallengeRatingLine(): String {
-	return listOfNotNull(
+internal fun MonsterReferenceEntry.monsterCardSubtitleChallengeRatingLine(): String =
+	listOfNotNull(
 		subtitle.takeIf { it.isNotBlank() },
 		formatMonsterChallengeRatingLabel(challengeRating)
 	).joinToString(MONSTER_CARD_VALUE_SEPARATOR)
-}
 
 internal fun MonsterReferenceEntry.monsterCardSummaryLine(
 	statLabels: List<String>
 ): String {
 	return statLabels
-		.mapNotNull { label -> statRows.firstOrNull { it.first == label }?.let { "${it.first} ${it.second}" } }
+		.mapNotNull { label ->
+			statRows.firstOrNull { it.first == label }
+				?.let { "${it.first} ${it.second}" }
+		}
 		.joinToString(MONSTER_CARD_VALUE_SEPARATOR)
 }
 
-internal fun MonsterReferenceEntry.monsterCardFilterSummaryLine(): String {
-	return listOfNotNull(
+internal fun MonsterReferenceEntry.monsterCardFilterSummaryLine(): String =
+	listOfNotNull(
 		creatureType.takeIf { it.isNotBlank() },
 		formatMonsterChallengeRatingLabel(challengeRating)
 	).joinToString(MONSTER_CARD_VALUE_SEPARATOR)
-}
 
 internal fun MonsterReferenceEntry.monsterCardPreviewLine(): String? {
 	val firstSectionBodyLine = sections
@@ -107,6 +112,7 @@ internal fun MonsterReferenceEntry.monsterCardPreviewLine(): String? {
 		?.firstOrNull(String::isNotBlank)
 	if (firstSectionBodyLine != null) return firstSectionBodyLine
 
-	return body.lineSequence().firstOrNull { it.isNotBlank() && !it.startsWith(MONSTER_ABILITY_SCORE_PREFIX) }
+	return body.lineSequence()
+		.firstOrNull { it.isNotBlank() && !it.startsWith(MONSTER_ABILITY_SCORE_PREFIX) }
 }
 

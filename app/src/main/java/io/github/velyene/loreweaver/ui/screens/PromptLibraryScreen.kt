@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,10 +50,6 @@ import io.github.velyene.loreweaver.R
 @Composable
 fun PromptLibraryScreen() {
 	val listState = rememberLazyListState()
-	val listModifier = Modifier
-		.fillMaxSize()
-		.padding(16.dp)
-		.visibleVerticalScrollbar(listState)
 
 	val displayPrompts = listOf(
 		LorePrompt(
@@ -88,8 +85,12 @@ fun PromptLibraryScreen() {
 		}
 	) { padding ->
 		LazyColumn(
-			modifier = listModifier.padding(padding),
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(padding)
+				.visibleVerticalScrollbar(listState),
 			state = listState,
+			contentPadding = PaddingValues(16.dp),
 			verticalArrangement = Arrangement.spacedBy(16.dp),
 			content = {
 				items(displayPrompts, key = { it.id }) { prompt ->
