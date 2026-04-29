@@ -119,7 +119,7 @@ class ContentSafetyAuditTest {
 	private val referenceCorpusAuditSnapshotFile =
 		File(projectRoot, "EXCLUDED_REFERENCE_CORPUS_AUDIT.md")
 
-	private val tocAuditSnapshotFile = File(projectRoot, "toc-audit.txt")
+	private val tocAuditSnapshotFile = File(projectRoot, "app/build/test-output/toc-audit.txt")
 
 	private val markdownAndLegalAuditFiles = listOf(
 		File(projectRoot, README_PATH),
@@ -612,13 +612,14 @@ class ContentSafetyAuditTest {
 	}
 
 	private fun formatTableOfContentsFindings(findings: List<TableOfContentsFinding>): String {
+		val snapshotPath = normalizeProjectPath(tocAuditSnapshotFile)
 		if (findings.isEmpty()) {
-			return "$LARGE_FILE_TOC_HEADER\n- Snapshot file: `${tocAuditSnapshotFile.name}`\n$NONE_LIST_ITEM"
+			return "$LARGE_FILE_TOC_HEADER\n- Snapshot file: `$snapshotPath`\n$NONE_LIST_ITEM"
 		}
 
 		return buildString {
 			appendLine(LARGE_FILE_TOC_HEADER)
-			appendLine("- Snapshot file: `${tocAuditSnapshotFile.name}`")
+			appendLine("- Snapshot file: `$snapshotPath`")
 			findings.forEach { finding ->
 				appendLine(
 					"- ${finding.relativePath} (${finding.lineCount} lines) missing ${finding.expectedMarker}"
