@@ -1,3 +1,14 @@
+/*
+ * FILE: MonsterReferenceDataAnimals.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Animal parser constants, section metadata, and regex helpers
+ * 2. Public animals dataset entry point
+ * 3. Intermediate parsed-entry models
+ * 4. Animal monster parsing pipeline
+ * 5. Raw imported animal reference text
+ */
+
 package io.github.velyene.loreweaver.domain.util
 
 private const val ANIMAL_MOD_SAVE_PREFIX = "MOD SAVE"

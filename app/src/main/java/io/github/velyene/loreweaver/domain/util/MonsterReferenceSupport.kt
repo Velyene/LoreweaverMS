@@ -1,3 +1,12 @@
+/*
+ * FILE: MonsterReferenceSupport.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Shared monster labels, section names, and preview metadata
+ * 2. Monster entry construction and stat-row parsing
+ * 3. Body-section extraction and profile helpers
+ */
+
 package io.github.velyene.loreweaver.domain.util
 
 internal const val MONSTER_GROUP_ANIMALS = "Animals"

@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. TrapDanger and TrapType enums, TrapTemplate model
- * 2. TrapReference singleton â€” trap dataset and search utilities
+ * 2. TrapReference singleton — trap dataset and search utilities
  */
 
 package io.github.velyene.loreweaver.domain.util
@@ -203,7 +203,7 @@ object TrapReference {
 			disarmDC = 0,
 			saveDC = 13,
 			attackBonus = 0,
-			damage = "1d3 darts Ã— 1d6",
+			damage = "1d3 darts × 1d6",
 			damageType = "Poison",
 			effect =
 				"Each creature in the darts' path makes a Dexterity save or is struck by 1d3 darts, taking 1d6 " +

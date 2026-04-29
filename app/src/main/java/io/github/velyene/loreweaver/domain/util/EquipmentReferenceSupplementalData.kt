@@ -15,9 +15,9 @@ package io.github.velyene.loreweaver.domain.util
 internal object EquipmentReferenceSupplementalData {
 	val AMMUNITION = listOf(
 		AmmunitionReferenceEntry("Arrows", "20", "Quiver", "1 lb.", "1 GP"),
-		AmmunitionReferenceEntry("Bolts", "20", "Case", "1Â½ lb.", "1 GP"),
+		AmmunitionReferenceEntry("Bolts", "20", "Case", "1½ lb.", "1 GP"),
 		AmmunitionReferenceEntry("Bullets, Firearm", "10", "Pouch", "2 lb.", "3 GP"),
-		AmmunitionReferenceEntry("Bullets, Sling", "20", "Pouch", "1Â½ lb.", "4 CP"),
+		AmmunitionReferenceEntry("Bullets, Sling", "20", "Pouch", "1½ lb.", "4 CP"),
 		AmmunitionReferenceEntry("Needles", "50", "Pouch", "1 lb.", "1 GP")
 	)
 
@@ -33,11 +33,11 @@ internal object EquipmentReferenceSupplementalData {
 		FocusReferenceEntry(FocusGroup.ARCANE, "Rod", "2 lb.", "10 GP", "A Sorcerer, Warlock, or Wizard can use this as an Arcane Focus."),
 		FocusReferenceEntry(FocusGroup.ARCANE, "Staff", "4 lb.", "5 GP", "A Sorcerer, Warlock, or Wizard can use this as an Arcane Focus.", listOf("Also functions as a Quarterstaff.")),
 		FocusReferenceEntry(FocusGroup.ARCANE, "Wand", "1 lb.", "10 GP", "A Sorcerer, Warlock, or Wizard can use this as an Arcane Focus."),
-		FocusReferenceEntry(FocusGroup.DRUIDIC, "Sprig of mistletoe", "â€”", "1 GP", "A Druid or Ranger can use this as a Druidic Focus."),
+		FocusReferenceEntry(FocusGroup.DRUIDIC, "Sprig of mistletoe", "—", "1 GP", "A Druid or Ranger can use this as a Druidic Focus."),
 		FocusReferenceEntry(FocusGroup.DRUIDIC, "Wooden Staff", "4 lb.", "5 GP", "A Druid or Ranger can use this as a Druidic Focus.", listOf("Also functions as a Quarterstaff.")),
 		FocusReferenceEntry(FocusGroup.DRUIDIC, "Yew wand", "1 lb.", "10 GP", "A Druid or Ranger can use this as a Druidic Focus."),
 		FocusReferenceEntry(FocusGroup.HOLY_SYMBOL, "Amulet", "1 lb.", "5 GP", "A Cleric or Paladin can use this as a Holy Symbol.", listOf("Can be displayed on or alongside a Shield.")),
-		FocusReferenceEntry(FocusGroup.HOLY_SYMBOL, "Emblem", "â€”", "5 GP", "A Cleric or Paladin can use this as a Holy Symbol.", listOf("Can be borne on fabric or a Shield.")),
+		FocusReferenceEntry(FocusGroup.HOLY_SYMBOL, "Emblem", "—", "5 GP", "A Cleric or Paladin can use this as a Holy Symbol.", listOf("Can be borne on fabric or a Shield.")),
 		FocusReferenceEntry(FocusGroup.HOLY_SYMBOL, "Reliquary", "2 lb.", "5 GP", "A Cleric or Paladin can use this as a Holy Symbol.", listOf("Often carried openly with a Shield or worn prominently.")),
 	)
 
@@ -84,7 +84,7 @@ internal object EquipmentReferenceSupplementalData {
 		TackDrawnReferenceEntry("Saddle, Military", "30 lb.", "20 GP"),
 		TackDrawnReferenceEntry("Saddle, Riding", "25 lb.", "10 GP"),
 		TackDrawnReferenceEntry("Sled", "300 lb.", "20 GP"),
-		TackDrawnReferenceEntry("Stabling", "â€”", "5 SP per day"),
+		TackDrawnReferenceEntry("Stabling", "—", "5 SP per day"),
 		TackDrawnReferenceEntry("Wagon", "400 lb.", "35 GP")
 	)
 
@@ -95,13 +95,13 @@ internal object EquipmentReferenceSupplementalData {
 	)
 
 	val LARGE_VEHICLES = listOf(
-		LargeVehicleReferenceEntry("Airship", "8 mph", "10", "20", "1", "13", "300", "â€”", "40,000 GP"),
+		LargeVehicleReferenceEntry("Airship", "8 mph", "10", "20", "1", "13", "300", "—", "40,000 GP"),
 		LargeVehicleReferenceEntry("Galley", "4 mph", "80", "120", "150", "15", "500", "20", "30,000 GP"),
-		LargeVehicleReferenceEntry("Keelboat", "1 mph", "1", "6", "0.5", "15", "100", "â€”", "3,000 GP"),
+		LargeVehicleReferenceEntry("Keelboat", "1 mph", "1", "6", "0.5", "15", "100", "—", "3,000 GP"),
 		LargeVehicleReferenceEntry("Longship", "3 mph", "40", "100", "10", "15", "300", "15", "10,000 GP"),
-		LargeVehicleReferenceEntry("Rowboat", "1Â½ mph", "1", "3", "â€”", "11", "50", "â€”", "50 GP"),
+		LargeVehicleReferenceEntry("Rowboat", "1½ mph", "1", "3", "—", "11", "50", "—", "50 GP"),
 		LargeVehicleReferenceEntry("Sailing Ship", "2 mph", "20", "20", "100", "15", "300", "15", "10,000 GP"),
-		LargeVehicleReferenceEntry("Warship", "2Â½ mph", "60", "60", "200", "15", "500", "20", "25,000 GP")
+		LargeVehicleReferenceEntry("Warship", "2½ mph", "60", "60", "200", "15", "500", "20", "25,000 GP")
 	)
 
 	val AIRBORNE_AND_WATERBORNE_VEHICLES_TABLE = ReferenceTable(
@@ -114,7 +114,7 @@ internal object EquipmentReferenceSupplementalData {
 		title = "Lifestyle Expenses",
 		columns = listOf("Lifestyle", "Daily Cost"),
 		rows = listOf(
-			listOf("Wretched", "â€”"),
+			listOf("Wretched", "—"),
 			listOf("Squalid", "1 SP"),
 			listOf("Poor", "2 SP"),
 			listOf("Modest", "1 GP"),
@@ -168,12 +168,12 @@ internal object EquipmentReferenceSupplementalData {
 		columns = listOf("d100", "Result"),
 		rows = listOf(
 			listOf("01", "Both potions lose their effects, and the mixture creates a magical explosion in a 5-foot-radius Sphere centered on itself. Each creature in that area takes 4d10 Force damage."),
-			listOf("02â€“08", "Both potions lose their effects."),
-			listOf("09â€“15", "Only one potion takes effect."),
-			listOf("16â€“25", "Both potions take effect."),
-			listOf("26â€“35", "One potionâ€™s effect is doubled."),
-			listOf("36â€“90", "The mixture works normally."),
-			listOf("91â€“99", "The mixture creates harmless but dramatic magical bubbles."),
+			listOf("02–08", "Both potions lose their effects."),
+			listOf("09–15", "Only one potion takes effect."),
+			listOf("16–25", "Both potions take effect."),
+			listOf("26–35", "One potion’s effect is doubled."),
+			listOf("36–90", "The mixture works normally."),
+			listOf("91–99", "The mixture creates harmless but dramatic magical bubbles."),
 			listOf("00", "The mixture becomes a permanent magical poison.")
 		)
 	)
@@ -182,10 +182,10 @@ internal object EquipmentReferenceSupplementalData {
 		title = "Magic Item Rarities and Values",
 		columns = listOf("Rarity", "Value"),
 		rows = listOf(
-			listOf("Common", "50â€“100 GP"),
-			listOf("Uncommon", "101â€“500 GP"),
-			listOf("Rare", "501â€“5,000 GP"),
-			listOf("Very Rare", "5,001â€“50,000 GP"),
+			listOf("Common", "50–100 GP"),
+			listOf("Uncommon", "101–500 GP"),
+			listOf("Rare", "501–5,000 GP"),
+			listOf("Very Rare", "5,001–50,000 GP"),
 			listOf("Legendary", "50,001+ GP"),
 			listOf("Artifact", "Priceless")
 		)
@@ -195,15 +195,15 @@ internal object EquipmentReferenceSupplementalData {
 		title = "Magic Item Tools",
 		columns = listOf("Item Type", "Tool"),
 		rows = listOf(
-			listOf("Armor", "Smithâ€™s Tools"),
-			listOf("Potion", "Alchemistâ€™s Supplies or Herbalism Kit"),
-			listOf("Ring", "Jewelerâ€™s Tools"),
-			listOf("Rod", "Smithâ€™s Tools"),
-			listOf("Scroll", "Calligrapherâ€™s Supplies"),
-			listOf("Staff", "Woodcarverâ€™s Tools"),
-			listOf("Wand", "Woodcarverâ€™s Tools"),
-			listOf("Weapon", "Smithâ€™s Tools"),
-			listOf("Wondrous Item", "Tinkerâ€™s Tools with a suitable nonmagical base item")
+			listOf("Armor", "Smith’s Tools"),
+			listOf("Potion", "Alchemist’s Supplies or Herbalism Kit"),
+			listOf("Ring", "Jeweler’s Tools"),
+			listOf("Rod", "Smith’s Tools"),
+			listOf("Scroll", "Calligrapher’s Supplies"),
+			listOf("Staff", "Woodcarver’s Tools"),
+			listOf("Wand", "Woodcarver’s Tools"),
+			listOf("Weapon", "Smith’s Tools"),
+			listOf("Wondrous Item", "Tinker’s Tools with a suitable nonmagical base item")
 		)
 	)
 
@@ -220,35 +220,35 @@ internal object EquipmentReferenceSupplementalData {
 	)
 
 	val SENTIENT_ITEM_ALIGNMENT_TABLE = ReferenceTable(
-		title = "Sentient Itemâ€™s Alignment",
+		title = "Sentient Item’s Alignment",
 		columns = listOf("d100", "Alignment"),
 		rows = listOf(
-			listOf("01â€“15", "Lawful Good"),
-			listOf("16â€“35", "Neutral Good"),
-			listOf("36â€“50", "Chaotic Good"),
-			listOf("51â€“63", "Lawful Neutral"),
-			listOf("64â€“73", "Neutral"),
-			listOf("74â€“85", "Chaotic Neutral"),
-			listOf("86â€“89", "Lawful Evil"),
-			listOf("90â€“96", "Neutral Evil"),
-			listOf("97â€“00", "Chaotic Evil")
+			listOf("01–15", "Lawful Good"),
+			listOf("16–35", "Neutral Good"),
+			listOf("36–50", "Chaotic Good"),
+			listOf("51–63", "Lawful Neutral"),
+			listOf("64–73", "Neutral"),
+			listOf("74–85", "Chaotic Neutral"),
+			listOf("86–89", "Lawful Evil"),
+			listOf("90–96", "Neutral Evil"),
+			listOf("97–00", "Chaotic Evil")
 		)
 	)
 
 	val SENTIENT_ITEM_COMMUNICATION_TABLE = ReferenceTable(
-		title = "Sentient Itemâ€™s Communication",
+		title = "Sentient Item’s Communication",
 		columns = listOf("d10", "Communication"),
 		rows = listOf(
 			listOf("1", "The item communicates by transmitting emotion to the creature carrying or wielding it."),
-			listOf("2â€“4", "The item can speak, read, and understand one or more languages."),
-			listOf("5â€“7", "The item can speak telepathically with its wielder or bearer."),
-			listOf("8â€“9", "The item can speak, read, and understand languages and communicate telepathically with its wielder or bearer."),
+			listOf("2–4", "The item can speak, read, and understand one or more languages."),
+			listOf("5–7", "The item can speak telepathically with its wielder or bearer."),
+			listOf("8–9", "The item can speak, read, and understand languages and communicate telepathically with its wielder or bearer."),
 			listOf("10", "The item speaks one or more languages and can communicate telepathically with any creature that carries or wields it.")
 		)
 	)
 
 	val SENTIENT_ITEM_SENSES_TABLE = ReferenceTable(
-		title = "Sentient Itemâ€™s Senses",
+		title = "Sentient Item’s Senses",
 		columns = listOf("d4", "Senses"),
 		rows = listOf(
 			listOf("1", "Hearing and normal vision out to 30 feet"),
@@ -259,12 +259,12 @@ internal object EquipmentReferenceSupplementalData {
 	)
 
 	val SENTIENT_ITEM_SPECIAL_PURPOSE_TABLE = ReferenceTable(
-		title = "Sentient Itemâ€™s Special Purpose",
+		title = "Sentient Item’s Special Purpose",
 		columns = listOf("d10", "Purpose"),
 		rows = listOf(
 			listOf("1", "Aligned. The item seeks to further the goals of creatures of a particular alignment."),
 			listOf("2", "Bane. The item seeks the downfall of creatures of a particular kind."),
-			listOf("3", "Creator Seeker. The item seeks its creator or the creatorâ€™s descendants."),
+			listOf("3", "Creator Seeker. The item seeks its creator or the creator’s descendants."),
 			listOf("4", "Destiny Seeker. The item is convinced it and its bearer have key roles in future events."),
 			listOf("5", "Destroyer. The item craves destruction and goads its user to fight arbitrarily."),
 			listOf("6", "Glory Seeker. The item seeks renown as the greatest magic item in the world by winning fame or notoriety for its user."),

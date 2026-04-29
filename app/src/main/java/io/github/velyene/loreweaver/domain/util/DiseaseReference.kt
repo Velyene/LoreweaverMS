@@ -69,7 +69,7 @@ object DiseaseReference {
 			incubationTime = "1 day",
 			symptoms = "Bleeding from eyes, blurry vision",
 			effects =
-				"The victimâ€™s sight deteriorates, imposing a growing penalty on attacks and sight-based ability " +
+				"The victim’s sight deteriorates, imposing a growing penalty on attacks and sight-based ability " +
 					"checks. If the penalty reaches its limit, the creature goes blind.",
 			progression =
 				"After each long rest, the penalty worsens by 1 until the disease is treated or the victim is fully " +

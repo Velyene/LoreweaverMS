@@ -1,3 +1,11 @@
+/*
+ * FILE: MonsterReferenceDataHtoN.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Public monster dataset object and entry list
+ * 2. Monster entries H-N
+ */
+
 package io.github.velyene.loreweaver.domain.util
 
 object MonsterReferenceDataHtoN {

@@ -38,7 +38,7 @@ class SpellcastingReferenceTest {
 		assertTrue(rules.containsKey("Preparing Spells"))
 		assertTrue(
 			rules.getValue("Preparing Spells")
-				.contains("Most spellcasting monsters donâ€™t change their lists of prepared spells")
+				.contains("Most spellcasting monsters don’t change their lists of prepared spells")
 		)
 		assertTrue(rules.containsKey("Casting in Armor"))
 		assertTrue(
