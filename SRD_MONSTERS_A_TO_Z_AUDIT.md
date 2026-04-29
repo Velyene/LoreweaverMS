@@ -4,17 +4,23 @@ Snapshot date: 2026-04-21
 
 ## Summary
 
-This note records the **post-quarantine shipped state** for monster-related reference content.
+This note records the **current shipped state** for monster-related reference content.
 
 Current local behavior is centered on:
 
 - `app/src/main/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreen.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceCatalog.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataAnimals.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataAtoC.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataDtoG.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataHtoM.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataNtoR.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataStoV.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataXtoZ.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/CoreRulesReference.kt`
 
-The previously bundled local `Monsters Aâ€“Z` corpus is **no longer present under `app/src/main`**.
-
-Goal: document that Loreweaver currently ships **monster-running guidance and monster-stat-block
-explanations only**, not a bundled searchable monster corpus.
+Goal: document that Loreweaver currently ships **reviewed SRD-derived monster reference content**
+alongside monster-running guidance and monster-stat-block explanations.
 
 ## Scope reviewed
 
@@ -36,24 +42,23 @@ explanations only**, not a bundled searchable monster corpus.
 
 ### Bundled monster corpus
 
-There is **no bundled local monster corpus** under `app/src/main` at this snapshot.
+There **is** bundled reviewed monster reference content under `app/src/main` at this snapshot.
 
-That means the app no longer ships:
+Current bundled sources include:
 
-- `MonsterReference.kt`
-- local `Monsters Aâ€“Z` searchable summaries
-- local spell-linked monster supplement cards
-- local monster alias tables tied to that removed corpus
+- `MonsterReferenceCatalog.kt`
+- `MonsterReferenceDataAnimals.kt`
+- `MonsterReferenceDataAtoC.kt`
+- `MonsterReferenceDataDtoG.kt`
+- `MonsterReferenceDataHtoM.kt`
+- `MonsterReferenceDataNtoR.kt`
+- `MonsterReferenceDataStoV.kt`
+- `MonsterReferenceDataXtoZ.kt`
 
 ### UI exposure
 
-The top-level `Monsters` tab still exists in `ReferenceScreen`, but it is now an
-**unavailable-state placeholder** rather than a bundled searchable corpus.
-
-Current behavior:
-
-- blank query â†’ `reference_monster_unavailable`
-- active query â†’ `reference_monster_search_unavailable`
+The top-level `Monsters` tab in `ReferenceScreen` exposes the bundled reviewed monster reference
+content rather than an unavailable-state placeholder.
 
 ### Still-shipped monster guidance
 
@@ -64,11 +69,14 @@ concise reviewed sections such as:
 - `Running a Monster`
 - `Monster Attack and Usage Notation`
 
+That guidance now sits alongside the bundled monster reference catalog rather than replacing it.
+
 Related tables and glossary content remain available through the audited core-rules dataset.
 
 ## Verification anchors
 
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenMonsterSearchTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceCatalogTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/ContentSafetyAuditTest.kt`
@@ -76,10 +84,7 @@ Related tables and glossary content remain available through the audited core-ru
 
 ## Notes for future updates
 
-- Treat any future reintroduction of bundled monster entries as a new audit event, not a
-  continuation of the removed corpus.
-- If a future monster dataset is added, document whether it is app-authored, excerpt-backed, or
-  remote-only before shipping it.
-- Keep monster-running/reference material concise, procedural, and clearly distinct from any
-  removed corpus-style content.
+- Keep monster-running/reference material concise, procedural, and clearly tied to reviewed
+  SRD-derived sources.
+- If the bundled monster dataset expands, document the reviewed source basis before shipping it.
 
