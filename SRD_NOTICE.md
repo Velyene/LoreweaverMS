@@ -13,7 +13,8 @@ https://creativecommons.org/licenses/by/4.0/legalcode.
   proprietary names, and unreviewed long prose blocks.
 - The current audited repo snapshot has no separately inventoried excluded reference corpus files
   under `app/src/main`.
-- Monster-running guidance currently ships through reviewed Core Rules summaries; the `Monsters`
-  reference tab does not bundle a local monster corpus.
+- Monster-running guidance and bundled local monster reference content currently ship from
+  `app/src/main`; keep the related provenance and scope aligned with the SRD audit documents,
+  especially `SRD_MONSTERS_A_TO_Z_AUDIT.md`.
 - When adding new rules content, prefer concise summaries and keep source verification explicit.
 
