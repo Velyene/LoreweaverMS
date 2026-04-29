@@ -62,6 +62,11 @@ private fun NewEncounterDialog(
 					modifier = Modifier.fillMaxWidth()
 				)
 				Text(
+					text = stringResource(R.string.encounter_creation_setup_message),
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					fontSize = 12.sp
+				)
+				Text(
 					text = stringResource(R.string.monster_import_removed_message),
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					fontSize = 12.sp

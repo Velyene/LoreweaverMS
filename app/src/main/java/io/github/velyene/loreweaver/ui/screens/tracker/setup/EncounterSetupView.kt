@@ -19,8 +19,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -69,17 +72,29 @@ internal fun EncounterSetupView(
 	encounterDifficulty: EncounterDifficultyResult?,
 	onNotesChange: (String) -> Unit,
 	onStart: () -> Unit,
-	onAddParty: () -> Unit,
+	onTogglePartyMember: (CharacterEntry) -> Unit,
 	onAddEnemy: (name: String, hp: Int, initiative: Int) -> Unit,
 	onRemoveCombatant: (String) -> Unit
 ) {
 	var showAddEnemyDialog by remember { mutableStateOf(false) }
 	var combatantPendingRemoval by remember { mutableStateOf<CombatantState?>(null) }
-	val partyCount = availablePartyMembers.count { it.party == CharacterParty.ADVENTURERS }
+	val savedPartyMembers = availablePartyMembers
+		.filter { it.party == CharacterParty.ADVENTURERS }
+		.sortedBy { it.name.lowercase() }
+	val savedPartyMemberIds = remember(savedPartyMembers) {
+		savedPartyMembers.map(CharacterEntry::id).toSet()
+	}
+	val selectedPartyIds = remember(combatants, savedPartyMemberIds) {
+		combatants.map(CombatantState::characterId).filter(savedPartyMemberIds::contains).toSet()
+	}
+	val enemies = remember(combatants, savedPartyMemberIds) {
+		combatants.filterNot { savedPartyMemberIds.contains(it.characterId) }
+	}
 
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
+			.verticalScroll(rememberScrollState())
 			.padding(24.dp),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
@@ -90,10 +105,27 @@ internal fun EncounterSetupView(
 		)
 		Spacer(modifier = Modifier.height(16.dp))
 
-		SetupQuickAddRow(
-			partyCount = partyCount,
-			onAddParty = onAddParty,
-			onAddEnemy = { showAddEnemyDialog = true }
+		Text(
+			text = stringResource(R.string.encounter_setup_shared_manager_summary),
+			style = MaterialTheme.typography.bodyMedium,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			modifier = Modifier.fillMaxWidth()
+		)
+
+		Spacer(modifier = Modifier.height(12.dp))
+
+		PartyMembersSection(
+			savedPartyMembers = savedPartyMembers,
+			selectedPartyIds = selectedPartyIds,
+			onTogglePartyMember = onTogglePartyMember
+		)
+
+		Spacer(modifier = Modifier.height(12.dp))
+
+		EnemiesSection(
+			enemies = enemies,
+			onAddEnemy = { showAddEnemyDialog = true },
+			onRemoveEnemy = { combatantPendingRemoval = it }
 		)
 
 		Spacer(modifier = Modifier.height(12.dp))
@@ -102,15 +134,8 @@ internal fun EncounterSetupView(
 			// Difficulty is only shown once a valid party is available so the card never
 			// presents partial calculations during early setup.
 			EncounterDifficultyCard(encounterDifficulty = encounterDifficulty)
+			Spacer(modifier = Modifier.height(12.dp))
 		}
-
-		Spacer(modifier = Modifier.height(12.dp))
-
-		SetupRosterSection(
-			combatants = combatants,
-			onRemoveCombatant = { combatantPendingRemoval = it },
-			modifier = Modifier.weight(1f)
-		)
 
 		Spacer(modifier = Modifier.height(12.dp))
 
@@ -120,7 +145,7 @@ internal fun EncounterSetupView(
 
 		Button(
 			onClick = onStart,
-			enabled = combatants.isNotEmpty(),
+			enabled = selectedPartyIds.isNotEmpty(),
 			modifier = Modifier
 				.fillMaxWidth()
 				.height(SETUP_BUTTON_HEIGHT_DP.dp),
@@ -165,6 +190,210 @@ internal fun EncounterSetupView(
 				combatantPendingRemoval = null
 			}
 		)
+	}
+}
+
+@Composable
+private fun PartyMembersSection(
+	savedPartyMembers: List<CharacterEntry>,
+	selectedPartyIds: Set<String>,
+	onTogglePartyMember: (CharacterEntry) -> Unit
+) {
+	Column(
+		modifier = Modifier
+			.fillMaxWidth()
+			.border(1.dp, MaterialTheme.colorScheme.outline, androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+			.padding(12.dp)
+	) {
+		Text(
+			text = stringResource(R.string.encounter_party_members_title),
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			style = MaterialTheme.typography.labelSmall,
+			modifier = Modifier.semantics { heading() }
+		)
+		Spacer(modifier = Modifier.height(4.dp))
+		Text(
+			text = stringResource(R.string.encounter_party_members_supporting_text),
+			style = MaterialTheme.typography.bodySmall,
+			color = MaterialTheme.colorScheme.onSurfaceVariant
+		)
+		Spacer(modifier = Modifier.height(8.dp))
+
+		if (savedPartyMembers.isEmpty()) {
+			Text(
+				text = stringResource(R.string.encounter_party_members_empty_message),
+				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+				fontSize = 13.sp,
+				lineHeight = 20.sp
+			)
+			return@Column
+		}
+
+		savedPartyMembers.forEach { character ->
+			val isSelected = selectedPartyIds.contains(character.id)
+			SavedPartyMemberCard(
+				character = character,
+				isSelected = isSelected,
+				onTogglePartyMember = { onTogglePartyMember(character) }
+			)
+			Spacer(modifier = Modifier.height(8.dp))
+		}
+	}
+}
+
+@Composable
+private fun SavedPartyMemberCard(
+	character: CharacterEntry,
+	isSelected: Boolean,
+	onTogglePartyMember: () -> Unit
+) {
+	Card(
+		modifier = Modifier
+			.fillMaxWidth()
+			.clickable(onClick = onTogglePartyMember),
+		colors = CardDefaults.cardColors(
+			containerColor = if (isSelected) {
+				MaterialTheme.colorScheme.primaryContainer
+			} else {
+				MaterialTheme.colorScheme.surfaceVariant
+			}
+		)
+	) {
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(horizontal = 12.dp, vertical = 10.dp),
+			verticalAlignment = Alignment.CenterVertically,
+			horizontalArrangement = Arrangement.SpaceBetween
+		) {
+			Column(modifier = Modifier.weight(1f)) {
+				Text(
+					text = character.name,
+					style = MaterialTheme.typography.titleSmall,
+					fontWeight = FontWeight.SemiBold,
+					color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+				)
+				Text(
+					text = stringResource(
+						R.string.encounter_party_member_summary,
+						character.level,
+						character.hp,
+						character.maxHp,
+						character.initiative
+					),
+					style = MaterialTheme.typography.bodySmall,
+					color = if (isSelected) {
+						MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+					} else {
+						MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+					}
+				)
+			}
+			Text(
+				text = if (isSelected) {
+					stringResource(R.string.encounter_party_member_selected)
+				} else {
+					stringResource(R.string.encounter_party_member_add)
+				},
+				style = MaterialTheme.typography.labelMedium,
+				fontWeight = FontWeight.Bold,
+				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+			)
+		}
+	}
+}
+
+@Composable
+private fun EnemiesSection(
+	enemies: List<CombatantState>,
+	onAddEnemy: () -> Unit,
+	onRemoveEnemy: (CombatantState) -> Unit
+) {
+	Column(
+		modifier = Modifier
+			.fillMaxWidth()
+			.border(1.dp, MaterialTheme.colorScheme.outline, androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+			.padding(12.dp)
+	) {
+		Row(
+			modifier = Modifier.fillMaxWidth(),
+			horizontalArrangement = Arrangement.SpaceBetween,
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			Text(
+				text = stringResource(R.string.encounter_enemies_title),
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+				style = MaterialTheme.typography.labelSmall,
+				modifier = Modifier.semantics { heading() }
+			)
+			TextButton(onClick = onAddEnemy) {
+				Text(text = stringResource(R.string.add_enemy_button))
+			}
+		}
+		Text(
+			text = stringResource(R.string.encounter_enemies_supporting_text),
+			style = MaterialTheme.typography.bodySmall,
+			color = MaterialTheme.colorScheme.onSurfaceVariant
+		)
+		Spacer(modifier = Modifier.height(8.dp))
+
+		if (enemies.isEmpty()) {
+			Text(
+				text = stringResource(R.string.encounter_enemies_empty_message),
+				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+				fontSize = 13.sp,
+				lineHeight = 20.sp
+			)
+			return@Column
+		}
+
+		enemies.forEach { enemy ->
+			EnemyCombatantCard(
+				combatant = enemy,
+				onRemoveEnemy = { onRemoveEnemy(enemy) }
+			)
+			Spacer(modifier = Modifier.height(8.dp))
+		}
+	}
+}
+
+@Composable
+private fun EnemyCombatantCard(
+	combatant: CombatantState,
+	onRemoveEnemy: () -> Unit
+) {
+	Card(
+		modifier = Modifier.fillMaxWidth(),
+		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+	) {
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(horizontal = 12.dp, vertical = 8.dp),
+			verticalAlignment = Alignment.CenterVertically,
+			horizontalArrangement = Arrangement.SpaceBetween
+		) {
+			Column(modifier = Modifier.weight(1f)) {
+				Text(
+					text = combatant.name,
+					style = MaterialTheme.typography.titleSmall,
+					fontWeight = FontWeight.Medium,
+					color = MaterialTheme.colorScheme.onSurfaceVariant
+				)
+				Text(
+					text = stringResource(
+						R.string.combatant_setup_summary,
+						combatant.maxHp,
+						combatant.initiative
+					),
+					style = MaterialTheme.typography.bodySmall,
+					color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+				)
+			}
+			TextButton(onClick = onRemoveEnemy) {
+				Text(text = stringResource(R.string.remove_button))
+			}
+		}
 	}
 }
 
