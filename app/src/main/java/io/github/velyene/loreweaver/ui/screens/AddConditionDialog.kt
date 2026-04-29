@@ -25,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import io.github.velyene.loreweaver.R
 
 /**
  * Dialog for adding a condition to a combatant.
@@ -32,20 +34,29 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddConditionDialog(
-	onConfirm: (conditionName: String, duration: Int?) -> Unit,
+	onConfirm: (conditionName: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
 	onDismiss: () -> Unit
 ) {
 	var selectedCondition by remember { mutableStateOf("") }
 	var duration by remember { mutableStateOf("") }
 	var hasDuration by remember { mutableStateOf(true) }
+	var persistsAcrossEncounters by remember { mutableStateOf(false) }
 	var expanded by remember { mutableStateOf(false) }
+	val selectedMetadata = remember(selectedCondition) {
+		selectedCondition.takeIf(String::isNotBlank)?.let(ConditionConstants::metadataFor)
+	}
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text("Add Condition") },
+		title = { Text(stringResource(R.string.add_condition_dialog_title)) },
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-				// Condition selector
+				selectedMetadata?.let { metadata ->
+					Text(
+						text = "${metadata.iconGlyph.orEmpty()} ${metadata.category.name.replace('_', ' ')}",
+						color = metadata.borderColor
+					)
+				}
 				ExposedDropdownMenuBox(
 					expanded = expanded,
 					onExpandedChange = { expanded = !expanded },
@@ -55,7 +66,7 @@ fun AddConditionDialog(
 						value = selectedCondition,
 						onValueChange = {},
 						readOnly = true,
-						label = { Text("Condition") },
+						label = { Text(stringResource(R.string.condition_label)) },
 						trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
 						modifier = Modifier
 							.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -65,11 +76,12 @@ fun AddConditionDialog(
 						expanded = expanded,
 						onDismissRequest = { expanded = false }
 					) {
-						ConditionConstants.ALL_CONDITIONS.forEach { condition ->
+									ConditionConstants.ALL_STATUS_LABELS.forEach { condition ->
 							DropdownMenuItem(
 								text = { Text(condition) },
 								onClick = {
 									selectedCondition = condition
+									persistsAcrossEncounters = ConditionConstants.defaultPersistsAcrossEncounters(condition)
 									expanded = false
 								}
 							)
@@ -77,7 +89,6 @@ fun AddConditionDialog(
 					}
 				}
 
-				// Duration toggle
 				Row(
 					modifier = Modifier.fillMaxWidth(),
 					verticalAlignment = Alignment.CenterVertically
@@ -86,18 +97,28 @@ fun AddConditionDialog(
 						checked = hasDuration,
 						onCheckedChange = { hasDuration = it }
 					)
-					Text("Has duration (in rounds)")
+					Text(stringResource(R.string.condition_has_duration_label))
 				}
 
-				// Duration input
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Checkbox(
+						checked = persistsAcrossEncounters,
+						onCheckedChange = { persistsAcrossEncounters = it }
+					)
+					Text(stringResource(R.string.condition_persistent_label))
+				}
+
 				if (hasDuration) {
 					OutlinedTextField(
 						value = duration,
 						onValueChange = { if (it.all { c -> c.isDigit() }) duration = it },
-						label = { Text("Duration (rounds)") },
+						label = { Text(stringResource(R.string.condition_duration_rounds_label)) },
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 						modifier = Modifier.fillMaxWidth(),
-						placeholder = { Text("e.g., 3") }
+						placeholder = { Text(stringResource(R.string.condition_duration_placeholder)) }
 					)
 				}
 			}
@@ -110,16 +131,16 @@ fun AddConditionDialog(
 							duration.toIntOrNull()
 						else
 							null
-						onConfirm(selectedCondition, dur)
+						onConfirm(selectedCondition, dur, persistsAcrossEncounters)
 					}
 				},
 				enabled = selectedCondition.isNotBlank()
 			) {
-				Text("Add")
+				Text(stringResource(R.string.add_button))
 			}
 		},
 		dismissButton = {
-			TextButton(onClick = onDismiss) { Text("Cancel") }
+			TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) }
 		}
 	)
 }

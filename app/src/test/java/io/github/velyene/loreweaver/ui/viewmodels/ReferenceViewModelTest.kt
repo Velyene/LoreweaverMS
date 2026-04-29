@@ -266,6 +266,31 @@ class ReferenceViewModelTest {
 	}
 
 	@Test
+	fun initializeFromNavigation_setsCategorySearchAndActionDetail() {
+		runTest {
+			val viewModel = createViewModel()
+
+			viewModel.initializeFromNavigation(
+				category = ReferenceCategory.CORE_RULES,
+				query = "Dodging",
+				detailCategory = ReferenceDetailResolver.CATEGORY_ACTIONS,
+				detailSlug = ReferenceDetailResolver.slugFor("Dodge")
+			)
+			advanceUntilIdle()
+
+			with(viewModel.uiState.value) {
+				assertEquals(ReferenceCategory.CORE_RULES, selectedCategory)
+				assertEquals("Dodging", searchQuery)
+				assertEquals("Dodge", selectedReferenceDetail?.title)
+				assertEquals(
+					ReferenceDetailResolver.CATEGORY_ACTIONS,
+					selectedReferenceDetail?.subtitle
+				)
+			}
+		}
+	}
+
+	@Test
 	fun openReferenceDetail_andClearReferenceDetail_updatesGenericDetailState() {
 		runTest {
 			val viewModel = createViewModel()
