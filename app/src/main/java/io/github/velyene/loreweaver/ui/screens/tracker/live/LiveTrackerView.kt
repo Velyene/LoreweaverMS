@@ -159,7 +159,7 @@ private fun CurrentCombatantControls(
 	onHpChange: (characterId: String, delta: Int) -> Unit
 ) {
 	Text(
-		"${combatant.name}'s Turn",
+		text = stringResource(R.string.combatant_turn, combatant.name),
 		color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
 		style = MaterialTheme.typography.labelSmall,
 		modifier = Modifier.semantics { heading() }
@@ -213,7 +213,11 @@ private fun QuickHpControls(
 		horizontalArrangement = Arrangement.spacedBy(4.dp),
 		verticalAlignment = Alignment.CenterVertically
 	) {
-		Text("HP:", fontSize = 12.sp, modifier = Modifier.padding(end = 4.dp))
+		Text(
+			text = stringResource(R.string.hp_label),
+			fontSize = 12.sp,
+			modifier = Modifier.padding(end = 4.dp)
+		)
 		HP_QUICK_ADJUSTMENTS.forEach { delta ->
 			OutlinedButton(
 				onClick = { onHpChange(characterId, delta) },

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.velyene.loreweaver.domain.use_case.GetAllSessionsUseCase
 import io.github.velyene.loreweaver.domain.use_case.GetCampaignsUseCase
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +37,8 @@ class CampaignListViewModel @Inject constructor(
 				getCampaignsUseCase().collect { campaigns ->
 					_uiState.update { it.copy(campaigns = campaigns, isLoading = false) }
 				}
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
 				reportError(formatCampaignError("Failed to load campaigns", e), ::loadCampaigns)
 			}
@@ -48,6 +51,8 @@ class CampaignListViewModel @Inject constructor(
 				getAllSessionsUseCase().collect { sessions ->
 					_uiState.update { it.copy(sessions = sessions) }
 				}
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
 				reportError(formatCampaignError("Failed to load sessions", e), ::loadAllSessions)
 			}

@@ -31,7 +31,7 @@ internal fun CampaignListUiState.withError(
 	onRetry = onRetry
 )
 
-internal fun CampaignListUiState.clearErrorState(): CampaignListUiState = copy(error = null)
+internal fun CampaignListUiState.clearErrorState(): CampaignListUiState = copy(error = null, onRetry = null)
 
 internal fun CampaignDetailUiState.beginLoading(): CampaignDetailUiState =
 	copy(isLoading = true, error = null, onRetry = null)
@@ -45,4 +45,4 @@ internal fun CampaignDetailUiState.withError(
 	onRetry = onRetry
 )
 
-internal fun CampaignDetailUiState.clearErrorState(): CampaignDetailUiState = copy(error = null)
+internal fun CampaignDetailUiState.clearErrorState(): CampaignDetailUiState = copy(error = null, onRetry = null)

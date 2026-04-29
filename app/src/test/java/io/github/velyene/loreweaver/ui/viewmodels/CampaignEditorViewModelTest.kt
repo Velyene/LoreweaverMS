@@ -167,6 +167,7 @@ class CampaignEditorViewModelTest {
 			assertEquals(2, combatants.size)
 			assertEquals(repository.insertedCharacters.map { it.id }.toSet(), combatants.map { it.characterId }.toSet())
 			assertTrue(combatants.all { it.name == "Ancient White Dragon" && it.currentHp == 333 && it.maxHp == 333 })
+			assertTrue(combatants.all { it.initiative in 13..32 })
 		}
 	}
 

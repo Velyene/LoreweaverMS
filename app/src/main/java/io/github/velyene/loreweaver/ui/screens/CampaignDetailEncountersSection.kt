@@ -21,10 +21,6 @@ internal fun LinkedEncounterList(
 	onAddEncounter: (String) -> Unit,
 	onAddEncounterWithMonsters: (String, List<RemoteItem>) -> Unit,
 ) {
-	@Suppress("UNUSED_PARAMETER")
-	fun keepApiStable(unused: (String, List<RemoteItem>) -> Unit) = Unit
-
-	keepApiStable(onAddEncounterWithMonsters)
 	var showAddDialog by remember { mutableStateOf(false) }
 	var encounterName by remember { mutableStateOf("") }
 	var monsterSearchQuery by remember { mutableStateOf("") }

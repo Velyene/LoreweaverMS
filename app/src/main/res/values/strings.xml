@@ -338,6 +338,7 @@ Create one to begin your journey!</string>
     <string name="create_encounter_with_monsters_button">Create Encounter (%1$d)</string>
     <string name="create_without_monsters_button">Create Without Monsters</string>
     <string name="encounter_picker_count_header">%1$s • %2$s</string>
+    <string name="encounter_increment_selected_monster">Add one %1$s to selection</string>
     <string name="encounter_decrement_selected_monster">Remove one %1$s from selection</string>
     <string name="encounter_remove_selected_monster">Remove all %1$s from selection</string>
     <plurals name="encounter_selected_monsters_quantity">
@@ -403,6 +404,9 @@ Add your party or individual enemies above.</string>
     <string name="add_condition_desc">Add condition</string>
     <string name="remove_condition_desc">Remove condition</string>
     <string name="combatant_initiative_summary">Init: %1$d</string>
+    <string name="combatant_turn">Turn: %1$s</string>
+    <string name="combatant_hp_label">HP: %1$d/%2$d</string>
+    <string name="combatant_hp_label_with_temp">HP: %1$d/%2$d +%3$d</string>
     <string name="combat_log_bullet">• %1$s</string>
 
     <!-- Reference Screen -->

@@ -13,6 +13,10 @@
 package io.github.velyene.loreweaver.data.mapper
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import io.github.velyene.loreweaver.data.entities.CampaignEntity
 import io.github.velyene.loreweaver.data.entities.CharacterEntity
@@ -23,6 +27,7 @@ import io.github.velyene.loreweaver.domain.model.Campaign
 import io.github.velyene.loreweaver.domain.model.CharacterAction
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CharacterResource
+import io.github.velyene.loreweaver.domain.model.DurationType
 import io.github.velyene.loreweaver.domain.model.Encounter
 import io.github.velyene.loreweaver.domain.model.EncounterSnapshot
 import io.github.velyene.loreweaver.domain.model.EncounterStatus
@@ -45,6 +50,48 @@ private val gson = Gson()
 private val resourceListType = object : TypeToken<List<CharacterResource>>() {}.type
 private val actionListType = object : TypeToken<List<CharacterAction>>() {}.type
 private val spellSlotsMapType = object : TypeToken<Map<Int, List<Int>>>() {}.type
+
+private fun parseEncounterSnapshot(snapshotJson: String): EncounterSnapshot? {
+	return runCatching {
+		val snapshotObject = JsonParser.parseString(snapshotJson).asJsonObject
+		normalizeLegacyCombatantSnapshots(snapshotObject)
+		gson.fromJson(snapshotObject, EncounterSnapshot::class.java)
+	}.getOrNull()
+}
+
+private fun normalizeLegacyCombatantSnapshots(snapshotObject: JsonObject) {
+	val combatants = snapshotObject.getAsJsonArray("combatants") ?: return
+	combatants.forEach { combatantElement ->
+		if (!combatantElement.isJsonObject) return@forEach
+		val combatant = combatantElement.asJsonObject
+		if (!combatant.has("tempHp")) {
+			combatant.addProperty("tempHp", 0)
+		}
+		normalizeLegacyConditionArray(combatant)
+	}
+}
+
+private fun normalizeLegacyConditionArray(combatant: JsonObject) {
+	val conditionsElement = combatant["conditions"] ?: return
+	if (!conditionsElement.isJsonArray) return
+
+	val normalizedConditions = JsonArray()
+	conditionsElement.asJsonArray.forEach { conditionElement ->
+		when {
+			conditionElement.isJsonObject -> normalizedConditions.add(conditionElement)
+			conditionElement.isJsonPrimitive -> {
+				val legacyCondition = JsonObject().apply {
+					addProperty("name", conditionElement.asString)
+					add("duration", JsonNull.INSTANCE)
+					addProperty("durationType", DurationType.ROUNDS.name)
+					addProperty("addedOnRound", 0)
+				}
+				normalizedConditions.add(legacyCondition)
+			}
+		}
+	}
+	combatant.add("conditions", normalizedConditions)
+}
 
 private fun normalizedCharacterTypeForDomain(
 	type: String,
@@ -304,7 +351,7 @@ fun SessionEntity.toDomain(): SessionRecord {
 		title = title,
 		date = date,
 		log = gson.fromJson(logJson, Array<String>::class.java).toList(),
-		snapshot = snapshotJson?.let { gson.fromJson(it, EncounterSnapshot::class.java) },
+		snapshot = snapshotJson?.let(::parseEncounterSnapshot),
 		reuseFlag = reuseFlag
 	)
 }
