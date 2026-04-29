@@ -4,27 +4,23 @@ Snapshot date: 2026-04-28
 
 ## Summary
 
-This note records the current shipped state for monster-related local reference content.
+This note records the **current shipped state** for monster-related reference content.
 
 Current local behavior is centered on:
 
-- `app/src/main/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenMonsters.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreen.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceCatalog.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataAnimals.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataAtoC.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataDtoG.kt`
-- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataHtoN.kt`
-- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataOtoR.kt`
-- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataStoW.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataHtoM.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataNtoR.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataStoV.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataXtoZ.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/CoreRulesReference.kt`
 
-The shipped app once had this corpus removed during provenance review, but it now includes a
-restored **local A-Z monster corpus** plus a reviewed **animal/beast corpus** based on
-user-provided SRD-backed content.
-
-Goal: document that Loreweaver now ships a **searchable local monster reference** for the current
-uploaded slices, including the dedicated animal import, while keeping the process incremental and
-auditable.
+Goal: document that Loreweaver currently ships **reviewed SRD-derived monster reference content**
+alongside monster-running guidance and monster-stat-block explanations.
 
 ## Scope reviewed
 
@@ -48,32 +44,23 @@ auditable.
 
 ### Bundled monster corpus
 
-There is a bundled local monster corpus under `app/src/main` at this snapshot.
+There **is** bundled reviewed monster reference content under `app/src/main` at this snapshot.
 
-Current shipped slice includes monsters from:
+Current bundled sources include:
 
-- `Aboleth` through `Zombie`, plus grouped late-range entries such as `Ogre Zombie`
-- chromatic and metallic dragon age categories included in the uploaded A-G slice
-- a dedicated reviewed animal corpus under `MonsterReferenceDataAnimals.kt`, including entries such
-  as `Allosaurus`, `Brown Bear`, `Giant Ape`, `Wolf`, and other beast/dinosaur/swarm stat blocks
-  grouped as `Animals`
-- humanoids, fiends, elementals, oozes, giants, fey, undead, dragons, monstrosities, constructs,
-  celestials, plants, lycanthropes, titans, beasts, dinosaurs, and swarms from the current local
-  corpus
-
-The legacy plain `MonsterReference.kt` file remains intentionally absent.
+- `MonsterReferenceCatalog.kt`
+- `MonsterReferenceDataAnimals.kt`
+- `MonsterReferenceDataAtoC.kt`
+- `MonsterReferenceDataDtoG.kt`
+- `MonsterReferenceDataHtoM.kt`
+- `MonsterReferenceDataNtoR.kt`
+- `MonsterReferenceDataStoV.kt`
+- `MonsterReferenceDataXtoZ.kt`
 
 ### UI exposure
 
-The top-level `Monsters` tab in `ReferenceScreen` now renders the restored local corpus.
-
-Current behavior:
-
-- blank query -> full local monster list for the imported slice
-- active query -> filtered local monster list using name, stat summary, and embedded rules text
-- tapping a monster card -> generic reference detail view via `ReferenceDetailResolver`
-- encounter monster picker -> supports an explicit `Animals` shortcut for quickly narrowing to the
-  local animal corpus during encounter setup
+The top-level `Monsters` tab in `ReferenceScreen` exposes the bundled reviewed monster reference
+content rather than an unavailable-state placeholder.
 
 ### Still-shipped monster guidance
 
@@ -84,13 +71,14 @@ concise reviewed sections such as:
 - `Running a Monster`
 - `Monster Attack and Usage Notation`
 
+That guidance now sits alongside the bundled monster reference catalog rather than replacing it.
+
 Related tables and glossary content remain available through the audited core-rules dataset.
 
 ## Verification anchors
 
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenMonsterSearchTest.kt`
-- `app/src/test/java/io/github/velyene/loreweaver/domain/util/ReferenceDetailResolverTest.kt`
-- `app/src/test/java/io/github/velyene/loreweaver/ui/viewmodels/ReferenceViewModelTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/domain/util/MonsterReferenceCatalogTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenNavigationTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/domain/util/ContentSafetyAuditTest.kt`
@@ -98,12 +86,7 @@ Related tables and glossary content remain available through the audited core-ru
 
 ## Notes for future updates
 
-- Continue importing future monster sections as additive reviewed slices rather than recreating
-  the removed legacy file layout.
-- Prefer the split `MonsterReferenceData*.kt` structure so later uploads remain reviewable and
-  easier to audit.
-- If a future monster dataset is added, document whether it is app-authored, excerpt-backed, or
-  remote-only before shipping it.
-- Keep monster-running/reference material concise, procedural, and clearly distinct from any
-  removed corpus-style content.
+- Keep monster-running/reference material concise, procedural, and clearly tied to reviewed
+  SRD-derived sources.
+- If the bundled monster dataset expands, document the reviewed source basis before shipping it.
 

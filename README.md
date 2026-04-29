@@ -103,9 +103,7 @@ Running the content-audit test suite can also regenerate the ignored local file
 files for developer review. In the current audited repo state, the audit suite reports no
 excluded corpus files under `app/src/main`.
 
-The Reference screen still includes monster-running guidance through reviewed Core Rules content,
-but the top-level `Monsters` tab is intentionally an unavailable placeholder instead of a bundled
-local monster corpus.
+The Reference screen includes reviewed SRD-derived monster reference content.
 
 ---
 

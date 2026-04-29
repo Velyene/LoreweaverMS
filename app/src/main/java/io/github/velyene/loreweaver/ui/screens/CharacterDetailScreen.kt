@@ -47,7 +47,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
@@ -64,7 +63,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -391,7 +389,11 @@ private fun CharacterDetailContent(
 						state.onRollResult
 					)
 
-					2 -> JournalTab(character, viewModel, onLookupCondition)
+					2 -> JournalTab(
+						character = character,
+						viewModel = viewModel,
+						onLookupCondition = onLookupCondition
+					)
 				}
 				if (state.rollResult != null) {
 					RollResultCard(
@@ -510,6 +512,129 @@ fun CombatTab(
 	ActionsSection(character, viewModel, situationalBonus, onRollResult)
 	Spacer(modifier = Modifier.height(16.dp))
 	DiceTraySection(situationalBonus, onRollResult)
+}
+
+private data class CharacterStatusSections(
+	val encounterConditions: List<StatusChipModel>,
+	val ongoingAfflictions: List<StatusChipModel>,
+	val persistentEffects: List<StatusChipModel>
+)
+
+@Composable
+private fun CharacterStatusOverview(
+	character: CharacterEntry,
+	viewModel: CharacterViewModel,
+	onLookupCondition: (String) -> Unit
+) {
+	val statusSections = remember(character.activeConditions) {
+		classifyCharacterStatusSections(character.activeConditions)
+	}
+
+	Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+		Text(
+			text = stringResource(R.string.character_status_overview_title),
+			style = MaterialTheme.typography.titleMedium,
+			fontWeight = FontWeight.Bold
+		)
+		CharacterStatusSectionCard(
+			title = stringResource(R.string.character_status_encounter_conditions_title),
+			emptyText = stringResource(R.string.character_status_encounter_conditions_empty),
+			statuses = statusSections.encounterConditions,
+			onLookupCondition = onLookupCondition,
+			onRemoveCondition = { conditionName ->
+				viewModel.updateCharacter(character.copy(activeConditions = character.activeConditions - conditionName))
+			}
+		)
+		CharacterStatusSectionCard(
+			title = stringResource(R.string.character_status_ongoing_afflictions_title),
+			emptyText = stringResource(R.string.character_status_ongoing_afflictions_empty),
+			statuses = statusSections.ongoingAfflictions,
+			onLookupCondition = onLookupCondition,
+			onRemoveCondition = { conditionName ->
+				viewModel.updateCharacter(character.copy(activeConditions = character.activeConditions - conditionName))
+			}
+		)
+		CharacterStatusSectionCard(
+			title = stringResource(R.string.character_status_persistent_effects_title),
+			emptyText = stringResource(R.string.character_status_persistent_effects_empty),
+			statuses = statusSections.persistentEffects,
+			onLookupCondition = onLookupCondition,
+			onRemoveCondition = { conditionName ->
+				viewModel.updateCharacter(character.copy(activeConditions = character.activeConditions - conditionName))
+			}
+		)
+	}
+}
+
+@Composable
+private fun CharacterStatusSectionCard(
+	title: String,
+	emptyText: String,
+	statuses: List<StatusChipModel>,
+	onLookupCondition: (String) -> Unit,
+	onRemoveCondition: (String) -> Unit
+) {
+	Card(
+		modifier = Modifier.fillMaxWidth(),
+		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+	) {
+		Column(
+			modifier = Modifier.padding(16.dp),
+			verticalArrangement = Arrangement.spacedBy(8.dp)
+		) {
+			Text(
+				text = title,
+				style = MaterialTheme.typography.labelLarge,
+				fontWeight = FontWeight.Bold,
+				color = MaterialTheme.colorScheme.onSurface
+			)
+			if (statuses.isEmpty()) {
+				Text(
+					text = emptyText,
+					style = MaterialTheme.typography.bodyMedium,
+					color = MaterialTheme.colorScheme.onSurfaceVariant
+				)
+			} else {
+				StatusChipFlowRow(
+					statuses = statuses,
+					onStatusClick = { status -> onLookupCondition(status.name) },
+					onStatusRemove = { status -> onRemoveCondition(status.name) }
+				)
+			}
+		}
+	}
+}
+
+private fun classifyCharacterStatusSections(activeConditions: Set<String>): CharacterStatusSections {
+	val afflictionCategories = setOf(
+		ConditionConstants.StatusCategory.DAMAGE_OVER_TIME,
+		ConditionConstants.StatusCategory.SENSORY,
+		ConditionConstants.StatusCategory.CONTROL,
+		ConditionConstants.StatusCategory.MOBILITY,
+		ConditionConstants.StatusCategory.DEBUFF
+	)
+	val encounterConditions = mutableListOf<StatusChipModel>()
+	val ongoingAfflictions = mutableListOf<StatusChipModel>()
+	val persistentEffects = mutableListOf<StatusChipModel>()
+
+	normalizedStatusLabels(activeConditions).forEach { conditionName ->
+		val metadata = ConditionConstants.metadataFor(conditionName)
+		val chip = statusChipModel(
+			name = conditionName,
+			isPersistent = metadata.persistsAcrossEncounters
+		)
+		when {
+			metadata.persistsAcrossEncounters -> persistentEffects += chip
+			metadata.category in afflictionCategories -> ongoingAfflictions += chip
+			else -> encounterConditions += chip
+		}
+	}
+
+	return CharacterStatusSections(
+		encounterConditions = encounterConditions,
+		ongoingAfflictions = ongoingAfflictions,
+		persistentEffects = persistentEffects
+	)
 }
 
 // -----------------------------------------------------------------------------
@@ -923,7 +1048,7 @@ private fun SkillChips(
 fun JournalTab(
 	character: CharacterEntry,
 	viewModel: CharacterViewModel,
-	onLookupCondition: (String) -> Unit = {}
+	onLookupCondition: (String) -> Unit
 ) {
 	Text(stringResource(R.string.inventory_label), style = MaterialTheme.typography.titleMedium)
 	Card(
@@ -944,27 +1069,11 @@ fun JournalTab(
 	}
 
 	Spacer(modifier = Modifier.height(16.dp))
-	Text(stringResource(R.string.conditions_label), style = MaterialTheme.typography.titleMedium)
-	if (character.activeConditions.isEmpty()) {
-		Text(stringResource(R.string.none_label), style = MaterialTheme.typography.bodyMedium)
-	} else {
-		character.activeConditions.forEach { cond ->
-			InputChip(
-				selected = true,
-				onClick = { onLookupCondition(cond) },
-				label = { Text(cond) },
-				trailingIcon = {
-					Icon(
-						Icons.Default.Close, null, Modifier
-							.size(16.dp)
-							.clickable {
-								viewModel.updateCharacter(character.copy(activeConditions = character.activeConditions - cond))
-							}
-					)
-				}
-			)
-		}
-	}
+	CharacterStatusOverview(
+		character = character,
+		viewModel = viewModel,
+		onLookupCondition = onLookupCondition
+	)
 
 	Spacer(modifier = Modifier.height(16.dp))
 	Text(stringResource(R.string.notes_label), style = MaterialTheme.typography.titleMedium)

@@ -7,6 +7,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.velyene.loreweaver.data.AppDatabase
 import io.github.velyene.loreweaver.data.repository.CampaignRepositoryImpl
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
+import io.github.velyene.loreweaver.domain.model.CombatantState
+import io.github.velyene.loreweaver.domain.model.Condition
+import io.github.velyene.loreweaver.domain.model.DurationType
+import io.github.velyene.loreweaver.domain.model.EncounterSnapshot
+import io.github.velyene.loreweaver.domain.model.SessionRecord
 import io.github.velyene.loreweaver.domain.repository.CampaignRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -87,5 +92,74 @@ class CampaignRepositoryInstrumentedTest {
 
 		val allCharacters = repository.getAllCharacters().first()
 		assertTrue(allCharacters.isEmpty())
+	}
+
+	@Test
+	fun insertSessionRecord_roundTripsCombatSnapshotState() = runBlocking {
+		val session = SessionRecord(
+			encounterId = "encounter-restore",
+			title = "Ruined Gate Resume",
+			date = 1_715_000_000_000,
+			log = listOf(
+				"Goblin takes 3 damage (4/7 HP)",
+				"Goblin is now Poisoned (2 rounds)"
+			),
+			snapshot = EncounterSnapshot(
+				combatants = listOf(
+					CombatantState(
+						characterId = "hero-1",
+						name = "Hero",
+						initiative = 15,
+						currentHp = 12,
+						maxHp = 12
+					),
+					CombatantState(
+						characterId = "goblin-1",
+						name = "Goblin",
+						initiative = 10,
+						currentHp = 4,
+						maxHp = 7,
+						conditions = listOf(
+							Condition(
+								name = "Poisoned",
+								duration = 2,
+								durationType = DurationType.ROUNDS,
+								addedOnRound = 1
+							)
+						)
+					)
+				),
+				currentTurnIndex = 1,
+				currentRound = 2
+			)
+		)
+
+		repository.insertSessionRecord(session)
+
+		val recentSession = repository.getRecentSession()
+		val encounterSessions = repository.getSessionsForEncounter("encounter-restore").first()
+
+		assertNotNull(recentSession)
+		assertEquals(1, encounterSessions.size)
+		assertEquals(session.id, recentSession?.id)
+		assertEquals("Ruined Gate Resume", recentSession?.title)
+		assertEquals(1_715_000_000_000, recentSession?.date)
+		assertEquals(session.log, recentSession?.log)
+
+		val snapshot = recentSession?.snapshot
+		assertNotNull(snapshot)
+		assertEquals(1, snapshot?.currentTurnIndex)
+		assertEquals(2, snapshot?.currentRound)
+		assertEquals(2, snapshot?.combatants?.size)
+		assertEquals(listOf("hero-1", "goblin-1"), snapshot?.combatants?.map { it.characterId })
+		assertEquals(12, snapshot?.combatants?.first()?.currentHp)
+		assertEquals(4, snapshot?.combatants?.get(1)?.currentHp)
+
+		val condition = snapshot?.combatants?.get(1)?.conditions?.single()
+		assertNotNull(condition)
+		assertEquals("Poisoned", condition?.name)
+		assertEquals(2, condition?.duration)
+		assertEquals(DurationType.ROUNDS, condition?.durationType)
+		assertEquals(1, condition?.addedOnRound)
 	}
 }

@@ -147,6 +147,45 @@ class ReferenceDetailResolverTest {
 	}
 
 	@Test
+	fun resolve_returnsActionDetailsFromCoreGlossary() {
+		val detail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_ACTIONS,
+			ReferenceDetailResolver.slugFor("Dodge")
+		)
+
+		assertNotNull(detail)
+		assertEquals("Dodge", detail?.title)
+		assertEquals(ReferenceDetailResolver.CATEGORY_ACTIONS, detail?.subtitle)
+		assertTrue(detail?.overview.orEmpty().contains("attacks against you", ignoreCase = true))
+	}
+
+	@Test
+	fun resolve_returnsHazardDetailsFromCoreGlossary() {
+		val detail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_HAZARDS,
+			ReferenceDetailResolver.slugFor("Burning")
+		)
+
+		assertNotNull(detail)
+		assertEquals("Burning", detail?.title)
+		assertEquals(ReferenceDetailResolver.CATEGORY_HAZARDS, detail?.subtitle)
+		assertTrue(detail?.overview.orEmpty().contains("ongoing fire damage", ignoreCase = true))
+	}
+
+	@Test
+	fun resolve_returnsGenericCoreRulesGlossaryDetails() {
+		val detail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_GLOSSARY,
+			ReferenceDetailResolver.slugFor("Concentration")
+		)
+
+		assertNotNull(detail)
+		assertEquals("Concentration", detail?.title)
+		assertEquals(ReferenceDetailResolver.CATEGORY_GLOSSARY, detail?.subtitle)
+		assertTrue(detail?.overview.orEmpty().contains("stay active", ignoreCase = true))
+	}
+
+	@Test
 	fun resolve_returnsLifestyleTableRowDetails() {
 		val detail = ReferenceDetailResolver.resolve(
 			ReferenceDetailResolver.CATEGORY_LIFESTYLES,

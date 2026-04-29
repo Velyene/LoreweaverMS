@@ -30,7 +30,10 @@ data class Encounter(
 	val id: String = UUID.randomUUID().toString(),
 	val campaignId: String? = null, // FK to Campaign
 	val name: String,
+	val notes: String = "",
 	val status: EncounterStatus = EncounterStatus.PENDING,
+	val currentRound: Int = 1,
+	val currentTurnIndex: Int = 0,
 	val participants: List<CombatantState> = emptyList(),
 	val activeTrackers: List<TrackerEntity> = emptyList()
 )
