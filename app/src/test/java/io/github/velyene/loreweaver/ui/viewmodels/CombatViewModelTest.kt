@@ -535,6 +535,105 @@ class CombatViewModelTest {
 		}
 	}
 
+	@Test
+	fun saveAndPauseEncounter_reloadRestoresHpTurnRoundAndConditionsFromSnapshot() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			repository.setEncounter(
+				Encounter(
+					id = "encounter-restore",
+					campaignId = "campaign-1",
+					name = "Ruined Gate",
+					status = EncounterStatus.PENDING
+				)
+			)
+			val initialViewModel = createViewModel(repository)
+			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
+			val goblin = combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
+			var completed = false
+
+			initialViewModel.loadEncounter("encounter-restore")
+			advanceUntilIdle()
+			initialViewModel.addParty(listOf(hero, goblin))
+			initialViewModel.updateNotes("Rain turns the stones slick.")
+			initialViewModel.startEncounter("encounter-restore")
+			advanceUntilIdle()
+			initialViewModel.updateCombatantHp(GOBLIN_ID, -3)
+			initialViewModel.nextTurn()
+			initialViewModel.addCondition(GOBLIN_ID, "Poisoned", duration = 2)
+			advanceUntilIdle()
+			initialViewModel.saveAndPauseEncounter { completed = true }
+			advanceUntilIdle()
+
+			assertTrue(completed)
+			val reloadedViewModel = createViewModel(repository)
+			reloadedViewModel.loadEncounter("encounter-restore")
+			advanceUntilIdle()
+
+			with(reloadedViewModel.uiState.value) {
+				val restoredHero = combatants.first { it.characterId == HERO_ID }
+				val restoredGoblin = combatants.first { it.characterId == GOBLIN_ID }
+				val restoredCondition = restoredGoblin.conditions.single()
+
+				assertFalse(isCombatActive)
+				assertEquals(EncounterLifecycle.PAUSED, encounterLifecycle)
+				assertEquals("encounter-restore", currentEncounterId)
+				assertEquals("Ruined Gate", currentEncounterName)
+				assertEquals("Rain turns the stones slick.", encounterNotes)
+				assertEquals(1, currentTurnIndex)
+				assertEquals(1, currentRound)
+				assertEquals(12, restoredHero.currentHp)
+				assertEquals(4, restoredGoblin.currentHp)
+				assertEquals("Poisoned", restoredCondition.name)
+				assertEquals(2, restoredCondition.duration)
+				assertEquals(1, restoredCondition.addedOnRound)
+				assertTrue(activeStatuses.any { it.contains("$GOBLIN_NAME takes 3 damage (4/7 HP)") })
+				assertTrue(activeStatuses.any { it.contains("$GOBLIN_NAME is now Poisoned (2 rounds)") })
+			}
+		}
+	}
+
+	@Test
+	fun nextTurn_expiresRoundDurationExactlyOnExpectedRoundAdvance() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			val viewModel = createViewModel(repository)
+			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
+			val goblin = combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
+
+			viewModel.addParty(listOf(hero, goblin))
+			advanceUntilIdle()
+			viewModel.addCondition(characterId = HERO_ID, conditionName = "Blessed", duration = 2)
+			advanceUntilIdle()
+
+			viewModel.nextTurn()
+			with(viewModel.uiState.value) {
+				assertEquals(1, currentTurnIndex)
+				assertEquals(1, currentRound)
+				assertEquals(2, combatants.first { it.characterId == HERO_ID }.conditions.single().duration)
+				assertFalse(activeStatuses.any { it.contains("Blessed condition has expired") })
+			}
+
+			viewModel.nextTurn()
+			with(viewModel.uiState.value) {
+				assertEquals(0, currentTurnIndex)
+				assertEquals(2, currentRound)
+				assertEquals(1, combatants.first { it.characterId == HERO_ID }.conditions.single().duration)
+				assertFalse(activeStatuses.any { it.contains("Blessed condition has expired") })
+			}
+
+			viewModel.nextTurn()
+			viewModel.nextTurn()
+			with(viewModel.uiState.value) {
+				assertEquals(0, currentTurnIndex)
+				assertEquals(3, currentRound)
+				assertTrue(combatants.first { it.characterId == HERO_ID }.conditions.isEmpty())
+				assertTrue(activeStatuses.any { it.contains("$HERO_NAME's Blessed condition has expired") })
+				assertTrue(activeStatuses.any { it.contains("Round 3 begins") })
+			}
+		}
+	}
+
 	private fun createViewModel(repository: FakeCombatCampaignRepository): CombatViewModel {
 		return CombatViewModel(
 			getCharactersUseCase = GetCharactersUseCase(repository),
