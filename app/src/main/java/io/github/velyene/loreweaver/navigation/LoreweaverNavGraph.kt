@@ -36,7 +36,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import io.github.velyene.loreweaver.domain.util.ReferenceDetailResolver
 import io.github.velyene.loreweaver.ui.screens.AdventureLogScreen
 import io.github.velyene.loreweaver.ui.screens.CampaignDetailScreen
 import io.github.velyene.loreweaver.ui.screens.CampaignListScreen
@@ -44,12 +43,12 @@ import io.github.velyene.loreweaver.ui.screens.CharacterDetailScreen
 import io.github.velyene.loreweaver.ui.screens.CharacterFormScreen
 import io.github.velyene.loreweaver.ui.screens.CharacterListScreen
 import io.github.velyene.loreweaver.ui.screens.CombatTrackerScreen
+import io.github.velyene.loreweaver.ui.screens.ConditionConstants
 import io.github.velyene.loreweaver.ui.screens.HomeScreen
 import io.github.velyene.loreweaver.ui.screens.PromptLibraryScreen
 import io.github.velyene.loreweaver.ui.screens.ReferenceScreen
 import io.github.velyene.loreweaver.ui.screens.SessionHistoryScreen
 import io.github.velyene.loreweaver.ui.screens.SessionSummaryScreen
-import io.github.velyene.loreweaver.ui.viewmodels.ReferenceCategory
 import kotlin.reflect.KClass
 
 @Composable
@@ -157,6 +156,17 @@ private fun LoreweaverNavGraph(
 						popUpTo<HomeRoute> { inclusive = true }
 					}
 				},
+				onContinueCampaign = { campaignId ->
+					navController.navigate(CampaignDetailRoute(campaignId)) {
+						popUpTo<SessionSummaryRoute> { inclusive = true }
+					}
+				},
+				onStartAnotherEncounter = {
+					navController.navigate(CombatTrackerRoute()) {
+						popUpTo<SessionSummaryRoute> { inclusive = true }
+					}
+				},
+				onOpenSessionHistory = { navController.navigate(SessionHistoryRoute) },
 				onOpenAdventureLog = { navController.navigate(AdventureLogRoute) },
 			)
 		}
@@ -183,15 +193,17 @@ private fun LoreweaverNavGraph(
 			CharacterDetailScreen(
 				characterId = dest.id,
 				onEdit = { id -> navController.navigate(CharacterFormRoute(id)) },
-				onLookupCondition = { cond ->
-					navController.navigate(
-						ReferenceRoute(
-							category = ReferenceCategory.CORE_RULES,
-							query = cond,
-							detailCategory = ReferenceDetailResolver.CATEGORY_CONDITIONS,
-							detailSlug = ReferenceDetailResolver.slugFor(cond),
+				onLookupCondition = { label ->
+					ConditionConstants.referenceTargetFor(label)?.let { target ->
+						navController.navigate(
+							ReferenceRoute(
+								category = target.category,
+								query = target.query,
+								detailCategory = target.detailCategory,
+								detailSlug = target.detailSlug,
+							)
 						)
-					)
+					}
 				},
 				onDelete = { navController.popBackStack() },
 				onBack = { navController.popBackStack() },

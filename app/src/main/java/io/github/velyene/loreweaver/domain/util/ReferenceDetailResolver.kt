@@ -26,6 +26,9 @@ data class ReferenceDetailContent(
 
 object ReferenceDetailResolver {
 	const val CATEGORY_CONDITIONS = "Conditions"
+	const val CATEGORY_GLOSSARY = "Core Rules"
+	const val CATEGORY_ACTIONS = "Actions"
+	const val CATEGORY_HAZARDS = "Hazards"
 	const val CATEGORY_FEATS = "Feats"
 	const val CATEGORY_MONSTERS = "Monsters"
 	const val CATEGORY_SPELLS = "Spells"
@@ -59,6 +62,20 @@ object ReferenceDetailResolver {
 			// use slightly different section names. Resolve through aliases so those entry points keep
 			// landing on the same canonical detail content.
 			matchesCategory(category, CATEGORY_CONDITIONS, "Condition") -> resolveCondition(slug)
+			matchesCategory(category, CATEGORY_ACTIONS, "Action") -> resolveGlossary(
+				slug = slug,
+				tag = "Action",
+				subtitle = CATEGORY_ACTIONS
+			)
+
+			matchesCategory(category, CATEGORY_HAZARDS, "Hazard") -> resolveGlossary(
+				slug = slug,
+				tag = "Hazard",
+				subtitle = CATEGORY_HAZARDS
+			)
+
+			matchesCategory(category, CATEGORY_GLOSSARY, "Glossary", "Core Rule", "Rule") ->
+				resolveGlossary(slug = slug, subtitle = CATEGORY_GLOSSARY)
 			matchesCategory(category, CATEGORY_FEATS, "Feat") -> resolveFeat(slug)
 			matchesCategory(category, CATEGORY_MONSTERS, "Monster", "Monster Reference") -> MonsterReferenceCatalog.resolve(
 				slug
@@ -107,23 +124,39 @@ object ReferenceDetailResolver {
 	}
 
 	private fun resolveCondition(slug: String): ReferenceDetailContent? {
+		return resolveGlossary(
+			slug = slug,
+			tag = "Condition",
+			subtitle = CATEGORY_CONDITIONS,
+			note = "This condition can be tracked in the character's Status field.",
+			primarySectionTitle = "Effects"
+		)
+	}
+
+	private fun resolveGlossary(
+		slug: String,
+		tag: String? = null,
+		subtitle: String,
+		note: String? = null,
+		primarySectionTitle: String = "Details"
+	): ReferenceDetailContent? {
 		val entry = CoreRulesReference.GLOSSARY_ENTRIES.firstOrNull { glossaryEntry ->
-			glossaryEntry.tag == "Condition" && matchesLookup(glossaryEntry.term, slug)
+			(tag == null || glossaryEntry.tag == tag) && matchesLookup(glossaryEntry.term, slug)
 		} ?: return null
 
 		return ReferenceDetailContent(
 			title = entry.term,
-			subtitle = CATEGORY_CONDITIONS,
+			subtitle = subtitle,
 			overview = entry.summary,
 			sections = buildList {
 				if (entry.bullets.isNotEmpty()) {
-					add(ReferenceDetailSection(title = "Effects", bullets = entry.bullets))
+					add(ReferenceDetailSection(title = primarySectionTitle, bullets = entry.bullets))
 				}
 				if (entry.seeAlso.isNotEmpty()) {
 					add(ReferenceDetailSection(title = "See Also", bullets = entry.seeAlso))
 				}
 			},
-			note = "This condition can be tracked in the character's Status field."
+			note = note
 		)
 	}
 

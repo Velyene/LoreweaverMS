@@ -36,12 +36,13 @@ import io.github.velyene.loreweaver.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddConditionDialog(
-	onConfirm: (conditionName: String, duration: Int?) -> Unit,
+	onConfirm: (conditionName: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
 	onDismiss: () -> Unit
 ) {
 	var selectedCondition by remember { mutableStateOf("") }
 	var duration by remember { mutableStateOf("") }
 	var hasDuration by remember { mutableStateOf(true) }
+	var persistsAcrossEncounters by remember { mutableStateOf(false) }
 	var expanded by remember { mutableStateOf(false) }
 	val selectedConditionLabel = ConditionConstants.ALL_CONDITIONS
 		.firstOrNull { it.name == selectedCondition }
@@ -77,11 +78,13 @@ fun AddConditionDialog(
 						expanded = expanded,
 						onDismissRequest = { expanded = false }
 					) {
-						ConditionConstants.ALL_CONDITIONS.forEach { condition ->
+						ConditionConstants.ALL_STATUS_LABELS.forEach { condition ->
 							DropdownMenuItem(
 								text = { Text(stringResource(condition.labelRes)) },
 								onClick = {
 									selectedCondition = condition.name
+									selectedCondition = condition
+									persistsAcrossEncounters = ConditionConstants.defaultPersistsAcrossEncounters(condition)
 									expanded = false
 								}
 							)
@@ -120,7 +123,7 @@ fun AddConditionDialog(
 							duration.toIntOrNull()
 						else
 							null
-						onConfirm(selectedCondition, dur)
+						onConfirm(selectedCondition, dur, persistsAcrossEncounters)
 					}
 				},
 				enabled = selectedCondition.isNotBlank()

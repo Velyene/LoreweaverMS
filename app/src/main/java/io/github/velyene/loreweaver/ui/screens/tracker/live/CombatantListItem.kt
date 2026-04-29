@@ -24,7 +24,7 @@ internal fun CombatantListItem(
 	combatant: CombatantState,
 	isActive: Boolean,
 	onHpChange: (characterId: String, delta: Int) -> Unit,
-	onAddCondition: (characterId: String, condition: String, duration: Int?) -> Unit,
+	onAddCondition: (characterId: String, condition: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
 	onRemoveCondition: (characterId: String, conditionName: String) -> Unit
 ) {
 	var showAddConditionDialog by remember { mutableStateOf(false) }
@@ -57,8 +57,8 @@ internal fun CombatantListItem(
 
 	if (showAddConditionDialog) {
 		AddConditionDialog(
-			onConfirm = { condition, duration ->
-				onAddCondition(combatant.characterId, condition, duration)
+			onConfirm = { condition, duration, persistsAcrossEncounters ->
+				onAddCondition(combatant.characterId, condition, duration, persistsAcrossEncounters)
 				dismissConditionDialog()
 			},
 			onDismiss = ::dismissConditionDialog

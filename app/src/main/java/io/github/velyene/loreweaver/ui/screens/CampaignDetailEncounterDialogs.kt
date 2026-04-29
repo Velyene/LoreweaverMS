@@ -260,11 +260,24 @@ private fun NewEncounterDialog(
 		onDismissRequest = actions.onDismiss,
 		title = { Text(text = stringResource(R.string.new_encounter_title)) },
 		text = {
-			NewEncounterDialogContent(
-				state = state,
-				actions = actions,
-				contentState = contentState,
-			)
+			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+				OutlinedTextField(
+					value = encounterName,
+					onValueChange = onEncounterNameChange,
+					label = { Text(text = stringResource(R.string.encounter_name_label)) },
+					modifier = Modifier.fillMaxWidth()
+				)
+				Text(
+					text = stringResource(R.string.encounter_creation_setup_message),
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					fontSize = 12.sp
+				)
+				Text(
+					text = stringResource(R.string.monster_import_removed_message),
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					fontSize = 12.sp
+				)
+			}
 		},
 		confirmButton = {
 			Button(onClick = actions.onCreateEncounter, enabled = canCreateEncounter) {

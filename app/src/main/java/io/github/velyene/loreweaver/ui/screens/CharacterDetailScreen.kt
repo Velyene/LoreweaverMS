@@ -313,7 +313,11 @@ private fun CharacterDetailContent(
 						state.onRollResult
 					)
 
-					2 -> JournalTab(character, viewModel, onLookupCondition)
+					2 -> JournalTab(
+						character = character,
+						viewModel = viewModel,
+						onLookupCondition = onLookupCondition
+					)
 				}
 				if (state.rollResult != null) {
 					// Roll results live outside the tab switch so checks made in any tab remain visible until

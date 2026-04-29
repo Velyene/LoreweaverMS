@@ -52,8 +52,19 @@ object ConditionConstants {
 		ConditionOption("Slowed", R.string.cond_slowed)
 	)
 
+	val CUSTOM_HOMEBREW_ONLY_LABELS = listOf(
+		"Bleeding"
+	)
+
 	/**
-	 * Combined list of all conditions for selection.
+	 * Legacy aliases kept so older call sites still compile while the picker/UI shifts to the new
+	 * status-policy terminology.
+	 */
+	val STANDARD_CONDITIONS = OFFICIAL_CONDITIONS
+	val COMMON_CONDITIONS = BUILT_IN_STATUS_LABELS + CUSTOM_EFFECT_LABELS + CUSTOM_HOMEBREW_ONLY_LABELS
+
+	/**
+	 * Combined list of all built-in status labels for selection.
 	 */
 	val ALL_CONDITIONS = (STANDARD_CONDITIONS + COMMON_CONDITIONS).sortedBy(ConditionOption::name)
 }

@@ -166,6 +166,9 @@ fun EncounterEntity.toDomain(): Encounter {
 		id = id,
 		campaignId = campaignId,
 		name = name,
+		notes = notes,
+		currentRound = currentRound,
+		currentTurnIndex = currentTurnIndex,
 		status = if (isActive) EncounterStatus.ACTIVE else EncounterStatus.PENDING
 	)
 }
@@ -175,7 +178,10 @@ fun Encounter.toEntity(): EncounterEntity {
 		id = id,
 		campaignId = campaignId ?: "",
 		name = name,
-		isActive = status == EncounterStatus.ACTIVE
+		notes = notes,
+		isActive = status == EncounterStatus.ACTIVE,
+		currentRound = currentRound,
+		currentTurnIndex = currentTurnIndex
 	)
 }
 
