@@ -1,8 +1,18 @@
+/*
+ * FILE: SessionSummaryViewModel.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Session summary UI models
+ * 2. ViewModel setup and loading flow
+ * 3. Summary mapping helpers
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.Campaign
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CombatantState
@@ -13,6 +23,8 @@ import io.github.velyene.loreweaver.domain.use_case.GetCharactersUseCase
 import io.github.velyene.loreweaver.domain.use_case.GetEncounterByIdUseCase
 import io.github.velyene.loreweaver.domain.use_case.GetRecentSessionUseCase
 import io.github.velyene.loreweaver.domain.util.CharacterParty
+import io.github.velyene.loreweaver.ui.util.AppText
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +36,8 @@ import javax.inject.Inject
 data class SessionSummaryUiState(
 	val isLoading: Boolean = true,
 	val summary: SessionSummaryUiModel? = null,
-	val error: String? = null
+	val error: String? = null,
+	val onRetry: (() -> Unit)? = null
 )
 
 data class SessionSummaryUiModel(
@@ -63,7 +76,8 @@ class SessionSummaryViewModel @Inject constructor(
 	private val getRecentSessionUseCase: GetRecentSessionUseCase,
 	private val getEncounterByIdUseCase: GetEncounterByIdUseCase,
 	private val getCampaignByIdUseCase: GetCampaignByIdUseCase,
-	private val getCharactersUseCase: GetCharactersUseCase
+	private val getCharactersUseCase: GetCharactersUseCase,
+	private val appText: AppText
 ) : ViewModel() {
 	private val _uiState = MutableStateFlow(SessionSummaryUiState())
 	val uiState: StateFlow<SessionSummaryUiState> = _uiState.asStateFlow()
@@ -73,15 +87,14 @@ class SessionSummaryViewModel @Inject constructor(
 	}
 
 	fun refreshSummary() {
-		_uiState.update { it.copy(isLoading = true, error = null) }
+		_uiState.update { it.beginLoading() }
 		viewModelScope.launch {
 			try {
 				val session = getRecentSessionUseCase()
 				if (session?.snapshot == null) {
 					_uiState.update {
-						it.copy(
-							isLoading = false,
-							error = "No recent encounter summary available"
+						it.withError(
+							message = appText.getString(R.string.session_summary_error_no_recent)
 						)
 					}
 					return@launch
@@ -91,23 +104,20 @@ class SessionSummaryViewModel @Inject constructor(
 				val campaign = encounter?.campaignId?.let { getCampaignByIdUseCase(it) }
 				val characters = getCharactersUseCase().first()
 				val summary = buildSessionSummary(
+					appText = appText,
 					session = session,
 					encounter = encounter,
 					campaign = campaign,
 					characters = characters
 				)
-				_uiState.update {
-					it.copy(
-						isLoading = false,
-						summary = summary,
-						error = null
-					)
-				}
+				_uiState.update { it.withSummary(summary) }
+			} catch (cancellationException: CancellationException) {
+				throw cancellationException
 			} catch (e: Exception) {
 				_uiState.update {
-					it.copy(
-						isLoading = false,
-						error = e.localizedMessage ?: "Failed to load encounter summary"
+					it.withError(
+						message = appText.getString(R.string.session_summary_error_load),
+						onRetry = { refreshSummary() }
 					)
 				}
 			}
@@ -116,6 +126,7 @@ class SessionSummaryViewModel @Inject constructor(
 }
 
 internal fun buildSessionSummary(
+	appText: AppText,
 	session: SessionRecord,
 	encounter: Encounter?,
 	campaign: Campaign?,
@@ -145,8 +156,8 @@ internal fun buildSessionSummary(
 		campaignTitle = campaign?.title,
 		result = result,
 		totalRounds = snapshot.currentRound,
-		survivingPlayers = survivingPlayers.map(::toParticipantSummary),
-		defeatedEnemies = defeatedEnemies.map(::toParticipantSummary),
+		survivingPlayers = survivingPlayers.map { combatant -> toParticipantSummary(appText, combatant) },
+		defeatedEnemies = defeatedEnemies.map { combatant -> toParticipantSummary(appText, combatant) },
 		persistentStatuses = players.mapNotNull { combatant ->
 			val persistentConditions = charactersById[combatant.characterId]
 				?.activeConditions
@@ -169,10 +180,14 @@ internal fun buildSessionSummary(
 
 private const val MAX_SUMMARY_LOG_ENTRIES = 8
 
-private fun toParticipantSummary(combatant: CombatantState): SessionParticipantSummary {
+private fun toParticipantSummary(appText: AppText, combatant: CombatantState): SessionParticipantSummary {
 	return SessionParticipantSummary(
 		name = combatant.name,
-		hpLabel = "${combatant.currentHp}/${combatant.maxHp} HP",
+		hpLabel = appText.getString(
+			R.string.combatant_hp_label,
+			combatant.currentHp,
+			combatant.maxHp
+		),
 		initiative = combatant.initiative
 	)
 }
