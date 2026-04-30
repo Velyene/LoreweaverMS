@@ -54,45 +54,6 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-internal fun MadnessContent(
-	selectedDuration: HysteriaDuration,
-	lastRoll: Int?,
-	lastResult: String?,
-	listState: LazyListState,
-	onDurationSelected: (HysteriaDuration) -> Unit,
-	onRoll: () -> Unit
-) {
-	val hysteriaSectionState = rememberHysteriaSectionState(
-		listState = listState,
-		selectedDuration = selectedDuration,
-		lastRoll = lastRoll,
-		onRoll = onRoll
-	)
-	val context = LocalContext.current
-	val shareChooserTitle = stringResource(R.string.reference_share_chooser_title)
-	val resultBringIntoViewRequester = remember { BringIntoViewRequester() }
-
-	LaunchedEffect(hysteriaSectionState.resultScrollToken, lastRoll, lastResult) {
-		if (hysteriaSectionState.resultScrollToken == 0 || lastRoll == null || lastResult.isNullOrBlank()) return@LaunchedEffect
-
-		delay(150.milliseconds)
-		resultBringIntoViewRequester.bringIntoView()
-		hysteriaSectionState.onResultShown()
-	}
-
-	HysteriaContentLayout(
-		selectedDuration = selectedDuration,
-		lastRoll = lastRoll,
-		lastResult = lastResult,
-		shareChooserTitle = shareChooserTitle,
-		context = context,
-		onDurationSelected = onDurationSelected,
-		state = hysteriaSectionState,
-		resultBringIntoViewRequester = resultBringIntoViewRequester
-	)
-}
-
-@Composable
 internal fun HysteriaContent(
 	selectedDuration: HysteriaDuration,
 	lastRoll: Int?,
@@ -220,8 +181,8 @@ private fun rememberHysteriaSectionState(
 		animatedRoll = animatedRoll,
 		isRolling = isRolling,
 		resultScrollToken = resultScrollToken,
-			onRollRequested = {
-				startHysteriaRollPreview(
+		onRollRequested = {
+			startHysteriaRollPreview(
 				coroutineScope = coroutineScope,
 				isRolling = isRolling,
 				onRollingChange = {
@@ -502,4 +463,5 @@ private fun buildHysteriaReferenceShareText(
 		appendLine("No roll yet. Use the d100 roller to generate a hysteria result.")
 	}
 }.trim()
+
 

@@ -2,7 +2,7 @@
  * FILE: ReferenceModels.kt
  *
  * TABLE OF CONTENTS:
- * 1. ReferenceCategory enum
+ * 1. ReferenceCategory model enum
  * 2. ReferenceUiState model
  */
 
@@ -11,7 +11,7 @@ package io.github.velyene.loreweaver.ui.viewmodels
 import androidx.annotation.Keep
 import io.github.velyene.loreweaver.domain.util.DiseaseReference
 import io.github.velyene.loreweaver.domain.util.DiseaseTemplate
-import io.github.velyene.loreweaver.domain.util.MadnessDuration
+import io.github.velyene.loreweaver.domain.util.HysteriaDuration
 import io.github.velyene.loreweaver.domain.util.MonsterReferenceCatalog
 import io.github.velyene.loreweaver.domain.util.MonsterReferenceEntry
 import io.github.velyene.loreweaver.domain.util.PoisonReference
@@ -24,19 +24,19 @@ import kotlinx.serialization.Serializable
 
 @Keep
 @Serializable
-internal enum class ReferenceCategory {
+enum class ReferenceCategory {
 	TRAPS,
 	POISONS,
 	DISEASES,
 	SPELLCASTING,
 	OBJECTS,
-	MADNESS,
+	HYSTERIA,
 	MONSTERS,
 	CORE_RULES,
 	CHARACTER_CREATION
 }
 
-internal data class ReferenceUiState(
+data class ReferenceUiState(
 	val isLoading: Boolean = true,
 	val error: String? = null,
 	val onRetry: (() -> Unit)? = null,
@@ -64,8 +64,8 @@ internal data class ReferenceUiState(
 	val selectedPoison: PoisonTemplate? = null,
 	val selectedDisease: DiseaseTemplate? = null,
 	val selectedReferenceDetail: ReferenceDetailContent? = null,
-	val selectedMadnessDuration: MadnessDuration = MadnessDuration.SHORT_TERM,
-	val madnessLastRoll: Int? = null,
-	val madnessLastResult: String? = null
+	val selectedHysteriaDuration: HysteriaDuration = HysteriaDuration.SHORT_TERM,
+	val hysteriaLastRoll: Int? = null,
+	val hysteriaLastResult: String? = null
 )
 

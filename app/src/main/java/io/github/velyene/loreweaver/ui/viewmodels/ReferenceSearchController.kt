@@ -2,9 +2,9 @@
  * FILE: ReferenceSearchController.kt
  *
  * TABLE OF CONTENTS:
- * 1. Search controller
- * 2. Navigation state helpers
- * */
+ * 1. Search control
+ * 2. Navigation initialization control
+ */
 
 package io.github.velyene.loreweaver.ui.viewmodels
 
@@ -43,7 +43,7 @@ internal class ReferenceSearchController(
 		val normalizedQuery = query.trim()
 		val normalizedDetailCategory = detailCategory?.takeIf { it.isNotBlank() }
 		val normalizedDetailSlug = detailSlug?.takeIf { it.isNotBlank() }
-		val key = navigationInitializationKey(
+		val key = buildNavigationInitializationKey(
 			category = category,
 			query = normalizedQuery,
 			detailCategory = normalizedDetailCategory,
@@ -105,20 +105,20 @@ internal class ReferenceSearchController(
 			it.copy(appliedSearchQuery = query, isSearchPending = false).withFilteredContent(query)
 		}
 	}
-}
 
-internal fun navigationInitializationKey(
-	category: ReferenceCategory?,
-	query: String,
-	detailCategory: String?,
-	detailSlug: String?
-): String {
-	return listOf(
-		category?.name.orEmpty(),
-		query,
-		detailCategory.orEmpty(),
-		detailSlug.orEmpty()
-	).joinToString("|")
+	private fun buildNavigationInitializationKey(
+		category: ReferenceCategory?,
+		query: String,
+		detailCategory: String?,
+		detailSlug: String?
+	): String {
+		return listOf(
+			category?.name.orEmpty(),
+			query,
+			detailCategory.orEmpty(),
+			detailSlug.orEmpty()
+		).joinToString("|")
+	}
 }
 
 private fun resolveReferenceDetail(

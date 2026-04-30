@@ -5,7 +5,7 @@
  * 1. Section state model and list entry point
  * 2. Lazy list subsection renderers
  * 3. Equipment reference cards
- * 4. Detail-navigation helpers
+ * 4. Detail-navigation support
  * 5. Search visibility and dataset filters
  * 6. Search matching extensions by equipment type
  */

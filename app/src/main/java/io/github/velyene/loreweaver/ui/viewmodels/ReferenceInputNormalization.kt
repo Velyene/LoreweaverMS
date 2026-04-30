@@ -1,13 +1,13 @@
 package io.github.velyene.loreweaver.ui.viewmodels
 
-import io.github.velyene.loreweaver.domain.util.MadnessDuration
-import io.github.velyene.loreweaver.domain.util.MadnessReference
+import io.github.velyene.loreweaver.domain.util.HysteriaDuration
+import io.github.velyene.loreweaver.domain.util.HysteriaReference
 
-internal fun madnessResultFor(duration: MadnessDuration, roll: Int): String? {
+internal fun hysteriaResultFor(duration: HysteriaDuration, roll: Int): String? {
 	return when (duration) {
-		MadnessDuration.SHORT_TERM -> MadnessReference.getShortTermEffect(roll)?.effect
-		MadnessDuration.LONG_TERM -> MadnessReference.getLongTermEffect(roll)?.effect
-		MadnessDuration.INDEFINITE -> MadnessReference.getIndefiniteFlaw(roll)
+		HysteriaDuration.SHORT_TERM -> HysteriaReference.getShortTermEffect(roll)?.effect
+		HysteriaDuration.LONG_TERM -> HysteriaReference.getLongTermEffect(roll)?.effect
+		HysteriaDuration.INDEFINITE -> HysteriaReference.getIndefiniteFlaw(roll)
 	}
 }
 

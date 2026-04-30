@@ -61,10 +61,10 @@ internal fun ReferenceUiState.clearSelectedDetails(): ReferenceUiState {
 	)
 }
 
-internal fun ReferenceUiState.clearMadnessResult(): ReferenceUiState {
+internal fun ReferenceUiState.clearHysteriaResult(): ReferenceUiState {
 	return copy(
-		madnessLastRoll = null,
-		madnessLastResult = null
+		hysteriaLastRoll = null,
+		hysteriaLastResult = null
 	)
 }
 

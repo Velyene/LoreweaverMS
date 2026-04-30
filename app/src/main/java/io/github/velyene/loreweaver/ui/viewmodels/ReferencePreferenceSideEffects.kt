@@ -2,9 +2,9 @@
  * FILE: ReferencePreferenceSideEffects.kt
  *
  * TABLE OF CONTENTS:
- * 1. Favorites observation
+ * 1. Favorites observation side effects
  * 2. Preference toggle side effects
- * */
+ */
 
 package io.github.velyene.loreweaver.ui.viewmodels
 

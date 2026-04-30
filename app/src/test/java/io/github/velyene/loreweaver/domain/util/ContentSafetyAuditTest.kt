@@ -304,7 +304,7 @@ class ContentSafetyAuditTest {
 			followUpNote = "Keep future imports sectioned, searchable, and limited to reviewed SRD-backed monster data."
 		),
 		// Mental strain tables and GM guidance were rewritten into more original summaries.
-		"java/io/github/velyene/loreweaver/domain/util/MadnessReference.kt" to ReviewedProseFile(
+		"java/io/github/velyene/loreweaver/domain/util/HysteriaReference.kt" to ReviewedProseFile(
 			reviewedOn = REVIEWED_ON_2026_04_18,
 			rationale = "Long-form horror guidance and table text were paraphrased during the strict-mode pass.",
 			followUpNote = "Watch for new tables that read too close to source-book phrasing."

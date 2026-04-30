@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -34,8 +35,9 @@ internal fun ReferenceSearchStatusRow(
 
 	val message = when {
 		isSearchPending -> stringResource(R.string.reference_search_updating)
-		visibleResultsCount != null -> stringResource(
-			R.string.reference_search_results_count,
+		visibleResultsCount != null -> pluralStringResource(
+			R.plurals.reference_search_results_count,
+			visibleResultsCount,
 			visibleResultsCount,
 			appliedSearchQuery
 		)

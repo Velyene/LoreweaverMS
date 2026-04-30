@@ -3,8 +3,8 @@
  *
  * TABLE OF CONTENTS:
  * 1. Generic reference detail composable
- * 2. Detail section rendering helpers
- * 3. Clipboard/share text formatting helpers
+ * 2. Detail section rendering
+ * 3. Clipboard and share-text formatting
  */
 
 package io.github.velyene.loreweaver.ui.screens
