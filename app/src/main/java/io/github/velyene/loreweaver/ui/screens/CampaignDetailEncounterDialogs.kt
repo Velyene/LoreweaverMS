@@ -5,13 +5,14 @@
  * 1. Encounter dialog constants, enums, and state models
  * 2. Encounter creation dialog host and main content
  * 3. Monster filter, picker, and detail-preview composables
- * 4. Selected-monster summary helpers and selection utilities
+ * 4. Selected-monster summary and selection support
  */
 
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
@@ -41,6 +44,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -82,6 +86,9 @@ private val encounterSectionCardPadding = 12.dp
 private val encounterSelectedCountHorizontalPadding = 8.dp
 private val encounterSelectedCountVerticalPadding = 12.dp
 private val encounterHelperTextSize = 12.sp
+private val encounterDialogContentMinHeight = 320.dp
+private const val encounterDialogContentMaxHeightFraction = 0.55f
+private val encounterDialogScrollbarPadding = 12.dp
 
 internal enum class EncounterMonsterSortMode {
 	NAME,
@@ -260,24 +267,11 @@ private fun NewEncounterDialog(
 		onDismissRequest = actions.onDismiss,
 		title = { Text(text = stringResource(R.string.new_encounter_title)) },
 		text = {
-			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-				OutlinedTextField(
-					value = encounterName,
-					onValueChange = onEncounterNameChange,
-					label = { Text(text = stringResource(R.string.encounter_name_label)) },
-					modifier = Modifier.fillMaxWidth()
-				)
-				Text(
-					text = stringResource(R.string.encounter_creation_setup_message),
-					color = MaterialTheme.colorScheme.onSurfaceVariant,
-					fontSize = 12.sp
-				)
-				Text(
-					text = stringResource(R.string.monster_import_removed_message),
-					color = MaterialTheme.colorScheme.onSurfaceVariant,
-					fontSize = 12.sp
-				)
-			}
+			NewEncounterDialogContent(
+				state = state,
+				actions = actions,
+				contentState = contentState
+			)
 		},
 		confirmButton = {
 			Button(onClick = actions.onCreateEncounter, enabled = canCreateEncounter) {
@@ -303,47 +297,62 @@ private fun NewEncounterDialogContent(
 	actions: EncounterCreationDialogActions,
 	contentState: NewEncounterDialogContentState,
 ) {
-	Column(verticalArrangement = LayoutArrangement.spacedBy(encounterDialogSectionSpacing)) {
-		OutlinedTextField(
-			value = state.encounterName,
-			onValueChange = actions.onEncounterNameChange,
-			label = { Text(text = stringResource(R.string.encounter_name_label)) },
-			modifier = Modifier.fillMaxWidth()
-		)
-		OutlinedTextField(
-			value = state.monsterSearchQuery,
-			onValueChange = actions.onMonsterSearchQueryChange,
-			label = { Text(text = stringResource(R.string.reference_search_hint)) },
-			modifier = Modifier.fillMaxWidth(),
-			singleLine = true
-		)
-		MonsterEncounterFilterSection(
-			state = contentState.filterSectionState,
-			actions = contentState.filterSectionActions
-		)
-		SelectedEncounterMonsterSummarySection(
-			modifier = Modifier.focusRequester(contentState.selectedSummaryFocusRequester),
-			selectedCountText = contentState.selectedCountText,
-			summaries = contentState.visibleSelectedSummaries,
-			remainingCount = contentState.remainingSelectedSummaryCount,
-			onDecrementSummary = actions.onDecrementSelectedMonster,
-			onRemoveSummary = actions.onRemoveSelectedMonster,
-			onClearSelection = actions.onClearMonsterSelection,
-			hasSelection = contentState.selectedMonsterTotal > 0
-		)
-		EncounterMonsterPickerSection(
-			filteredMonsters = contentState.filteredMonsters,
-			selectedMonsterCounts = state.selectedMonsterCounts,
-			selectedMonsterTotal = contentState.selectedMonsterTotal,
-			monsterListState = contentState.monsterListState,
-			pickerHeaderFocusRequester = contentState.pickerHeaderFocusRequester,
-			onMonsterCountChange = actions.onMonsterCountChange
-		)
-		Text(
-			text = stringResource(R.string.encounter_monster_picker_helper),
-			color = MaterialTheme.colorScheme.onSurfaceVariant,
-			fontSize = encounterHelperTextSize
-		)
+	val scrollState = rememberScrollState()
+	val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+	BoxWithConstraints(
+		modifier = Modifier
+			.fillMaxWidth()
+			.heightIn(max = (screenHeight * encounterDialogContentMaxHeightFraction).coerceAtLeast(encounterDialogContentMinHeight))
+			.visibleVerticalScrollbar(scrollState)
+	) {
+		Column(
+			modifier = Modifier
+				.fillMaxWidth()
+				.verticalScroll(scrollState)
+				.padding(end = encounterDialogScrollbarPadding),
+			verticalArrangement = LayoutArrangement.spacedBy(encounterDialogSectionSpacing)
+		) {
+			OutlinedTextField(
+				value = state.encounterName,
+				onValueChange = actions.onEncounterNameChange,
+				label = { Text(text = stringResource(R.string.encounter_name_label)) },
+				modifier = Modifier.fillMaxWidth()
+			)
+			OutlinedTextField(
+				value = state.monsterSearchQuery,
+				onValueChange = actions.onMonsterSearchQueryChange,
+				label = { Text(text = stringResource(R.string.reference_search_hint)) },
+				modifier = Modifier.fillMaxWidth(),
+				singleLine = true
+			)
+			MonsterEncounterFilterSection(
+				state = contentState.filterSectionState,
+				actions = contentState.filterSectionActions
+			)
+			SelectedEncounterMonsterSummarySection(
+				modifier = Modifier.focusRequester(contentState.selectedSummaryFocusRequester),
+				selectedCountText = contentState.selectedCountText,
+				summaries = contentState.visibleSelectedSummaries,
+				remainingCount = contentState.remainingSelectedSummaryCount,
+				onDecrementSummary = actions.onDecrementSelectedMonster,
+				onRemoveSummary = actions.onRemoveSelectedMonster,
+				onClearSelection = actions.onClearMonsterSelection,
+				hasSelection = contentState.selectedMonsterTotal > 0
+			)
+			EncounterMonsterPickerSection(
+				filteredMonsters = contentState.filteredMonsters,
+				selectedMonsterCounts = state.selectedMonsterCounts,
+				selectedMonsterTotal = contentState.selectedMonsterTotal,
+				monsterListState = contentState.monsterListState,
+				pickerHeaderFocusRequester = contentState.pickerHeaderFocusRequester,
+				onMonsterCountChange = actions.onMonsterCountChange
+			)
+			Text(
+				text = stringResource(R.string.encounter_monster_picker_helper),
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+				fontSize = encounterHelperTextSize
+			)
+		}
 	}
 }
 
@@ -387,7 +396,8 @@ private fun EncounterMonsterPickerSection(
 					state = monsterListState,
 					modifier = Modifier
 						.fillMaxHeight()
-						.padding(top = encounterPickerTopPadding),
+						.padding(top = encounterPickerTopPadding)
+						.visibleVerticalScrollbar(monsterListState),
 					verticalArrangement = LayoutArrangement.spacedBy(encounterChipSpacing)
 				) {
 					visibleMonsters.forEach { monster ->

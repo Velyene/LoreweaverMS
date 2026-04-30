@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. Linked encounter list composable
- * 2. Encounter dialog state reset helpers
+ * 2. Encounter dialog state reset support
  * 3. Encounter creation dialog wiring
  */
 
