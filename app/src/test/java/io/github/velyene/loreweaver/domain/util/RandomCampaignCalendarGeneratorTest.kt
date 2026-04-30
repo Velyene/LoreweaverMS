@@ -1,9 +1,9 @@
 package io.github.velyene.loreweaver.domain.util
 
-import kotlin.random.Random
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.random.Random
 
 class RandomCampaignCalendarGeneratorTest {
 
