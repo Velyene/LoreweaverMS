@@ -362,6 +362,7 @@ Create one to begin your journey!</string>
     <string name="encounter_not_found_message">Encounter not found.</string>
     <string name="encounter_error_load">Failed to load encounter</string>
     <string name="encounter_error_start">Failed to start encounter</string>
+    <string name="encounter_error_save">Failed to save encounter</string>
     <string name="encounter_monster_picker_helper">Add monsters from the local library below. Selected creatures will be imported into the encounter with their reference stats.</string>
     <string name="encounter_monster_picker_empty">No monsters match the current search and filters.</string>
     <string name="encounter_selected_monsters_more" tools:ignore="PluralsCandidate">+%1$d more</string>

@@ -53,17 +53,20 @@ fun CombatTrackerScreen(
 
 	LaunchedEffect(uiState.error) {
 		uiState.error?.let { errorMsg ->
+			val retryAction = uiState.onRetry
 			val result = snackbarHostState.showSnackbar(
 				message = errorMsg,
-				actionLabel = if (uiState.onRetry != null) retryActionLabel else null,
+				actionLabel = if (retryAction != null) retryActionLabel else null,
 				duration = SnackbarDuration.Long
 			)
 			if (result == SnackbarResult.ActionPerformed) {
-				uiState.onRetry?.invoke()
+				viewModel.clearError(errorMsg)
+				retryAction?.invoke()
+			} else {
+				// Only clear the error if the snackbar is still consuming the same message so a fast
+				// retry cannot erase a newer failure that was emitted while this snackbar was visible.
+				viewModel.clearError(errorMsg)
 			}
-			// Clear the consumed error after the snackbar finishes so restored compositions do not keep
-			// replaying the same message.
-			viewModel.clearError()
 		}
 	}
 
@@ -79,7 +82,8 @@ fun CombatTrackerScreen(
 				),
 				showEncounterMenu = showEncounterMenu,
 				onBack = onBack,
-				onSaveAndExit = { viewModel.saveAndPauseEncounter(onEndEncounter) },
+				onSaveAndExit = { viewModel.saveAndPauseEncounter(onBack) },
+				onEndEncounter = { viewModel.saveAndPauseEncounter(onEndEncounter) },
 				onToggleEncounterMenu = { showEncounterMenu = it }
 			)
 		}

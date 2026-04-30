@@ -72,6 +72,9 @@ internal class FakeCombatCampaignRepository : CampaignRepository {
 	private val encountersById = mutableMapOf<String, Encounter>()
 	private val sessionsByEncounterId = mutableMapOf<String, List<SessionRecord>>()
 	var updateCharacterDelayMillis: Long = 0
+	var insertEncounterFailure: Exception? = null
+	var insertSessionFailure: Exception? = null
+	var setActiveEncounterFailure: Exception? = null
 	val activeEncounterId: String?
 		get() = activeEncounter?.id
 	private var activeEncounter: Encounter? = Encounter(
@@ -96,6 +99,7 @@ internal class FakeCombatCampaignRepository : CampaignRepository {
 	override suspend fun getEncounterById(encounterId: String): Encounter? = encountersById[encounterId]
 
 	override suspend fun insertEncounter(encounter: Encounter) {
+		insertEncounterFailure?.let { throw it }
 		encountersById[encounter.id] = encounter
 	}
 
@@ -110,6 +114,7 @@ internal class FakeCombatCampaignRepository : CampaignRepository {
 	override fun getAllSessions(): Flow<List<SessionRecord>> = allSessionsFlow
 
 	override suspend fun insertSessionRecord(session: SessionRecord) {
+		insertSessionFailure?.let { throw it }
 		allSessionsFlow.value += session
 		session.encounterId?.let { encounterId ->
 			sessionsByEncounterId[encounterId] = listOf(session) + sessionsByEncounterId[encounterId].orEmpty()
@@ -144,6 +149,7 @@ internal class FakeCombatCampaignRepository : CampaignRepository {
 	override suspend fun getActiveEncounter(): Encounter? = activeEncounter
 
 	override suspend fun setActiveEncounter(encounterId: String) {
+		setActiveEncounterFailure?.let { throw it }
 		activeEncounter = encountersById[encounterId]
 	}
 

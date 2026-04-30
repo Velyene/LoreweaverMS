@@ -25,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -545,6 +546,51 @@ class CombatViewModelTest {
 			assertNotNull(recentSession)
 			assertEquals("Boss Chamber", recentSession?.title)
 			assertEquals(listOf(hero), recentSession?.snapshot?.combatants)
+		}
+	}
+
+	@Test
+	fun saveAndPauseEncounter_failureReportsRetryableErrorAndRetryCanCompletePause() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			repository.insertSessionFailure = IllegalStateException("Disk full")
+			repository.setEncounter(
+				Encounter(
+					id = "encounter-active",
+					campaignId = "campaign-1",
+					name = "Boss Chamber",
+					status = EncounterStatus.ACTIVE
+				)
+			)
+			val viewModel = createCombatViewModel(repository)
+			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
+			var completed = false
+
+			viewModel.loadEncounter("encounter-active")
+			advanceUntilIdle()
+			viewModel.addParty(listOf(hero))
+			viewModel.saveAndPauseEncounter { completed = true }
+			advanceUntilIdle()
+
+			with(viewModel.uiState.value) {
+				assertFalse(completed)
+				assertEquals(EncounterLifecycle.ACTIVE, encounterLifecycle)
+				assertEquals("Failed to save encounter: Disk full", error)
+				assertNotNull(onRetry)
+			}
+			assertNull(repository.getRecentSession())
+
+			repository.insertSessionFailure = null
+			viewModel.uiState.value.onRetry?.invoke()
+			advanceUntilIdle()
+
+			val storedEncounter = repository.getStoredEncounter("encounter-active")
+			val recentSession = repository.getRecentSession()
+			assertTrue(completed)
+			assertNull(viewModel.uiState.value.error)
+			assertEquals(EncounterStatus.PENDING, storedEncounter?.status)
+			assertEquals(null, repository.activeEncounterId)
+			assertNotNull(recentSession)
 		}
 	}
 

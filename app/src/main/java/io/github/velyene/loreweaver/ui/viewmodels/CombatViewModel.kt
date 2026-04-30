@@ -70,8 +70,14 @@ class CombatViewModel @Inject constructor(
 		encounterController.loadEncounter(encounterId)
 	}
 
-	fun clearError() {
-		_uiState.update { it.clearErrorState() }
+	fun clearError(expectedMessage: String? = null) {
+		_uiState.update {
+			if (expectedMessage == null || it.error == expectedMessage) {
+				it.clearErrorState()
+			} else {
+				it
+			}
+		}
 	}
 
 	fun updateNotes(newNotes: String) {

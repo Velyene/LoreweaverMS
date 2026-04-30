@@ -50,8 +50,14 @@ class ReferenceViewModel @Inject constructor(
 		preferenceSideEffects.observeFavorites()
 	}
 
-	fun clearError() {
-		_uiState.update { it.clearErrorState() }
+	fun clearError(expectedMessage: String? = null) {
+		_uiState.update {
+			if (expectedMessage == null || it.error == expectedMessage) {
+				it.clearErrorState()
+			} else {
+				it
+			}
+		}
 	}
 
 	/**

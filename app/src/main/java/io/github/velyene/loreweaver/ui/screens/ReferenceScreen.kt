@@ -74,15 +74,18 @@ fun ReferenceScreen(
 
 	LaunchedEffect(uiState.error) {
 		uiState.error?.let { errorMessage ->
+			val retryAction = uiState.onRetry
 			val result = snackbarHostState.showSnackbar(
 				message = errorMessage,
-				actionLabel = if (uiState.onRetry != null) retryActionLabel else null,
+				actionLabel = if (retryAction != null) retryActionLabel else null,
 				duration = SnackbarDuration.Long
 			)
 			if (result == SnackbarResult.ActionPerformed) {
-				uiState.onRetry?.invoke()
+				viewModel.clearError(errorMessage)
+				retryAction?.invoke()
+			} else {
+				viewModel.clearError(errorMessage)
 			}
-			viewModel.clearError()
 		}
 	}
 

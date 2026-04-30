@@ -2,15 +2,15 @@ package io.github.velyene.loreweaver.domain.util
 
 import kotlin.random.Random
 
-private const val RandomCalendarWeekdayCount = 7
-private const val RandomCalendarMinMonthCount = 10
-private const val RandomCalendarMaxMonthCount = 14
-private const val RandomCalendarMinMonthDays = 28
-private const val RandomCalendarMaxMonthDays = 36
-private const val RandomCalendarMinFestivalDays = 2
-private const val RandomCalendarMaxFestivalDays = 5
-private const val RandomCalendarMinYear = 101
-private const val RandomCalendarMaxYearExclusive = 1000
+private const val RANDOM_CALENDAR_WEEKDAY_COUNT = 7
+private const val RANDOM_CALENDAR_MIN_MONTH_COUNT = 10
+private const val RANDOM_CALENDAR_MAX_MONTH_COUNT = 14
+private const val RANDOM_CALENDAR_MIN_MONTH_DAYS = 28
+private const val RANDOM_CALENDAR_MAX_MONTH_DAYS = 36
+private const val RANDOM_CALENDAR_MIN_FESTIVAL_DAYS = 2
+private const val RANDOM_CALENDAR_MAX_FESTIVAL_DAYS = 5
+private const val RANDOM_CALENDAR_MIN_YEAR = 101
+private const val RANDOM_CALENDAR_MAX_YEAR_EXCLUSIVE = 1000
 
 private val calendarPrefixPool = listOf(
 	"Amber",
@@ -172,13 +172,13 @@ data class CampaignCalendar(
 )
 
 fun generateRandomCampaignCalendar(random: Random = Random.Default): CampaignCalendar {
-	val monthCount = random.nextInt(RandomCalendarMinMonthCount, RandomCalendarMaxMonthCount + 1)
+	val monthCount = random.nextInt(RANDOM_CALENDAR_MIN_MONTH_COUNT, RANDOM_CALENDAR_MAX_MONTH_COUNT + 1)
 	val months = monthNames(random)
 		.take(monthCount)
 		.map { monthName ->
 			CampaignCalendarMonth(
 				name = monthName,
-				days = random.nextInt(RandomCalendarMinMonthDays, RandomCalendarMaxMonthDays + 1),
+				days = random.nextInt(RANDOM_CALENDAR_MIN_MONTH_DAYS, RANDOM_CALENDAR_MAX_MONTH_DAYS + 1),
 			)
 		}
 	val currentMonthIndex = random.nextInt(months.size)
@@ -187,7 +187,7 @@ fun generateRandomCampaignCalendar(random: Random = Random.Default): CampaignCal
 		weekdays = weekdayNames(random),
 		months = months,
 		festivalDays = festivalNames(random),
-		currentYear = random.nextInt(RandomCalendarMinYear, RandomCalendarMaxYearExclusive),
+		currentYear = random.nextInt(RANDOM_CALENDAR_MIN_YEAR, RANDOM_CALENDAR_MAX_YEAR_EXCLUSIVE),
 		eraName = eraPool.random(random),
 		currentMonthIndex = currentMonthIndex,
 		currentDay = random.nextInt(1, months[currentMonthIndex].days + 1),
@@ -225,7 +225,7 @@ private fun calendarName(random: Random): String {
 }
 
 private fun weekdayNames(random: Random): List<String> {
-	return weekdayPool.shuffled(random).take(RandomCalendarWeekdayCount)
+	return weekdayPool.shuffled(random).take(RANDOM_CALENDAR_WEEKDAY_COUNT)
 }
 
 private fun monthNames(random: Random): List<String> {
@@ -240,6 +240,6 @@ private fun festivalNames(random: Random): List<String> {
 		.zip(festivalSuffixPool.shuffled(random))
 		.map { (prefix, suffix) -> "$prefix $suffix" }
 		.distinct()
-		.take(random.nextInt(RandomCalendarMinFestivalDays, RandomCalendarMaxFestivalDays + 1))
+		.take(random.nextInt(RANDOM_CALENDAR_MIN_FESTIVAL_DAYS, RANDOM_CALENDAR_MAX_FESTIVAL_DAYS + 1))
 }
 

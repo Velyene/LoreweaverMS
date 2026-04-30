@@ -22,11 +22,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -63,15 +63,18 @@ fun AdventureLogScreen(
 
 	LaunchedEffect(uiState.error) {
 		val error = uiState.error ?: return@LaunchedEffect
+		val retryAction = uiState.onRetry
 		val result = snackbarHostState.showSnackbar(
 			message = error,
-			actionLabel = if (uiState.onRetry != null) retryActionLabel else null,
+			actionLabel = if (retryAction != null) retryActionLabel else null,
 			duration = SnackbarDuration.Long,
 		)
 		if (result == SnackbarResult.ActionPerformed) {
-			uiState.onRetry?.invoke()
+			viewModel.clearError(error)
+			retryAction?.invoke()
+		} else {
+			viewModel.clearError(error)
 		}
-		viewModel.clearError()
 	}
 
 	Scaffold(

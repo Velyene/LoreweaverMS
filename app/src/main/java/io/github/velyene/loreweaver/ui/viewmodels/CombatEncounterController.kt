@@ -19,6 +19,7 @@ import io.github.velyene.loreweaver.domain.use_case.GetEncounterByIdUseCase
 import io.github.velyene.loreweaver.domain.use_case.GetSessionsForEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertSessionRecordUseCase
+import io.github.velyene.loreweaver.domain.use_case.NO_ACTIVE_ENCOUNTER_MESSAGE
 import io.github.velyene.loreweaver.domain.use_case.SetActiveEncounterUseCase
 import io.github.velyene.loreweaver.domain.util.Resource
 import io.github.velyene.loreweaver.ui.util.AppText
@@ -27,8 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-private const val NO_ACTIVE_ENCOUNTER_ERROR_MESSAGE = "No active encounter found"
 
 internal class CombatEncounterController(
 	private val uiState: MutableStateFlow<CombatUiState>,
@@ -91,17 +90,25 @@ internal class CombatEncounterController(
 	}
 
 	fun saveAndPauseEncounter(onComplete: () -> Unit) {
-		val state = uiState.value
-		val encounterId = state.currentEncounterId ?: java.util.UUID.randomUUID().toString()
-		val session = buildPausedSessionRecord(encounterId, state)
-
 		scope.launch {
-			uiState.update { it.copy(encounterLifecycle = EncounterLifecycle.PAUSED) }
-			val existingEncounter = state.currentEncounterId?.let { getEncounterByIdUseCase(it) }
-			insertEncounterUseCase(buildPausedEncounter(encounterId, state, existingEncounter))
-			insertSessionRecordUseCase(session)
-			setActiveEncounterUseCase("")
-			onComplete()
+			val state = uiState.value
+			val encounterId = state.currentEncounterId ?: java.util.UUID.randomUUID().toString()
+			val session = buildPausedSessionRecord(encounterId, state)
+			try {
+				val existingEncounter = state.currentEncounterId?.let { getEncounterByIdUseCase(it) }
+				insertEncounterUseCase(buildPausedEncounter(encounterId, state, existingEncounter))
+				insertSessionRecordUseCase(session)
+				setActiveEncounterUseCase("")
+				uiState.update {
+					it.copy(encounterLifecycle = EncounterLifecycle.PAUSED).clearErrorState()
+				}
+				onComplete()
+			} catch (e: Exception) {
+				reportError(
+					message = formatCampaignError(appText, R.string.encounter_error_save, e),
+					onRetry = retrySaveAndPauseEncounter(onComplete)
+				)
+			}
 		}
 	}
 
@@ -130,7 +137,7 @@ internal class CombatEncounterController(
 
 	private fun handleActiveEncounterError(message: String?) {
 		reportError(
-			message = if (message == NO_ACTIVE_ENCOUNTER_ERROR_MESSAGE) null else message,
+			message = if (message == NO_ACTIVE_ENCOUNTER_MESSAGE) null else message,
 			onRetry = retryLoadEncounter(null)
 		)
 	}
@@ -159,6 +166,10 @@ internal class CombatEncounterController(
 	}
 
 	private fun retryLoadEncounter(encounterId: String?): () -> Unit = { loadEncounter(encounterId) }
+
+	private fun retrySaveAndPauseEncounter(onComplete: () -> Unit): () -> Unit = {
+		saveAndPauseEncounter(onComplete)
+	}
 
 	private fun reportError(message: String?, onRetry: (() -> Unit)? = null) {
 		uiState.update { it.withError(message, onRetry) }

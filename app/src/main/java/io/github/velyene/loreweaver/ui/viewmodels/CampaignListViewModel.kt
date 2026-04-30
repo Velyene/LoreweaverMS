@@ -29,8 +29,14 @@ class CampaignListViewModel @Inject constructor(
 		loadAllSessions()
 	}
 
-	fun clearError() {
-		_uiState.update(CampaignListUiState::clearErrorState)
+	fun clearError(expectedMessage: String? = null) {
+		_uiState.update {
+			if (expectedMessage == null || it.error == expectedMessage) {
+				it.clearErrorState()
+			} else {
+				it
+			}
+		}
 	}
 
 	private fun loadCampaigns() {

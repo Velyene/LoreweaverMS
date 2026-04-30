@@ -51,15 +51,18 @@ fun CampaignDetailScreen(
 	}
 
 	LaunchedEffect(uiState.error) {
-		uiState.error?.let {
+		uiState.error?.let { errorMessage ->
+			val retryAction = uiState.onRetry
 			val result = snackbarHostState.showSnackbar(
-				message = it,
-				actionLabel = if (uiState.onRetry != null) retryActionLabel else null,
+				message = errorMessage,
+				actionLabel = if (retryAction != null) retryActionLabel else null,
 			)
 			if (result == SnackbarResult.ActionPerformed) {
-				uiState.onRetry?.invoke()
+				viewModel.clearError(errorMessage)
+				retryAction?.invoke()
+			} else {
+				viewModel.clearError(errorMessage)
 			}
-			viewModel.clearError()
 		}
 	}
 

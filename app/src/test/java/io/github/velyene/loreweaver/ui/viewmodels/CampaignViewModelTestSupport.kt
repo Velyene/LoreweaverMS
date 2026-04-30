@@ -271,6 +271,7 @@ internal class FakeAppText : AppText {
 			R.string.encounter_not_found_message -> "Encounter not found."
 			R.string.encounter_error_load -> "Failed to load encounter"
 			R.string.encounter_error_start -> "Failed to start encounter"
+			R.string.encounter_error_save -> "Failed to save encounter"
 			R.string.character_error_load -> "Failed to load characters"
 			R.string.character_error_not_found -> "Character not found"
 			R.string.character_error_add -> "Failed to add character"

@@ -34,6 +34,7 @@ internal fun CombatTrackerTopBar(
 	showEncounterMenu: Boolean,
 	onBack: () -> Unit,
 	onSaveAndExit: () -> Unit,
+	onEndEncounter: () -> Unit,
 	onToggleEncounterMenu: (Boolean) -> Unit
 ) {
 	val defaultLiveTitle = stringResource(R.string.combat_tracker_live_title)
@@ -84,6 +85,7 @@ internal fun CombatTrackerTopBar(
 				CombatTrackerTopBarMenu(
 					showEncounterMenu = showEncounterMenu,
 					onSaveAndExit = onSaveAndExit,
+					onEndEncounter = onEndEncounter,
 					onToggleEncounterMenu = onToggleEncounterMenu
 				)
 			}
@@ -95,6 +97,7 @@ internal fun CombatTrackerTopBar(
 private fun CombatTrackerTopBarMenu(
 	showEncounterMenu: Boolean,
 	onSaveAndExit: () -> Unit,
+	onEndEncounter: () -> Unit,
 	onToggleEncounterMenu: (Boolean) -> Unit
 ) {
 	androidx.compose.foundation.layout.Box {
@@ -119,7 +122,7 @@ private fun CombatTrackerTopBarMenu(
 				text = { Text(stringResource(R.string.end_encounter_button)) },
 				onClick = {
 					onToggleEncounterMenu(false)
-					onSaveAndExit()
+					onEndEncounter()
 				}
 			)
 		}

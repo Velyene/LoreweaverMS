@@ -120,9 +120,6 @@ fun AddConditionDialog(
 						value = duration,
 						onValueChange = { if (it.all { c -> c.isDigit() }) duration = it },
 						label = { Text(stringResource(R.string.add_condition_dialog_duration_label)) },
-						supportingText = {
-							Text(stringResource(R.string.add_condition_dialog_duration_placeholder))
-						},
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 						modifier = Modifier.fillMaxWidth(),
 						placeholder = { Text(stringResource(R.string.add_condition_dialog_duration_placeholder)) }
