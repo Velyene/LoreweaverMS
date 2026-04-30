@@ -1,3 +1,11 @@
+/*
+ * FILE: AddConditionDialog.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Add-condition dialog composable
+ * 2. Duration validation
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
@@ -42,8 +50,14 @@ fun AddConditionDialog(
 	var selectedCondition by remember { mutableStateOf("") }
 	var duration by remember { mutableStateOf("") }
 	var hasDuration by remember { mutableStateOf(true) }
-	var persistsAcrossEncounters by remember { mutableStateOf(false) }
 	var expanded by remember { mutableStateOf(false) }
+	val persistsAcrossEncounters = ConditionConstants.defaultPersistsAcrossEncounters(selectedCondition)
+	val parsedDuration = parseConditionDuration(hasDuration = hasDuration, durationText = duration)
+	val canConfirm = canConfirmConditionSelection(
+		selectedCondition = selectedCondition,
+		hasDuration = hasDuration,
+		durationText = duration
+	)
 	val selectedConditionLabel = ConditionConstants.ALL_CONDITIONS
 		.firstOrNull { it.name == selectedCondition }
 		?.let { stringResource(it.labelRes) }
@@ -78,13 +92,11 @@ fun AddConditionDialog(
 						expanded = expanded,
 						onDismissRequest = { expanded = false }
 					) {
-						ConditionConstants.ALL_STATUS_LABELS.forEach { condition ->
+						ConditionConstants.ALL_CONDITIONS.forEach { condition ->
 							DropdownMenuItem(
 								text = { Text(stringResource(condition.labelRes)) },
 								onClick = {
 									selectedCondition = condition.name
-									selectedCondition = condition
-									persistsAcrossEncounters = ConditionConstants.defaultPersistsAcrossEncounters(condition)
 									expanded = false
 								}
 							)
@@ -108,6 +120,9 @@ fun AddConditionDialog(
 						value = duration,
 						onValueChange = { if (it.all { c -> c.isDigit() }) duration = it },
 						label = { Text(stringResource(R.string.add_condition_dialog_duration_label)) },
+						supportingText = {
+							Text(stringResource(R.string.add_condition_dialog_duration_placeholder))
+						},
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 						modifier = Modifier.fillMaxWidth(),
 						placeholder = { Text(stringResource(R.string.add_condition_dialog_duration_placeholder)) }
@@ -118,15 +133,11 @@ fun AddConditionDialog(
 		confirmButton = {
 			Button(
 				onClick = {
-					if (selectedCondition.isNotBlank()) {
-						val dur = if (hasDuration && duration.isNotBlank())
-							duration.toIntOrNull()
-						else
-							null
-						onConfirm(selectedCondition, dur, persistsAcrossEncounters)
+					if (canConfirm) {
+						onConfirm(selectedCondition, parsedDuration, persistsAcrossEncounters)
 					}
 				},
-				enabled = selectedCondition.isNotBlank()
+				enabled = canConfirm
 			) {
 				Text(stringResource(R.string.add_button))
 			}
@@ -136,3 +147,20 @@ fun AddConditionDialog(
 		}
 	)
 }
+
+internal fun canConfirmConditionSelection(
+	selectedCondition: String,
+	hasDuration: Boolean,
+	durationText: String
+): Boolean {
+	return selectedCondition.isNotBlank() && (!hasDuration || parseConditionDuration(hasDuration, durationText) != null)
+}
+
+internal fun parseConditionDuration(hasDuration: Boolean, durationText: String): Int? {
+	return if (!hasDuration) {
+		null
+	} else {
+		durationText.toIntOrNull()?.takeIf { it > 0 }
+	}
+}
+

@@ -1,3 +1,12 @@
+/*
+ * FILE: StatusEffectChips.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Status chip models and builders
+ * 2. Status chip row composables
+ * 3. Display and accessibility support
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.BorderStroke
@@ -182,7 +191,7 @@ private fun statusChipLabel(status: StatusChipModel): String {
 private fun statusChipDisplayLabel(status: StatusChipModel, persistentSuffix: String): String {
 	val metadata = ConditionConstants.metadataFor(status.name)
 	return buildString {
-		metadata.iconGlyph?.takeIf(String::isNotBlank)?.let {
+		metadata.iconGlyph.takeIf(String::isNotBlank)?.let {
 			append(it)
 			append(' ')
 		}
