@@ -44,7 +44,7 @@ internal fun CombatantStatusRow(
 			if (statuses.isEmpty()) {
 				stringResource(R.string.empty_label)
 			} else {
-				statuses.joinToString(::statusChipDisplayText)
+				statuses.joinToString { status -> statusChipDisplayText(status) }
 			}
 		)
 	}

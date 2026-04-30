@@ -6,8 +6,8 @@ import io.github.velyene.loreweaver.domain.model.ClassInfo
 import io.github.velyene.loreweaver.domain.util.CharacterCreationReference
 
 internal enum class CharacterBuilderSection(
-	@StringRes val titleResId: Int,
-	@StringRes val descriptionResId: Int,
+	@param:StringRes val titleResId: Int,
+	@param:StringRes val descriptionResId: Int,
 ) {
 	IDENTITY(
 		R.string.character_builder_identity_title,
@@ -31,13 +31,15 @@ internal enum class CharacterBuilderSection(
 	),
 }
 
+private val characterBuilderSections = CharacterBuilderSection::class.java.enumConstants.orEmpty().toList()
+
 internal fun CharacterBuilderSection.previous(): CharacterBuilderSection? {
 	val previousIndex = ordinal - 1
-	return entries.getOrNull(previousIndex)
+	return characterBuilderSections.getOrNull(previousIndex)
 }
 
 internal fun CharacterBuilderSection.next(): CharacterBuilderSection? {
-	return entries.getOrNull(ordinal + 1)
+	return characterBuilderSections.getOrNull(ordinal + 1)
 }
 
 internal data class CharacterBuildSuggestions(
@@ -47,6 +49,9 @@ internal data class CharacterBuildSuggestions(
 	val backgroundEquipment: List<String>,
 	val guidance: List<String>,
 )
+
+private const val EXPLORERS_PACK = "Explorer's Pack"
+private const val LEATHER_ARMOR = "Leather Armor"
 
 private val SPELL_SUGGESTIONS_BY_CLASS = mapOf(
 	"Bard" to listOf("Healing Word", "Dissonant Whispers", "Faerie Fire"),
@@ -60,17 +65,17 @@ private val SPELL_SUGGESTIONS_BY_CLASS = mapOf(
 )
 
 private val EQUIPMENT_SUGGESTIONS_BY_CLASS = mapOf(
-	"Barbarian" to listOf("Greataxe", "Handaxes", "Explorer's Pack"),
-	"Bard" to listOf("Rapier", "Lute", "Leather Armor"),
+	"Barbarian" to listOf("Greataxe", "Handaxes", EXPLORERS_PACK),
+	"Bard" to listOf("Rapier", "Lute", LEATHER_ARMOR),
 	"Cleric" to listOf("Mace", "Shield", "Holy Symbol"),
-	"Druid" to listOf("Quarterstaff", "Leather Armor", "Druidic Focus"),
+	"Druid" to listOf("Quarterstaff", LEATHER_ARMOR, "Druidic Focus"),
 	"Fighter" to listOf("Chain Mail", "Longsword", "Shield"),
-	"Monk" to listOf("Quarterstaff", "Darts", "Explorer's Pack"),
+	"Monk" to listOf("Quarterstaff", "Darts", EXPLORERS_PACK),
 	"Paladin" to listOf("Chain Mail", "Shield", "Holy Symbol"),
-	"Ranger" to listOf("Longbow", "Shortswords", "Explorer's Pack"),
+	"Ranger" to listOf("Longbow", "Shortswords", EXPLORERS_PACK),
 	"Rogue" to listOf("Rapier", "Shortbow", "Thieves' Tools"),
 	"Sorcerer" to listOf("Light Crossbow", "Arcane Focus", "Dagger"),
-	"Warlock" to listOf("Light Crossbow", "Arcane Focus", "Leather Armor"),
+	"Warlock" to listOf("Light Crossbow", "Arcane Focus", LEATHER_ARMOR),
 	"Wizard" to listOf("Quarterstaff", "Spellbook", "Component Pouch"),
 )
 
@@ -85,7 +90,7 @@ internal fun buildCharacterSuggestions(
 	val recommendedAbilities = classInfo?.primaryStats.orEmpty()
 	val suggestedSpells = SPELL_SUGGESTIONS_BY_CLASS[normalizedClassName].orEmpty()
 	val suggestedEquipment = EQUIPMENT_SUGGESTIONS_BY_CLASS[normalizedClassName]
-		?: listOf("Explorer's Pack", "Potion of Healing", "Backup weapon")
+		?: listOf(EXPLORERS_PACK, "Potion of Healing", "Backup weapon")
 	val guidance = buildList {
 		if (classInfo != null) {
 			add("d${classInfo.hitDie} hit die")
