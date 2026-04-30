@@ -1,3 +1,12 @@
+/*
+ * FILE: CampaignRepositoryInstrumentedTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. In-memory database setup
+ * 2. Repository snapshot persistence test
+ * 3. Teardown
+ */
+
 package io.github.velyene.loreweaver
 
 import android.content.Context
