@@ -2,9 +2,9 @@
  * FILE: CombatEncounterController.kt
  *
  * TABLE OF CONTENTS:
- * 1. Character observation and difficulty refresh
- * 2. Encounter loading and error handling
- * 3. Encounter start and pause persistence
+ * 1. Character observation and difficulty refresh control
+ * 2. Encounter loading control and error handling
+ * 3. Encounter start and pause control
  */
 
 package io.github.velyene.loreweaver.ui.viewmodels

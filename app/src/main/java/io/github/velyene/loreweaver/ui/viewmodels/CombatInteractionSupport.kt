@@ -2,9 +2,9 @@
  * FILE: CombatInteractionSupport.kt
  *
  * TABLE OF CONTENTS:
- * 1. Combatant HP and turn-selection helpers
- * 2. Action-resolution helpers
- * 3. Condition and temp-HP helpers
+ * 1. Combatant HP and turn-selection support
+ * 2. Action-resolution support
+ * 3. Condition and temp-HP support
  */
 
 package io.github.velyene.loreweaver.ui.viewmodels

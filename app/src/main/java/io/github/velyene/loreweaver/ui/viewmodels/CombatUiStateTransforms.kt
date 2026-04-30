@@ -3,14 +3,13 @@
  *
  * TABLE OF CONTENTS:
  * 1. CombatUiState turn helpers
- * 2. Target and encounter presentation helpers
- * 3. Condition-duration and turn-index utilities
+ * 2. Selected-target helpers
+ * 3. Condition-duration utilities
  */
 
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import io.github.velyene.loreweaver.domain.model.CombatantState
-import io.github.velyene.loreweaver.domain.model.Encounter
 
 internal fun CombatUiState.advanceTurn(): CombatUiState {
 	if (combatants.isEmpty()) return this
@@ -48,35 +47,6 @@ internal fun CombatUiState.clearPendingTurnState(): CombatUiState = copy(
 	selectedTargetId = null
 )
 
-internal fun CombatUiState.withEncounterPresentation(
-	encounter: Encounter,
-	combatants: List<CombatantState>,
-	encounterLifecycle: EncounterLifecycle,
-	requestedTurnIndex: Int,
-	currentRound: Int,
-	activeStatuses: List<String>,
-	isCombatActive: Boolean,
-	resetTransientTurnState: Boolean
-): CombatUiState {
-	val presentedState = copy(
-		currentEncounterId = encounter.id,
-		currentEncounterName = encounter.name,
-		encounterLifecycle = encounterLifecycle,
-		combatants = combatants,
-		currentTurnIndex = normalizedTurnIndex(combatants, requestedTurnIndex),
-		currentRound = currentRound.coerceAtLeast(1),
-		encounterNotes = encounter.notes,
-		activeStatuses = activeStatuses,
-		isCombatActive = isCombatActive,
-		isLoading = false
-	)
-	return if (resetTransientTurnState) {
-		presentedState.clearPendingTurnState()
-	} else {
-		presentedState
-	}
-}
-
 internal fun decrementConditionDurations(combatants: List<CombatantState>): Pair<List<CombatantState>, List<String>> {
 	val expiredMessages = mutableListOf<String>()
 	val updatedCombatants = combatants.map { combatant ->
@@ -95,7 +65,4 @@ internal fun decrementConditionDurations(combatants: List<CombatantState>): Pair
 	return updatedCombatants to expiredMessages
 }
 
-internal fun normalizedTurnIndex(combatants: List<CombatantState>, requestedIndex: Int): Int {
-	return if (combatants.isEmpty()) 0 else requestedIndex.coerceIn(0, combatants.lastIndex)
-}
 

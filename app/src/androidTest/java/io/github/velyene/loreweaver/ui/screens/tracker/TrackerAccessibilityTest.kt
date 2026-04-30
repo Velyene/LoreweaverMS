@@ -102,12 +102,12 @@ class TrackerAccessibilityTest {
 	}
 
 	@Test
-	fun combatantConditionsRow_usesFormattedStateAndRemoveDescriptions() {
+	fun combatantConditionsRow_usesFormattedMergedStateAndRemoveDescriptions() {
 		val poisoned = Condition(name = "Poisoned", duration = 3)
 		val combatant = combatant(conditions = listOf(poisoned))
 		val stateDescription = context.getString(
 			R.string.conditions_state_description,
-			"Poisoned (3)"
+			"Poisoned (3), Exhaustion ${context.getString(R.string.condition_persistent_chip_suffix)}"
 		)
 		val removeDescription = context.getString(
 			R.string.remove_condition_desc_with_name,
@@ -118,6 +118,7 @@ class TrackerAccessibilityTest {
 			MaterialTheme {
 				CombatantConditionsRow(
 					combatant = combatant,
+					persistentConditions = setOf("Exhaustion"),
 					onRemoveCondition = { _, _ -> },
 					onAddConditionClick = {}
 				)

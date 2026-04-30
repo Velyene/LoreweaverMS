@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. Combat tracker top bar
- * 2. Encounter overflow menu helpers
+ * 2. Encounter overflow menu support
  * 3. Lifecycle label formatting
  */
 

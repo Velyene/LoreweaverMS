@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. Difficulty summary card
- * 2. Difficulty color helpers
+ * 2. Difficulty color support
  */
 
 package io.github.velyene.loreweaver.ui.screens.tracker.setup

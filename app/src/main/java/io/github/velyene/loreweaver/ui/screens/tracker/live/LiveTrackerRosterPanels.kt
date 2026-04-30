@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. Secondary party and enemy roster panels
- * 2. Shared participant roster card helpers
+ * 2. Shared participant roster card support
  */
 
 package io.github.velyene.loreweaver.ui.screens.tracker.live

@@ -2,9 +2,9 @@
  * FILE: LiveTrackerFormatting.kt
  *
  * TABLE OF CONTENTS:
- * 1. Participant mapping helpers
- * 2. Resource formatting helpers
- * 3. Turn window helpers
+ * 1. Participant mapping and labels
+ * 2. Resource formatting
+ * 3. Turn-window formatting
  */
 
 package io.github.velyene.loreweaver.ui.screens.tracker.live
@@ -13,12 +13,19 @@ import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.domain.util.CharacterParty
 
-private const val stringLiteralEnemy = "Enemy"
-private val defaultActionLabels = listOf("Strike", "Cast", "Sneak", "Dodge")
+internal data class LiveTrackerFormattingLabels(
+	val enemyTypeLabel: String,
+	val defaultActionLabels: List<String>,
+	val tempHpFormat: String,
+	val manaFormat: String,
+	val staminaFormat: String,
+	val namedResourceFormat: String
+)
 
 internal fun buildLiveParticipants(
 	combatants: List<CombatantState>,
-	availableCharacters: List<CharacterEntry>
+	availableCharacters: List<CharacterEntry>,
+	labels: LiveTrackerFormattingLabels
 ): List<LiveParticipantUiModel> {
 	val charactersById = availableCharacters.associateBy(CharacterEntry::id)
 	return combatants.map { combatant ->
@@ -34,35 +41,36 @@ internal fun buildLiveParticipants(
 			typeLabel = character?.type?.takeIf(String::isNotBlank) ?: if (isPlayer) {
 				CharacterParty.ADVENTURERS
 			} else {
-				stringLiteralEnemy
+				labels.enemyTypeLabel
 			},
 			isPlayer = isPlayer,
 			isEliminated = combatant.currentHp <= 0,
 			notes = character?.notes.orEmpty(),
 			persistentConditions = character?.activeConditions.orEmpty(),
-			actionLabels = if (customActionLabels.isNotEmpty()) customActionLabels else defaultActionLabels,
-			resourceLines = buildResourceLines(character, combatant)
+			actionLabels = if (customActionLabels.isNotEmpty()) customActionLabels else labels.defaultActionLabels,
+			resourceLines = buildResourceLines(character, combatant, labels)
 		)
 	}
 }
 
 private fun buildResourceLines(
 	character: CharacterEntry?,
-	combatant: CombatantState
+	combatant: CombatantState,
+	labels: LiveTrackerFormattingLabels
 ): List<String> {
 	return buildList {
 		if (combatant.tempHp > 0) {
-			add("Temp HP ${combatant.tempHp}")
+			add(labels.tempHpFormat.format(combatant.tempHp))
 		}
 		if (character != null) {
 			if (character.maxMana > 0) {
-				add("Mana ${character.mana}/${character.maxMana}")
+				add(labels.manaFormat.format(character.mana, character.maxMana))
 			}
 			if (character.maxStamina > 0) {
-				add("Stamina ${character.stamina}/${character.maxStamina}")
+				add(labels.staminaFormat.format(character.stamina, character.maxStamina))
 			}
 			character.resources.take(3).forEach { resource ->
-				add("${resource.name} ${resource.current}/${resource.max}")
+				add(labels.namedResourceFormat.format(resource.name, resource.current, resource.max))
 			}
 		}
 	}

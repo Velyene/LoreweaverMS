@@ -17,6 +17,7 @@ import io.github.velyene.loreweaver.domain.model.EncounterStatus
 import io.github.velyene.loreweaver.domain.model.SessionRecord
 import io.github.velyene.loreweaver.domain.util.EncounterDifficulty
 import io.github.velyene.loreweaver.domain.util.EncounterDifficultyResult
+import java.util.UUID
 
 internal data class EncounterPresentation(
 	val encounter: Encounter,
@@ -138,6 +139,10 @@ internal fun buildPausedSessionRecord(encounterId: String, state: CombatUiState)
 			currentRound = state.currentRound
 		)
 	)
+}
+
+internal fun resolveEncounterId(explicitEncounterId: String?, currentEncounterId: String?): String {
+	return explicitEncounterId ?: currentEncounterId ?: UUID.randomUUID().toString()
 }
 
 internal fun resolveEncounterName(existingEncounter: Encounter?, currentEncounterName: String): String {

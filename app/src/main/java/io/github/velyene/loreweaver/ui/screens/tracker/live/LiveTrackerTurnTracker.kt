@@ -13,6 +13,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -49,14 +50,14 @@ internal fun TurnTrackerStrip(
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = Modifier.semantics { heading() }
 		)
-		Spacer(modifier = Modifier.padding(top = 6.dp))
+		Spacer(modifier = Modifier.height(6.dp))
 		Text(
 			text = androidx.compose.ui.res.stringResource(R.string.round_counter, round),
 			style = MaterialTheme.typography.bodyMedium,
 			fontWeight = FontWeight.Bold,
 			color = MaterialTheme.colorScheme.onSurface
 		)
-		Spacer(modifier = Modifier.padding(top = 8.dp))
+		Spacer(modifier = Modifier.height(8.dp))
 
 		if (participants.isEmpty()) {
 			Text(

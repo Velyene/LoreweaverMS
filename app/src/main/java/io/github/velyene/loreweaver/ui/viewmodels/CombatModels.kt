@@ -2,9 +2,9 @@
  * FILE: CombatModels.kt
  *
  * TABLE OF CONTENTS:
- * 1. CombatUiState
+ * 1. CombatUiState model
  * 2. Turn/lifecycle/action enums
- * 3. PendingTurnAction and HP helper models
+ * 3. PendingTurnAction and HP support models
  */
 
 package io.github.velyene.loreweaver.ui.viewmodels

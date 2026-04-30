@@ -3,8 +3,8 @@
  *
  * TABLE OF CONTENTS:
  * 1. Combatant conditions row composable
- * 2. Condition chip rendering helpers
- * 3. Condition duration formatting helpers
+ * 2. Condition chip rendering support
+ * 3. Condition duration formatting
  */
 
 package io.github.velyene.loreweaver.ui.screens.tracker.live
@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CombatantState
-import io.github.velyene.loreweaver.domain.model.Condition
 import io.github.velyene.loreweaver.ui.screens.StatusChipFlowRow
 import io.github.velyene.loreweaver.ui.screens.StatusChipModel
 import io.github.velyene.loreweaver.ui.screens.canonicalStatusLabel
@@ -44,11 +43,13 @@ internal fun CombatantConditionsRow(
 	onAddConditionClick: () -> Unit
 ) {
 	val addConditionDescription = stringResource(R.string.add_condition_desc)
-	val conditionsStateValue = if (combatant.conditions.isEmpty()) {
+	val persistentSuffix = stringResource(R.string.condition_persistent_chip_suffix)
+	val statuses = buildCombatantStatusChips(combatant, persistentConditions)
+	val conditionsStateValue = if (statuses.isEmpty()) {
 		stringResource(R.string.empty_label)
 	} else {
-		combatant.conditions.joinToString { condition ->
-			condition.name + conditionDurationText(condition)
+		statuses.joinToString { status ->
+			statusChipStateText(status, persistentSuffix)
 		}
 	}
 	val conditionsStateDescription = stringResource(
@@ -59,7 +60,7 @@ internal fun CombatantConditionsRow(
 	// Conditions remain inline with the combatant row so status effect changes stay visible
 	// without forcing players to open a secondary detail surface during live combat.
 	StatusChipFlowRow(
-		statuses = buildCombatantStatusChips(combatant, persistentConditions),
+		statuses = statuses,
 		modifier = Modifier
 			.fillMaxWidth()
 			.semantics {
@@ -88,50 +89,24 @@ internal fun CombatantConditionsRow(
 					color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
 				)
 			)
-		)
-	}
-}
-
-@Composable
-private fun ConditionChip(
-	condition: Condition,
-	onRemove: () -> Unit
-) {
-	val removeConditionDescription = stringResource(
-		R.string.remove_condition_desc_with_name,
-		condition.name
-	)
-
-	FilterChip(
-		selected = true,
-		onClick = {},
-		enabled = false,
-		label = {
-			Text(
-				"${condition.name}${conditionDurationText(condition)}",
-				fontSize = 11.sp
-			)
-		},
-		trailingIcon = {
-			IconButton(
-				onClick = onRemove,
-				modifier = Modifier.size(16.dp)
-			) {
-				Icon(
-					Icons.Default.Close,
-					contentDescription = removeConditionDescription,
-					modifier = Modifier.size(12.dp)
-				)
-			}
-		},
-		colors = FilterChipDefaults.filterChipColors(
-			selectedContainerColor = getConditionColor(condition.name)
-		)
+		}
 	)
 }
 
-private fun conditionDurationText(condition: Condition): String {
+private fun conditionDurationText(condition: io.github.velyene.loreweaver.domain.model.Condition): String {
 	return condition.duration?.let { " ($it)" } ?: ""
+}
+
+private fun statusChipStateText(status: StatusChipModel, persistentSuffix: String): String {
+	return buildString {
+		append(status.name)
+		if (status.isPersistent) {
+			append(' ')
+			append(persistentSuffix)
+		} else {
+			append(status.durationText)
+		}
+	}
 }
 
 private fun buildCombatantStatusChips(

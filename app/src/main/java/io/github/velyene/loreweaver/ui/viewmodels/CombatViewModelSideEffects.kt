@@ -2,8 +2,8 @@
  * FILE: CombatViewModelSideEffects.kt
  *
  * TABLE OF CONTENTS:
- * 1. Status/log side-effect helpers
- * 2. Persisted-condition coordination helpers
+ * 1. Status/log side effects
+ * 2. Persisted-condition side effects
  */
 
 package io.github.velyene.loreweaver.ui.viewmodels
