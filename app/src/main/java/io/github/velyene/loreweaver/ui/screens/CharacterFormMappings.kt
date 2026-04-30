@@ -2,8 +2,8 @@
  * FILE: CharacterFormMappings.kt
  *
  * TABLE OF CONTENTS:
- * 1. CharacterEntry â†’ CharacterFormState mapping (toFormState)
- * 2. CharacterFormState â†’ CharacterEntry mapping (toCharacterEntry)
+ * 1. CharacterEntry → CharacterFormState mapping (toFormState)
+ * 2. CharacterFormState → CharacterEntry mapping (toCharacterEntry)
  * 3. Derived-field helpers for HP, mana, resources, spell slots, and actions
  */
 

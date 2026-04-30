@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. CharacterFormCallbacks callback-holder class
- * 2. Factory function â€” wireCharacterFormCallbacks (binds ViewModel actions to form callbacks)
+ * 2. Factory function — wireCharacterFormCallbacks (binds ViewModel actions to form callbacks)
  */
 
 package io.github.velyene.loreweaver.ui.screens

@@ -1,3 +1,12 @@
+/*
+ * FILE: CombatantConditionsRow.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Combatant conditions row composable
+ * 2. Condition chip rendering helpers
+ * 3. Condition duration formatting helpers
+ */
+
 package io.github.velyene.loreweaver.ui.screens.tracker.live
 
 import androidx.compose.foundation.BorderStroke
@@ -35,30 +44,17 @@ internal fun CombatantConditionsRow(
 	onAddConditionClick: () -> Unit
 ) {
 	val addConditionDescription = stringResource(R.string.add_condition_desc)
-	val conditionsStateDescription = buildString {
-		append(stringResource(R.string.conditions_label))
-		append(": ")
-		append(
-			if (combatant.conditions.isEmpty() && persistentConditions.isEmpty()) {
-				stringResource(R.string.empty_label)
-			} else {
-				buildList {
-					addAll(combatant.conditions.map { condition ->
-						condition.name + conditionDurationText(condition)
-					})
-					addAll(
-						persistentConditions
-							.filterNot { persistentName ->
-								combatant.conditions.any { it.name == persistentName }
-							}
-							.map { persistentName ->
-								"$persistentName ${stringResource(R.string.condition_persistent_chip_suffix)}"
-							}
-					)
-				}.joinToString()
-			}
-		)
+	val conditionsStateValue = if (combatant.conditions.isEmpty()) {
+		stringResource(R.string.empty_label)
+	} else {
+		combatant.conditions.joinToString { condition ->
+			condition.name + conditionDurationText(condition)
+		}
 	}
+	val conditionsStateDescription = stringResource(
+		R.string.conditions_state_description,
+		conditionsStateValue
+	)
 
 	// Conditions remain inline with the combatant row so status effect changes stay visible
 	// without forcing players to open a secondary detail surface during live combat.
@@ -92,7 +88,45 @@ internal fun CombatantConditionsRow(
 					color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
 				)
 			)
-		}
+		)
+	}
+}
+
+@Composable
+private fun ConditionChip(
+	condition: Condition,
+	onRemove: () -> Unit
+) {
+	val removeConditionDescription = stringResource(
+		R.string.remove_condition_desc_with_name,
+		condition.name
+	)
+
+	FilterChip(
+		selected = true,
+		onClick = {},
+		enabled = false,
+		label = {
+			Text(
+				"${condition.name}${conditionDurationText(condition)}",
+				fontSize = 11.sp
+			)
+		},
+		trailingIcon = {
+			IconButton(
+				onClick = onRemove,
+				modifier = Modifier.size(16.dp)
+			) {
+				Icon(
+					Icons.Default.Close,
+					contentDescription = removeConditionDescription,
+					modifier = Modifier.size(12.dp)
+				)
+			}
+		},
+		colors = FilterChipDefaults.filterChipColors(
+			selectedContainerColor = getConditionColor(condition.name)
+		)
 	)
 }
 

@@ -58,7 +58,7 @@ class CoreRulesReferenceTest {
 		val rows = CoreRulesReference.PROFICIENCY_BONUS_TABLE.rows
 
 		assertEquals(listOf("Up to 4", "+2"), rows.first())
-		assertEquals(listOf("29â€“30", "+9"), rows.last())
+		assertEquals(listOf("29–30", "+9"), rows.last())
 	}
 
 	@Test

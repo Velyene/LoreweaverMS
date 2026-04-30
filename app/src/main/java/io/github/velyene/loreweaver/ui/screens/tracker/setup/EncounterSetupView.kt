@@ -400,13 +400,11 @@ private fun EnemyCombatantCard(
 @Composable
 private fun EncounterDifficultyCard(encounterDifficulty: EncounterDifficultyResult) {
 	val ratingLabel = EncounterDifficulty.formatDifficultyRating(encounterDifficulty.rating).first
-	val difficultySummary = buildString {
-		append(stringResource(R.string.encounter_difficulty_label))
-		append(' ')
-		append(ratingLabel)
-		append(". ")
-		append(stringResource(R.string.adjusted_xp_label, encounterDifficulty.adjustedXp))
-	}
+	val difficultySummary = stringResource(
+		R.string.encounter_difficulty_accessibility_desc,
+		ratingLabel,
+		encounterDifficulty.adjustedXp
+	)
 
 	Card(
 		modifier = Modifier

@@ -20,6 +20,7 @@ package io.github.velyene.loreweaver.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.domain.model.Condition
@@ -42,6 +43,7 @@ import io.github.velyene.loreweaver.domain.util.CharacterParty
 import io.github.velyene.loreweaver.domain.util.EncounterDifficulty
 import io.github.velyene.loreweaver.domain.util.EncounterDifficultyResult
 import io.github.velyene.loreweaver.domain.util.Resource
+import io.github.velyene.loreweaver.ui.util.AppText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,6 +52,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
+
+private const val NO_ACTIVE_ENCOUNTER_ERROR_MESSAGE = "No active encounter found"
 
 data class CombatUiState(
 	val isCombatActive: Boolean = false,
@@ -114,7 +118,7 @@ class CombatViewModel @Inject constructor(
 	private val setActiveEncounterUseCase: SetActiveEncounterUseCase,
 	private val insertLogUseCase: InsertLogUseCase,
 	private val insertSessionRecordUseCase: InsertSessionRecordUseCase,
-	private val updateCharacterUseCase: UpdateCharacterUseCase
+	private val appText: AppText
 ) : ViewModel() {
 	private val _uiState = MutableStateFlow(CombatUiState())
 	val uiState: StateFlow<CombatUiState> = _uiState.asStateFlow()
@@ -230,7 +234,7 @@ class CombatViewModel @Inject constructor(
 	 */
 	private fun handleActiveEncounterError(message: String?) {
 		reportError(
-			message = if (message == "No active encounter found") null else message,
+			message = if (message == NO_ACTIVE_ENCOUNTER_ERROR_MESSAGE) null else message,
 			onRetry = retryLoadEncounter(null)
 		)
 	}
@@ -243,7 +247,7 @@ class CombatViewModel @Inject constructor(
 		try {
 			val encounter = getEncounterByIdUseCase(encounterId)
 				?: run {
-					reportError("Encounter not found")
+					reportError(appText.getString(R.string.encounter_not_found_message))
 					return
 				}
 
@@ -252,60 +256,28 @@ class CombatViewModel @Inject constructor(
 			showEncounter(encounter, lastSession)
 		} catch (e: Exception) {
 			reportError(
-				message = formatError("Failed to load encounter", e),
+				message = formatCampaignError(appText, R.string.encounter_error_load, e),
 				onRetry = retryLoadEncounter(encounterId)
 			)
 		}
 	}
 
 	private fun beginLoading() {
-		_uiState.update { it.copy(isLoading = true, error = null, onRetry = null) }
+		_uiState.update { it.beginLoading() }
 	}
 
 	private fun retryLoadEncounter(encounterId: String?): () -> Unit =
 		{ loadEncounter(encounterId) }
 
-	private fun formatError(prefix: String, exception: Exception): String {
-		return "$prefix: ${exceptionDetail(exception)}"
-	}
-
 	private fun reportError(message: String?, onRetry: (() -> Unit)? = null) {
-		_uiState.update {
-			it.copy(
-				isLoading = false,
-				error = message,
-				onRetry = onRetry
-			)
-		}
+		_uiState.update { it.withError(message, onRetry) }
 	}
 
-	private fun updateEncounterPresentation(
-		encounter: Encounter,
-		combatants: List<CombatantState>,
-		encounterLifecycle: EncounterLifecycle,
-		requestedTurnIndex: Int,
-		currentRound: Int,
-		activeStatuses: List<String>,
-		isCombatActive: Boolean,
-		resetTransientTurnState: Boolean = true
-	) {
-		_uiState.update { state ->
-			state.withEncounterPresentation(
-				encounter = encounter,
-				combatants = combatants,
-				encounterLifecycle = encounterLifecycle,
-				requestedTurnIndex = requestedTurnIndex,
-				currentRound = currentRound,
-				activeStatuses = activeStatuses,
-				isCombatActive = isCombatActive,
-				resetTransientTurnState = resetTransientTurnState
-			)
-		}
-	}
-
-	private fun showEncounter(encounter: Encounter, lastSession: SessionRecord?) {
-		if (encounter.status == EncounterStatus.ACTIVE) {
-			showActiveEncounter(encounter, lastSession)
+	private fun showEncounter(encounterId: String, lastSession: SessionRecord?) {
+		if (lastSession?.snapshot != null) {
+			// A saved snapshot is the source of truth for an in-progress encounter because it preserves
+			// turn order, HP, and conditions that the bare encounter record does not store.
+			restoreCombatFromSnapshot(encounterId, lastSession)
 			return
 		}
 
@@ -344,7 +316,7 @@ class CombatViewModel @Inject constructor(
 	}
 
 	fun clearError() {
-		_uiState.update { it.copy(error = null) }
+		_uiState.update { it.clearErrorState() }
 	}
 
 	fun updateNotes(newNotes: String) {
@@ -352,40 +324,34 @@ class CombatViewModel @Inject constructor(
 	}
 
 	fun startEncounter(encounterId: String? = null) {
-		val state = _uiState.value
-		if (state.combatants.isEmpty()) return
-
-		val existingEncounterId = encounterId ?: state.currentEncounterId
-		val id = existingEncounterId ?: UUID.randomUUID().toString()
-		viewModelScope.launch {
-			try {
-				val existingEncounter = existingEncounterId?.let { getEncounterByIdUseCase(it) }
-				val sortedCombatants = state.combatants.sortedByDescending { it.initiative }
-				val encounter = Encounter(
-					id = id,
-					campaignId = existingEncounter?.campaignId,
-					name = resolveEncounterName(existingEncounter, state.currentEncounterName),
-					notes = state.encounterNotes,
-					status = EncounterStatus.ACTIVE,
-					currentRound = state.currentRound.coerceAtLeast(1),
-					currentTurnIndex = state.currentTurnIndex.coerceIn(0, sortedCombatants.lastIndex),
-					participants = sortedCombatants
-				)
-				insertEncounterUseCase(encounter)
-				setActiveEncounterUseCase(id)
-				updateEncounterPresentation(
-					encounter = encounter,
-					combatants = sortedCombatants,
-					encounterLifecycle = EncounterLifecycle.ACTIVE,
-					requestedTurnIndex = encounter.currentTurnIndex,
-					currentRound = encounter.currentRound,
-					activeStatuses = state.activeStatuses,
-					isCombatActive = true,
-					resetTransientTurnState = false
-				)
-				updateEncounterDifficulty()
-			} catch (e: Exception) {
-				reportError(formatError("Failed to start encounter", e))
+		if (_uiState.value.combatants.isNotEmpty()) {
+			val id =
+				encounterId ?: _uiState.value.currentEncounterId ?: UUID.randomUUID().toString()
+			viewModelScope.launch {
+				try {
+					// If it's a new encounter, we might need to insert it
+					if (encounterId == null && _uiState.value.currentEncounterId == null) {
+						insertEncounterUseCase(
+							Encounter(
+								id = id,
+								name = "Quick Encounter ${System.currentTimeMillis()}",
+								status = io.github.velyene.loreweaver.domain.model.EncounterStatus.ACTIVE
+							)
+						)
+					}
+					// Mark the encounter active before publishing UI state so repository-backed screens and
+					// process restores observe the same active encounter ID the tracker is about to use.
+					setActiveEncounterUseCase(id)
+					_uiState.update {
+						it.copy(
+							currentEncounterId = id,
+							combatants = it.combatants.sortedByDescending { c -> c.initiative },
+							isCombatActive = true
+						)
+					}
+				} catch (e: Exception) {
+					reportError(formatCampaignError(appText, R.string.encounter_error_start, e))
+				}
 			}
 		}
 	}
@@ -743,6 +709,8 @@ class CombatViewModel @Inject constructor(
 		}
 
 		val (updatedCombatants, expiredMessages) = decrementConditionDurations(combatants)
+		// Conditions tick only when the round wraps, matching the encounter-wide notion of
+		// "one round has passed" instead of decrementing on every individual combatant turn.
 		return copy(
 			currentTurnIndex = 0,
 			currentRound = currentRound + 1,

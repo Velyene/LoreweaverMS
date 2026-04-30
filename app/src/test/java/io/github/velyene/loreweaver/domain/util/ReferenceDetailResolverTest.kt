@@ -1,3 +1,12 @@
+/*
+ * FILE: ReferenceDetailResolverTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Feat, equipment, and spell detail resolution tests
+ * 2. Monster detail and grouped-entry resolution tests
+ * 3. Fallback and missing-detail behavior tests
+ */
+
 package io.github.velyene.loreweaver.domain.util
 
 import org.junit.Assert.assertEquals
@@ -201,12 +210,12 @@ class ReferenceDetailResolverTest {
 	fun resolve_acceptsSingularCategoryAliasesAndTypographicSlugs() {
 		val spellDetail = ReferenceDetailResolver.resolve(
 			"Spell",
-			ReferenceDetailResolver.slugFor("Heroesâ€™ Feast")
+			ReferenceDetailResolver.slugFor("Heroes’ Feast")
 		)
 		val conditionDetail = ReferenceDetailResolver.resolve("Condition", "blinded")
 
 		assertNotNull(spellDetail)
-		assertEquals("Heroesâ€™ Feast", spellDetail?.title)
+		assertEquals("Heroes’ Feast", spellDetail?.title)
 		assertNotNull(conditionDetail)
 		assertEquals("Blinded", conditionDetail?.title)
 	}

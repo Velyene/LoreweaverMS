@@ -784,245 +784,26 @@ private fun SummaryStatRow(primaryLabel: String, secondaryLabel: String) {
 		modifier = Modifier.fillMaxWidth(),
 		horizontalArrangement = Arrangement.spacedBy(8.dp)
 	) {
-		MiniSummaryCard(label = primaryLabel, modifier = Modifier.weight(1f))
-		MiniSummaryCard(label = secondaryLabel, modifier = Modifier.weight(1f))
-	}
-}
-
-@Composable
-private fun MiniSummaryCard(label: String, modifier: Modifier = Modifier) {
-	Box(
-		modifier = modifier
-			.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
-			.padding(horizontal = 12.dp, vertical = 10.dp),
-		contentAlignment = Alignment.Center
-	) {
-		Text(
-			text = label,
-			style = MaterialTheme.typography.bodyMedium,
-			fontWeight = FontWeight.Medium,
-			color = MaterialTheme.colorScheme.onPrimaryContainer
-		)
-	}
-}
-
-@Composable
-private fun ResourceLinesSection(resourceLines: List<String>) {
-	Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-		resourceLines.forEach { line ->
-			Text(
-				text = line,
-				style = MaterialTheme.typography.bodySmall,
-				color = MaterialTheme.colorScheme.onPrimaryContainer
+		combatActionChipSpecs.forEach { action ->
+			val actionLabel = stringResource(action.labelRes)
+			ActionChip(
+				label = actionLabel,
+				onClick = { onAction(actionLabel) }
 			)
 		}
 	}
 }
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun ParticipantActionChips(
-	actionLabels: List<String>,
-	onAction: (String) -> Unit
-) {
-	FlowRow(
-		modifier = Modifier.fillMaxWidth(),
-		horizontalArrangement = Arrangement.spacedBy(8.dp),
-		verticalArrangement = Arrangement.spacedBy(8.dp)
-	) {
-		actionLabels.forEach { actionLabel ->
-			ActionChip(label = actionLabel, onClick = { onAction(actionLabel) })
-		}
-	}
-}
+private val combatActionChipSpecs = listOf(
+	CombatActionChipSpec(labelRes = R.string.combat_action_strike),
+	CombatActionChipSpec(labelRes = R.string.combat_action_cast),
+	CombatActionChipSpec(labelRes = R.string.combat_action_sneak),
+	CombatActionChipSpec(labelRes = R.string.combat_action_dodge)
+)
 
-@Composable
-private fun EncounterNotesCard(encounterNotes: String) {
-	Card(
-		modifier = Modifier.fillMaxWidth(),
-		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-	) {
-		Column(modifier = Modifier.padding(16.dp)) {
-			Text(
-				text = stringResource(R.string.encounter_notes_title),
-				style = MaterialTheme.typography.labelSmall,
-				color = MaterialTheme.colorScheme.onSurfaceVariant,
-				modifier = Modifier.semantics { heading() }
-			)
-			Spacer(modifier = Modifier.height(4.dp))
-			Text(
-				text = encounterNotes,
-				style = MaterialTheme.typography.bodyMedium,
-				color = MaterialTheme.colorScheme.onSurface
-			)
-		}
-	}
-}
-
-@Composable
-private fun SecondaryPartyPanel(
-	partyMembers: List<LiveParticipantUiModel>,
-	selectedTargetId: String?,
-	selectableTargetIds: Set<String>,
-	onSelectTarget: (String) -> Unit
-) {
-	CompactParticipantSection(
-		title = stringResource(R.string.encounter_secondary_party_title),
-		emptyMessage = stringResource(R.string.encounter_secondary_party_empty_message),
-		participants = partyMembers,
-		selectedTargetId = selectedTargetId,
-		selectableTargetIds = selectableTargetIds,
-		statusFor = { participant ->
-			if (participant.isEliminated) {
-				stringResource(R.string.encounter_status_downed)
-			} else {
-				stringResource(R.string.encounter_status_ready)
-			}
-		},
-		onSelectTarget = onSelectTarget
-	)
-}
-
-@Composable
-private fun EnemyPanel(
-	enemies: List<LiveParticipantUiModel>,
-	selectedTargetId: String?,
-	selectableTargetIds: Set<String>,
-	onSelectTarget: (String) -> Unit
-) {
-	CompactParticipantSection(
-		title = stringResource(R.string.encounter_enemy_panel_title),
-		emptyMessage = stringResource(R.string.encounter_enemy_panel_empty_message),
-		participants = enemies,
-		selectedTargetId = selectedTargetId,
-		selectableTargetIds = selectableTargetIds,
-		statusFor = { participant ->
-			if (participant.isEliminated) {
-				stringResource(R.string.encounter_status_defeated)
-			} else {
-				stringResource(R.string.encounter_status_alive)
-			}
-		},
-		onSelectTarget = onSelectTarget
-	)
-}
-
-@Composable
-private fun CompactParticipantSection(
-	title: String,
-	emptyMessage: String,
-	participants: List<LiveParticipantUiModel>,
-	selectedTargetId: String?,
-	selectableTargetIds: Set<String>,
-	statusFor: @Composable (LiveParticipantUiModel) -> String,
-	onSelectTarget: (String) -> Unit
-) {
-	Column(
-		modifier = Modifier
-			.fillMaxWidth()
-			.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(10.dp))
-			.padding(12.dp)
-	) {
-		Text(
-			text = title,
-			style = MaterialTheme.typography.labelSmall,
-			color = MaterialTheme.colorScheme.onSurfaceVariant,
-			modifier = Modifier.semantics { heading() }
-		)
-		Spacer(modifier = Modifier.height(8.dp))
-
-		if (participants.isEmpty()) {
-			Text(
-				text = emptyMessage,
-				style = MaterialTheme.typography.bodySmall,
-				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-			)
-			return@Column
-		}
-
-		Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-			participants.forEach { participant ->
-				CompactParticipantCard(
-					participant = participant,
-					statusLabel = statusFor(participant),
-					isSelectedTarget = participant.combatant.characterId == selectedTargetId,
-					isSelectableTarget = selectableTargetIds.contains(participant.combatant.characterId),
-					onClick = {
-						if (selectableTargetIds.contains(participant.combatant.characterId)) {
-							onSelectTarget(participant.combatant.characterId)
-						}
-					}
-				)
-			}
-		}
-	}
-}
-
-@Composable
-private fun CompactParticipantCard(
-	participant: LiveParticipantUiModel,
-	statusLabel: String,
-	isSelectedTarget: Boolean,
-	isSelectableTarget: Boolean,
-	onClick: () -> Unit
-) {
-	val accentColor = if (participant.isPlayer) ArcaneTeal else DangerRed
-	val containerColor = when {
-		isSelectedTarget -> MaterialTheme.colorScheme.tertiaryContainer
-		participant.isPlayer -> ArcaneTeal.copy(alpha = 0.12f)
-		else -> DangerRed.copy(alpha = 0.12f)
-	}
-	val contentColor = if (isSelectedTarget) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-	Card(
-		modifier = Modifier
-			.fillMaxWidth()
-			.then(
-				if (isSelectableTarget) Modifier.clickable(onClick = onClick) else Modifier
-			),
-		colors = CardDefaults.cardColors(containerColor = containerColor),
-		border = BorderStroke(
-			width = if (isSelectedTarget) 2.dp else 1.dp,
-			color = if (isSelectedTarget) AntiqueGold else accentColor.copy(alpha = 0.55f)
-		)
-	) {
-		Row(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 12.dp, vertical = 10.dp),
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.SpaceBetween
-		) {
-			Column(modifier = Modifier.weight(1f)) {
-				Text(
-					text = participant.combatant.name,
-					style = MaterialTheme.typography.titleSmall,
-					fontWeight = FontWeight.SemiBold,
-					color = contentColor
-				)
-				Text(
-					text = participant.typeLabel,
-					style = MaterialTheme.typography.bodySmall,
-					color = contentColor.copy(alpha = 0.8f)
-				)
-				Text(
-					text = stringResource(
-						R.string.encounter_active_hp_summary,
-						participant.combatant.currentHp,
-						participant.combatant.maxHp
-					),
-					style = MaterialTheme.typography.bodySmall,
-					color = contentColor.copy(alpha = 0.8f)
-				)
-			}
-			Text(
-				text = statusLabel,
-				style = MaterialTheme.typography.labelMedium,
-				fontWeight = FontWeight.Bold,
-				color = if (participant.isEliminated) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-			)
-		}
-	}
-}
+private data class CombatActionChipSpec(
+	val labelRes: Int
+)
 
 @Composable
 private fun QuickHpControls(

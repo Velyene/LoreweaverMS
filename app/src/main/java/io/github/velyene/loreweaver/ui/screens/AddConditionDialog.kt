@@ -24,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.velyene.loreweaver.R
@@ -42,31 +44,31 @@ fun AddConditionDialog(
 	var hasDuration by remember { mutableStateOf(true) }
 	var persistsAcrossEncounters by remember { mutableStateOf(false) }
 	var expanded by remember { mutableStateOf(false) }
-	val selectedMetadata = remember(selectedCondition) {
-		selectedCondition.takeIf(String::isNotBlank)?.let(ConditionConstants::metadataFor)
-	}
+	val selectedConditionLabel = ConditionConstants.ALL_CONDITIONS
+		.firstOrNull { it.name == selectedCondition }
+		?.let { stringResource(it.labelRes) }
+		.orEmpty()
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text(stringResource(R.string.add_condition_dialog_title)) },
+		title = {
+			Text(
+				text = stringResource(R.string.add_condition_dialog_title),
+				modifier = Modifier.semantics { heading() }
+			)
+		},
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-				selectedMetadata?.let { metadata ->
-					Text(
-						text = "${metadata.iconGlyph.orEmpty()} ${metadata.category.name.replace('_', ' ')}",
-						color = metadata.borderColor
-					)
-				}
 				ExposedDropdownMenuBox(
 					expanded = expanded,
 					onExpandedChange = { expanded = !expanded },
 					modifier = Modifier.fillMaxWidth()
 				) {
 					OutlinedTextField(
-						value = selectedCondition,
+						value = selectedConditionLabel,
 						onValueChange = {},
 						readOnly = true,
-						label = { Text(stringResource(R.string.condition_label)) },
+						label = { Text(stringResource(R.string.add_condition_dialog_condition_label)) },
 						trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
 						modifier = Modifier
 							.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -78,8 +80,9 @@ fun AddConditionDialog(
 					) {
 						ConditionConstants.ALL_STATUS_LABELS.forEach { condition ->
 							DropdownMenuItem(
-								text = { Text(condition) },
+								text = { Text(stringResource(condition.labelRes)) },
 								onClick = {
+									selectedCondition = condition.name
 									selectedCondition = condition
 									persistsAcrossEncounters = ConditionConstants.defaultPersistsAcrossEncounters(condition)
 									expanded = false
@@ -97,28 +100,17 @@ fun AddConditionDialog(
 						checked = hasDuration,
 						onCheckedChange = { hasDuration = it }
 					)
-					Text(stringResource(R.string.condition_has_duration_label))
-				}
-
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Checkbox(
-						checked = persistsAcrossEncounters,
-						onCheckedChange = { persistsAcrossEncounters = it }
-					)
-					Text(stringResource(R.string.condition_persistent_label))
+					Text(stringResource(R.string.add_condition_dialog_has_duration_label))
 				}
 
 				if (hasDuration) {
 					OutlinedTextField(
 						value = duration,
 						onValueChange = { if (it.all { c -> c.isDigit() }) duration = it },
-						label = { Text(stringResource(R.string.condition_duration_rounds_label)) },
+						label = { Text(stringResource(R.string.add_condition_dialog_duration_label)) },
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 						modifier = Modifier.fillMaxWidth(),
-						placeholder = { Text(stringResource(R.string.condition_duration_placeholder)) }
+						placeholder = { Text(stringResource(R.string.add_condition_dialog_duration_placeholder)) }
 					)
 				}
 			}

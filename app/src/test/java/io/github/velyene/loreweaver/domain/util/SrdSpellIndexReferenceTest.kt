@@ -34,7 +34,7 @@ class SrdSpellIndexReferenceTest {
 		Arcane Hand
 		Arcane Lock
 		Arcane Sword
-		Arcanistâ€™s Magic Aura
+		Arcanist’s Magic Aura
 		Astral Projection
 		Augury
 		Aura of Life
@@ -114,7 +114,7 @@ class SrdSpellIndexReferenceTest {
 		Dominate Beast
 		Dominate Monster
 		Dominate Person
-		Dragonâ€™s Breath
+		Dragon’s Breath
 		Dream
 		Druidcraft
 		Earthquake
@@ -180,14 +180,14 @@ class SrdSpellIndexReferenceTest {
 		Healing Word
 		Heat Metal
 		Hellish Rebuke
-		Heroesâ€™ Feast
+		Heroes’ Feast
 		Heroism
 		Hex
 		Hideous Laughter
 		Hold Monster
 		Hold Person
 		Holy Aura
-		Hunterâ€™s Mark
+		Hunter’s Mark
 		Hypnotic Pattern
 		Ice Knife
 		Ice Storm
@@ -368,10 +368,10 @@ class SrdSpellIndexReferenceTest {
 		assertEquals("Arcane Sword", SrdSpellIndexReference.canonicalNameFor("Arcane Sword"))
 		assertEquals("Arcane Sword", SrdSpellIndexReference.canonicalNameFor("arcane-sword"))
 		assertEquals(
-			"Arcanistâ€™s Magic Aura",
+			"Arcanist’s Magic Aura",
 			SrdSpellIndexReference.canonicalNameFor("Arcanist's Magic Aura")
 		)
-		assertEquals("Dragonâ€™s Breath", SrdSpellIndexReference.canonicalNameFor("dragon-s-breath"))
+		assertEquals("Dragon’s Breath", SrdSpellIndexReference.canonicalNameFor("dragon-s-breath"))
 		assertNull(SrdSpellIndexReference.canonicalNameFor("Tasha's Hideous Laughter"))
 	}
 

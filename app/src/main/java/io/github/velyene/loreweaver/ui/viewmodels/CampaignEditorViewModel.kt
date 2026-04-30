@@ -2,7 +2,9 @@ package io.github.velyene.loreweaver.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.annotation.StringRes
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.Note
 import io.github.velyene.loreweaver.domain.model.RemoteItem
 import io.github.velyene.loreweaver.domain.use_case.AddCampaignUseCase
@@ -14,6 +16,7 @@ import io.github.velyene.loreweaver.domain.use_case.UpdateNoteUseCase
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LOCATION
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LORE
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_NPC
+import io.github.velyene.loreweaver.ui.util.AppText
 import io.github.velyene.loreweaver.ui.util.parseNpcExtra
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +33,8 @@ class CampaignEditorViewModel @Inject constructor(
 	private val addMonstersToEncounterUseCase: AddMonstersToEncounterUseCase,
 	private val addNoteUseCase: AddNoteUseCase,
 	private val updateNoteUseCase: UpdateNoteUseCase,
-	private val deleteNoteUseCase: DeleteNoteUseCase
+	private val deleteNoteUseCase: DeleteNoteUseCase,
+	private val appText: AppText
 ) : ViewModel() {
 	private val _uiState = MutableStateFlow(CampaignEditorUiState())
 	val uiState: StateFlow<CampaignEditorUiState> = _uiState.asStateFlow()
@@ -40,13 +44,13 @@ class CampaignEditorViewModel @Inject constructor(
 	}
 
 	fun addCampaign(name: String, description: String) {
-		launchMutation(CAMPAIGN_EDITOR_ADD_CAMPAIGN_ERROR_PREFIX) {
+		launchMutation(R.string.campaign_error_add_campaign) {
 			addCampaignUseCase(name, description)
 		}
 	}
 
 	fun addEncounter(campaignId: String, name: String) {
-		launchMutation(CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX) {
+		launchMutation(R.string.campaign_error_add_encounter) {
 			addEncounterUseCase(campaignId, name)
 		}
 	}
@@ -56,7 +60,7 @@ class CampaignEditorViewModel @Inject constructor(
 		name: String,
 		selectedMonsters: List<RemoteItem>
 	) {
-		val errorPrefix = CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX
+		val errorPrefixResId = R.string.campaign_error_add_encounter
 
 		viewModelScope.launch {
 			try {
@@ -65,39 +69,41 @@ class CampaignEditorViewModel @Inject constructor(
 					addMonstersToEncounterUseCase(encounterId, selectedMonsters)
 					_uiState.update {
 						it.copy(
-							message = formatEncounterAddedWithMonstersMessage(selectedMonsters.size)
+							message = formatEncounterAddedWithMonstersMessage(appText, selectedMonsters.size)
 						)
 					}
 				}
 			} catch (e: CancellationException) {
 				throw e
 			} catch (e: Exception) {
-				_uiState.update { it.copy(message = formatCampaignError(errorPrefix, e)) }
+				_uiState.update {
+					it.copy(message = formatCampaignError(appText, errorPrefixResId, e))
+				}
 			}
 		}
 	}
 
 	fun addNote(campaignId: String, content: String, type: String, extra: String = "") {
-		launchMutation(CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX) {
+		launchMutation(R.string.campaign_error_add_note) {
 			val note = createNote(campaignId, content, type, extra)
 			addNoteUseCase(note)
 		}
 	}
 
 	fun updateNote(note: Note) {
-		launchMutation(CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX) {
+		launchMutation(R.string.campaign_error_update_note) {
 			updateNoteUseCase(note)
 		}
 	}
 
 	fun deleteNote(note: Note) {
-		launchMutation(CAMPAIGN_EDITOR_DELETE_NOTE_ERROR_PREFIX) {
+		launchMutation(R.string.campaign_error_delete_note) {
 			deleteNoteUseCase(note)
 		}
 	}
 
 	private fun launchMutation(
-		errorPrefix: String,
+		@StringRes errorPrefixResId: Int,
 		action: suspend () -> Unit
 	) {
 		viewModelScope.launch {
@@ -106,7 +112,9 @@ class CampaignEditorViewModel @Inject constructor(
 			} catch (e: CancellationException) {
 				throw e
 			} catch (e: Exception) {
-				_uiState.update { it.copy(message = formatCampaignError(errorPrefix, e)) }
+				_uiState.update {
+					it.copy(message = formatCampaignError(appText, errorPrefixResId, e))
+				}
 			}
 		}
 	}

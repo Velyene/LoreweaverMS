@@ -4,8 +4,9 @@
  * TABLE OF CONTENTS:
  * 1. Audit configuration, allowlists, and file inventories
  * 2. Source-content provenance and forbidden-content checks
- * 3. Long-prose review coverage and reference-corpus inventory verification
- * 4. Exact SRD attribution notice verification
+ * 3. Large-file table-of-contents compliance verification
+ * 4. Long-prose review coverage and reference-corpus inventory verification
+ * 5. Exact SRD attribution notice verification
  */
 
 package io.github.velyene.loreweaver.domain.util
@@ -22,6 +23,8 @@ class ContentSafetyAuditTest {
 			"Excluded SRD/reference corpus prose inventory is out of sync"
 		const val FORBIDDEN_FILE_HEADER =
 			"Hard do-not-ship forbidden files are still present under app/src/main"
+		const val LARGE_FILE_TOC_HEADER =
+			"Large repo files over 150 lines must include a visible top-level table of contents"
 
 		const val README_PATH = "README.md"
 		const val NOTICE_PATH = "NOTICE"
@@ -36,7 +39,10 @@ class ContentSafetyAuditTest {
 		const val REVIEWED_ON_2026_04_18 = "2026-04-18"
 		const val REVIEWED_ON_2026_04_20 = "2026-04-20"
 		const val REVIEWED_ON_2026_04_21 = "2026-04-21"
+		const val LARGE_FILE_TOC_LINE_THRESHOLD = 150
 		const val FILE_EXTENSION_KOTLIN = "kt"
+		const val FILE_EXTENSION_JAVA = "java"
+		const val FILE_EXTENSION_MARKDOWN = "md"
 		const val FILE_EXTENSION_XML = "xml"
 		const val NONE_LIST_ITEM = "- None"
 		const val TRIPLE_QUOTED_STRING_DELIMITER = "\"\"\""
@@ -113,6 +119,8 @@ class ContentSafetyAuditTest {
 	private val referenceCorpusAuditSnapshotFile =
 		File(projectRoot, "EXCLUDED_REFERENCE_CORPUS_AUDIT.md")
 
+	private val tocAuditSnapshotFile = File(projectRoot, "app/build/test-output/toc-audit.txt")
+
 	private val markdownAndLegalAuditFiles = listOf(
 		File(projectRoot, README_PATH),
 		File(projectRoot, NOTICE_PATH),
@@ -173,6 +181,12 @@ class ContentSafetyAuditTest {
 		val reviewedOn: String,
 		val rationale: String,
 		val followUpNote: String
+	)
+
+	private data class TableOfContentsFinding(
+		val relativePath: String,
+		val lineCount: Int,
+		val expectedMarker: String
 	)
 
 	private data class ReferenceCorpusProseFile(
@@ -351,23 +365,23 @@ class ContentSafetyAuditTest {
 	@Test
 	fun proprietaryLegacySpellNames_areAbsentFromAppOwnedContent() {
 		val blockedTerms = setOf(
-			"Melfâ€™s Acid Arrow",
+			"Melf’s Acid Arrow",
 			"Melf's Acid Arrow",
-			"Mordenkainenâ€™s Sword",
+			"Mordenkainen’s Sword",
 			"Mordenkainen's Sword",
-			"Ottoâ€™s Irresistible Dance",
+			"Otto’s Irresistible Dance",
 			"Otto's Irresistible Dance",
-			"Nystulâ€™s Magic Aura",
+			"Nystul’s Magic Aura",
 			"Nystul's Magic Aura",
-			"Evardâ€™s Black Tentacles",
+			"Evard’s Black Tentacles",
 			"Evard's Black Tentacles",
-			"Mordenkainenâ€™s Faithful Hound",
+			"Mordenkainen’s Faithful Hound",
 			"Mordenkainen's Faithful Hound",
-			"Tenserâ€™s Floating Disk",
+			"Tenser’s Floating Disk",
 			"Tenser's Floating Disk",
-			"Otilukeâ€™s Freezing Sphere",
+			"Otiluke’s Freezing Sphere",
 			"Otiluke's Freezing Sphere",
-			"Tashaâ€™s Hideous Laughter",
+			"Tasha’s Hideous Laughter",
 			"Tasha's Hideous Laughter",
 			"Drow Poison"
 		)
@@ -417,6 +431,17 @@ class ContentSafetyAuditTest {
 		assertTrue(
 			formatForbiddenFileFindings(discoveredFlaggedFiles),
 			discoveredFlaggedFiles.isEmpty()
+		)
+	}
+
+	@Test
+	fun largeRepoFiles_includeTopLevelTableOfContents() {
+		val findings = findLargeFilesMissingTableOfContents()
+		writeTableOfContentsAuditSnapshot(findings)
+
+		assertTrue(
+			formatTableOfContentsFindings(findings),
+			findings.isEmpty()
 		)
 	}
 
@@ -540,6 +565,73 @@ class ContentSafetyAuditTest {
 			}
 			.sortedWith(compareBy(AuditFinding::term, AuditFinding::relativePath))
 			.toList()
+	}
+
+	private fun findLargeFilesMissingTableOfContents(): List<TableOfContentsFinding> {
+		return projectRoot
+			.walkTopDown()
+			.filter { file ->
+				file.isFile &&
+					file.extension in setOf(
+						FILE_EXTENSION_KOTLIN,
+						FILE_EXTENSION_JAVA,
+						FILE_EXTENSION_MARKDOWN
+					) &&
+					!isIgnoredAuditPath(file)
+			}
+			.mapNotNull { file ->
+				val text = file.readText()
+				val lineCount = text.lineSequence().count()
+				if (lineCount <= LARGE_FILE_TOC_LINE_THRESHOLD) {
+					null
+				} else {
+					val relativePath = normalizeProjectPath(file)
+					val expectedMarker = if (file.extension == FILE_EXTENSION_MARKDOWN) {
+						"## Contents"
+					} else {
+						"TABLE OF CONTENTS:"
+					}
+					val hasTableOfContents = if (file.extension == FILE_EXTENSION_MARKDOWN) {
+						Regex("(?m)^## Contents\\b").containsMatchIn(text)
+					} else {
+						text.contains("TABLE OF CONTENTS:")
+					}
+					if (hasTableOfContents) {
+						null
+					} else {
+						TableOfContentsFinding(
+							relativePath = relativePath,
+							lineCount = lineCount,
+							expectedMarker = expectedMarker
+						)
+					}
+				}
+			}
+			.sortedBy(TableOfContentsFinding::relativePath)
+			.toList()
+	}
+
+	private fun formatTableOfContentsFindings(findings: List<TableOfContentsFinding>): String {
+		val snapshotPath = normalizeProjectPath(tocAuditSnapshotFile)
+		if (findings.isEmpty()) {
+			return "$LARGE_FILE_TOC_HEADER\n- Snapshot file: `$snapshotPath`\n$NONE_LIST_ITEM"
+		}
+
+		return buildString {
+			appendLine(LARGE_FILE_TOC_HEADER)
+			appendLine("- Snapshot file: `$snapshotPath`")
+			findings.forEach { finding ->
+				appendLine(
+					"- ${finding.relativePath} (${finding.lineCount} lines) missing ${finding.expectedMarker}"
+				)
+			}
+		}
+	}
+
+	private fun isIgnoredAuditPath(file: File): Boolean {
+		return file.toPath().iterator().asSequence().any { part ->
+			part.toString() in setOf("build", ".gradle", ".idea")
+		}
 	}
 
 	private fun findBlockedTermsInComments(blockedTerms: Set<String>): List<AuditFinding> {
@@ -884,7 +976,7 @@ class ContentSafetyAuditTest {
 			return (text.length >= 400 || lineCount >= 5) && sentenceCount >= 3
 		}
 
-		val wordMatches = Regex("\\b\\p{L}[\\p{L}'â€™-]*\\b").findAll(text).toList()
+		val wordMatches = Regex("\\b\\p{L}[\\p{L}'’-]*\\b").findAll(text).toList()
 		val wordCount = wordMatches.size
 		if (wordCount < 16) return false
 		if (sentenceCount == 0) return false
@@ -1144,6 +1236,22 @@ class ContentSafetyAuditTest {
 		)
 	}
 
+	private fun writeTableOfContentsAuditSnapshot(findings: List<TableOfContentsFinding>) {
+		tocAuditSnapshotFile.parentFile?.mkdirs()
+		tocAuditSnapshotFile.writeText(renderTableOfContentsAuditSnapshot(findings))
+	}
+
+	private fun renderTableOfContentsAuditSnapshot(findings: List<TableOfContentsFinding>): String {
+		return buildString {
+			appendLine("COUNT=${findings.size}")
+			findings.forEach { finding ->
+				appendLine(
+					"${finding.relativePath}\t${finding.expectedMarker}\t${finding.lineCount}"
+				)
+			}
+		}.trimEnd() + "\n"
+	}
+
 	private fun renderReferenceCorpusInventoryMarkdown(
 		discoveredCorpusPaths: Set<String>,
 		findings: List<ProseFinding>,
@@ -1207,7 +1315,7 @@ class ContentSafetyAuditTest {
 
 			appendLine("## Review priority")
 			appendLine()
-			appendLine("Thresholds: Critical â‰¥ 800 chars, High â‰¥ 500, Medium â‰¥ 300, Low < 300.")
+			appendLine("Thresholds: Critical ≥ 800 chars, High ≥ 500, Medium ≥ 300, Low < 300.")
 			appendLine()
 			priorityOrder.forEach { priority ->
 				val priorityRollups = rollupsByPriority[priority].orEmpty()

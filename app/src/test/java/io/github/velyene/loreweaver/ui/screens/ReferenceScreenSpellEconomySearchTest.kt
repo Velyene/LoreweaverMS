@@ -11,9 +11,9 @@ class ReferenceScreenSpellEconomySearchTest {
 		assertQueryResults(listOf("Magic Item Rarities and Values"), "Priceless", ::filterEquipmentTables) { it.title }
 		assertQueryResults(listOf("Magic Item Tools"), "nonmagical base item", ::filterEquipmentTables) { it.title }
 		assertQueryResults(listOf("Magic Item Crafting Time and Cost"), "250 days", ::filterEquipmentTables) { it.title }
-		assertQueryResults(listOf("Sentient Itemâ€™s Communication"), "telepathically", ::filterEquipmentTables) { it.title }
-		assertQueryResults(listOf("Sentient Itemâ€™s Senses"), "Darkvision out to 120 feet", ::filterEquipmentTables) { it.title }
-		assertQueryResults(listOf("Sentient Itemâ€™s Special Purpose"), "Soulmate Seeker", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Sentient Item’s Communication"), "telepathically", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Sentient Item’s Senses"), "Darkvision out to 120 feet", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Sentient Item’s Special Purpose"), "Soulmate Seeker", ::filterEquipmentTables) { it.title }
 		assertNoQueryResults("Nonexistent Spell Economy Term", ::filterEquipmentTables)
 	}
 

@@ -1,5 +1,10 @@
 /*
  * FILE: SessionSummaryScreen.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Session summary screen entry point
+ * 2. Summary cards and stat badges
+ * 3. Primary and secondary action rows
  */
 
 package io.github.velyene.loreweaver.ui.screens

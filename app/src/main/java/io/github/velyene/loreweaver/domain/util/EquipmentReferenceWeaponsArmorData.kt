@@ -49,7 +49,7 @@ internal object EquipmentReferenceWeaponsArmorData {
 		weapon("Dart", "Simple Ranged", "1d4 Piercing", listOf("Finesse", "Thrown (Range 20/60)"), "Vex", "1/4 lb.", "5 CP"),
 		weapon("Light Crossbow", "Simple Ranged", "1d8 Piercing", listOf("Ammunition (Range 80/320; Bolt)", "Loading", "Two-Handed"), "Slow", "5 lb.", "25 GP"),
 		weapon("Shortbow", "Simple Ranged", "1d6 Piercing", listOf("Ammunition (Range 80/320; Arrow)", "Two-Handed"), "Vex", "2 lb.", "25 GP"),
-		weapon("Sling", "Simple Ranged", "1d4 Bludgeoning", listOf("Ammunition (Range 30/120; Bullet)"), "Slow", "â€”", "1 SP"),
+		weapon("Sling", "Simple Ranged", "1d4 Bludgeoning", listOf("Ammunition (Range 30/120; Bullet)"), "Slow", "—", "1 SP"),
 		weapon("Battleaxe", "Martial Melee", "1d8 Slashing", listOf("Versatile (1d10)"), "Topple", "4 lb.", "10 GP"),
 		weapon("Flail", "Martial Melee", "1d8 Bludgeoning", emptyList(), "Sap", "2 lb.", "10 GP"),
 		weapon("Glaive", "Martial Melee", "1d10 Slashing", listOf("Heavy", "Reach", "Two-Handed"), "Graze", "6 lb.", "20 GP"),
@@ -84,7 +84,7 @@ internal object EquipmentReferenceWeaponsArmorData {
 				weapon.name,
 				weapon.category,
 				weapon.damage,
-				weapon.properties.joinToString().ifBlank { "â€”" },
+				weapon.properties.joinToString().ifBlank { "—" },
 				weapon.mastery,
 				weapon.weight,
 				weapon.cost
@@ -93,19 +93,19 @@ internal object EquipmentReferenceWeaponsArmorData {
 	)
 
 	val ARMOR = listOf(
-		armor("Padded Armor", "Light (1 minute to don or doff)", "11 + Dex modifier", "â€”", "Disadvantage", "8 lb.", "5 GP"),
-		armor("Leather Armor", "Light (1 minute to don or doff)", "11 + Dex modifier", "â€”", "â€”", "10 lb.", "10 GP"),
-		armor("Studded Leather Armor", "Light (1 minute to don or doff)", "12 + Dex modifier", "â€”", "â€”", "13 lb.", "45 GP"),
-		armor("Hide Armor", "Medium (5 minutes to don or doff)", "12 + Dex modifier (max 2)", "â€”", "â€”", "12 lb.", "10 GP"),
-		armor("Chain Shirt", "Medium (5 minutes to don or doff)", "13 + Dex modifier (max 2)", "â€”", "â€”", "20 lb.", "50 GP"),
-		armor("Scale Mail", "Medium (5 minutes to don or doff)", "14 + Dex modifier (max 2)", "â€”", "Disadvantage", "45 lb.", "50 GP"),
-		armor("Breastplate", "Medium (5 minutes to don or doff)", "14 + Dex modifier (max 2)", "â€”", "â€”", "20 lb.", "400 GP"),
-		armor("Half Plate Armor", "Medium (5 minutes to don or doff)", "15 + Dex modifier (max 2)", "â€”", "Disadvantage", "40 lb.", "750 GP"),
-		armor("Ring Mail", "Heavy (10 minutes to don, 5 minutes to doff)", "14", "â€”", "Disadvantage", "40 lb.", "30 GP"),
+		armor("Padded Armor", "Light (1 minute to don or doff)", "11 + Dex modifier", "—", "Disadvantage", "8 lb.", "5 GP"),
+		armor("Leather Armor", "Light (1 minute to don or doff)", "11 + Dex modifier", "—", "—", "10 lb.", "10 GP"),
+		armor("Studded Leather Armor", "Light (1 minute to don or doff)", "12 + Dex modifier", "—", "—", "13 lb.", "45 GP"),
+		armor("Hide Armor", "Medium (5 minutes to don or doff)", "12 + Dex modifier (max 2)", "—", "—", "12 lb.", "10 GP"),
+		armor("Chain Shirt", "Medium (5 minutes to don or doff)", "13 + Dex modifier (max 2)", "—", "—", "20 lb.", "50 GP"),
+		armor("Scale Mail", "Medium (5 minutes to don or doff)", "14 + Dex modifier (max 2)", "—", "Disadvantage", "45 lb.", "50 GP"),
+		armor("Breastplate", "Medium (5 minutes to don or doff)", "14 + Dex modifier (max 2)", "—", "—", "20 lb.", "400 GP"),
+		armor("Half Plate Armor", "Medium (5 minutes to don or doff)", "15 + Dex modifier (max 2)", "—", "Disadvantage", "40 lb.", "750 GP"),
+		armor("Ring Mail", "Heavy (10 minutes to don, 5 minutes to doff)", "14", "—", "Disadvantage", "40 lb.", "30 GP"),
 		armor("Chain Mail", "Heavy (10 minutes to don, 5 minutes to doff)", "16", "Str 13", "Disadvantage", "55 lb.", "75 GP"),
 		armor("Splint Armor", "Heavy (10 minutes to don, 5 minutes to doff)", "17", "Str 15", "Disadvantage", "60 lb.", "200 GP"),
 		armor("Plate Armor", "Heavy (10 minutes to don, 5 minutes to doff)", "18", "Str 15", "Disadvantage", "65 lb.", "1,500 GP"),
-		armor("Shield", "Shield (Utilize action to don or doff)", "+2", "â€”", "â€”", "6 lb.", "10 GP")
+		armor("Shield", "Shield (Utilize action to don or doff)", "+2", "—", "—", "6 lb.", "10 GP")
 	)
 
 	val ARMOR_TABLE = ReferenceTable(

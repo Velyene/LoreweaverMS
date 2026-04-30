@@ -65,6 +65,8 @@ fun CampaignDetailScreen(
 
 	LaunchedEffect(editorUiState.message) {
 		editorUiState.message?.let {
+			// Editing actions surface transient success/failure feedback through a separate editor state,
+			// but the campaign detail screen still owns the shared snackbar host shown to the user.
 			snackbarHostState.showSnackbar(it)
 			editorViewModel.clearMessage()
 		}

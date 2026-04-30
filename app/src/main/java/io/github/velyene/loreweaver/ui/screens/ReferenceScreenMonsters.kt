@@ -1,3 +1,12 @@
+/*
+ * FILE: ReferenceScreenMonsters.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Monster list content entry point
+ * 2. Monster filter rows and shortcut chips
+ * 3. Monster cards and preview helpers
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.clickable

@@ -1,3 +1,12 @@
+/*
+ * FILE: CampaignDetailEncountersSection.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Linked encounter list composable
+ * 2. Encounter dialog state reset helpers
+ * 3. Encounter creation dialog wiring
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.layout.Column

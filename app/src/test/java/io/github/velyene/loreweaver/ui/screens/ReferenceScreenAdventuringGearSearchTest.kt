@@ -12,7 +12,7 @@ class ReferenceScreenAdventuringGearSearchTest {
 	@Test
 	fun adventuringGearSearch_matchesStructuredFields() {
 		val backpack = EquipmentReference.ADVENTURING_GEAR.first { it.name == BACKPACK }
-		val healerKit = EquipmentReference.ADVENTURING_GEAR.first { it.name == "Healerâ€™s Kit" }
+		val healerKit = EquipmentReference.ADVENTURING_GEAR.first { it.name == "Healer’s Kit" }
 		val spellScroll = EquipmentReference.ADVENTURING_GEAR.first { it.name == "Spell Scroll" }
 
 		assertMatchesAll(backpack::matchesSearchQuery, "2 GP", SADDLEBAG)
@@ -24,7 +24,7 @@ class ReferenceScreenAdventuringGearSearchTest {
 	fun filterAdventuringGear_returnsExpectedMatchesForQuery() {
 		assertQueryResults(listOf(BACKPACK), SADDLEBAG, ::filterAdventuringGear) { it.name }
 		assertQueryResults(
-			listOf("Healerâ€™s Kit"),
+			listOf("Healer’s Kit"),
 			"stabilize an Unconscious creature",
 			::filterAdventuringGear
 		) { it.name }

@@ -1,3 +1,13 @@
+/*
+ * FILE: CampaignDetailEncounterDialogs.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Encounter dialog constants, enums, and state models
+ * 2. Encounter creation dialog host and main content
+ * 3. Monster filter, picker, and detail-preview composables
+ * 4. Selected-monster summary helpers and selection utilities
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.animation.Crossfade
