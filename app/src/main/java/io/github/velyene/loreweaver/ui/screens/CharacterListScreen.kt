@@ -260,6 +260,8 @@ fun CharacterListScreen(
 	) { padding ->
 		CharacterListScaffoldContent(
 			padding = padding,
+			isLoading = uiState.isLoading,
+			error = uiState.error,
 			viewState = viewState,
 			onPartyFilterChange = { selectedPartyFilter = it },
 			onCharacterClick = onCharacterClick,
@@ -274,6 +276,8 @@ fun CharacterListScreen(
 @Composable
 private fun CharacterListScaffoldContent(
 	padding: PaddingValues,
+	isLoading: Boolean,
+	error: String?,
 	viewState: CharacterListViewState,
 	onPartyFilterChange: (String?) -> Unit,
 	onCharacterClick: (String) -> Unit,
@@ -287,11 +291,26 @@ private fun CharacterListScaffoldContent(
 			.padding(padding)
 			.fillMaxSize()
 	) {
+		if (isLoading && viewState.filteredCharacters.isEmpty()) {
+			Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+				Text(stringResource(R.string.loading_label), color = MutedText)
+			}
+			return
+		}
+
 		if (!viewState.showInitiativeOrder && viewState.allParties.isNotEmpty()) {
 			PartyFilterTabs(
 				allParties = viewState.allParties,
 				selectedPartyFilter = viewState.selectedPartyFilter,
 				onPartyFilterChange = onPartyFilterChange
+			)
+		}
+		error?.takeIf { it.isNotBlank() }?.let { message ->
+			Text(
+				text = message,
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+				color = MaterialTheme.colorScheme.error,
+				style = MaterialTheme.typography.bodyMedium
 			)
 		}
 		if (viewState.filteredCharacters.isEmpty()) {
@@ -329,11 +348,23 @@ private fun matchesFilter(
 	query: String,
 	partyFilter: String?
 ): Boolean {
-	val matchesSearch = query.isEmpty() ||
-		character.name.contains(query, ignoreCase = true) ||
-		character.type.contains(query, ignoreCase = true)
+	val matchesSearch = matchesCharacterSearch(character, query)
 	val matchesParty = partyFilter == null || character.partyLabel == partyFilter
 	return matchesSearch && matchesParty
+}
+
+internal fun matchesCharacterSearch(character: CharacterEntry, query: String): Boolean {
+	if (query.isBlank()) return true
+
+	return listOf(
+		character.name,
+		character.type,
+		character.species,
+		character.background,
+		character.formattedIdentity()
+	).any { candidate ->
+		candidate.contains(query, ignoreCase = true)
+	}
 }
 
 /** Returns (newTurnIndex, newRoundCount) without any branching in the caller. */
@@ -678,8 +709,16 @@ private fun InitiativeSupportingContent(
 	onUpdateHP: (Int) -> Unit,
 	onRoll: () -> Unit
 ) {
+	val identitySummary = character.formattedIdentity()
 	Column {
 		Text(character.type)
+		if (identitySummary.isNotBlank()) {
+			Text(
+				text = identitySummary,
+				style = MaterialTheme.typography.bodySmall,
+				color = MaterialTheme.colorScheme.onSurfaceVariant
+			)
+		}
 		Row(
 			modifier = Modifier.padding(top = 4.dp),
 			verticalAlignment = Alignment.CenterVertically
@@ -766,14 +805,21 @@ fun CharacterItem(
 ) {
 	val haptic = LocalHapticFeedback.current
 	var lastRoll by remember { mutableStateOf<Int?>(null) }
+	val identitySummary = character.formattedIdentity()
 
 	val editDetailsLabel = stringResource(R.string.edit_details, character.name)
 	val deleteActionLabel = stringResource(R.string.delete_character_desc, character.name)
 	val dyingAccessibilityLabel = stringResource(R.string.dying_accessibility_label)
+	val identityAccessibilitySuffix = if (identitySummary.isBlank()) {
+		""
+	} else {
+		". Identity: $identitySummary"
+	}
 	val characterContentDescription = stringResource(
 		R.string.character_accessibility_desc,
 		character.name,
 		character.type,
+		identityAccessibilitySuffix,
 		character.hp,
 		character.maxHp,
 		character.ac,
@@ -815,6 +861,7 @@ private fun CharacterItemSupporting(
 	onUpdateHP: (Int) -> Unit,
 	onRoll: () -> Unit
 ) {
+	val identitySummary = character.formattedIdentity()
 	Column {
 		Text(
 			text = stringResource(
@@ -826,6 +873,14 @@ private fun CharacterItemSupporting(
 			),
 			modifier = Modifier.clearAndSetSemantics { }
 		)
+		if (identitySummary.isNotBlank()) {
+			Text(
+				text = identitySummary,
+				style = MaterialTheme.typography.bodySmall,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+				modifier = Modifier.clearAndSetSemantics { }
+			)
+		}
 		Row(
 			modifier = Modifier.padding(top = 4.dp),
 			verticalAlignment = Alignment.CenterVertically
