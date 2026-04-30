@@ -42,6 +42,8 @@ class CharacterViewModel @Inject constructor(
 		const val DEFAULT_LOG_TYPE = "Roll"
 	}
 
+	private var selectedCharacterId: String? = null
+
 	private val _uiState = MutableStateFlow(CharacterUiState())
 	val uiState: StateFlow<CharacterUiState> = _uiState.asStateFlow()
 
@@ -54,7 +56,15 @@ class CharacterViewModel @Inject constructor(
 			beginLoading()
 			try {
 				getCharactersUseCase().collect { characters ->
-					_uiState.update { it.copy(characters = characters, isLoading = false) }
+					_uiState.update { currentState ->
+						currentState.copy(
+							characters = characters,
+							selectedCharacter = selectedCharacterId?.let { id ->
+								characters.find { it.id == id }
+							},
+							isLoading = false
+						)
+					}
 				}
 			} catch (e: CancellationException) {
 				throw e
@@ -65,6 +75,7 @@ class CharacterViewModel @Inject constructor(
 	}
 
 	fun selectCharacter(id: String) {
+		selectedCharacterId = id
 		viewModelScope.launch {
 			beginLoading()
 			try {
@@ -78,16 +89,34 @@ class CharacterViewModel @Inject constructor(
 		}
 	}
 
-	fun addCharacter(character: CharacterEntry) {
-		launchActionWithError(R.string.character_error_add) { addCharacterUseCase(character) }
+	fun addCharacter(character: CharacterEntry, onSuccess: () -> Unit = {}) {
+		launchActionWithError(
+			errorPrefix = "Failed to add character",
+			action = { addCharacterUseCase(character) },
+			onSuccess = onSuccess
+		)
 	}
 
-	fun updateCharacter(character: CharacterEntry) {
-		launchActionWithError(R.string.character_error_update) { updateCharacterUseCase(character) }
+	fun updateCharacter(character: CharacterEntry, onSuccess: () -> Unit = {}) {
+		launchActionWithError(
+			errorPrefix = "Failed to update character",
+			action = { updateCharacterUseCase(character) },
+			onSuccess = onSuccess
+		)
 	}
 
-	fun deleteCharacter(character: CharacterEntry) {
-		launchActionWithError(R.string.character_error_delete) { deleteCharacterUseCase(character) }
+	fun deleteCharacter(character: CharacterEntry, onSuccess: () -> Unit = {}) {
+		launchActionWithError(
+			errorPrefix = "Failed to delete character",
+			action = { deleteCharacterUseCase(character) },
+			onSuccess = {
+				if (selectedCharacterId == character.id) {
+					selectedCharacterId = null
+					_uiState.update { it.copy(selectedCharacter = null) }
+				}
+				onSuccess()
+			}
+		)
 	}
 
 	private fun beginLoading() {
@@ -98,15 +127,19 @@ class CharacterViewModel @Inject constructor(
 		_uiState.update { it.withError(message) }
 	}
 
+	private fun formatError(prefix: String, exception: Exception): String {
+		return "$prefix: ${exceptionDetail(exception)}"
+	}
+
 	private fun launchActionWithError(
-		@androidx.annotation.StringRes errorPrefixResId: Int,
-		action: suspend () -> Unit
+		errorPrefix: String,
+		action: suspend () -> Unit,
+		onSuccess: () -> Unit = {}
 	) {
 		viewModelScope.launch {
 			try {
 				action()
-			} catch (e: CancellationException) {
-				throw e
+				onSuccess()
 			} catch (e: Exception) {
 				reportError(formatCampaignError(appText, errorPrefixResId, e))
 			}

@@ -26,9 +26,23 @@ import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.ui.screens.tracker.components.TrackerModeBadge
 import io.github.velyene.loreweaver.ui.screens.visibleVerticalScrollbar
 
+@Suppress("kotlin:S107")
+internal data class LiveTrackerCallbacks(
+	val onAction: (String) -> Unit,
+	val onNextTurn: () -> Unit,
+	val onHpChange: (characterId: String, delta: Int) -> Unit,
+	val onAddCondition: (characterId: String, condition: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
+	val onRemoveCondition: (characterId: String, conditionName: String, removePersistentCondition: Boolean) -> Unit,
+	val onEnd: () -> Unit
+)
+
 @Composable
 internal fun LiveTrackerView(
-	state: LiveTrackerViewState,
+	round: Int,
+	combatants: List<CombatantState>,
+	persistentConditionsByCharacterId: Map<String, Set<String>>,
+	turnIndex: Int,
+	statuses: List<String>,
 	callbacks: LiveTrackerCallbacks
 ) {
 	val trackerState = rememberLiveTrackerUiState(
@@ -60,16 +74,13 @@ internal fun LiveTrackerView(
 			modifier = Modifier.fillMaxWidth()
 		)
 
-		Spacer(modifier = Modifier.height(12.dp))
-		LiveTrackerContentList(
-			encounterName = state.encounterName,
-			encounterNotes = state.encounterNotes,
-			statuses = state.statuses,
-			turnStep = state.turnStep,
-			pendingAction = state.pendingAction,
-			selectedTargetId = state.selectedTargetId,
-			trackerState = trackerState,
-			callbacks = callbacks,
+		CombatantHpList(
+			combatants = combatants,
+			persistentConditionsByCharacterId = persistentConditionsByCharacterId,
+			turnIndex = turnIndex,
+			onHpChange = callbacks.onHpChange,
+			onAddCondition = callbacks.onAddCondition,
+			onRemoveCondition = callbacks.onRemoveCondition,
 			modifier = Modifier
 				.fillMaxWidth()
 				.weight(1f)

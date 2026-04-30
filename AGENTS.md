@@ -87,9 +87,10 @@ Key route notes:
 
 ## Data Layer Conventions
 
-- **Room DB**: `AppDatabase` uses version **8**, database name `loreweaver_database`, and
+- **Room DB**: `AppDatabase` uses version **11**, database name `loreweaver_database`, and
   `exportSchema = false`.
-- **Migrations**: `MIGRATION_4_5`, `MIGRATION_5_6`, `MIGRATION_6_7`, and `MIGRATION_7_8` are all
+- **Migrations**: `MIGRATION_4_5`, `MIGRATION_5_6`, `MIGRATION_6_7`, `MIGRATION_7_8`,
+  `MIGRATION_8_9`, `MIGRATION_9_10`, and `MIGRATION_10_11` are all
   registered in `Room.databaseBuilder()`.
 - **JSON columns**: Complex character fields such as `resources`, `actions`, `proficiencies`,
   `inventory`, and `spellSlotsJson` are stored as raw JSON strings and mapped with Gson in
@@ -102,8 +103,20 @@ Key route notes:
   `CharacterEntry` to its entity.
 - **Spell slots**: Domain `spellSlots` uses `Map<Int, Pair<Int, Int>>`; the mapper serializes it as
   `Map<Int, List<Int>>` for Gson round-tripping.
+- **Selected spells**: Domain `spells` uses `List<String>` and persists directly through Room list
+  converters for readable spell visibility in the builder, detail screen, and action view.
 - **Challenge rating**: `challengeRating: Double` was added to `CharacterEntity` in
   `MIGRATION_7_8`.
+- **Character identity**: `species` and `background` were added to `CharacterEntity` in
+  `MIGRATION_8_9` and now round-trip through the guided character builder.
+- **Character spells**: `spells` was added to `CharacterEntity` in `MIGRATION_9_10` and now
+  round-trips through the guided builder and action/detail character views.
+- **Condition split**: `MIGRATION_10_11` adds `persistentConditions`, copies legacy saved
+  `activeConditions` into that new column, and clears encounter-only condition state.
+- **Character conditions**: Domain `CharacterEntry` now stores longer-lived
+  `persistentConditions` separately from encounter `activeConditions`; the builder, detail views,
+  and live tracker all use that split, and live combat can optionally promote a condition into the
+  persisted set through `CombatViewModel`.
 - **Reference favorites**: The reference feature stores trap, poison, and disease favorites in
   `SharedPreferences` through `ReferencePreferencesRepositoryImpl`.
 - **Log capping**: `CampaignRepositoryImpl.insertLog()` keeps only the most recent 100
@@ -231,7 +244,7 @@ Key versions from `gradle/libs.versions.toml`:
   artifacts.
 - Room 2.8.x DAO methods return `Long` and `Int`; `CampaignRepositoryImpl` uses block bodies so
   those return values do not leak through `Unit`-typed repository methods.
-- All four migrations are wired into `Room.databaseBuilder()`.
+- All six migrations are wired into `Room.databaseBuilder()`.
 - Some IDE `ComposableFunction0/1/2` errors around Compose lambdas in files such as
   `MainActivity.kt` and `navigation/LoreweaverNavGraph.kt` may be JetBrains IDE analysis false
   positives even when Gradle builds successfully.

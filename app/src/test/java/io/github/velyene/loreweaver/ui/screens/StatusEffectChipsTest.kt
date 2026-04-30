@@ -1,8 +1,7 @@
-
 package io.github.velyene.loreweaver.ui.screens
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -10,59 +9,52 @@ class StatusEffectChipsTest {
 
 	@Test
 	fun normalizedStatusLabels_trimsCanonicalizesDedupesAndSorts() {
-		val labels = listOf(" poisoned ", "Exhaustion", "Blessed", "poisoned", "blessed")
+		val labels = listOf(" poisoned ", "Blessed", "poisoned", " burning ")
 
 		assertEquals(
-			listOf("Blessed", "Exhaustion", "Poisoned"),
-			normalizedStatusLabels(labels)
+			listOf("Blessed", "Burning", "Poisoned"),
+			normalizedStatusLabels(labels),
 		)
 	}
 
 	@Test
-	fun persistentStatusChipModels_marksAllResultsPersistentUsingCanonicalLabels() {
-		val chips = persistentStatusChipModels(listOf("cursed", " Exhaustion "))
+	fun buildStatusChipModels_marksPersistentStateAndSrdStatus() {
+		val chips = buildStatusChipModels(listOf("Poisoned", "Blessed"), isPersistent = true)
 
-		assertEquals(listOf("Cursed", "Exhaustion"), chips.map(StatusChipModel::name))
+		assertEquals(listOf("Blessed", "Poisoned"), chips.map(StatusChipModel::name))
 		assertTrue(chips.all(StatusChipModel::isPersistent))
+		assertTrue(chips.any { it.name == "Poisoned" && it.isSrdCondition })
+		assertFalse(chips.any { it.name == "Blessed" && it.isSrdCondition })
 	}
 
 	@Test
-	fun statusChipModel_marksOnlyMappedLabelsInteractive() {
-		val officialChip = statusChipModel("Poisoned")
-		val builtInChip = statusChipModel("Dodging")
-		val homebrewChip = statusChipModel("Bleeding")
+	fun statusChipDisplayText_includesDurationWhenPresent() {
+		val chip = statusChipModel(name = "Poisoned", durationText = " (3)", isPersistent = false)
 
-		assertTrue(officialChip.isInteractive)
-		assertTrue(builtInChip.isInteractive)
-		assertTrue(!homebrewChip.isInteractive)
+		assertEquals("Poisoned (3)", statusChipDisplayText(chip))
 	}
 
 	@Test
-	fun statusChipAnnouncement_describesReferenceAvailability() {
-		val interactiveAnnouncement = statusChipAnnouncement(
-			status = statusChipModel("Dodging"),
-			persistentSuffix = "(Persistent)",
-			referenceAvailableDescription = "Reference details available",
-			statusOnlyDescription = "Status only"
-		)
-		val statusOnlyAnnouncement = statusChipAnnouncement(
-			status = statusChipModel("Bleeding"),
-			persistentSuffix = "(Persistent)",
-			referenceAvailableDescription = "Reference details available",
-			statusOnlyDescription = "Status only"
-		)
+	fun statusChipDisplayText_appendsPersistentMarker() {
+		val chip = statusChipModel(name = "Blessed", isPersistent = true)
 
-		assertEquals("⬒ Dodging, Reference details available", interactiveAnnouncement)
-		assertEquals("✹ Bleeding, Status only", statusOnlyAnnouncement)
+		assertEquals("Blessed • Persistent", statusChipDisplayText(chip))
 	}
 
 	@Test
-	fun normalizedStatusLabels_preservesCustomAndBuiltInLabelsWithoutGrantingAllReferenceTargets() {
-		val labels = normalizedStatusLabels(listOf(" burning ", "Bleeding", "dodging", "Burning"))
+	fun statusChipDisplayText_keepsDurationVisibleWhenPersistent() {
+		val chip = statusChipModel(name = "Blessed", durationText = " (3)", isPersistent = true)
 
-		assertEquals(listOf("Bleeding", "Burning", "Dodging"), labels)
-		assertNull(ConditionConstants.referenceTargetFor("Bleeding"))
-		assertTrue(ConditionConstants.referenceTargetFor("Burning") != null)
-		assertTrue(ConditionConstants.referenceTargetFor("Dodging") != null)
+		assertEquals("Blessed (3) • Persistent", statusChipDisplayText(chip))
+	}
+
+	@Test
+	fun conditionMetadata_defaultsUnknownLabelsToCustomCategory() {
+		val metadata = ConditionConstants.metadataFor("Battle Focus")
+
+		assertEquals("Battle Focus", metadata.label)
+		assertEquals(ConditionConstants.StatusCategory.CUSTOM, metadata.category)
+		assertFalse(metadata.isSrdCondition)
 	}
 }
+

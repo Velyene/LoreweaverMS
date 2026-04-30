@@ -32,8 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.velyene.loreweaver.R
@@ -65,12 +63,7 @@ fun AddConditionDialog(
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = {
-			Text(
-				text = stringResource(R.string.add_condition_dialog_title),
-				modifier = Modifier.semantics { heading() }
-			)
-		},
+		title = { Text(stringResource(R.string.add_encounter_condition_dialog_title)) },
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 				ExposedDropdownMenuBox(
@@ -82,7 +75,7 @@ fun AddConditionDialog(
 						value = selectedConditionLabel,
 						onValueChange = {},
 						readOnly = true,
-						label = { Text(stringResource(R.string.add_condition_dialog_condition_label)) },
+						label = { Text(stringResource(R.string.encounter_condition_label)) },
 						trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
 						modifier = Modifier
 							.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -112,17 +105,32 @@ fun AddConditionDialog(
 						checked = hasDuration,
 						onCheckedChange = { hasDuration = it }
 					)
-					Text(stringResource(R.string.add_condition_dialog_has_duration_label))
+					Text(stringResource(R.string.encounter_condition_duration_toggle))
+				}
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Checkbox(
+						checked = persistsAcrossEncounters,
+						onCheckedChange = { persistsAcrossEncounters = it }
+					)
+					Text(stringResource(R.string.encounter_condition_persistent_toggle))
+				}
+				if (!hasDuration) {
+					Text(
+						text = stringResource(R.string.encounter_condition_no_duration_hint)
+					)
 				}
 
 				if (hasDuration) {
 					OutlinedTextField(
 						value = duration,
 						onValueChange = { if (it.all { c -> c.isDigit() }) duration = it },
-						label = { Text(stringResource(R.string.add_condition_dialog_duration_label)) },
+						label = { Text(stringResource(R.string.encounter_condition_duration_label)) },
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 						modifier = Modifier.fillMaxWidth(),
-						placeholder = { Text(stringResource(R.string.add_condition_dialog_duration_placeholder)) }
+						placeholder = { Text(stringResource(R.string.encounter_condition_duration_placeholder)) }
 					)
 				}
 			}
@@ -136,7 +144,7 @@ fun AddConditionDialog(
 				},
 				enabled = canConfirm
 			) {
-				Text(stringResource(R.string.add_button))
+				Text(stringResource(R.string.add_encounter_condition_button))
 			}
 		},
 		dismissButton = {

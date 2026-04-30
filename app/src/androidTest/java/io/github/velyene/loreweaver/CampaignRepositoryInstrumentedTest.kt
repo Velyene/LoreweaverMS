@@ -69,7 +69,15 @@ class CampaignRepositoryInstrumentedTest {
 	@Test
 	@Throws(Exception::class)
 	fun insertAndGetCharacter() = runBlocking {
-		val character = CharacterEntry(name = "Thorin", type = "Fighter", hp = 30, maxHp = 30)
+		val character = CharacterEntry(
+			name = "Thorin",
+			type = "Fighter",
+			hp = 30,
+			maxHp = 30,
+			species = "Dwarf",
+			background = "Soldier",
+			spells = listOf("Heroism")
+		)
 		repository.insertCharacter(character)
 
 		val allCharacters = repository.getAllCharacters().first()
@@ -78,18 +86,22 @@ class CampaignRepositoryInstrumentedTest {
 		val loaded = repository.getCharacterById(character.id)
 		assertNotNull(loaded)
 		assertEquals("Thorin", loaded?.name)
+		assertEquals("Dwarf", loaded?.species)
+		assertEquals("Soldier", loaded?.background)
+		assertEquals(listOf("Heroism"), loaded?.spells)
 	}
 
 	@Test
 	fun updateCharacter() = runBlocking {
-		val character = CharacterEntry(name = "Thorin", hp = 30, maxHp = 30)
+		val character = CharacterEntry(name = "Thorin", hp = 30, maxHp = 30, spells = listOf("Shield"))
 		repository.insertCharacter(character)
 
-		val updated = character.copy(hp = 20)
+		val updated = character.copy(hp = 20, spells = listOf("Shield", "Magic Missile"))
 		repository.updateCharacter(updated)
 
 		val loaded = repository.getCharacterById(character.id)
 		assertEquals(20, loaded?.hp)
+		assertEquals(listOf("Shield", "Magic Missile"), loaded?.spells)
 	}
 
 	@Test

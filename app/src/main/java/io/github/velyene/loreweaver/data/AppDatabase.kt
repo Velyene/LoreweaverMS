@@ -39,7 +39,7 @@ import io.github.velyene.loreweaver.data.entities.SessionEntity
 		NoteEntity::class,
 		LogEntryEntity::class
 	],
-	version = 8,
+	version = 11,
 	exportSchema = false
 )
 @TypeConverters(Converters::class)

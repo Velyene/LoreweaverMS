@@ -38,7 +38,7 @@
     <string name="initiative_hp_summary">HP: %1$d/%2$d</string>
     <string name="character_list_item_summary">%1$s • HP: %2$d/%3$d • AC: %4$d</string>
     <string name="initiative_accessibility_desc">%1$s, Initiative %2$d, HP %3$d of %4$d%5$s</string>
-    <string name="character_accessibility_desc">%1$s, %2$s. HP %3$d of %4$d. AC %5$d%6$s</string>
+    <string name="character_accessibility_desc">%1$s, %2$s%3$s. HP %4$d of %5$d. AC %6$d%7$s</string>
     <string name="decrease_hp_desc">Decrease HP for %1$s</string>
     <string name="increase_hp_desc">Increase HP for %1$s</string>
     <string name="back_button">Back</string>
@@ -81,6 +81,25 @@
     <string name="successes_label">Successes: </string>
     <string name="failures_label">Failures: </string>
     <string name="survival_resting_label">Survival &amp; Resting</string>
+    <string name="action_view_title">Action View</string>
+    <string name="action_view_level_label">Level %1$d</string>
+    <string name="action_view_resource_value">%1$d / %2$d</string>
+    <string name="action_view_no_conditions">No active conditions</string>
+    <string name="action_view_tab_actions">Actions</string>
+    <string name="action_view_tab_spells">Spells</string>
+    <string name="action_view_tab_items">Items</string>
+    <string name="action_view_empty_actions">No actions or tracked resources yet.</string>
+    <string name="action_view_empty_spells">No spell slots available for this character.</string>
+    <string name="action_view_empty_items">No inventory items available for quick selection.</string>
+    <string name="action_view_notes_badge">Notes</string>
+    <string name="action_view_spell_level_label">Level %1$d Magic</string>
+    <string name="action_view_use_slot_button">Use Slot</string>
+    <string name="action_view_recover_slot_button">Recover Slot</string>
+    <string name="action_view_detail_panel_title">Detail Panel</string>
+    <string name="action_view_detail_empty">Tap an action, spell slot, or item to inspect it here.</string>
+    <string name="action_view_type_label">Type</string>
+    <string name="action_view_cost_label">Cost</string>
+    <string name="action_view_use_notes_label">Use Notes</string>
     <string name="hit_dice_label">Hit Dice (d%1$d): %2$d / %3$d</string>
     <string name="roll_hd_button">Roll HD</string>
     <string name="short_rest_button">Short Rest</string>
@@ -145,17 +164,41 @@
     <string name="dmg_dice_label" tools:keep="@string/dmg_dice_label">Damage (e.g. 1d8+3)</string>
     <string name="add_action_button">Add Action</string>
     <string name="standard_conditions_title" tools:keep="@string/standard_conditions_title">Standard Conditions</string>
+    <string name="action_view_custom_conditions_title">Custom Conditions</string>
     <string name="status_label">Status</string>
     <string name="save_character_button">Save Character</string>
     <string name="mana_stat_label" tools:keep="@string/mana_stat_label">Mana</string>
     <string name="stamina_stat_label" tools:keep="@string/stamina_stat_label">Stamina</string>
     <string name="character_form_quick_build">Quick Build</string>
     <string name="character_form_random_name">Random Name</string>
+    <string name="character_builder_step_counter">Step %1$d of %2$d</string>
+    <string name="character_builder_identity_title">Identity</string>
+    <string name="character_builder_identity_description">Set who this character is before you fine-tune the sheet.</string>
+    <string name="character_builder_core_stats_title">Core Stats</string>
+    <string name="character_builder_core_stats_description">Define level, survivability, ability scores, and key combat math.</string>
+    <string name="character_builder_build_suggestions_title">Build Suggestions</string>
+    <string name="character_builder_build_suggestions_description">Review class-driven recommendations, then shape equipment, resources, and actions.</string>
+    <string name="character_builder_status_notes_title">Status &amp; Notes</string>
+    <string name="character_builder_status_notes_description">Capture current situation, lasting conditions, and anything worth remembering.</string>
+    <string name="character_builder_review_save_title">Review &amp; Save</string>
+    <string name="character_builder_review_save_description">Check the completed builder summary, confirm validation, and save.</string>
+    <string name="character_builder_exit_button">Exit Builder</string>
+    <string name="character_builder_previous_button">Previous</string>
+    <string name="character_builder_continue_button">Continue</string>
+    <string name="species_label">Species</string>
+    <string name="background_label">Background</string>
     <string name="challenge_rating_input_label">Challenge Rating (CR)</string>
     <string name="challenge_rating_supporting_text">e.g., 0.125, 0.25, 0.5, 1, 2, 3…</string>
     <string name="class_info_hit_die_summary" tools:ignore="PluralsCandidate">%1$s — d%2$d hit die</string>
     <string name="class_info_recommended_stats">Recommended: %1$s</string>
     <string name="class_info_spellcaster_summary">Spellcaster ✦ slots scale with level</string>
+    <string name="ability_increase_label">Ability Increase:</string>
+    <string name="languages_label">Languages:</string>
+    <string name="species_traits_label">Traits:</string>
+    <string name="background_feat_label">Feat:</string>
+    <string name="background_skills_label">Skills:</string>
+    <string name="tool_proficiency_label">Tool:</string>
+    <string name="equipment_options_label">Equipment:</string>
     <string name="randomize_button">Randomize</string>
     <string name="save_chip_label">Save</string>
     <string name="hit_points_section_title">Hit Points</string>
@@ -172,6 +215,38 @@
     <string name="hit_die_section_title">Hit Die</string>
     <string name="custom_actions_section_title">Custom Actions</string>
     <string name="damage_label_short">Damage</string>
+    <string name="current_conditions_label">Current Conditions</string>
+    <string name="current_conditions_supporting_text">Use this for short-lived status notes, concentration, wounds, or encounter-only effects.</string>
+    <string name="encounter_conditions_title">Encounter Conditions</string>
+    <string name="encounter_conditions_supporting_text">Track short-lived SRD conditions and custom effects that matter right now.</string>
+    <string name="encounter_conditions_empty">No encounter conditions selected.</string>
+    <string name="persistent_conditions_title">Persistent Conditions</string>
+    <string name="persistent_conditions_supporting_text">Select ongoing conditions that should stay with the character when saved.</string>
+    <string name="persistent_conditions_empty">No persistent conditions selected.</string>
+    <string name="condition_persistent_chip_suffix">Persistent</string>
+    <string name="encounter_status_notes_label">Encounter Status Notes</string>
+    <string name="encounter_status_notes_supporting_text">Use this for quick reminders like concentration, wounds, tactical state, or scene notes.</string>
+    <string name="srd_conditions_title">SRD Conditions</string>
+    <string name="custom_condition_label">Custom Condition / Effect</string>
+    <string name="character_build_recommended_abilities_title">Recommended Abilities</string>
+    <string name="character_build_generalist_abilities">Balanced, general-purpose spread</string>
+    <string name="character_build_suggested_spells_title">Suggested Spells</string>
+    <string name="character_build_no_spells_suggestion">No class spell suggestions for this build.</string>
+    <string name="character_build_selected_spells_title">Selected Spells</string>
+    <string name="character_build_selected_spells_placeholder">One spell per line…</string>
+    <string name="character_build_apply_spells_button">Use Suggested Spells as Starter Spell List</string>
+    <string name="character_build_suggested_equipment_title">Suggested Equipment</string>
+    <string name="character_build_no_equipment_suggestion">No starter equipment suggestions available.</string>
+    <string name="character_build_apply_equipment_button">Use Suggested Equipment as Starter Inventory</string>
+    <string name="character_build_guidance_title">Build Guidance</string>
+    <string name="character_builder_review_intro">Review the full summary below before saving. Recommended identity fields can still be left blank, but required validation must pass.</string>
+    <string name="character_builder_validation_title">Validation Pass</string>
+    <string name="character_builder_validation_name">Name provided</string>
+    <string name="character_builder_validation_hp">HP is numeric</string>
+    <string name="character_builder_validation_species">Species chosen (recommended)</string>
+    <string name="character_builder_validation_background">Background chosen (recommended)</string>
+    <string name="character_builder_validation_ready">Ready</string>
+    <string name="character_builder_validation_attention">Needs attention</string>
 
     <!-- Classes/Types -->
     <string name="class_rogue" tools:keep="@string/class_rogue">Rogue</string>

@@ -170,6 +170,8 @@ fun CharacterListScreen(
 	) { padding ->
 		CharacterListScaffoldContent(
 			padding = padding,
+			isLoading = uiState.isLoading,
+			error = uiState.error,
 			viewState = viewState,
 			onPartyFilterChange = { selectedPartyFilter = it },
 			onCharacterClick = onCharacterClick,
@@ -180,6 +182,331 @@ fun CharacterListScreen(
 		)
 	}
 }
+
+@Composable
+private fun CharacterListScaffoldContent(
+	padding: PaddingValues,
+	isLoading: Boolean,
+	error: String?,
+	viewState: CharacterListViewState,
+	onPartyFilterChange: (String?) -> Unit,
+	onCharacterClick: (String) -> Unit,
+	onUpdateHP: (CharacterEntry, Int) -> Unit,
+	onDelete: (CharacterEntry) -> Unit
+) {
+	val listState = rememberLazyListState()
+
+	Column(
+		modifier = Modifier
+			.padding(padding)
+			.fillMaxSize()
+	) {
+		if (isLoading && viewState.filteredCharacters.isEmpty()) {
+			Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+				Text(stringResource(R.string.loading_label), color = MutedText)
+			}
+			return
+		}
+
+		if (!viewState.showInitiativeOrder && viewState.allParties.isNotEmpty()) {
+			PartyFilterTabs(
+				allParties = viewState.allParties,
+				selectedPartyFilter = viewState.selectedPartyFilter,
+				onPartyFilterChange = onPartyFilterChange
+			)
+		}
+		error?.takeIf { it.isNotBlank() }?.let { message ->
+			Text(
+				text = message,
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+				color = MaterialTheme.colorScheme.error,
+				style = MaterialTheme.typography.bodyMedium
+			)
+		}
+		if (viewState.filteredCharacters.isEmpty()) {
+			EmptyCharactersMessage(searchQuery = viewState.searchQuery)
+		} else {
+			LazyColumn(
+				state = listState,
+				modifier = Modifier
+					.weight(1f)
+					.visibleVerticalScrollbar(listState)
+			) {
+				if (viewState.showInitiativeOrder) {
+					initiativeOrderItems(
+						characters = viewState.filteredCharacters,
+						sortByInitiative = viewState.sortByInitiative,
+						currentTurnIndex = viewState.currentTurnIndex,
+						onCharacterClick = onCharacterClick,
+						onUpdateHP = onUpdateHP
+					)
+				} else {
+					groupedCharacterItems(
+						groupedCharacters = viewState.groupedCharacters,
+						onCharacterClick = onCharacterClick,
+						onUpdateHP = onUpdateHP,
+						onDelete = onDelete
+					)
+				}
+			}
+		}
+	}
+}
+
+private fun matchesFilter(
+	character: CharacterEntry,
+	query: String,
+	partyFilter: String?
+): Boolean {
+	val matchesSearch = matchesCharacterSearch(character, query)
+	val matchesParty = partyFilter == null || character.partyLabel == partyFilter
+	return matchesSearch && matchesParty
+}
+
+internal fun matchesCharacterSearch(character: CharacterEntry, query: String): Boolean {
+	if (query.isBlank()) return true
+
+	return listOf(
+		character.name,
+		character.type,
+		character.species,
+		character.background,
+		character.formattedIdentity()
+	).any { candidate ->
+		candidate.contains(query, ignoreCase = true)
+	}
+}
+
+/** Returns (newTurnIndex, newRoundCount) without any branching in the caller. */
+private fun computeNextTurnState(currentIndex: Int, roundCount: Int, size: Int): Pair<Int, Int> {
+	if (size == 0) return currentIndex to roundCount
+	val next = (currentIndex + 1) % size
+	return next to (if (next == 0) roundCount + 1 else roundCount)
+}
+
+// -----------------------------------------------------------------------------
+// 3. Top Bar
+// -----------------------------------------------------------------------------
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CharacterListTopBar(
+	searchState: SearchState,
+	combatState: CombatState,
+	onBack: () -> Unit
+) {
+	TopAppBar(
+		title = { CharacterListTitle(searchState, combatState.showInitiativeOrder) },
+		navigationIcon = { CharacterListNavIcon(searchState, onBack) },
+		actions = { CharacterListActions(searchState, combatState) }
+	)
+}
+
+@Composable
+private fun CharacterListTitle(searchState: SearchState, showInitiativeOrder: Boolean) {
+	if (searchState.isActive) {
+		TextField(
+			value = searchState.query,
+			onValueChange = searchState.onQueryChange,
+			placeholder = { Text(stringResource(R.string.search_characters_placeholder)) },
+			modifier = Modifier.fillMaxWidth(),
+			colors = TextFieldDefaults.colors(
+				focusedContainerColor = Color.Transparent,
+				unfocusedContainerColor = Color.Transparent
+			)
+		)
+	} else {
+		val titleRes =
+			if (showInitiativeOrder) R.string.initiative_order_title else R.string.characters_title
+		Text(stringResource(titleRes))
+	}
+}
+
+@Composable
+private fun CharacterListNavIcon(searchState: SearchState, onBack: () -> Unit) {
+	if (searchState.isActive) {
+		IconButton(onClick = searchState.onToggle) {
+			Icon(Icons.Default.Close, contentDescription = stringResource(R.string.back_button))
+		}
+	} else {
+		IconButton(onClick = onBack) {
+			Icon(
+				Icons.AutoMirrored.Filled.ArrowBack,
+				contentDescription = stringResource(R.string.back_button)
+			)
+		}
+	}
+}
+
+@Composable
+private fun CharacterListActions(searchState: SearchState, combatState: CombatState) {
+	if (!combatState.showInitiativeOrder) {
+		IconButton(onClick = searchState.onToggle) {
+			Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_button))
+		}
+	}
+	if (combatState.showInitiativeOrder) {
+		Text(
+			stringResource(R.string.round_counter, combatState.roundCount),
+			style = MaterialTheme.typography.labelLarge,
+			modifier = Modifier.padding(end = 8.dp)
+		)
+		IconButton(onClick = combatState.onNextTurn) {
+			Icon(Icons.Default.PlayArrow, contentDescription = stringResource(R.string.next_turn))
+		}
+		val sortDesc =
+			if (combatState.sortByInitiative) R.string.sort_by_hp else R.string.sort_by_initiative
+		IconButton(onClick = combatState.onToggleSort) {
+			Icon(Icons.Default.SwapVert, contentDescription = stringResource(sortDesc))
+		}
+	}
+	val toggleIcon =
+		if (combatState.showInitiativeOrder) Icons.AutoMirrored.Filled.List else Icons.Default.PlayArrow
+	IconButton(onClick = combatState.onToggle) {
+		Icon(toggleIcon, contentDescription = stringResource(R.string.toggle_initiative))
+	}
+}
+
+// -----------------------------------------------------------------------------
+// 4. Party Filter Tabs
+// -----------------------------------------------------------------------------
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PartyFilterTabs(
+	allParties: List<String>,
+	selectedPartyFilter: String?,
+	onPartyFilterChange: (String?) -> Unit
+) {
+	PrimaryScrollableTabRow(
+		selectedTabIndex = allParties.indexOf(selectedPartyFilter) + 1,
+		edgePadding = 16.dp,
+		divider = {},
+		containerColor = Color.Transparent
+	) {
+		Tab(selected = selectedPartyFilter == null, onClick = { onPartyFilterChange(null) }) {
+			Text(
+				stringResource(R.string.all_parties),
+				modifier = Modifier.padding(vertical = 12.dp)
+			)
+		}
+		allParties.forEach { party ->
+			Tab(selected = selectedPartyFilter == party, onClick = { onPartyFilterChange(party) }) {
+				Text(party, modifier = Modifier.padding(vertical = 12.dp))
+			}
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+// 5. Empty State
+// -----------------------------------------------------------------------------
+
+@Composable
+private fun EmptyCharactersMessage(searchQuery: String) {
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(32.dp),
+		verticalArrangement = Arrangement.Center,
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		Icon(
+			imageVector = Icons.Default.Info,
+			contentDescription = null,
+			modifier = Modifier.size(56.dp),
+			tint = ArcaneTeal.copy(alpha = 0.5f)
+		)
+		Spacer(modifier = Modifier.height(16.dp))
+		val message = if (searchQuery.isNotEmpty()) {
+			stringResource(R.string.no_search_results, searchQuery)
+		} else {
+			stringResource(R.string.empty_characters_message)
+		}
+		Text(
+			text = message,
+			style = MaterialTheme.typography.titleMedium,
+			textAlign = TextAlign.Center,
+			color = MutedText
+		)
+	}
+}
+
+// -----------------------------------------------------------------------------
+// 6. List Sections
+// -----------------------------------------------------------------------------
+
+private fun LazyListScope.initiativeOrderItems(
+	characters: List<CharacterEntry>,
+	sortByInitiative: Boolean,
+	currentTurnIndex: Int,
+	onCharacterClick: (String) -> Unit,
+	onUpdateHP: (CharacterEntry, Int) -> Unit
+) {
+	val sorted = if (sortByInitiative) {
+		characters.sortedByDescending { it.initiative }
+	} else {
+		characters.sortedBy { it.hp.toFloat() / it.maxHp }
+	}
+	itemsIndexed(sorted, key = { index, char -> "init_${char.id}_$index" }) { index, character ->
+		val isActive = sortByInitiative && index == currentTurnIndex
+		val highlight = isActive || (!sortByInitiative && character.hp < character.maxHp / 4)
+		InitiativeItem(
+			character = character,
+			onClick = { onCharacterClick(character.id) },
+			onUpdateHP = { delta -> onUpdateHP(character, delta) },
+			highlight = highlight,
+			isActiveTurn = isActive
+		)
+		HorizontalDivider()
+	}
+}
+
+private fun LazyListScope.groupedCharacterItems(
+	groupedCharacters: Map<String, List<CharacterEntry>>,
+	onCharacterClick: (String) -> Unit,
+	onUpdateHP: (CharacterEntry, Int) -> Unit,
+	onDelete: (CharacterEntry) -> Unit
+) {
+	groupedCharacters.forEach { (party, partyMembers) ->
+		item(key = "header_$party") { PartyHeader(party) }
+		items(partyMembers, key = { it.id }) { character ->
+			CharacterItem(
+				character = character,
+				onClick = { onCharacterClick(character.id) },
+				onUpdateHP = { delta -> onUpdateHP(character, delta) },
+				onDelete = { onDelete(character) }
+			)
+			HorizontalDivider()
+		}
+	}
+}
+
+@Composable
+private fun PartyHeader(party: String) {
+	Box(
+		modifier = Modifier
+			.fillMaxWidth()
+			.background(
+				androidx.compose.ui.graphics.Brush.horizontalGradient(
+					listOf(AntiqueGold.copy(alpha = 0.15f), AntiqueGold.copy(alpha = 0.05f))
+				)
+			)
+			.padding(horizontal = 16.dp, vertical = 8.dp)
+	) {
+		Text(
+			text = party.uppercase(),
+			style = MaterialTheme.typography.labelLarge,
+			fontWeight = FontWeight.Bold,
+			letterSpacing = 1.5.sp,
+			color = AntiqueGold
+		)
+	}
+}
+
+// -----------------------------------------------------------------------------
+// 7. InitiativeItem
+// -----------------------------------------------------------------------------
 
 @Composable
 fun InitiativeItem(
@@ -236,6 +563,148 @@ fun InitiativeItem(
 	}
 }
 
+private fun buildDyingAccessibilitySuffix(
+	isDying: Boolean,
+	dyingAccessibilityLabel: String
+): String {
+	return if (isDying) ". $dyingAccessibilityLabel" else ""
+}
+
+// -----------------------------------------------------------------------------
+// 8. Initiative Item Sub-sections
+// -----------------------------------------------------------------------------
+
+@Composable
+private fun InitiativeCircle(initiative: Int, isActiveTurn: Boolean, highlight: Boolean) {
+	val color = when {
+		isActiveTurn -> MaterialTheme.colorScheme.primary
+		highlight -> MaterialTheme.colorScheme.error
+		else -> MaterialTheme.colorScheme.outline
+	}
+	Surface(shape = CircleShape, color = color, modifier = Modifier.size(40.dp)) {
+		Box(contentAlignment = Alignment.Center) {
+			Text(
+				text = initiative.toString(),
+				color = if (isActiveTurn || highlight) MaterialTheme.colorScheme.onPrimary else Color.Unspecified,
+				fontWeight = FontWeight.Bold,
+				modifier = Modifier.clearAndSetSemantics { }
+			)
+		}
+	}
+}
+
+@Composable
+private fun InitiativeHeadline(name: String, isActiveTurn: Boolean) {
+	Row(verticalAlignment = Alignment.CenterVertically) {
+		Text(
+			name,
+			fontWeight = if (isActiveTurn) FontWeight.ExtraBold else FontWeight.Bold,
+			color = if (isActiveTurn) MaterialTheme.colorScheme.primary else Color.Unspecified,
+			modifier = Modifier.semantics { heading() }
+		)
+		if (isActiveTurn) {
+			Badge(
+				modifier = Modifier.padding(start = 8.dp),
+				containerColor = MaterialTheme.colorScheme.primary
+			) { Text(stringResource(R.string.active_badge)) }
+		}
+	}
+}
+
+@Composable
+private fun InitiativeSupportingContent(
+	character: CharacterEntry,
+	haptic: androidx.compose.ui.hapticfeedback.HapticFeedback,
+	lastRoll: Int?,
+	onUpdateHP: (Int) -> Unit,
+	onRoll: () -> Unit
+) {
+	val identitySummary = character.formattedIdentity()
+	Column {
+		Text(character.type)
+		if (identitySummary.isNotBlank()) {
+			Text(
+				text = identitySummary,
+				style = MaterialTheme.typography.bodySmall,
+				color = MaterialTheme.colorScheme.onSurfaceVariant
+			)
+		}
+		Row(
+			modifier = Modifier.padding(top = 4.dp),
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			IconButton(
+				onClick = { haptic.performHapticFeedback(HapticFeedbackType.LongPress); onUpdateHP(-1) },
+				modifier = Modifier.size(32.dp)
+			) {
+				Icon(
+					Icons.Default.Remove,
+					contentDescription = stringResource(R.string.decrease_hp_desc, character.name),
+					tint = MaterialTheme.colorScheme.error,
+					modifier = Modifier.size(16.dp)
+				)
+			}
+			IconButton(
+				onClick = { haptic.performHapticFeedback(HapticFeedbackType.LongPress); onUpdateHP(1) },
+				modifier = Modifier.size(32.dp)
+			) {
+				Icon(
+					Icons.Default.Add,
+					contentDescription = stringResource(R.string.increase_hp_desc, character.name),
+					tint = MaterialTheme.colorScheme.primary,
+					modifier = Modifier.size(16.dp)
+				)
+			}
+			Spacer(modifier = Modifier.width(4.dp))
+			D20RollButton(lastRoll = lastRoll, onRoll = onRoll, small = true)
+		}
+	}
+}
+
+@Composable
+private fun InitiativeTrailingContent(character: CharacterEntry) {
+	Column(horizontalAlignment = Alignment.End) {
+		Text(
+			text = stringResource(R.string.initiative_hp_summary, character.hp, character.maxHp),
+			color = if (character.hp < character.maxHp / 4) MaterialTheme.colorScheme.error else Color.Unspecified,
+			fontWeight = if (character.hp < character.maxHp / 4) FontWeight.Bold else FontWeight.Normal,
+			modifier = Modifier.clearAndSetSemantics { }
+		)
+		if (character.hp == 0 && character.party == CharacterParty.ADVENTURERS) {
+			Text(
+				stringResource(R.string.dying_label),
+				color = MaterialTheme.colorScheme.error,
+				fontWeight = FontWeight.Bold,
+				style = MaterialTheme.typography.labelSmall,
+				modifier = Modifier.clearAndSetSemantics { }
+			)
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+// D20 Roll Button (shared)
+// -----------------------------------------------------------------------------
+
+@Composable
+private fun D20RollButton(lastRoll: Int?, onRoll: () -> Unit, small: Boolean = false) {
+	val label = if (lastRoll == null) stringResource(R.string.d20_roll)
+	else stringResource(R.string.d20_roll_result, lastRoll)
+	FilledTonalButton(
+		onClick = onRoll,
+		modifier = Modifier.height(if (small) 28.dp else 32.dp),
+		contentPadding = PaddingValues(horizontal = if (small) 4.dp else 8.dp)
+	) {
+		Text(
+			label,
+			style = if (small) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodySmall
+		)
+	}
+}
+
+// -----------------------------------------------------------------------------
+// CharacterItem
+// -----------------------------------------------------------------------------
 
 @Composable
 fun CharacterItem(
@@ -246,14 +715,21 @@ fun CharacterItem(
 ) {
 	val haptic = LocalHapticFeedback.current
 	var lastRoll by remember { mutableStateOf<Int?>(null) }
+	val identitySummary = character.formattedIdentity()
 
 	val editDetailsLabel = stringResource(R.string.edit_details, character.name)
 	val deleteActionLabel = stringResource(R.string.delete_character_desc, character.name)
 	val dyingAccessibilityLabel = stringResource(R.string.dying_accessibility_label)
+	val identityAccessibilitySuffix = if (identitySummary.isBlank()) {
+		""
+	} else {
+		". Identity: $identitySummary"
+	}
 	val characterContentDescription = stringResource(
 		R.string.character_accessibility_desc,
 		character.name,
 		character.type,
+		identityAccessibilitySuffix,
 		character.hp,
 		character.maxHp,
 		character.ac,
@@ -295,6 +771,7 @@ private fun CharacterItemSupporting(
 	onUpdateHP: (Int) -> Unit,
 	onRoll: () -> Unit
 ) {
+	val identitySummary = character.formattedIdentity()
 	Column {
 		Text(
 			text = stringResource(
@@ -306,6 +783,14 @@ private fun CharacterItemSupporting(
 			),
 			modifier = Modifier.clearAndSetSemantics { }
 		)
+		if (identitySummary.isNotBlank()) {
+			Text(
+				text = identitySummary,
+				style = MaterialTheme.typography.bodySmall,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+				modifier = Modifier.clearAndSetSemantics { }
+			)
+		}
 		Row(
 			modifier = Modifier.padding(top = 4.dp),
 			verticalAlignment = Alignment.CenterVertically

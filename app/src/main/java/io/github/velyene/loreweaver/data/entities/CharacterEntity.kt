@@ -37,6 +37,7 @@ data class CharacterEntity(
 	val resourcesJson: String = "[]",
 	val hitDieType: Int = 8,
 	val hitDiceCurrent: Int = 1,
+	val persistentConditions: Set<String> = emptySet(),
 	val activeConditions: Set<String> = emptySet(),
 	val actionsJson: String = "[]",
 	val proficiencies: Set<String> = emptySet(),
@@ -44,5 +45,8 @@ data class CharacterEntity(
 	val isPlayerCharacter: Boolean = false,
 	val hasInspiration: Boolean = false,
 	val spellSlotsJson: String = "{}",
+	val species: String = "",
+	val background: String = "",
+	val spells: List<String> = emptyList(),
 	val createdAt: Long = System.currentTimeMillis()
 )
