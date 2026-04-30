@@ -36,6 +36,7 @@ import io.github.velyene.loreweaver.domain.use_case.InsertEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertLogUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertSessionRecordUseCase
 import io.github.velyene.loreweaver.domain.use_case.SetActiveEncounterUseCase
+import io.github.velyene.loreweaver.domain.use_case.UpdateCharacterUseCase
 import io.github.velyene.loreweaver.domain.util.CharacterParty
 import io.github.velyene.loreweaver.domain.util.EncounterDifficulty
 import io.github.velyene.loreweaver.domain.util.EncounterDifficultyResult
@@ -73,7 +74,8 @@ class CombatViewModel @Inject constructor(
 	private val insertEncounterUseCase: InsertEncounterUseCase,
 	private val setActiveEncounterUseCase: SetActiveEncounterUseCase,
 	private val insertLogUseCase: InsertLogUseCase,
-	private val insertSessionRecordUseCase: InsertSessionRecordUseCase
+	private val insertSessionRecordUseCase: InsertSessionRecordUseCase,
+	private val updateCharacterUseCase: UpdateCharacterUseCase
 ) : ViewModel() {
 	private val _uiState = MutableStateFlow(CombatUiState())
 	val uiState: StateFlow<CombatUiState> = _uiState.asStateFlow()
@@ -352,7 +354,12 @@ class CombatViewModel @Inject constructor(
 	/**
 	 * Adds a condition to a combatant.
 	 */
-	fun addCondition(characterId: String, conditionName: String, duration: Int? = null) {
+	fun addCondition(
+		characterId: String,
+		conditionName: String,
+		duration: Int? = null,
+		persistsAcrossEncounters: Boolean = false
+	) {
 		val currentRound = _uiState.value.currentRound
 		updateCombatant(characterId) { combatant ->
 			combatant.copy(
@@ -364,11 +371,19 @@ class CombatViewModel @Inject constructor(
 				)
 			)
 		}
+		if (persistsAcrossEncounters) {
+			updatePersistedCharacterCondition(
+				characterId = characterId,
+				conditionName = conditionName,
+				shouldAddCondition = true
+			)
+		}
 
 		val combatant = _uiState.value.combatants.find { it.characterId == characterId }
 		combatant?.let {
 			val durationText = if (duration != null) " ($duration rounds)" else ""
-			val msg = "${it.name} is now $conditionName$durationText"
+			val persistenceText = if (persistsAcrossEncounters) " (persistent)" else ""
+			val msg = "${it.name} is now $conditionName$durationText$persistenceText"
 			appendStatus(msg)
 		}
 	}
@@ -376,14 +391,43 @@ class CombatViewModel @Inject constructor(
 	/**
 	 * Removes a condition from a combatant.
 	 */
-	fun removeCondition(characterId: String, conditionName: String) {
+	fun removeCondition(
+		characterId: String,
+		conditionName: String,
+		removePersistentCondition: Boolean = false
+	) {
 		updateCombatant(characterId) { combatant ->
 			combatant.copy(conditions = combatant.conditions.filter { it.name != conditionName })
+		}
+		if (removePersistentCondition) {
+			updatePersistedCharacterCondition(
+				characterId = characterId,
+				conditionName = conditionName,
+				shouldAddCondition = false
+			)
 		}
 
 		val combatant = _uiState.value.combatants.find { it.characterId == characterId }
 		combatant?.let {
 			appendStatus("${it.name} is no longer $conditionName")
+		}
+	}
+
+	private fun updatePersistedCharacterCondition(
+		characterId: String,
+		conditionName: String,
+		shouldAddCondition: Boolean
+	) {
+		val character = _uiState.value.availableCharacters.firstOrNull { it.id == characterId } ?: return
+		viewModelScope.launch {
+			val updatedCharacter = character.copy(
+				persistentConditions = if (shouldAddCondition) {
+					character.persistentConditions + conditionName
+				} else {
+					character.persistentConditions - conditionName
+				}
+			)
+			updateCharacterUseCase(updatedCharacter)
 		}
 	}
 

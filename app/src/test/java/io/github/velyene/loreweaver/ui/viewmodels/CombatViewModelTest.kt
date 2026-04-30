@@ -28,6 +28,7 @@ import io.github.velyene.loreweaver.domain.use_case.InsertEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertLogUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertSessionRecordUseCase
 import io.github.velyene.loreweaver.domain.use_case.SetActiveEncounterUseCase
+import io.github.velyene.loreweaver.domain.use_case.UpdateCharacterUseCase
 import io.github.velyene.loreweaver.domain.util.DifficultyRating
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -128,6 +129,40 @@ class CombatViewModelTest {
 	}
 
 	@Test
+	fun addCondition_withPersistentFlag_updatesSavedCharacterConditions() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			repository.setCharacters(
+				listOf(
+					CharacterEntry(
+						id = HERO_ID,
+						name = HERO_NAME,
+						party = "Adventurers",
+						hp = 12,
+						maxHp = 12
+					)
+				)
+			)
+			val viewModel = createViewModel(repository)
+			advanceUntilIdle()
+
+			viewModel.addParty(listOf(combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)))
+			advanceUntilIdle()
+			viewModel.addCondition(
+				characterId = HERO_ID,
+				conditionName = "Blessed",
+				duration = null,
+				persistsAcrossEncounters = true
+			)
+			advanceUntilIdle()
+
+			assertEquals(setOf("Blessed"), repository.requireCharacter(HERO_ID).persistentConditions)
+			assertEquals("Blessed", viewModel.uiState.value.combatants.first().conditions.single().name)
+			assertTrue(viewModel.uiState.value.activeStatuses.last().contains("persistent"))
+		}
+	}
+
+	@Test
 	fun removeCondition_removesConditionAndLogsStatus() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
@@ -155,6 +190,47 @@ class CombatViewModelTest {
 					.contains("$HERO_NAME is no longer Restrained")
 
 			)
+		}
+	}
+
+	@Test
+	fun removeCondition_withPersistentFlag_clearsSavedPersistentCondition() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			repository.setCharacters(
+				listOf(
+					CharacterEntry(
+						id = HERO_ID,
+						name = HERO_NAME,
+						party = "Adventurers",
+						hp = 12,
+						maxHp = 12,
+						persistentConditions = setOf("Restrained")
+					)
+				)
+			)
+			val viewModel = createViewModel(repository)
+			advanceUntilIdle()
+
+			viewModel.addParty(listOf(combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)))
+			advanceUntilIdle()
+			viewModel.addCondition(
+				characterId = HERO_ID,
+				conditionName = "Restrained",
+				duration = 2,
+				persistsAcrossEncounters = true
+			)
+			advanceUntilIdle()
+
+			viewModel.removeCondition(
+				characterId = HERO_ID,
+				conditionName = "Restrained",
+				removePersistentCondition = true
+			)
+			advanceUntilIdle()
+
+			assertTrue(repository.requireCharacter(HERO_ID).persistentConditions.isEmpty())
+			assertTrue(viewModel.uiState.value.combatants.first().conditions.isEmpty())
 		}
 	}
 
@@ -225,7 +301,8 @@ class CombatViewModelTest {
 			insertEncounterUseCase = InsertEncounterUseCase(repository),
 			setActiveEncounterUseCase = SetActiveEncounterUseCase(repository),
 			insertLogUseCase = InsertLogUseCase(repository),
-			insertSessionRecordUseCase = InsertSessionRecordUseCase(repository)
+			insertSessionRecordUseCase = InsertSessionRecordUseCase(repository),
+			updateCharacterUseCase = UpdateCharacterUseCase(repository)
 		)
 	}
 
@@ -293,7 +370,11 @@ private class FakeCombatCampaignRepository : CampaignRepository {
 
 	override suspend fun insertCharacter(character: CharacterEntry) = Unit
 
-	override suspend fun updateCharacter(character: CharacterEntry) = Unit
+	override suspend fun updateCharacter(character: CharacterEntry) {
+		charactersFlow.value = charactersFlow.value.map { existing ->
+			if (existing.id == character.id) character else existing
+		}
+	}
 
 	override suspend fun deleteCharacter(character: CharacterEntry) = Unit
 
@@ -321,5 +402,9 @@ private class FakeCombatCampaignRepository : CampaignRepository {
 
 	fun setCharacters(characters: List<CharacterEntry>) {
 		charactersFlow.value = characters
+	}
+
+	fun requireCharacter(characterId: String): CharacterEntry {
+		return charactersFlow.value.first { it.id == characterId }
 	}
 }

@@ -22,10 +22,11 @@ import io.github.velyene.loreweaver.ui.screens.AddConditionDialog
 @Composable
 internal fun CombatantListItem(
 	combatant: CombatantState,
+	persistentConditions: Set<String>,
 	isActive: Boolean,
 	onHpChange: (characterId: String, delta: Int) -> Unit,
-	onAddCondition: (characterId: String, condition: String, duration: Int?) -> Unit,
-	onRemoveCondition: (characterId: String, conditionName: String) -> Unit
+	onAddCondition: (characterId: String, condition: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
+	onRemoveCondition: (characterId: String, conditionName: String, removePersistentCondition: Boolean) -> Unit
 ) {
 	var showAddConditionDialog by remember { mutableStateOf(false) }
 	fun dismissConditionDialog() {
@@ -45,20 +46,21 @@ internal fun CombatantListItem(
 			onHpChange = onHpChange
 		)
 
-		if (combatant.conditions.isNotEmpty() || isActive) {
+		if (combatant.conditions.isNotEmpty() || persistentConditions.isNotEmpty() || isActive) {
 			Spacer(modifier = Modifier.height(4.dp))
-			CombatantConditionsRow(
-				combatant = combatant,
-				onRemoveCondition = onRemoveCondition,
-				onAddConditionClick = { showAddConditionDialog = true }
+			CombatantStatusRow(
+				combatant,
+				persistentConditions,
+				onRemoveCondition,
+				{ showAddConditionDialog = true }
 			)
 		}
 	}
 
 	if (showAddConditionDialog) {
 		AddConditionDialog(
-			onConfirm = { condition, duration ->
-				onAddCondition(combatant.characterId, condition, duration)
+			onConfirm = { condition, duration, persistsAcrossEncounters ->
+				onAddCondition(combatant.characterId, condition, duration, persistsAcrossEncounters)
 				dismissConditionDialog()
 			},
 			onDismiss = ::dismissConditionDialog

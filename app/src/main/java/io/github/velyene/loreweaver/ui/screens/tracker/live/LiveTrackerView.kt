@@ -54,18 +54,24 @@ import io.github.velyene.loreweaver.ui.screens.CombatTrackerConstants.QUICK_HP_B
 import io.github.velyene.loreweaver.ui.screens.tracker.components.TrackerModeBadge
 import io.github.velyene.loreweaver.ui.screens.visibleVerticalScrollbar
 
+@Suppress("kotlin:S107")
+internal data class LiveTrackerCallbacks(
+	val onAction: (String) -> Unit,
+	val onNextTurn: () -> Unit,
+	val onHpChange: (characterId: String, delta: Int) -> Unit,
+	val onAddCondition: (characterId: String, condition: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
+	val onRemoveCondition: (characterId: String, conditionName: String, removePersistentCondition: Boolean) -> Unit,
+	val onEnd: () -> Unit
+)
+
 @Composable
 internal fun LiveTrackerView(
 	round: Int,
 	combatants: List<CombatantState>,
+	persistentConditionsByCharacterId: Map<String, Set<String>>,
 	turnIndex: Int,
 	statuses: List<String>,
-	onAction: (String) -> Unit,
-	onNextTurn: () -> Unit,
-	onHpChange: (characterId: String, delta: Int) -> Unit,
-	onAddCondition: (characterId: String, condition: String, duration: Int?) -> Unit,
-	onRemoveCondition: (characterId: String, conditionName: String) -> Unit,
-	onEnd: () -> Unit
+	callbacks: LiveTrackerCallbacks
 ) {
 	val current = combatants.getOrNull(turnIndex)
 
@@ -90,10 +96,11 @@ internal fun LiveTrackerView(
 
 		CombatantHpList(
 			combatants = combatants,
+			persistentConditionsByCharacterId = persistentConditionsByCharacterId,
 			turnIndex = turnIndex,
-			onHpChange = onHpChange,
-			onAddCondition = onAddCondition,
-			onRemoveCondition = onRemoveCondition,
+			onHpChange = callbacks.onHpChange,
+			onAddCondition = callbacks.onAddCondition,
+			onRemoveCondition = callbacks.onRemoveCondition,
 			modifier = Modifier
 				.fillMaxWidth()
 				.weight(1f)
@@ -106,8 +113,8 @@ internal fun LiveTrackerView(
 		current?.let {
 			CurrentCombatantControls(
 				combatant = it,
-				onAction = onAction,
-				onHpChange = onHpChange
+				onAction = callbacks.onAction,
+				onHpChange = callbacks.onHpChange
 			)
 		}
 
@@ -116,8 +123,8 @@ internal fun LiveTrackerView(
 		Spacer(modifier = Modifier.height(8.dp))
 
 		EncounterActionButtons(
-			onNextTurn = onNextTurn,
-			onEnd = onEnd
+			onNextTurn = callbacks.onNextTurn,
+			onEnd = callbacks.onEnd
 		)
 	}
 }
@@ -125,10 +132,11 @@ internal fun LiveTrackerView(
 @Composable
 private fun CombatantHpList(
 	combatants: List<CombatantState>,
+	persistentConditionsByCharacterId: Map<String, Set<String>>,
 	turnIndex: Int,
 	onHpChange: (characterId: String, delta: Int) -> Unit,
-	onAddCondition: (characterId: String, condition: String, duration: Int?) -> Unit,
-	onRemoveCondition: (characterId: String, conditionName: String) -> Unit,
+	onAddCondition: (characterId: String, condition: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
+	onRemoveCondition: (characterId: String, conditionName: String, removePersistentCondition: Boolean) -> Unit,
 	modifier: Modifier = Modifier
 ) {
 	val listState = rememberLazyListState()
@@ -143,6 +151,7 @@ private fun CombatantHpList(
 		itemsIndexed(combatants, key = { _, combatant -> combatant.characterId }) { index, combatant ->
 			CombatantListItem(
 				combatant = combatant,
+				persistentConditions = persistentConditionsByCharacterId[combatant.characterId].orEmpty(),
 				isActive = index == turnIndex,
 				onHpChange = onHpChange,
 				onAddCondition = onAddCondition,

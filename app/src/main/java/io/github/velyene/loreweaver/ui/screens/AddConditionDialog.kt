@@ -23,8 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import io.github.velyene.loreweaver.R
 
 /**
  * Dialog for adding a condition to a combatant.
@@ -32,17 +34,18 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddConditionDialog(
-	onConfirm: (conditionName: String, duration: Int?) -> Unit,
+	onConfirm: (conditionName: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
 	onDismiss: () -> Unit
 ) {
 	var selectedCondition by remember { mutableStateOf("") }
 	var duration by remember { mutableStateOf("") }
 	var hasDuration by remember { mutableStateOf(true) }
+	var persistsAcrossEncounters by remember { mutableStateOf(false) }
 	var expanded by remember { mutableStateOf(false) }
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text("Add Condition") },
+		title = { Text(stringResource(R.string.add_encounter_condition_dialog_title)) },
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 				// Condition selector
@@ -55,7 +58,7 @@ fun AddConditionDialog(
 						value = selectedCondition,
 						onValueChange = {},
 						readOnly = true,
-						label = { Text("Condition") },
+						label = { Text(stringResource(R.string.encounter_condition_label)) },
 						trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
 						modifier = Modifier
 							.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -70,6 +73,7 @@ fun AddConditionDialog(
 								text = { Text(condition) },
 								onClick = {
 									selectedCondition = condition
+												persistsAcrossEncounters = ConditionConstants.defaultPersistsAcrossEncounters(condition)
 									expanded = false
 								}
 							)
@@ -86,7 +90,22 @@ fun AddConditionDialog(
 						checked = hasDuration,
 						onCheckedChange = { hasDuration = it }
 					)
-					Text("Has duration (in rounds)")
+					Text(stringResource(R.string.encounter_condition_duration_toggle))
+				}
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Checkbox(
+						checked = persistsAcrossEncounters,
+						onCheckedChange = { persistsAcrossEncounters = it }
+					)
+					Text(stringResource(R.string.encounter_condition_persistent_toggle))
+				}
+				if (!hasDuration) {
+					Text(
+						text = stringResource(R.string.encounter_condition_no_duration_hint)
+					)
 				}
 
 				// Duration input
@@ -94,10 +113,10 @@ fun AddConditionDialog(
 					OutlinedTextField(
 						value = duration,
 						onValueChange = { if (it.all { c -> c.isDigit() }) duration = it },
-						label = { Text("Duration (rounds)") },
+						label = { Text(stringResource(R.string.encounter_condition_duration_label)) },
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 						modifier = Modifier.fillMaxWidth(),
-						placeholder = { Text("e.g., 3") }
+						placeholder = { Text(stringResource(R.string.encounter_condition_duration_placeholder)) }
 					)
 				}
 			}
@@ -110,16 +129,16 @@ fun AddConditionDialog(
 							duration.toIntOrNull()
 						else
 							null
-						onConfirm(selectedCondition, dur)
+						onConfirm(selectedCondition, dur, persistsAcrossEncounters)
 					}
 				},
 				enabled = selectedCondition.isNotBlank()
 			) {
-				Text("Add")
+				Text(stringResource(R.string.add_encounter_condition_button))
 			}
 		},
 		dismissButton = {
-			TextButton(onClick = onDismiss) { Text("Cancel") }
+			TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) }
 		}
 	)
 }

@@ -42,6 +42,7 @@ import io.github.velyene.loreweaver.domain.util.CharacterParty
 import io.github.velyene.loreweaver.domain.util.EncounterDifficultyResult
 import io.github.velyene.loreweaver.ui.screens.CombatTrackerConstants.INITIATIVE_ROLL_MAX
 import io.github.velyene.loreweaver.ui.screens.CombatTrackerConstants.INITIATIVE_ROLL_MIN
+import io.github.velyene.loreweaver.ui.screens.tracker.live.LiveTrackerCallbacks
 import io.github.velyene.loreweaver.ui.screens.tracker.live.LiveTrackerView
 import io.github.velyene.loreweaver.ui.screens.tracker.setup.EncounterSetupView
 import io.github.velyene.loreweaver.ui.viewmodels.CombatViewModel
@@ -70,6 +71,9 @@ fun CombatTrackerScreen(
 			round = uiState.currentRound,
 			turnIndex = uiState.currentTurnIndex,
 			statuses = uiState.activeStatuses,
+			persistentConditionsByCharacterId = uiState.availableCharacters.associate { character ->
+				character.id to character.persistentConditions
+			},
 			onNotesChange = viewModel::updateNotes,
 			onStartEncounter = viewModel::startEncounter,
 			onAddParty = viewModel::addParty,
@@ -78,8 +82,12 @@ fun CombatTrackerScreen(
 			onAction = viewModel::performAction,
 			onNextTurn = viewModel::nextTurn,
 			onHpChange = viewModel::updateCombatantHp,
-			onAddCondition = viewModel::addCondition,
-			onRemoveCondition = viewModel::removeCondition,
+			onAddCondition = { characterId, condition, duration, persistsAcrossEncounters ->
+				viewModel.addCondition(characterId, condition, duration, persistsAcrossEncounters)
+			},
+			onRemoveCondition = { characterId, conditionName, removePersistentCondition ->
+				viewModel.removeCondition(characterId, conditionName, removePersistentCondition)
+			},
 			onEndEncounter = { viewModel.saveAndEndEncounter(onEndEncounter) }
 		)
 	}
@@ -147,6 +155,7 @@ private data class TrackerScreenModel(
 	val round: Int,
 	val turnIndex: Int,
 	val statuses: List<String>,
+	val persistentConditionsByCharacterId: Map<String, Set<String>>,
 	val onNotesChange: (String) -> Unit,
 	val onStartEncounter: (String?) -> Unit,
 	val onAddParty: (List<CombatantState>) -> Unit,
@@ -155,8 +164,8 @@ private data class TrackerScreenModel(
 	val onAction: (String) -> Unit,
 	val onNextTurn: () -> Unit,
 	val onHpChange: (String, Int) -> Unit,
-	val onAddCondition: (String, String, Int?) -> Unit,
-	val onRemoveCondition: (String, String) -> Unit,
+	val onAddCondition: (String, String, Int?, Boolean) -> Unit,
+	val onRemoveCondition: (String, String, Boolean) -> Unit,
 	val onEndEncounter: () -> Unit
 )
 
@@ -184,14 +193,17 @@ private fun TrackerContent(
 	LiveTrackerView(
 		round = model.round,
 		combatants = model.combatants,
+		persistentConditionsByCharacterId = model.persistentConditionsByCharacterId,
 		turnIndex = model.turnIndex,
 		statuses = model.statuses,
-		onAction = model.onAction,
-		onNextTurn = model.onNextTurn,
-		onHpChange = model.onHpChange,
-		onAddCondition = model.onAddCondition,
-		onRemoveCondition = model.onRemoveCondition,
-		onEnd = model.onEndEncounter
+		callbacks = LiveTrackerCallbacks(
+			onAction = model.onAction,
+			onNextTurn = model.onNextTurn,
+			onHpChange = model.onHpChange,
+			onAddCondition = model.onAddCondition,
+			onRemoveCondition = model.onRemoveCondition,
+			onEnd = model.onEndEncounter
+		)
 	)
 }
 
