@@ -1,3 +1,13 @@
+/*
+ * FILE: SharedScrollbars.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Scrollbar constants and draw parameter models
+ * 2. ScrollState and LazyListState modifier extensions
+ * 3. Scrollbar metric calculation helpers
+ * 4. Drawing helpers
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.ScrollState
@@ -25,6 +35,12 @@ private data class ScrollbarDrawParams(
 	val thicknessPx: Float,
 	val endPaddingPx: Float,
 	val minThumbHeightPx: Float
+)
+
+internal data class ScrollbarMetrics(
+	val thumbHeight: Float,
+	val thumbOffsetY: Float,
+	val viewportHeight: Float
 )
 
 @Composable
@@ -101,40 +117,73 @@ internal fun Modifier.visibleVerticalScrollbar(
 		drawContent()
 
 		val layoutInfo = listState.layoutInfo
-		val viewportHeight = (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset).toFloat()
+		val viewportHeight = size.height
 		val visibleItems = layoutInfo.visibleItemsInfo
 		val totalItemsCount = layoutInfo.totalItemsCount
 		if (viewportHeight <= 0f || visibleItems.isEmpty() || totalItemsCount <= 0) return@drawWithContent
 		if (!listState.canScrollBackward && !listState.canScrollForward) return@drawWithContent
 
-		val averageItemHeight = visibleItems.map { it.size }.average().toFloat().coerceAtLeast(1f)
-		val estimatedTotalContentHeight = (
-			(averageItemHeight * totalItemsCount) +
-				layoutInfo.beforeContentPadding +
-				layoutInfo.afterContentPadding
-			).coerceAtLeast(viewportHeight)
-		val estimatedScrollOffset = (
-			(averageItemHeight * listState.firstVisibleItemIndex) +
-				listState.firstVisibleItemScrollOffset
-			).coerceAtLeast(0f)
-		val maxScrollOffset = (estimatedTotalContentHeight - viewportHeight).coerceAtLeast(1f)
-		val thumbHeight = ((viewportHeight / estimatedTotalContentHeight) * viewportHeight)
-			.coerceAtLeast(params.minThumbHeightPx)
-			.coerceAtMost(viewportHeight)
-		val travel = (viewportHeight - thumbHeight).coerceAtLeast(0f)
-		val scrollFraction = (estimatedScrollOffset / maxScrollOffset).coerceIn(0f, 1f)
-		val thumbOffsetY = travel * scrollFraction
+		val metrics = calculateLazyListScrollbarMetrics(
+			viewportHeight = viewportHeight,
+			visibleItemSizes = visibleItems.map { it.size },
+			totalItemsCount = totalItemsCount,
+			beforeContentPadding = layoutInfo.beforeContentPadding,
+			afterContentPadding = layoutInfo.afterContentPadding,
+			firstVisibleItemIndex = listState.firstVisibleItemIndex,
+			firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
+			minThumbHeightPx = params.minThumbHeightPx
+		) ?: return@drawWithContent
 
 		drawScrollbarTrackAndThumb(
 			trackColor = params.trackColor,
 			thumbColor = params.thumbColor,
-			thumbOffsetY = thumbOffsetY,
-			thumbHeight = thumbHeight,
+			thumbOffsetY = metrics.thumbOffsetY,
+			thumbHeight = metrics.thumbHeight,
 			thicknessPx = params.thicknessPx,
 			endPaddingPx = params.endPaddingPx,
-			viewportHeight = size.height
+			viewportHeight = metrics.viewportHeight
 		)
 	}
+}
+
+internal fun calculateLazyListScrollbarMetrics(
+	viewportHeight: Float,
+	visibleItemSizes: List<Int>,
+	totalItemsCount: Int,
+	beforeContentPadding: Int,
+	afterContentPadding: Int,
+	firstVisibleItemIndex: Int,
+	firstVisibleItemScrollOffset: Int,
+	minThumbHeightPx: Float
+): ScrollbarMetrics? {
+	if (viewportHeight <= 0f || visibleItemSizes.isEmpty() || totalItemsCount <= 0) return null
+
+	val averageItemHeight = visibleItemSizes
+		.sum()
+		.toFloat()
+		.div(visibleItemSizes.size)
+		.coerceAtLeast(1f)
+	val estimatedTotalContentHeight = (
+		(averageItemHeight * totalItemsCount) +
+			beforeContentPadding +
+			afterContentPadding
+		).coerceAtLeast(viewportHeight)
+	val estimatedScrollOffset = (
+		(averageItemHeight * firstVisibleItemIndex) +
+			firstVisibleItemScrollOffset
+		).coerceAtLeast(0f)
+	val maxScrollOffset = (estimatedTotalContentHeight - viewportHeight).coerceAtLeast(1f)
+	val thumbHeight = ((viewportHeight / estimatedTotalContentHeight) * viewportHeight)
+		.coerceAtLeast(minThumbHeightPx)
+		.coerceAtMost(viewportHeight)
+	val travel = (viewportHeight - thumbHeight).coerceAtLeast(0f)
+	val scrollFraction = (estimatedScrollOffset / maxScrollOffset).coerceIn(0f, 1f)
+
+	return ScrollbarMetrics(
+		thumbHeight = thumbHeight,
+		thumbOffsetY = travel * scrollFraction,
+		viewportHeight = viewportHeight
+	)
 }
 
 private fun DrawScope.drawScrollbarTrackAndThumb(

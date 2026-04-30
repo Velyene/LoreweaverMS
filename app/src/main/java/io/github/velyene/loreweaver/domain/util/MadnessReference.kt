@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. MadnessDuration enum and MadnessEffect models
- * 2. MadnessReference singleton â€” short-term, long-term, and indefinite effect tables
+ * 2. MadnessReference singleton — short-term, long-term, and indefinite effect tables
  */
 
 package io.github.velyene.loreweaver.domain.util
@@ -13,7 +13,7 @@ package io.github.velyene.loreweaver.domain.util
  */
 enum class MadnessDuration {
 	SHORT_TERM,   // 1d10 minutes
-	LONG_TERM,    // 1d10 Ã— 10 hours
+	LONG_TERM,    // 1d10 × 10 hours
 	INDEFINITE    // Until cured
 }
 
@@ -62,7 +62,7 @@ object MadnessReference {
 		),
 		MadnessEffect(
 			MadnessDuration.SHORT_TERM,
-			"Disturbing hallucinations cloud the characterâ€™s judgment, imposing disadvantage on ability checks.",
+			"Disturbing hallucinations cloud the character’s judgment, imposing disadvantage on ability checks.",
 			61..70
 		),
 		MadnessEffect(
@@ -88,7 +88,7 @@ object MadnessReference {
 	)
 
 	/**
-	 * Long-term madness effects (1d10 Ã— 10 hours).
+	 * Long-term madness effects (1d10 × 10 hours).
 	 */
 	val LONG_TERM_EFFECTS = listOf(
 		MadnessEffect(
@@ -167,7 +167,7 @@ object MadnessReference {
 	val INDEFINITE_FLAWS = listOf(
 		"Only intoxication or numbness makes me feel safe." to (1..15),
 		"If I find something unattended, I convince myself it belongs with me." to (16..25),
-		"I keep remaking myself in someone elseâ€™s image, borrowing their style, habits, or identity." to
+		"I keep remaking myself in someone else’s image, borrowing their style, habits, or identity." to
 			(26..30),
 		"I twist the truth because plain honesty feels dull and unbearable." to (31..35),
 		"My personal objective outweighs every other concern." to (36..45),
@@ -219,7 +219,7 @@ object MadnessReference {
 	fun getDurationDescription(duration: MadnessDuration): String {
 		return when (duration) {
 			MadnessDuration.SHORT_TERM -> "1d10 minutes"
-			MadnessDuration.LONG_TERM -> "1d10 Ã— 10 hours"
+			MadnessDuration.LONG_TERM -> "1d10 × 10 hours"
 			MadnessDuration.INDEFINITE -> "Until cured (permanent character flaw)"
 		}
 	}

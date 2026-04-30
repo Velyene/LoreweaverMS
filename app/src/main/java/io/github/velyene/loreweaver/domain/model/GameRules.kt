@@ -739,7 +739,7 @@ enum class CreatureSize(
 	val spaceInFeet: Int,
 	val description: String
 ) {
-	TINY("Tiny", 2, "2Â½ by 2Â½ ft."),
+	TINY("Tiny", 2, "2½ by 2½ ft."),
 	SMALL("Small", 5, "5 by 5 ft."),
 	MEDIUM("Medium", 5, "5 by 5 ft."),
 	LARGE("Large", 10, "10 by 10 ft."),

@@ -1,5 +1,15 @@
+/*
+ * FILE: CampaignEditorViewModelTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Campaign and encounter validation tests
+ * 2. Note creation and update validation tests
+ * 3. Monster-linking and success-path tests
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.MainDispatcherRule
 import io.github.velyene.loreweaver.domain.model.Note
 import io.github.velyene.loreweaver.domain.model.RemoteItem
@@ -9,10 +19,13 @@ import io.github.velyene.loreweaver.domain.use_case.ValidationMessages.NOTE_CONT
 import io.github.velyene.loreweaver.domain.use_case.ValidationMessages.NOTE_LOCATION_REGION_EMPTY_MESSAGE
 import io.github.velyene.loreweaver.domain.use_case.ValidationMessages.NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE
 import io.github.velyene.loreweaver.domain.use_case.ValidationMessages.NOTE_NPC_FACTION_EMPTY_MESSAGE
+import io.github.velyene.loreweaver.domain.util.CharacterParty
+import io.github.velyene.loreweaver.domain.util.ReferenceDetailResolver
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LOCATION
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LORE
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_NPC
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -40,7 +53,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_CAMPAIGN_ERROR_PREFIX: $CAMPAIGN_NAME_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_campaign, CAMPAIGN_NAME_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -56,7 +69,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX: $ENCOUNTER_NAME_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_encounter, ENCOUNTER_NAME_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -76,7 +89,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX: $ENCOUNTER_NAME_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_encounter, ENCOUNTER_NAME_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -110,9 +123,61 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				formatEncounterAddedWithMonstersMessage(selectedMonsters.size),
+				expectedEncounterAddedWithMonstersMessage(selectedMonsters.size),
 				viewModel.uiState.value.message
 			)
+		}
+	}
+
+	@Test
+	fun addEncounterWithMonsters_persistsLocalMonsterStatsForEncounterCombatants() {
+		runTest {
+			val repository = SplitFakeCampaignRepository()
+			val viewModel = createCampaignEditorViewModel(repository)
+			val selectedMonsters = listOf(
+				RemoteItem(
+					id = ReferenceDetailResolver.slugFor("Ancient White Dragon"),
+					name = "Ancient White Dragon",
+					category = "monster",
+					detail = "Dragon"
+				),
+				RemoteItem(
+					id = ReferenceDetailResolver.slugFor("Ancient White Dragon"),
+					name = "Ancient White Dragon",
+					category = "monster",
+					detail = "Dragon"
+				)
+			)
+
+			viewModel.addEncounterWithMonsters(
+				campaignId = CAMPAIGN_ID,
+				name = "Dragon's Lair",
+				selectedMonsters = selectedMonsters
+			)
+			advanceUntilIdle()
+
+			assertEquals(2, repository.insertedCharacters.size)
+			assertEquals(2, repository.insertedCharacters.map { it.id }.distinct().size)
+
+			repository.insertedCharacters.forEach { monster ->
+				assertEquals("Ancient White Dragon", monster.name)
+				assertEquals("Dragon", monster.type)
+				assertEquals(CharacterParty.MONSTERS, monster.party)
+				assertEquals(333, monster.hp)
+				assertEquals(333, monster.maxHp)
+				assertEquals(20, monster.ac)
+				assertEquals(40, monster.speed)
+				assertEquals(12, monster.initiative)
+				assertEquals(20.0, monster.challengeRating, 0.0)
+				assertTrue(monster.notes.contains("Gargantuan Dragon"))
+			}
+
+			val encounterId = repository.getEncountersForCampaign(CAMPAIGN_ID).first().single().id
+			val combatants = repository.combatantsByEncounterId.getValue(encounterId)
+			assertEquals(2, combatants.size)
+			assertEquals(repository.insertedCharacters.map { it.id }.toSet(), combatants.map { it.characterId }.toSet())
+			assertTrue(combatants.all { it.name == "Ancient White Dragon" && it.currentHp == 333 && it.maxHp == 333 })
+			assertTrue(combatants.all { it.initiative in 13..32 })
 		}
 	}
 
@@ -131,7 +196,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_CONTENT_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_note, NOTE_CONTENT_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -152,7 +217,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_note, NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -173,7 +238,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_NPC_FACTION_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_note, NOTE_NPC_FACTION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -194,7 +259,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_LOCATION_REGION_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_add_note, NOTE_LOCATION_REGION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -210,7 +275,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_CONTENT_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_update_note, NOTE_CONTENT_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -226,7 +291,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_update_note, NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -242,7 +307,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_NPC_FACTION_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_update_note, NOTE_NPC_FACTION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -258,7 +323,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_LOCATION_REGION_EMPTY_MESSAGE",
+				expectedErrorMessage(R.string.campaign_error_update_note, NOTE_LOCATION_REGION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}

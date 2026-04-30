@@ -5,6 +5,23 @@ Snapshot date: 2026-04-20
 This note translates the project's current repo state into the user's **"If I cannot prove this came
 from SRD 5.2.1, it does not go in the shipped app"** rule.
 
+## Contents
+
+- [Release-blocking do-not-ship checklist](#release-blocking-do-not-ship-checklist)
+- [Loreweaver hard do-not-ship check](#loreweaver-hard-do-not-ship-check)
+- [Safe replacement rule](#safe-replacement-rule)
+- [File-by-file one-line rule](#file-by-file-one-line-rule)
+- [Audit basis used for this snapshot](#audit-basis-used-for-this-snapshot)
+- [Current repo state note](#current-repo-state-note)
+- [High-level result](#high-level-result)
+- [Existing checks that already pass](#existing-checks-that-already-pass)
+- [Historical hard do-not-ship findings](#historical-hard-do-not-ship-findings)
+- [Items that currently look comparatively safer](#items-that-currently-look-comparatively-safer)
+- [Branding / presentation check](#branding--presentation-check)
+- [Recommended ship gate](#recommended-ship-gate)
+- [Minimal next-step checklist](#minimal-next-step-checklist)
+- [Fast Android Studio search terms](#fast-android-studio-search-terms)
+
 ## Release-blocking do-not-ship checklist
 
 Treat the following as a **hard release gate** for Loreweaver. If any item below fails, the content
@@ -12,18 +29,18 @@ must not ship from `app/src/main`.
 
 - [ ] **Feat rule:** if a feat is not one of the exact approved SRD feat names, remove it from
   shipped data.
-	- Current approved feat set is the 17-name subset already represented in
-	  `CharacterCreationReference.FEATS` and verified by `CharacterCreationReferenceTest`.
+    - Current approved feat set is the 17-name subset already represented in
+      `CharacterCreationReference.FEATS` and verified by `CharacterCreationReferenceTest`.
 - [ ] **Weapon rule:** if a weapon is not in the approved SRD weapons table, remove it from shipped
   data.
-	- Canonical weapon labels live in `EquipmentReference.WEAPONS` and should be treated as an exact
-	  allowlist, not a suggestion.
+    - Canonical weapon labels live in `EquipmentReference.WEAPONS` and should be treated as an exact
+      allowlist, not a suggestion.
 - [ ] **Named item provenance rule:** if an item name came from Basic Rules / core books / legacy
   imports and is not proven against the approved SRD source, remove it.
-	- This applies to structured item rows, embedded example names, and searchable aliases.
+    - This applies to structured item rows, embedded example names, and searchable aliases.
 - [ ] **Unknown-source rule:** if the source is unknown, mixed, legacy, or cannot be re-proven
   quickly, quarantine it until verified.
-	- Quarantine target: `quarantine_do_not_ship/`
+    - Quarantine target: `quarantine_do_not_ship/`
 
 ### One-line decision rule
 
@@ -63,23 +80,23 @@ Do not ship a feat if any of the following are true:
 - the feat name is not one of the approved SRD feat names
 - the feat text was copied from outside the SRD
 - the feat exists in the app but is not one of:
-	- `Alert`
-	- `Magic Initiate`
-	- `Savage Attacker`
-	- `Skilled`
-	- `Ability Score Improvement`
-	- `Grappler`
-	- `Archery`
-	- `Defense`
-	- `Great Weapon Fighting`
-	- `Two-Weapon Fighting`
-	- `Boon of Combat Prowess`
-	- `Boon of Dimensional Travel`
-	- `Boon of Fate`
-	- `Boon of Irresistible Offense`
-	- `Boon of Spell Recall`
-	- `Boon of the Night Spirit`
-	- `Boon of Truesight`
+    - `Alert`
+    - `Magic Initiate`
+    - `Savage Attacker`
+    - `Skilled`
+    - `Ability Score Improvement`
+    - `Grappler`
+    - `Archery`
+    - `Defense`
+    - `Great Weapon Fighting`
+    - `Two-Weapon Fighting`
+    - `Boon of Combat Prowess`
+    - `Boon of Dimensional Travel`
+    - `Boon of Fate`
+    - `Boon of Irresistible Offense`
+    - `Boon of Spell Recall`
+    - `Boon of the Night Spirit`
+    - `Boon of Truesight`
 
 ### 4. Weapons
 
@@ -96,19 +113,19 @@ Do not ship an armor entry if any of the following are true:
 - the armor name is not one of the approved SRD armor names
 - the armor table values came from somewhere other than SRD 5.2.1
 - the armor is not one of:
-	- `Padded Armor`
-	- `Leather Armor`
-	- `Studded Leather Armor`
-	- `Hide Armor`
-	- `Chain Shirt`
-	- `Scale Mail`
-	- `Breastplate`
-	- `Half Plate Armor`
-	- `Ring Mail`
-	- `Chain Mail`
-	- `Splint Armor`
-	- `Plate Armor`
-	- `Shield`
+    - `Padded Armor`
+    - `Leather Armor`
+    - `Studded Leather Armor`
+    - `Hide Armor`
+    - `Chain Shirt`
+    - `Scale Mail`
+    - `Breastplate`
+    - `Half Plate Armor`
+    - `Ring Mail`
+    - `Chain Mail`
+    - `Splint Armor`
+    - `Plate Armor`
+    - `Shield`
 
 ### 6. Tools
 
@@ -172,23 +189,23 @@ See `quarantine_do_not_ship/README.md` for the tiny audit template and quarantin
 ## Audit basis used for this snapshot
 
 - existing repo audit notes:
-	- `SRD_EQUIPMENT_ALLOWLIST_AUDIT.md`
-	- `SRD_GAMEPLAY_TOOLBOX_AUDIT.md`
-	- `SRD_MAGIC_ITEMS_AUDIT.md`
-	- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
+    - `SRD_EQUIPMENT_ALLOWLIST_AUDIT.md`
+    - `SRD_GAMEPLAY_TOOLBOX_AUDIT.md`
+    - `SRD_MAGIC_ITEMS_AUDIT.md`
+    - `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
 - current shipped source under `app/src/main`
 - targeted text searches for:
-	- `2014`
-	- `SpellDescriptionReference`
-	- `MonsterReference`
-	- `CharacterClassReference`
-	- `ClassSpellListReference`
-	- `Magic Initiate (Cleric)` / `Magic Initiate (Wizard)`
-	- `Musket` / `Pistol`
-	- `Three-Dragon Ante`
-	- `Energy Bow`
-	- `Hat of Many Spells`
-	- `Arcanist’s Magic Aura`
+    - `2014`
+    - `SpellDescriptionReference`
+    - `MonsterReference`
+    - `CharacterClassReference`
+    - `ClassSpellListReference`
+    - `Magic Initiate (Cleric)` / `Magic Initiate (Wizard)`
+    - `Musket` / `Pistol`
+    - `Three-Dragon Ante`
+    - `Energy Bow`
+    - `Hat of Many Spells`
+    - `Arcanist’s Magic Aura`
 
 ## Current repo state note
 
@@ -199,21 +216,22 @@ This file now serves as both:
 
 At the current repo snapshot:
 
-- the previously flagged bundled monster/class/spell corpora are no longer present under
-  `app/src/main`
-- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` reports **0** discovered excluded-corpus files
-- the `Monsters` tab in `ReferenceScreen.kt` is an unavailable-state placeholder rather than a
-  bundled local corpus
-- concise monster-running guidance still ships through reviewed `CoreRulesReference` content
+- bundled local monster reference data is present under `app/src/main` and exposed through the
+  `Monsters` tab in `ReferenceScreen.kt`
+- that monster corpus must stay aligned with the repo-owned monster audit documents rather than be
+  treated as an excluded-corpus false positive
+- the local `ContentSafetyAuditTest` audit path still concerns separately inventoried excluded
+  corpus files, not every reviewed SRD-backed dataset that intentionally ships in the app
+- concise monster-running guidance also ships through reviewed `CoreRulesReference` content
 
 ## High-level result
 
 **Treat this note as the strict shipping policy, not as evidence that the previously flagged corpora
 still ship today.**
 
-The current workspace still requires SRD-only proof discipline, but the specific bundled corpora
-called out below were historical findings that have since been removed from `app/src/main` during
-the quarantine/alignment work.
+The current workspace still requires SRD-only proof discipline. Some bundled corpora were removed
+during quarantine/alignment work, but the reviewed local monster reference corpus is present again
+in the current repo state and must continue to satisfy the SRD-only gate.
 
 ## Existing checks that already pass
 

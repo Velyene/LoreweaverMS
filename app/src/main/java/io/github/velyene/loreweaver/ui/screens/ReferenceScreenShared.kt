@@ -337,7 +337,7 @@ internal fun StackedDetailRow(label: String, value: String) {
 @Composable
 internal fun ReferenceBulletRow(text: String) {
 	Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-		Text("â€¢", fontWeight = FontWeight.Bold, color = ArcaneTeal)
+		Text("•", fontWeight = FontWeight.Bold, color = ArcaneTeal)
 		Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
 	}
 }
@@ -378,14 +378,14 @@ internal fun ReferenceTableCard(table: ReferenceTable) {
 				modifier = Modifier.semantics { heading() }
 			)
 			Text(
-				text = table.columns.joinToString(" â€¢ "),
+				text = table.columns.joinToString(" • "),
 				style = MaterialTheme.typography.labelSmall,
 				color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
 			)
 
 			table.rows.forEach { row ->
 				val cells = table.columns.zip(row).filter { (_, value) ->
-					value.isNotBlank() && value != "â€”"
+					value.isNotBlank() && value != "—"
 				}
 
 				if (cells.isNotEmpty()) {

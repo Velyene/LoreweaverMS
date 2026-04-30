@@ -103,7 +103,7 @@ class EquipmentReferenceTest {
 		assertEquals(
 			listOf(
 				"Acid",
-				"Alchemistâ€™s Fire",
+				"Alchemist’s Fire",
 				"Ammunition",
 				"Antitoxin",
 				"Arcane Focus",
@@ -118,27 +118,27 @@ class EquipmentReferenceTest {
 				"Book",
 				"Bottle, Glass",
 				"Bucket",
-				"Burglarâ€™s Pack",
+				"Burglar’s Pack",
 				"Caltrops",
 				"Candle",
 				"Case, Crossbow Bolt",
 				"Case, Map or Scroll",
 				"Chain",
 				"Chest",
-				"Climberâ€™s Kit",
+				"Climber’s Kit",
 				"Clothes, Fine",
-				"Clothes, Travelerâ€™s",
+				"Clothes, Traveler’s",
 				"Component Pouch",
 				"Costume",
 				"Crowbar",
-				"Diplomatâ€™s Pack",
+				"Diplomat’s Pack",
 				"Druidic Focus",
-				"Dungeoneerâ€™s Pack",
-				"Entertainerâ€™s Pack",
-				"Explorerâ€™s Pack",
+				"Dungeoneer’s Pack",
+				"Entertainer’s Pack",
+				"Explorer’s Pack",
 				"Flask",
 				"Grappling Hook",
-				"Healerâ€™s Kit",
+				"Healer’s Kit",
 				"Holy Symbol",
 				"Holy Water",
 				"Hunting Trap",
@@ -164,14 +164,14 @@ class EquipmentReferenceTest {
 				"Pot, Iron",
 				"Potion of Healing",
 				"Pouch",
-				"Priestâ€™s Pack",
+				"Priest’s Pack",
 				"Quiver",
 				"Ram, Portable",
 				"Rations",
 				"Robe",
 				"Rope",
 				"Sack",
-				"Scholarâ€™s Pack",
+				"Scholar’s Pack",
 				"Shovel",
 				"Signal Whistle",
 				"Spell Scroll",
@@ -333,7 +333,7 @@ class EquipmentReferenceTest {
 				weapon.name,
 				weapon.category,
 				weapon.damage,
-				weapon.properties.joinToString().ifBlank { "â€”" },
+				weapon.properties.joinToString().ifBlank { "—" },
 				weapon.mastery,
 				weapon.weight,
 				weapon.cost
@@ -425,8 +425,8 @@ class EquipmentReferenceTest {
 					"Leather Armor",
 					"Light (1 minute to don or doff)",
 					"11 + Dex modifier",
-					"â€”",
-					"â€”",
+					"—",
+					"—",
 					"10 lb.",
 					"10 GP"
 				)
@@ -438,8 +438,8 @@ class EquipmentReferenceTest {
 					"Shield",
 					"Shield (Utilize action to don or doff)",
 					"+2",
-					"â€”",
-					"â€”",
+					"—",
+					"—",
 					"6 lb.",
 					"10 GP"
 				)
@@ -488,7 +488,7 @@ class EquipmentReferenceTest {
 			EquipmentReference.ADVENTURING_GEAR_TABLE.rows.contains(
 				listOf(
 					"Spell Scroll",
-					"â€”",
+					"—",
 					"Varies"
 				)
 			)
@@ -647,7 +647,7 @@ class EquipmentReferenceTest {
 	fun lifestyleAndServiceTables_remainSurfacedInEquipmentReference() {
 		assertEquals(
 			listOf(
-				listOf("Wretched", "â€”"),
+				listOf("Wretched", "—"),
 				listOf("Squalid", "1 SP"),
 				listOf("Poor", "2 SP"),
 				listOf("Modest", "1 GP"),
@@ -719,7 +719,7 @@ class EquipmentReferenceTest {
 			EquipmentReference.MAGIC_ITEM_TOOLS_TABLE.rows.contains(
 				listOf(
 					"Scroll",
-					"Calligrapherâ€™s Supplies"
+					"Calligrapher’s Supplies"
 				)
 			)
 		)
@@ -735,7 +735,7 @@ class EquipmentReferenceTest {
 		assertTrue(
 			EquipmentReference.SENTIENT_ITEM_ALIGNMENT_TABLE.rows.contains(
 				listOf(
-					"97â€“00",
+					"97–00",
 					"Chaotic Evil"
 				)
 			)
@@ -868,7 +868,7 @@ class EquipmentReferenceTest {
 		val wandOfWonder =
 			EquipmentReference.MAGIC_ITEMS_A_TO_Z.first { it.name == "Wand of Wonder" }
 		assertTrue(wandOfWonder.tables.single().rows.any {
-			it.first() == "98â€“00" && it.last().contains("Petrified")
+			it.first() == "98–00" && it.last().contains("Petrified")
 		})
 	}
 
@@ -876,17 +876,17 @@ class EquipmentReferenceTest {
 	fun toolTables_areDerivedFromStructuredToolLists() {
 		val expectedArtisanRows = EquipmentReference.ARTISANS_TOOLS.map { tool ->
 			listOf(
-				tool.name.replace("'", "â€™"),
+				tool.name.replace("'", "’"),
 				tool.ability,
 				tool.weight,
 				tool.cost,
 				tool.utilize.joinToString(", or "),
-				tool.craft.joinToString().ifBlank { "â€”" }
+				tool.craft.joinToString().ifBlank { "—" }
 			)
 		}
 		val expectedOtherRows = EquipmentReference.OTHER_TOOLS.map { tool ->
 			listOf(
-				tool.name.replace("'", "â€™"),
+				tool.name.replace("'", "’"),
 				tool.ability,
 				tool.weight,
 				if (tool.variants.isNotEmpty()) tool.variants.joinToString() else tool.cost,
@@ -894,7 +894,7 @@ class EquipmentReferenceTest {
 				when {
 					tool.craft.isNotEmpty() -> tool.craft.joinToString()
 					tool.notes.isNotEmpty() -> tool.notes.joinToString()
-					else -> "â€”"
+					else -> "—"
 				}
 			)
 		}
@@ -904,7 +904,7 @@ class EquipmentReferenceTest {
 		assertTrue(
 			EquipmentReference.ARTISANS_TOOLS_TABLE.rows.contains(
 				listOf(
-					"Calligrapherâ€™s Supplies",
+					"Calligrapher’s Supplies",
 					"Dexterity",
 					"5 lb.",
 					"10 GP",

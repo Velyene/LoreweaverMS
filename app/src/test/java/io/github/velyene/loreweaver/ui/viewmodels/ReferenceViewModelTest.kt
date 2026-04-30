@@ -11,14 +11,12 @@
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import io.github.velyene.loreweaver.MainDispatcherRule
-import io.github.velyene.loreweaver.domain.repository.ReferencePreferencesRepository
 import io.github.velyene.loreweaver.domain.util.MadnessDuration
+import io.github.velyene.loreweaver.domain.util.MonsterReferenceCatalog
 import io.github.velyene.loreweaver.domain.util.PoisonReference
 import io.github.velyene.loreweaver.domain.util.ReferenceDetailResolver
 import io.github.velyene.loreweaver.domain.util.TrapReference
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -37,6 +35,9 @@ class ReferenceViewModelTest {
 		const val ROLLING_STONE = "Rolling Stone"
 		const val ASSASSINS_BLOOD = "Assassin's Blood"
 		const val BLINDED = "Blinded"
+		const val ANCIENT_WHITE_DRAGON = "Ancient White Dragon"
+		const val SWARM_OF_BATS = "Swarm of Bats"
+		const val TYRANNOSAURUS_REX = "Tyrannosaurus Rex"
 	}
 
 	@get:Rule
@@ -88,7 +89,7 @@ class ReferenceViewModelTest {
 	@Test
 	fun favoritesOnly_filtersCurrentCategory_andRespondsToFavoriteUpdates() {
 		runTest {
-			val repository = FakeReferencePreferencesRepository()
+			val repository = TestReferencePreferencesRepository()
 			val viewModel = createViewModel(repository)
 			val favoriteTrap = TrapReference.TEMPLATES.first()
 
@@ -111,17 +112,11 @@ class ReferenceViewModelTest {
 
 			viewModel.search(ROLLING_STONE)
 			advanceUntilIdle()
-			assertEquals(
-
-				listOf(ROLLING_STONE),
-				viewModel.uiState.value.filteredTraps.map { it.name })
+			assertFilteredLabels(listOf(ROLLING_STONE), viewModel.uiState.value.filteredTraps) { it.name }
 
 			viewModel.search("+8 bonus")
 			advanceUntilIdle()
-			assertEquals(
-
-				listOf(ROLLING_STONE),
-				viewModel.uiState.value.filteredTraps.map { it.name })
+			assertFilteredLabels(listOf(ROLLING_STONE), viewModel.uiState.value.filteredTraps) { it.name }
 		}
 	}
 
@@ -150,7 +145,7 @@ class ReferenceViewModelTest {
 			with(viewModel.uiState.value) {
 				assertEquals(ROLLING_STONE, appliedSearchQuery)
 				assertFalse(isSearchPending)
-				assertEquals(listOf(ROLLING_STONE), filteredTraps.map { it.name })
+				assertFilteredLabels(listOf(ROLLING_STONE), filteredTraps) { it.name }
 			}
 		}
 	}
@@ -183,17 +178,11 @@ class ReferenceViewModelTest {
 
 			viewModel.search(ASSASSINS_BLOOD)
 			advanceUntilIdle()
-			assertEquals(
-
-				listOf(ASSASSINS_BLOOD),
-				viewModel.uiState.value.filteredPoisons.map { it.name })
+			assertFilteredLabels(listOf(ASSASSINS_BLOOD), viewModel.uiState.value.filteredPoisons) { it.name }
 
 			viewModel.search("1d12")
 			advanceUntilIdle()
-			assertEquals(
-
-				listOf(ASSASSINS_BLOOD),
-				viewModel.uiState.value.filteredPoisons.map { it.name })
+			assertFilteredLabels(listOf(ASSASSINS_BLOOD), viewModel.uiState.value.filteredPoisons) { it.name }
 		}
 	}
 
@@ -266,6 +255,92 @@ class ReferenceViewModelTest {
 	}
 
 	@Test
+	fun initializeFromNavigation_setsCategorySearchAndActionDetail() {
+		runTest {
+			val viewModel = createViewModel()
+
+			viewModel.initializeFromNavigation(
+				category = ReferenceCategory.CORE_RULES,
+				query = "Dodging",
+				detailCategory = ReferenceDetailResolver.CATEGORY_ACTIONS,
+				detailSlug = ReferenceDetailResolver.slugFor("Dodge")
+			)
+			advanceUntilIdle()
+
+			with(viewModel.uiState.value) {
+				assertEquals(ReferenceCategory.CORE_RULES, selectedCategory)
+				assertEquals("Dodging", searchQuery)
+				assertEquals("Dodge", selectedReferenceDetail?.title)
+				assertEquals(
+					ReferenceDetailResolver.CATEGORY_ACTIONS,
+					selectedReferenceDetail?.subtitle
+				)
+			}
+		}
+	}
+
+	@Test
+	fun openReferenceDetail_andClearReferenceDetail_updatesGenericDetailState() {
+		runTest {
+			val viewModel = createViewModel()
+
+			viewModel.initializeFromNavigation(
+				category = ReferenceCategory.MONSTERS,
+				query = "aboleth",
+				detailCategory = ReferenceDetailResolver.CATEGORY_MONSTERS,
+				detailSlug = ReferenceDetailResolver.slugFor("Aboleth")
+			)
+			advanceUntilIdle()
+
+			with(viewModel.uiState.value) {
+				assertEquals(ReferenceCategory.MONSTERS, selectedCategory)
+				assertEquals("aboleth", searchQuery)
+				assertEquals("Aboleth", selectedReferenceDetail?.title)
+			}
+		}
+	}
+
+	@Test
+	fun monsterFilters_limitFilteredMonsterStateByTypeAndCr() {
+		runTest {
+			val viewModel = createViewModel()
+
+			viewModel.selectCategory(ReferenceCategory.MONSTERS)
+			viewModel.updateMonsterCreatureTypeFilter("Dragon")
+			viewModel.updateMonsterChallengeRatingFilter("20")
+			advanceUntilIdle()
+
+			with(viewModel.uiState.value) {
+				assertEquals("Dragon", selectedMonsterCreatureType)
+				assertEquals("20", selectedMonsterChallengeRating)
+				assertContainsFilteredLabels(filteredMonsters, { it.name }, ANCIENT_WHITE_DRAGON)
+				assertAllFiltered(filteredMonsters, "Expected all filtered monsters to be CR 20 dragons") {
+					it.creatureType == "Dragon" && it.challengeRating == "20"
+				}
+			}
+		}
+	}
+
+	@Test
+	fun monsterGroupFilter_limitsFilteredMonsterStateToAnimalsIncludingSwarmAndDinosaurEntries() {
+		runTest {
+			val viewModel = createViewModel()
+
+			viewModel.selectCategory(ReferenceCategory.MONSTERS)
+			viewModel.updateMonsterGroupFilter(MonsterReferenceCatalog.ANIMAL_GROUP)
+			advanceUntilIdle()
+
+			with(viewModel.uiState.value) {
+				assertEquals(MonsterReferenceCatalog.ANIMAL_GROUP, selectedMonsterGroup)
+				assertContainsFilteredLabels(filteredMonsters, { it.name }, SWARM_OF_BATS, TYRANNOSAURUS_REX)
+				assertAllFiltered(filteredMonsters, "Expected all filtered monsters to be in the Animals group") {
+					it.group == MonsterReferenceCatalog.ANIMAL_GROUP
+				}
+			}
+		}
+	}
+
+	@Test
 	fun openReferenceDetail_andClearReferenceDetail_updatesGenericDetailState() {
 		runTest {
 			val viewModel = createViewModel()
@@ -282,37 +357,4 @@ class ReferenceViewModelTest {
 		}
 	}
 
-	private fun createViewModel(
-		repository: FakeReferencePreferencesRepository = FakeReferencePreferencesRepository()
-	): ReferenceViewModel = ReferenceViewModel(repository)
-}
-
-private class FakeReferencePreferencesRepository : ReferencePreferencesRepository {
-	private val _favoriteTrapNames = MutableStateFlow(emptySet<String>())
-	private val _favoritePoisonNames = MutableStateFlow(emptySet<String>())
-	private val _favoriteDiseaseNames = MutableStateFlow(emptySet<String>())
-
-	override val favoriteTrapNames: StateFlow<Set<String>> = _favoriteTrapNames
-	override val favoritePoisonNames: StateFlow<Set<String>> = _favoritePoisonNames
-	override val favoriteDiseaseNames: StateFlow<Set<String>> = _favoriteDiseaseNames
-
-	override suspend fun toggleTrapFavorite(name: String) {
-		_favoriteTrapNames.value = _favoriteTrapNames.value.toggle(name)
-	}
-
-	override suspend fun togglePoisonFavorite(name: String) {
-		_favoritePoisonNames.value = _favoritePoisonNames.value.toggle(name)
-	}
-
-	override suspend fun toggleDiseaseFavorite(name: String) {
-		_favoriteDiseaseNames.value = _favoriteDiseaseNames.value.toggle(name)
-	}
-
-	fun setTrapFavorites(names: Set<String>) {
-		_favoriteTrapNames.value = names
-	}
-
-	private fun Set<String>.toggle(name: String): Set<String> {
-		return if (name in this) this - name else this + name
-	}
 }

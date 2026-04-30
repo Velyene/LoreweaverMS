@@ -5,24 +5,13 @@
  * 1. Main Screen (CharacterDetailScreen)
  *    a. State & Storage Initialization
  *    b. Update Handlers (HP, Mana, Stamina)
- *    c. Tab Navigation (Combat, Stats, Journal)
- * 2. Tab Views
- *    a. CombatTab
- *    b. StatsTab
- *    c. JournalTab
- * 3. Combat Sub-sections
- *    a. QuickStatsBar
- *    b. HitDiceAndRestingSection
- *    c. SpellSlotsSection
- *    d. ActionsSection
- *    e. DiceTraySection
- * 4. Stats Sub-sections
- *    a. AttributeGrid
- *    b. SkillChips
- * 5. Pure Logic Helpers
+ *    c. Tab Navigation and Content Routing
+ * 2. Roll Result Presentation
+ * 3. Shared UI Components
+ *    a. StatDisplayRow
+ *    b. DeathSaveRow
+ * 4. Pure Update Helper
  *    a. applyStatDelta
- *    b. rollDicePool / rollWithAdvDis / evaluateDicePart / parseAndRoll
- * 6. UI Components (StatDisplayRow, DeathSaveRow)
  */
 
 package io.github.velyene.loreweaver.ui.screens
@@ -34,16 +23,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,12 +47,10 @@ import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -75,8 +58,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -96,7 +77,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -104,28 +84,24 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
-import io.github.velyene.loreweaver.domain.util.CharacterParty
-import io.github.velyene.loreweaver.ui.theme.AntiqueGold
 import io.github.velyene.loreweaver.ui.theme.ArcaneTeal
 import io.github.velyene.loreweaver.ui.theme.MutedText
 import io.github.velyene.loreweaver.ui.viewmodels.CharacterViewModel
-import kotlin.random.Random
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-private const val STAT_TYPE_HP = "HP"
-private const val STAT_TYPE_MANA = "Mana"
-private const val STAT_TYPE_STAMINA = "Stamina"
-private const val STAT_TYPE_TEMP_HP = "TempHP"
+internal const val STAT_TYPE_HP = "HP"
+internal const val STAT_TYPE_MANA = "Mana"
+internal const val STAT_TYPE_STAMINA = "Stamina"
+internal const val STAT_TYPE_TEMP_HP = "TempHP"
 
 private fun applyStatDelta(
 	character: CharacterEntry,
@@ -146,59 +122,12 @@ private fun applyStatDelta(
 		else -> character
 	}
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
-private fun rollDicePool(num: Int, sides: Int): Int =
-	(1..num).sumOf { Random.nextInt(1, sides + 1) }
-
-private fun rollWithAdvDis(num: Int, sides: Int, advantage: Boolean): Int {
-	val roll1 = rollDicePool(num, sides)
-	val roll2 = rollDicePool(num, sides)
-	return if (advantage) maxOf(roll1, roll2) else minOf(roll1, roll2)
-}
-
-private fun evaluateDicePart(
-	cleanPart: String,
-	isFirstPart: Boolean,
-	isAdv: Boolean,
-	isDis: Boolean
-): Int {
-	if (!cleanPart.contains("d")) return cleanPart.toIntOrNull() ?: 0
-	val (numStr, sidesStr) = cleanPart.split("d", limit = 2)
-	val num = numStr.ifEmpty { "1" }.toIntOrNull() ?: 1
-	val sides = sidesStr.toIntOrNull() ?: 6
-	return if (isFirstPart && (isAdv || isDis)) {
-		rollWithAdvDis(num, sides, isAdv)
-	} else {
-		rollDicePool(num, sides)
-	}
-}
-
-fun parseAndRoll(diceExpr: String): Int = try {
-	val cleanExpr = diceExpr.lowercase().trim()
-	val isAdv = cleanExpr.startsWith("adv")
-	val isDis = cleanExpr.startsWith("dis")
-	val expr = cleanExpr.removePrefix("adv").removePrefix("dis").replace(" ", "")
-
-	expr.split("(?=[+-])".toRegex())
-		.mapIndexed { index, part ->
-			val negative = part.startsWith("-")
-			val cleanPart = part.removePrefix("+").removePrefix("-")
-			val value = evaluateDicePart(cleanPart, index == 0, isAdv, isDis)
-			if (negative) -value else value
-		}
-		.sum()
-} catch (_: Exception) {
-	0
-}
 
 // -----------------------------------------------------------------------------
 // 1. Main Screen
 // -----------------------------------------------------------------------------
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterDetailScreen(
 	characterId: String?,
@@ -222,7 +151,8 @@ fun CharacterDetailScreen(
 		stringResource(R.string.tab_stats),
 		stringResource(R.string.tab_journal)
 	)
-	// Extracted: stat mutation + optional HP log in one clean lambda
+	// Keep stat mutation and optional HP logging together so every tab uses the same rules for
+	// applying deltas and the combat log cannot drift from the displayed HP changes.
 	val onUpdateStat: (Int, String) -> Unit = { delta, statType ->
 		character?.let { current ->
 			viewModel.updateCharacter(applyStatDelta(current, delta, statType))
@@ -341,7 +271,6 @@ private fun CharacterDetailActions(
 	}
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CharacterDetailContent(
 	character: CharacterEntry?,
@@ -409,16 +338,22 @@ private fun CharacterDetailContent(
 						state.onRollResult
 					)
 
-					1 -> StatsTab(
+					1 -> CharacterDetailAttributesAndSkills(
 						character,
 						state.situationalBonus,
 						state.onBonusChange,
 						state.onRollResult
 					)
 
-					2 -> JournalTab(character, viewModel, onLookupCondition)
+					2 -> JournalTab(
+						character = character,
+						viewModel = viewModel,
+						onLookupCondition = onLookupCondition
+					)
 				}
 				if (state.rollResult != null) {
+					// Roll results live outside the tab switch so checks made in any tab remain visible until
+					// dismissed, even if the user immediately changes sections.
 					RollResultCard(
 						result = state.rollResult,
 						onClear = { state.onRollResult(null) })

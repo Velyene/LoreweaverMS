@@ -1,98 +1,96 @@
 package io.github.velyene.loreweaver.ui.screens
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceScreenMagicItemSearchTest {
 
 	@Test
 	fun filterEquipmentMagicItems_matchesNamesBodiesAndEmbeddedTables() {
-		assertEquals(
+		assertQueryResults(
 			listOf("Adamantine Armor"),
-			filterEquipmentMagicItems("Critical Hit against you becomes a normal hit").map { it.name }
-		)
-		assertEquals(
+			"Critical Hit against you becomes a normal hit",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertQueryResults(
 			listOf("Amulet of the Planes"),
-			filterEquipmentMagicItems("DC 15 Intelligence (Arcana) check").map { it.name }
-		)
-		assertEquals(
+			"DC 15 Intelligence (Arcana) check",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertQueryResults(
 			listOf("Apparatus of the Crab"),
-			filterEquipmentMagicItems("giant lobster-like vehicle").map { it.name }
-		)
-		assertEquals(
+			"giant lobster-like vehicle",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertQueryResults(
 			listOf("Bag of Beans"),
-			filterEquipmentMagicItems("cloud giantâ€™s castle").map { it.name }
-		)
-		assertEquals(
+			"cloud giant’s castle",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertQueryResults(
 			listOf("Crystal Ball of Telepathy"),
-			filterEquipmentMagicItems("cast Suggestion through that sensor").map { it.name }
-		)
-		assertEquals(
+			"cast Suggestion through that sensor",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertQueryResults(
 			listOf("Dragon Orb"),
-			filterEquipmentMagicItems("chromatic dragons within 40 miles").map { it.name }
-		)
-		assertEquals(
+			"chromatic dragons within 40 miles",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertQueryResults(
 			listOf("Ioun Stone"),
-			filterEquipmentMagicItems("Your Proficiency Bonus increases by 1").map { it.name }
-		)
-		assertEquals(
+			"Your Proficiency Bonus increases by 1",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertQueryResults(
 			listOf("Portable Hole"),
-			filterEquipmentMagicItems("extradimensional hole 10 feet deep").map { it.name }
-		)
-		assertEquals(
+			"extradimensional hole 10 feet deep",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertQueryResults(
 			listOf("Spell Scroll"),
-			filterEquipmentMagicItems("mystical cipher").map { it.name }
-		)
-		assertEquals(
+			"mystical cipher",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertQueryResults(
 			listOf("Wand of Wonder"),
-			filterEquipmentMagicItems("oversized butterflies").map { it.name }
-		)
-		assertTrue(filterEquipmentMagicItems("Nonexistent Magic Item Term").isEmpty())
+			"oversized butterflies",
+			::filterEquipmentMagicItems
+		) { it.name }
+		assertNoQueryResults("Nonexistent Magic Item Term", ::filterEquipmentMagicItems)
 	}
 
 	@Test
 	fun visibleEquipmentMagicItems_isSearchOnlyWithinEquipmentSubsection() {
-		assertTrue(visibleEquipmentMagicItems("").isEmpty())
-		assertEquals(
+		assertSearchOnlyHiddenWhenBlank(::visibleEquipmentMagicItems)
+		assertSearchOnlyVisible(
 			listOf("Adamantine Armor"),
-			visibleEquipmentMagicItems(
-				"Critical Hit against you becomes a normal hit"
-			).map { it.name }
-		)
-		assertEquals(
+			"Critical Hit against you becomes a normal hit",
+			::visibleEquipmentMagicItems
+		) { it.name }
+		assertSearchOnlyVisible(
 			listOf("Dragon Orb"),
-			visibleEquipmentMagicItems(
-				"chromatic dragons within 40 miles"
-			).map { it.name }
-		)
-		assertEquals(
+			"chromatic dragons within 40 miles",
+			::visibleEquipmentMagicItems
+		) { it.name }
+		assertSearchOnlyVisible(
 			listOf("Portable Hole"),
-			visibleEquipmentMagicItems(
-				"extradimensional hole 10 feet deep"
-			).map { it.name }
-		)
+			"extradimensional hole 10 feet deep",
+			::visibleEquipmentMagicItems
+		) { it.name }
 	}
 
 	@Test
 	fun visibleEquipmentMagicItems_usesSearchAcrossSubsections() {
-		assertEquals(
+		assertSearchOnlyVisible(
 			listOf("Amulet of the Planes"),
-			visibleEquipmentMagicItems(
-				"DC 15 Intelligence (Arcana) check"
-			).map { it.name }
-		)
-		assertEquals(
+			"DC 15 Intelligence (Arcana) check",
+			::visibleEquipmentMagicItems
+		) { it.name }
+		assertSearchOnlyVisible(
 			listOf("Ioun Stone"),
-			visibleEquipmentMagicItems(
-				"Your Proficiency Bonus increases by 1"
-			).map { it.name }
-		)
-		assertEquals(
-			listOf("Spell Scroll"),
-			visibleEquipmentMagicItems(
-				"mystical cipher"
-			).map { it.name }
-		)
+			"Your Proficiency Bonus increases by 1",
+			::visibleEquipmentMagicItems
+		) { it.name }
+		assertSearchOnlyVisible(listOf("Spell Scroll"), "mystical cipher", ::visibleEquipmentMagicItems) { it.name }
 	}
 }

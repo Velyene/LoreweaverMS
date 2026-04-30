@@ -1,8 +1,6 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.EquipmentReference
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceScreenTransportSearchTest {
@@ -21,86 +19,90 @@ class ReferenceScreenTransportSearchTest {
 		val saddle = EquipmentReference.TACK_AND_DRAWN_ITEMS.first { it.item == SADDLE_MILITARY }
 		val airship = EquipmentReference.LARGE_VEHICLES.first { it.ship == AIRSHIP }
 
-		assertTrue(warhorse.matchesSearchQuery("540 lb."))
-		assertTrue(warhorse.matchesSearchQuery(WARHORSE_QUERY))
-		assertTrue(saddle.matchesSearchQuery(SADDLE_QUERY))
-		assertTrue(saddle.matchesSearchQuery("20 GP"))
-		assertTrue(airship.matchesSearchQuery(AIRSHIP_QUERY))
-		assertTrue(airship.matchesSearchQuery("40,000 GP"))
+		assertMatchesAll(warhorse::matchesSearchQuery, "540 lb.", WARHORSE_QUERY)
+		assertMatchesAll(saddle::matchesSearchQuery, SADDLE_QUERY, "20 GP")
+		assertMatchesAll(airship::matchesSearchQuery, AIRSHIP_QUERY, "40,000 GP")
 	}
 
 	@Test
 	fun filterEquipmentTransport_returnsExpectedMatchesForQuery() {
-		assertEquals(listOf(WARHORSE), filterEquipmentMounts(WARHORSE_QUERY).map { it.item })
-		assertEquals(
+		assertQueryResults(listOf(WARHORSE), WARHORSE_QUERY, ::filterEquipmentMounts) { it.item }
+		assertQueryResults(
 			listOf(SADDLE_MILITARY),
-			filterEquipmentTackAndDrawn(SADDLE_QUERY).map { it.item })
-		assertEquals(listOf(AIRSHIP), filterEquipmentLargeVehicles(AIRSHIP_QUERY).map { it.ship })
-		assertEquals(
+			SADDLE_QUERY,
+			::filterEquipmentTackAndDrawn
+		) { it.item }
+		assertQueryResults(listOf(AIRSHIP), AIRSHIP_QUERY, ::filterEquipmentLargeVehicles) { it.ship }
+		assertQueryResults(
 			listOf("Galley", "Warship"),
-			filterEquipmentLargeVehicles("500").map { it.ship })
-		assertTrue(filterEquipmentMounts("Nonexistent Mount Term").isEmpty())
-		assertTrue(filterEquipmentTackAndDrawn("Nonexistent Tack Term").isEmpty())
-		assertTrue(filterEquipmentLargeVehicles("Nonexistent Vehicle Term").isEmpty())
+			"500",
+			::filterEquipmentLargeVehicles
+		) { it.ship }
+		assertNoQueryResults("Nonexistent Mount Term", ::filterEquipmentMounts)
+		assertNoQueryResults("Nonexistent Tack Term", ::filterEquipmentTackAndDrawn)
+		assertNoQueryResults("Nonexistent Vehicle Term", ::filterEquipmentLargeVehicles)
 	}
 
 	@Test
 	fun visibleEquipmentTransport_respectsEquipmentSubsectionWhenQueryBlank() {
-		assertEquals(
+		assertVisibleWhenBlankInSubsection(
 			EquipmentReference.MOUNTS.map { it.item },
-			visibleEquipmentMounts("", CharacterCreationSubsection.EQUIPMENT).map { it.item }
-		)
-		assertEquals(
+			CharacterCreationSubsection.EQUIPMENT,
+			::visibleEquipmentMounts
+		) { it.item }
+		assertVisibleWhenBlankInSubsection(
 			EquipmentReference.TACK_AND_DRAWN_ITEMS.map { it.item },
-			visibleEquipmentTackAndDrawn("", CharacterCreationSubsection.EQUIPMENT).map { it.item }
-		)
-		assertEquals(
+			CharacterCreationSubsection.EQUIPMENT,
+			::visibleEquipmentTackAndDrawn
+		) { it.item }
+		assertVisibleWhenBlankInSubsection(
 			EquipmentReference.LARGE_VEHICLES.map { it.ship },
-			visibleEquipmentLargeVehicles("", CharacterCreationSubsection.EQUIPMENT).map { it.ship }
-		)
-		assertTrue(visibleEquipmentMounts("", CharacterCreationSubsection.CLASSES).isEmpty())
-		assertTrue(visibleEquipmentTackAndDrawn("", CharacterCreationSubsection.CLASSES).isEmpty())
-		assertTrue(visibleEquipmentLargeVehicles("", CharacterCreationSubsection.CLASSES).isEmpty())
+			CharacterCreationSubsection.EQUIPMENT,
+			::visibleEquipmentLargeVehicles
+		) { it.ship }
+		assertHiddenWhenBlankInSubsection(CharacterCreationSubsection.CLASSES, ::visibleEquipmentMounts)
+		assertHiddenWhenBlankInSubsection(CharacterCreationSubsection.CLASSES, ::visibleEquipmentTackAndDrawn)
+		assertHiddenWhenBlankInSubsection(CharacterCreationSubsection.CLASSES, ::visibleEquipmentLargeVehicles)
 	}
 
 	@Test
 	fun visibleEquipmentTransport_usesSearchAcrossSubsections() {
-		assertEquals(
+		assertVisibleForSearch(
 			listOf(WARHORSE),
-			visibleEquipmentMounts(
-				WARHORSE_QUERY,
-				CharacterCreationSubsection.SPECIES_ORIGIN
-			).map { it.item }
-		)
-		assertEquals(
+			WARHORSE_QUERY,
+			CharacterCreationSubsection.SPECIES_ORIGIN,
+			::visibleEquipmentMounts
+		) { it.item }
+		assertVisibleForSearch(
 			listOf(SADDLE_MILITARY),
-			visibleEquipmentTackAndDrawn(
-				SADDLE_QUERY,
-				CharacterCreationSubsection.SPECIES_ORIGIN
-			).map { it.item }
-		)
-		assertEquals(
+			SADDLE_QUERY,
+			CharacterCreationSubsection.SPECIES_ORIGIN,
+			::visibleEquipmentTackAndDrawn
+		) { it.item }
+		assertVisibleForSearch(
 			listOf(AIRSHIP),
-			visibleEquipmentLargeVehicles(
-				AIRSHIP_QUERY,
-				CharacterCreationSubsection.SPECIES_ORIGIN
-			).map { it.ship }
-		)
+			AIRSHIP_QUERY,
+			CharacterCreationSubsection.SPECIES_ORIGIN,
+			::visibleEquipmentLargeVehicles
+		) { it.ship }
 	}
 
 	@Test
 	fun filterEquipmentTables_keepsSupplementalEquipmentTablesSearchable() {
-		assertEquals(
+		assertQueryResults(
 			listOf("Lifestyle Expenses"),
-			filterEquipmentTables("Aristocratic").map { it.title }
-		)
-		assertEquals(
+			"Aristocratic",
+			::filterEquipmentTables
+		) { it.title }
+		assertQueryResults(
 			listOf("Food, Drink, and Lodging"),
-			filterEquipmentTables("Inn Stay").map { it.title }
-		)
-		assertEquals(
+			"Inn Stay",
+			::filterEquipmentTables
+		) { it.title }
+		assertQueryResults(
 			listOf("Hirelings"),
-			filterEquipmentTables("Untrained").map { it.title }
-		)
+			"Untrained",
+			::filterEquipmentTables
+		) { it.title }
 	}
 }

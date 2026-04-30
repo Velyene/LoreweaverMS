@@ -1,3 +1,12 @@
+/*
+ * FILE: CharacterFormMappingsTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Resource and action helper tests
+ * 2. Form-state editing and class-info tests
+ * 3. Character-entry mapping tests
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.model.ATTRIBUTE_CONSTITUTION
@@ -11,6 +20,7 @@ import io.github.velyene.loreweaver.domain.model.CharacterAction
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CharacterResource
 import io.github.velyene.loreweaver.domain.model.ClassInfo
+import io.github.velyene.loreweaver.domain.util.CharacterParty
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

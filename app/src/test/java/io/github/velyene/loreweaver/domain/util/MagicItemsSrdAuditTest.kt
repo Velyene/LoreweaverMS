@@ -292,7 +292,7 @@ class MagicItemsSrdAuditTest {
 
 		val bagOfBeans = EquipmentReference.MAGIC_ITEMS_A_TO_Z.first { it.name == "Bag of Beans" }
 		assertTrue(bagOfBeans.tables.single().rows.any {
-			it.last().contains("cloud giantâ€™s castle")
+			it.last().contains("cloud giant’s castle")
 		})
 
 		val crystalBallOfTelepathy =
@@ -377,7 +377,7 @@ class MagicItemsSrdAuditTest {
 			EquipmentReference.ADVENTURING_GEAR_TABLE.rows.contains(
 				listOf(
 					SPELL_SCROLL,
-					"â€”",
+					"—",
 					"Varies"
 				)
 			)
@@ -393,10 +393,10 @@ class MagicItemsSrdAuditTest {
 		assertTrue(tableTitles.contains("Magic Item Rarities and Values"))
 		assertTrue(tableTitles.contains("Magic Item Tools"))
 		assertTrue(tableTitles.contains("Magic Item Crafting Time and Cost"))
-		assertTrue(tableTitles.contains("Sentient Itemâ€™s Alignment"))
-		assertTrue(tableTitles.contains("Sentient Itemâ€™s Communication"))
-		assertTrue(tableTitles.contains("Sentient Itemâ€™s Senses"))
-		assertTrue(tableTitles.contains("Sentient Itemâ€™s Special Purpose"))
+		assertTrue(tableTitles.contains("Sentient Item’s Alignment"))
+		assertTrue(tableTitles.contains("Sentient Item’s Communication"))
+		assertTrue(tableTitles.contains("Sentient Item’s Senses"))
+		assertTrue(tableTitles.contains("Sentient Item’s Special Purpose"))
 		assertFalse(tableTitles.contains("Spellcasting Services"))
 		assertFalse(tableTitles.contains("Spell Scroll Costs"))
 	}
@@ -413,7 +413,7 @@ class MagicItemsSrdAuditTest {
 			EquipmentReference.MAGIC_ITEM_TOOLS_TABLE.rows.contains(
 				listOf(
 					"Scroll",
-					"Calligrapherâ€™s Supplies"
+					"Calligrapher’s Supplies"
 				)
 			)
 		)
@@ -421,7 +421,7 @@ class MagicItemsSrdAuditTest {
 			EquipmentReference.MAGIC_ITEM_TOOLS_TABLE.rows.contains(
 				listOf(
 					"Potion",
-					"Alchemistâ€™s Supplies or Herbalism Kit"
+					"Alchemist’s Supplies or Herbalism Kit"
 				)
 			)
 		)

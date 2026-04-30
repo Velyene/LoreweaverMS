@@ -63,6 +63,9 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 
 ## Developer Workflow & Repository Hygiene
 
+See `ENGINEERING_STANDARDS.md` for the repo-wide expectations around Kotlin/Compose structure,
+ViewModel state conventions, accessibility, localization, testing, audits, and release readiness.
+
 - Gradle tasks are the source of truth for build health. JetBrains inspections can still raise
   false positives around manifest-owned Android components, Hilt providers/constructors, Room
   converters, and JUnit entry points.
@@ -98,14 +101,15 @@ coverage applies only to reviewed SRD-derived material intentionally included in
 The full Creative Commons Attribution 4.0 license text is mirrored locally in
 `licenses/CC-BY-4.0.txt`.
 
-Running the content-audit test suite also regenerates
+Running the content-audit test suite can also regenerate the ignored local file
 `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`, which summarizes separately inventoried reference/SRD corpus
-files. In the current audited repo state, that snapshot reports no excluded corpus files under
-`app/src/main`.
+files for developer review. That excluded-corpus inventory is separate from the repo-owned audit
+artifacts such as `SRD_MONSTERS_A_TO_Z_AUDIT.md`, which track bundled reviewed datasets that do
+ship from `app/src/main`.
 
-The Reference screen still includes monster-running guidance through reviewed Core Rules content,
-but the top-level `Monsters` tab is intentionally an unavailable placeholder instead of a bundled
-local monster corpus.
+The Reference screen includes a local `Monsters` tab backed by bundled monster datasets plus
+filtering and deep-link detail support. Monster content and provenance expectations are tracked by
+the SRD audit documents in the repo, especially `SRD_MONSTERS_A_TO_Z_AUDIT.md`.
 
 ---
 

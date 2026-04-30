@@ -12,6 +12,7 @@
     <string name="home_brand_subtitle">Fantasy encounter companion</string>
     <string name="no_campaigns">No campaigns yet.</string>
     <string name="search_characters_placeholder">Search characters…</string>
+    <string name="search_characters_label">Search characters</string>
     <string name="characters_title">Characters</string>
     <string name="initiative_order_title">Initiative Order</string>
     <string name="round_counter">Round %1$d</string>
@@ -57,6 +58,13 @@
     <string name="tab_combat">Combat</string>
     <string name="tab_stats">Stats</string>
     <string name="tab_journal">Journal</string>
+    <string name="character_status_overview_title">Status Overview</string>
+    <string name="character_status_encounter_conditions_title">Encounter Conditions</string>
+    <string name="character_status_encounter_conditions_empty">No active encounter conditions.</string>
+    <string name="character_status_ongoing_afflictions_title">Ongoing Afflictions</string>
+    <string name="character_status_ongoing_afflictions_empty">No ongoing afflictions.</string>
+    <string name="character_status_persistent_effects_title">Persistent Effects</string>
+    <string name="character_status_persistent_effects_empty">No persistent effects.</string>
     <string name="roll_result_desc">Roll result: %1$s is %2$d</string>
     <string name="clear_button">Clear</string>
     <string name="cancel_button">Cancel</string>
@@ -73,6 +81,8 @@
     <string name="speed_label">Speed</string>
     <string name="insp_label">Insp.</string>
     <string name="inspiration_desc">Inspiration</string>
+    <string name="inspiration_state_on">Inspiration active</string>
+    <string name="inspiration_state_off">Inspiration inactive</string>
     <string name="hp_label">HP</string>
     <string name="temp_hp_label">Temp HP</string>
     <string name="death_saves_label">Death Saves</string>
@@ -299,6 +309,26 @@
     <string name="cond_restrained" tools:keep="@string/cond_restrained">Restrained</string>
     <string name="cond_stunned" tools:keep="@string/cond_stunned">Stunned</string>
     <string name="cond_unconscious" tools:keep="@string/cond_unconscious">Unconscious</string>
+    <string name="cond_bleeding">Bleeding</string>
+    <string name="cond_blessed">Blessed</string>
+    <string name="cond_burning">Burning</string>
+    <string name="cond_concentrating">Concentrating</string>
+    <string name="cond_cursed">Cursed</string>
+    <string name="cond_dodging">Dodging</string>
+    <string name="cond_hasted">Hasted</string>
+    <string name="cond_hexed">Hexed</string>
+    <string name="cond_hidden">Hidden</string>
+    <string name="cond_inspired">Inspired</string>
+    <string name="cond_marked">Marked</string>
+    <string name="cond_raging">Raging</string>
+    <string name="cond_slowed">Slowed</string>
+
+    <!-- Add Condition Dialog -->
+    <string name="add_condition_dialog_title">Add Condition</string>
+    <string name="add_condition_dialog_condition_label">Condition</string>
+    <string name="add_condition_dialog_has_duration_label">Has duration (in rounds)</string>
+    <string name="add_condition_dialog_duration_label">Duration (rounds)</string>
+    <string name="add_condition_dialog_duration_placeholder">e.g., 3</string>
 
     <!-- Prompt Library -->
     <string name="prompt_library_title">Prompt Library</string>
@@ -345,9 +375,13 @@
     <string name="clear_log_confirm_title">Clear adventure log?</string>
     <string name="clear_log_confirm_message">This will remove all saved log entries.</string>
     <string name="adventure_log_empty_message">The chronicles are empty…</string>
+    <string name="adventure_log_error_load">Failed to load adventure log</string>
+    <string name="adventure_log_error_clear">Failed to clear adventure log</string>
 
     <!-- Campaigns -->
     <string name="campaigns_title">Campaigns</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="message_with_detail">%1$s: %2$s</string>
     <string name="create_campaign_desc">Create new campaign</string>
     <string name="new_campaign_button">New Campaign</string>
     <string name="campaigns_empty_message">No campaigns found.
@@ -358,6 +392,16 @@ Create one to begin your journey!</string>
     <string name="campaign_name_label">Campaign Name</string>
     <string name="campaign_loading_title">Loading…</string>
     <string name="campaign_not_found_message">Campaign not found.</string>
+    <string name="campaign_error_critical">Critical error</string>
+    <string name="campaign_error_load_campaigns">Failed to load campaigns</string>
+    <string name="campaign_error_load_sessions">Failed to load sessions</string>
+    <string name="campaign_error_load_encounters">Failed to load encounters</string>
+    <string name="campaign_error_load_notes">Failed to load notes</string>
+    <string name="campaign_error_add_campaign">Failed to add campaign</string>
+    <string name="campaign_error_add_encounter">Failed to add encounter</string>
+    <string name="campaign_error_add_note">Failed to add note</string>
+    <string name="campaign_error_update_note">Failed to update note</string>
+    <string name="campaign_error_delete_note">Failed to delete note</string>
     <string name="campaign_tab_lore_notes">Lore &amp; Notes</string>
     <string name="campaign_tab_sessions">Sessions</string>
     <string name="campaign_tab_encounters">Encounters</string>
@@ -394,15 +438,56 @@ Create one to begin your journey!</string>
     <string name="encounter_open_badge">OPEN</string>
     <string name="new_encounter_title">New Encounter</string>
     <string name="encounter_name_label">Encounter Name</string>
+    <string name="encounter_not_found_message">Encounter not found.</string>
+    <string name="encounter_error_load">Failed to load encounter</string>
+    <string name="encounter_error_start">Failed to start encounter</string>
     <string name="monster_import_removed_message">Monster library import has been removed from
         this build.</string>
+    <string name="encounter_monster_picker_helper">Add monsters from the local library below. Selected creatures will be imported into the encounter with their reference stats.</string>
+    <string name="encounter_monster_picker_empty">No monsters match the current search and filters.</string>
+    <string name="encounter_selected_monsters_count">%1$d monsters selected</string>
+    <string name="encounter_selected_monsters_more">+%1$d more</string>
+    <string name="encounter_no_monsters_selected">No monsters selected yet.</string>
+    <string name="encounter_add_monster_button">Add</string>
+    <string name="encounter_remove_all_button">Remove</string>
+    <string name="encounter_monster_sort_label">Sort monsters</string>
+    <string name="encounter_monster_sort_name">Name</string>
+    <string name="encounter_monster_sort_cr">CR</string>
+    <string name="encounter_animals_shortcut_button">Animals</string>
+    <string name="encounter_selected_only_button">Selected only</string>
+    <string name="encounter_clear_filters_button">Clear filters</string>
+    <string name="encounter_clear_selection_button">Clear selection</string>
+    <string name="create_encounter_with_monsters_button">Create Encounter (%1$d)</string>
     <string name="create_without_monsters_button">Create Without Monsters</string>
+    <string name="encounter_picker_count_header">%1$s • %2$s</string>
+    <string name="encounter_increment_selected_monster">Add one %1$s to selection</string>
+    <string name="encounter_decrement_selected_monster">Remove one %1$s from selection</string>
+    <string name="encounter_remove_selected_monster">Remove all %1$s from selection</string>
+    <plurals name="encounter_selected_monsters_quantity">
+        <item quantity="one">%d monster selected</item>
+        <item quantity="other">%d monsters selected</item>
+    </plurals>
+    <plurals name="encounter_matching_monsters_quantity">
+        <item quantity="one">%d matching monster</item>
+        <item quantity="other">%d matching monsters</item>
+    </plurals>
+    <plurals name="encounter_created_with_monsters_message">
+        <item quantity="one">Encounter created with %d monster!</item>
+        <item quantity="other">Encounter created with %d monsters!</item>
+    </plurals>
     <string name="confirm_delete_note_title">Delete note?</string>
     <string name="confirm_delete_note_message">This note will be permanently removed from the
         campaign.</string>
 
     <!-- Session History -->
     <string name="session_history_title">Session History</string>
+
+    <!-- Character errors -->
+    <string name="character_error_load">Failed to load characters</string>
+    <string name="character_error_not_found">Character not found</string>
+    <string name="character_error_add">Failed to add character</string>
+    <string name="character_error_update">Failed to update character</string>
+    <string name="character_error_delete">Failed to delete character</string>
     <string name="session_summary_badge">ENCOUNTER SAVED</string>
     <string name="session_summary_snapshot_title">Encounter snapshot</string>
     <string name="session_summary_snapshot_subtitle">Current round and HP are preserved</string>
@@ -418,6 +503,27 @@ and ready when you return</string>
     <string name="search_sessions_placeholder">Search sessions…</string>
     <string name="session_history_empty_message">No sessions found.</string>
     <string name="session_combat_log_title">Combat Log</string>
+    <string name="session_summary_empty_message">No recent encounter summary is available.</string>
+    <string name="session_summary_rounds_title">Total Rounds</string>
+    <string name="session_summary_survivors_count_title">Survivors</string>
+    <string name="session_summary_saved_title">Outcome</string>
+    <string name="session_summary_saved_subtitle">Saved</string>
+    <string name="session_summary_surviving_players_title">Surviving Players</string>
+    <string name="session_summary_no_survivors_message">No players survived this encounter.</string>
+    <string name="session_summary_defeated_enemies_title">Defeated Enemies</string>
+    <string name="session_summary_no_defeated_enemies_message">No enemies were defeated before the encounter ended.</string>
+    <string name="session_summary_persistent_statuses_title">Persistent Statuses Remaining</string>
+    <string name="session_summary_no_persistent_statuses_message">No persistent statuses remain on the party.</string>
+    <string name="session_summary_log_empty_message">No combat log entries were recorded.</string>
+    <string name="session_summary_continue_campaign_button">Continue Campaign</string>
+    <string name="session_summary_start_another_encounter_button">Start Another Encounter</string>
+    <string name="session_summary_view_history_button">View Session History</string>
+    <string name="session_summary_result_victory">Victory</string>
+    <string name="session_summary_result_victory_subtitle">The party outlasted the opposition and holds the field.</string>
+    <string name="session_summary_result_defeat">Defeat</string>
+    <string name="session_summary_result_defeat_subtitle">The party fell or could no longer continue the encounter.</string>
+    <string name="session_summary_result_ended_early">Ended Early</string>
+    <string name="session_summary_result_ended_early_subtitle">The encounter was stopped before a clear winner was decided.</string>
     <string name="session_end_state_title">End State</string>
     <string name="session_final_round">Final Round: %1$d</string>
     <string name="session_combatant_hp_summary">%1$s: %2$d/%3$d HP</string>
@@ -432,10 +538,65 @@ and ready when you return</string>
     <string name="retry_action">Retry</string>
     <string name="combat_setup_badge_label">SETUP</string>
     <string name="combat_tracker_badge_label">TRACKER</string>
+    <string name="encounter_save_exit_button">Save &amp; Exit</string>
+    <string name="encounter_options_button">Encounter options</string>
+    <string name="encounter_top_bar_active_subtitle">Round %1$d • %2$s</string>
     <string name="start_encounter_button">Start Encounter</string>
+    <string name="encounter_setup_shared_manager_summary">Build one shared encounter dashboard: select saved party members, add enemies, set notes, then begin initiative.</string>
     <string name="add_party_button">Add Party</string>
     <string name="add_party_button_with_count">Add Party (%1$d)</string>
     <string name="add_enemy_button">Add Enemy</string>
+    <string name="encounter_party_members_title">Party Members</string>
+    <string name="encounter_party_members_supporting_text">Select which saved Adventurers are joining this encounter.</string>
+    <string name="encounter_party_members_empty_message">No saved Adventurers are available yet. Create them from Characters, then return here.</string>
+    <string name="encounter_party_member_summary">Lv %1$d • HP %2$d/%3$d • Init +%4$d</string>
+    <string name="encounter_party_member_selected">Selected</string>
+    <string name="encounter_party_member_add">Tap to add</string>
+    <string name="encounter_enemies_title">Enemies</string>
+    <string name="encounter_enemies_supporting_text">Add opposition, hazards, or neutral creatures that need a turn in the shared tracker.</string>
+    <string name="encounter_enemies_empty_message">No enemies added yet. Use Add Enemy to build the opposing side.</string>
+    <string name="encounter_turn_tracker_title">Turn Tracker</string>
+    <string name="encounter_turn_tracker_empty_message">Initiative order will appear here once participants are in the encounter.</string>
+    <string name="encounter_turn_label_current">Current</string>
+    <string name="encounter_turn_label_next">Next</string>
+    <string name="encounter_turn_label_upcoming">Soon</string>
+    <string name="encounter_turn_chip_player">Player</string>
+    <string name="encounter_turn_chip_enemy">Enemy</string>
+    <string name="encounter_active_panel_title">Active Turn</string>
+    <string name="encounter_active_panel_empty_message">No active participant is available. Start the encounter or advance the turn order to continue.</string>
+    <string name="encounter_active_hp_summary">HP %1$d/%2$d</string>
+    <string name="encounter_turn_flow_title">Turn Sequence</string>
+    <string name="encounter_turn_step_select_action">1. Choose an action for the active participant.</string>
+    <string name="encounter_turn_step_select_target">2. Choose a target for the selected action.</string>
+    <string name="encounter_turn_step_apply_result">3. Apply the result, then review the shared log.</string>
+    <string name="encounter_turn_step_ready_to_end">4. The result is logged. End the turn to advance initiative.</string>
+    <string name="encounter_available_actions_title">Available Actions</string>
+    <string name="encounter_target_prompt">Select a target.</string>
+    <string name="encounter_target_prompt_with_action">Select a target for %1$s.</string>
+    <string name="encounter_apply_result_prompt">Apply the result against %1$s.</string>
+    <string name="encounter_apply_result_prompt_no_target">Apply the result for this action.</string>
+    <string name="encounter_result_amount_label">Amount</string>
+    <string name="encounter_result_miss_button">Miss</string>
+    <string name="encounter_result_damage_button">Damage</string>
+    <string name="encounter_result_heal_button">Heal</string>
+    <string name="encounter_turn_ready_summary">%1$s has been resolved against %2$s. End the turn when ready.</string>
+    <string name="encounter_turn_ready_no_target">The action result is recorded. End the turn when ready.</string>
+    <string name="encounter_clear_turn_selection_button">Clear selection</string>
+    <string name="encounter_skip_turn_button">Skip Turn</string>
+    <string name="encounter_participant_notes_empty_message">No participant notes.</string>
+    <string name="encounter_secondary_party_title">Party Status</string>
+    <string name="encounter_secondary_party_empty_message">No other party members are currently in the roster.</string>
+    <string name="encounter_enemy_panel_title">Enemy Panel</string>
+    <string name="encounter_enemy_panel_empty_message">No enemies are being tracked right now.</string>
+    <string name="encounter_status_ready">Ready</string>
+    <string name="encounter_status_downed">Downed</string>
+    <string name="encounter_status_alive">Alive</string>
+    <string name="encounter_status_defeated">Defeated</string>
+    <string name="encounter_lifecycle_draft">Draft</string>
+    <string name="encounter_lifecycle_active">Active</string>
+    <string name="encounter_lifecycle_paused">Paused</string>
+    <string name="encounter_lifecycle_completed">Completed</string>
+    <string name="encounter_lifecycle_archived">Archived</string>
     <string name="encounter_roster_title">Encounter Roster (%1$d)</string>
     <string name="encounter_roster_empty_message">No combatants added yet.
 Add your party or individual enemies above.</string>
@@ -443,6 +604,7 @@ Add your party or individual enemies above.</string>
     <string name="remove_combatant_desc">Remove %1$s from encounter</string>
     <string name="remove_combatant_confirm_title">Remove combatant?</string>
     <string name="remove_combatant_confirm_message">Remove %1$s from the encounter roster?</string>
+    <string name="combatant_setup_content_description">%1$s. %2$s</string>
     <string name="encounter_notes_title">Encounter notes</string>
     <string name="add_enemy_dialog_title">Add Enemy</string>
     <string name="end_turn_button">End Turn</string>
@@ -460,6 +622,11 @@ Add your party or individual enemies above.</string>
     <string name="encounter_condition_no_duration_hint">Leave this unchecked to keep the effect until the encounter ends.</string>
     <string name="add_encounter_condition_button">Add Encounter Condition</string>
     <string name="combatant_initiative_summary">Init: %1$d</string>
+    <string name="combatant_turn">Turn: %1$s</string>
+    <string name="combatant_hp_label">HP: %1$d/%2$d</string>
+    <string name="combatant_hp_label_with_temp">HP: %1$d/%2$d +%3$d</string>
+    <string name="combatant_header_state_description">%1$s, %2$s</string>
+    <string name="encounter_difficulty_accessibility_desc">Encounter Difficulty: %1$s. Adjusted XP: %2$d</string>
     <string name="combat_log_bullet">• %1$s</string>
 
     <!-- Reference Screen -->
@@ -471,9 +638,15 @@ Add your party or individual enemies above.</string>
     <string name="reference_tab_objects" tools:keep="@string/reference_tab_objects">Objects</string>
     <string name="reference_tab_madness">Madness</string>
     <string name="reference_tab_monsters">Monsters</string>
+    <string name="reference_monster_filter_all">All</string>
+    <string name="reference_monster_filter_shortcuts">Shortcuts</string>
+    <string name="reference_monster_filter_animals">Animals</string>
+    <string name="reference_monster_filter_cr">CR</string>
+    <string name="reference_monster_filter_type">Type</string>
     <string name="reference_tab_core_rules">Core Rules</string>
     <string name="reference_tab_character_creation">Character Creation</string>
     <string name="reference_tab_with_favorites_count">%1$s, %2$d favorites</string>
+    <string name="reference_search_label">Search reference</string>
     <string name="reference_search_hint">Search…</string>
     <string name="reference_back_to_list">Back to list</string>
     <string name="reference_roll_d100">Roll d100</string>

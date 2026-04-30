@@ -13,6 +13,10 @@
 package io.github.velyene.loreweaver.data.mapper
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import io.github.velyene.loreweaver.data.entities.CampaignEntity
 import io.github.velyene.loreweaver.data.entities.CharacterEntity
@@ -23,6 +27,7 @@ import io.github.velyene.loreweaver.domain.model.Campaign
 import io.github.velyene.loreweaver.domain.model.CharacterAction
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CharacterResource
+import io.github.velyene.loreweaver.domain.model.DurationType
 import io.github.velyene.loreweaver.domain.model.Encounter
 import io.github.velyene.loreweaver.domain.model.EncounterSnapshot
 import io.github.velyene.loreweaver.domain.model.EncounterStatus
@@ -45,6 +50,74 @@ private val gson = Gson()
 private val resourceListType = object : TypeToken<List<CharacterResource>>() {}.type
 private val actionListType = object : TypeToken<List<CharacterAction>>() {}.type
 private val spellSlotsMapType = object : TypeToken<Map<Int, List<Int>>>() {}.type
+
+private fun parseEncounterSnapshot(snapshotJson: String): EncounterSnapshot? {
+	return runCatching {
+		val snapshotObject = JsonParser.parseString(snapshotJson).asJsonObject
+		// Session snapshots have evolved over time. Normalize older payloads before Gson reads them
+		// so saved encounters from previous builds still restore into the current domain model.
+		normalizeLegacyCombatantSnapshots(snapshotObject)
+		gson.fromJson(snapshotObject, EncounterSnapshot::class.java)
+	}.getOrNull()
+}
+
+private fun normalizeLegacyCombatantSnapshots(snapshotObject: JsonObject) {
+	val combatants = snapshotObject.getAsJsonArray("combatants") ?: return
+	combatants.forEach { combatantElement ->
+		if (!combatantElement.isJsonObject) return@forEach
+		val combatant = combatantElement.asJsonObject
+		if (!combatant.has("tempHp")) {
+			combatant.addProperty("tempHp", 0)
+		}
+		normalizeLegacyConditionArray(combatant)
+	}
+}
+
+private fun normalizeLegacyConditionArray(combatant: JsonObject) {
+	val conditionsElement = combatant["conditions"] ?: return
+	if (!conditionsElement.isJsonArray) return
+
+	val normalizedConditions = JsonArray()
+	conditionsElement.asJsonArray.forEach { conditionElement ->
+		when {
+			conditionElement.isJsonObject -> normalizedConditions.add(conditionElement)
+			conditionElement.isJsonPrimitive -> {
+				// Older builds stored conditions as bare names. Rebuild the missing fields with safe
+				// defaults so duration handling can treat restored and newly created conditions the same.
+				val legacyCondition = JsonObject().apply {
+					addProperty("name", conditionElement.asString)
+					add("duration", JsonNull.INSTANCE)
+					addProperty("durationType", DurationType.ROUNDS.name)
+					addProperty("addedOnRound", 0)
+				}
+				normalizedConditions.add(legacyCondition)
+			}
+		}
+	}
+	combatant.add("conditions", normalizedConditions)
+}
+
+private fun normalizedCharacterTypeForDomain(
+	type: String,
+	party: String,
+	isPlayerCharacter: Boolean
+): String {
+	val trimmedType = type.trim()
+	return if (party == CharacterParty.ADVENTURERS || isPlayerCharacter) {
+		normalizeClassName(trimmedType)
+	} else {
+		trimmedType.ifBlank { "Monster" }
+	}
+}
+
+private fun normalizedCharacterTypeForStorage(type: String, party: String): String {
+	val trimmedType = type.trim()
+	return if (party == CharacterParty.ADVENTURERS) {
+		normalizeClassName(trimmedType)
+	} else {
+		trimmedType.ifBlank { "Monster" }
+	}
+}
 
 /**
  * Converts a LogEntryEntity from the database to a domain LogEntry model.
@@ -93,6 +166,9 @@ fun EncounterEntity.toDomain(): Encounter {
 		id = id,
 		campaignId = campaignId,
 		name = name,
+		notes = notes,
+		currentRound = currentRound,
+		currentTurnIndex = currentTurnIndex,
 		status = if (isActive) EncounterStatus.ACTIVE else EncounterStatus.PENDING
 	)
 }
@@ -102,7 +178,10 @@ fun Encounter.toEntity(): EncounterEntity {
 		id = id,
 		campaignId = campaignId ?: "",
 		name = name,
-		isActive = status == EncounterStatus.ACTIVE
+		notes = notes,
+		isActive = status == EncounterStatus.ACTIVE,
+		currentRound = currentRound,
+		currentTurnIndex = currentTurnIndex
 	)
 }
 
@@ -110,7 +189,7 @@ fun CharacterEntity.toDomain(): CharacterEntry {
 	return CharacterEntry(
 		id = id,
 		name = name,
-		type = normalizeClassName(type),
+		type = normalizedCharacterTypeForDomain(type = type, party = party, isPlayerCharacter = isPlayerCharacter),
 		hp = hp,
 		maxHp = maxHp,
 		tempHp = tempHp,
@@ -144,6 +223,8 @@ fun CharacterEntity.toDomain(): CharacterEntry {
 		proficiencies = proficiencies,
 		inventory = inventory,
 		hasInspiration = hasInspiration,
+		// Spell slots are persisted as simple integer lists for stable JSON round-tripping, then
+		// reconstructed into the domain-friendly Pair<current, max> shape on read.
 		spellSlots = gson.fromJson<Map<Int, List<Int>>>(
 			spellSlotsJson,
 			spellSlotsMapType
@@ -159,7 +240,7 @@ fun CharacterEntry.toEntity(): CharacterEntity {
 	return CharacterEntity(
 		id = id,
 		name = name,
-		type = normalizeClassName(type),
+		type = normalizedCharacterTypeForStorage(type = type, party = party),
 		hp = hp,
 		maxHp = maxHp,
 		tempHp = tempHp,
@@ -171,6 +252,7 @@ fun CharacterEntry.toEntity(): CharacterEntity {
 		speed = speed,
 		initiative = initiative,
 		level = level,
+		challengeRating = challengeRating,
 		strength = strength,
 		dexterity = dexterity,
 		constitution = constitution,
@@ -193,6 +275,8 @@ fun CharacterEntry.toEntity(): CharacterEntity {
 		inventory = inventory,
 		isPlayerCharacter = party == CharacterParty.ADVENTURERS,
 		hasInspiration = hasInspiration,
+		// Persist spell slots as raw lists instead of Kotlin Pair JSON so older snapshots and Room
+		// rows keep a stable, library-agnostic wire shape.
 		spellSlotsJson = gson.toJson(spellSlots.mapValues {
 			listOf(
 				it.value.first,
@@ -289,7 +373,7 @@ fun SessionEntity.toDomain(): SessionRecord {
 		title = title,
 		date = date,
 		log = gson.fromJson(logJson, Array<String>::class.java).toList(),
-		snapshot = snapshotJson?.let { gson.fromJson(it, EncounterSnapshot::class.java) },
+		snapshot = snapshotJson?.let(::parseEncounterSnapshot),
 		reuseFlag = reuseFlag
 	)
 }

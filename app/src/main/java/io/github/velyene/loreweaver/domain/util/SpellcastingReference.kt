@@ -4,7 +4,7 @@
  * TABLE OF CONTENTS:
  * 1. Spell classification enums (SchoolOfMagic, SpellComponent, AreaOfEffect, CastingTime)
  * 2. Caster-type models (SpellcasterType, SpellSlotTable, SpellPreparationReferenceEntry)
- * 3. SpellcastingReference singleton â€” slot tables, caster rules, and spell economy data
+ * 3. SpellcastingReference singleton — slot tables, caster rules, and spell economy data
  */
 
 package io.github.velyene.loreweaver.domain.util
@@ -115,7 +115,7 @@ object SpellcastingReference {
 
 	val SPELL_PREPARATION_BY_CLASS_TABLE = ReferenceTable(
 		title = "Spell Preparation by Class",
-		columns = listOf("Class", "Change When Youâ€¦", "Number of Spells"),
+		columns = listOf("Class", "Change When You…", "Number of Spells"),
 		rows = SPELL_PREPARATION_BY_CLASS.map { entry ->
 			listOf(entry.className, entry.changeWhenYou, entry.numberOfSpells)
 		}
@@ -345,7 +345,7 @@ object SpellcastingReference {
 		return when (component) {
 			SpellComponent.VERBAL ->
 				"Chanting esoteric words in a normal speaking voice. A gagged creature or one in magical silence " +
-					"canâ€™t provide this component."
+					"can’t provide this component."
 
 			SpellComponent.SOMATIC ->
 				"A forceful gesticulation or intricate set of gestures. The caster must use at least one hand to " +
@@ -368,9 +368,9 @@ object SpellcastingReference {
 				"Some spells are cast as a Bonus Action, often in response to a trigger defined in the spell. " +
 					"Even then, you can expend only one spell slot on your turn."
 
-			CastingTime.REACTION -> "Cast in response to a trigger defined in the spellâ€™s Casting Time entry."
+			CastingTime.REACTION -> "Cast in response to a trigger defined in the spell’s Casting Time entry."
 			CastingTime.RITUAL ->
-				"A Ritual takes 10 minutes longer than normal to cast and doesnâ€™t expend a spell slot, but the " +
+				"A Ritual takes 10 minutes longer than normal to cast and doesn’t expend a spell slot, but the " +
 					"caster must have the spell prepared."
 
 			CastingTime.MINUTES ->
@@ -430,30 +430,30 @@ object SpellcastingReference {
 			"Preparing Spells" to
 				"If you have a list of level 1+ spells you prepare, your spellcasting feature specifies when you can " +
 				"change the list and the number of spells you can change, as summarized in the Spell Preparation by " +
-				"Class table. Most spellcasting monsters donâ€™t change their lists of prepared spells, but the GM is " +
+				"Class table. Most spellcasting monsters don’t change their lists of prepared spells, but the GM is " +
 				"free to alter them.",
 			"Always-Prepared Spells" to
 				"Certain features might give you a spell that you always have prepared. If you also have a list of " +
-				"prepared spells that you can change, a spell that you always have prepared doesnâ€™t count against " +
+				"prepared spells that you can change, a spell that you always have prepared doesn’t count against " +
 				"the number of spells on that list.",
 			"Casting Spells" to
 				"Each spell description has a series of entries that provide the details needed to cast the spell. The " +
-				"following sections explain each of those entries, which follow a spellâ€™s name.",
+				"following sections explain each of those entries, which follow a spell’s name.",
 			"Spell Level" to
-				"Every spell has a level from 0 to 9, which is indicated in a spellâ€™s description. A spellâ€™s level is " +
-				"an indicator of how powerful it is. Cantripsâ€”simple spells that can be cast almost by roteâ€”are " +
+				"Every spell has a level from 0 to 9, which is indicated in a spell’s description. A spell’s level is " +
+				"an indicator of how powerful it is. Cantrips—simple spells that can be cast almost by rote—are " +
 				"level 0. The rules for each spellcasting class say when its members gain access to spells of certain " +
 				"levels.",
 			"Spell Slots" to
 				"Spellcasting is taxing, so a spellcaster can cast only a limited number of level 1+ spells before " +
-				"resting. Spell slots are the main way a spellcasterâ€™s magical potential is represented. When you " +
-				"cast a spell, you expend a slot of that spellâ€™s level or higher. A level 1 spell fits into a slot of " +
+				"resting. Spell slots are the main way a spellcaster’s magical potential is represented. When you " +
+				"cast a spell, you expend a slot of that spell’s level or higher. A level 1 spell fits into a slot of " +
 				"any size, but a level 2 spell fits only into a slot that is at least level 2. Finishing a Long Rest " +
 				"restores any expended spell slots.",
 			"Casting without Slots" to
 				"There are several ways to cast a spell without expending a spell slot. Cantrips are cast without a " +
 				"spell slot. Ritual spells can be cast following the normal rules or as a Ritual, which takes 10 " +
-				"minutes longer but doesnâ€™t expend a spell slot; to do so, the spellcaster must have the spell " +
+				"minutes longer but doesn’t expend a spell slot; to do so, the spellcaster must have the spell " +
 				"prepared. Some special abilities let characters or monsters cast specific spells without a slot, " +
 				"often with another limit such as uses per day. Spell Scrolls and some other magic items also let you " +
 				"cast a spell without expending a slot.",
@@ -465,38 +465,38 @@ object SpellcastingReference {
 				"You must have training with any armor you are wearing to cast spells while wearing it. You are " +
 				"otherwise too hampered by the armor for spellcasting.",
 			"Class Spell Lists" to
-				"If a spell is on a classâ€™s spell list, the class name appears in parentheses after the spellâ€™s " +
+				"If a spell is on a class’s spell list, the class name appears in parentheses after the spell’s " +
 				"school of magic.",
 			"Casting Time" to
-				"A spellâ€™s Casting Time entry specifies whether it requires the Magic action, a Bonus Action, a " +
+				"A spell’s Casting Time entry specifies whether it requires the Magic action, a Bonus Action, a " +
 				"Reaction, or a longer time such as 1 minute or more.",
 			"One Spell with a Spell Slot per Turn" to
-				"On a turn, you can expend only one spell slot to cast a spell. You canâ€™t cast one slotted spell " +
+				"On a turn, you can expend only one spell slot to cast a spell. You can’t cast one slotted spell " +
 				"with the Magic action and another slotted spell with a Bonus Action on the same turn.",
 			"Reaction and Bonus Action Triggers" to
 				"Reaction spells and some Bonus Action spells are cast in response to triggers defined in the " +
-				"spellâ€™s Casting Time entry.",
+				"spell’s Casting Time entry.",
 			"Longer Casting Times" to
 				"A spell with a casting time of 1 minute or more requires the Magic action on each of your " +
 				"turns and Concentration throughout the casting. If Concentration breaks, the spell fails and " +
 				"no slot is expended.",
 			"Range" to
-				"A spellâ€™s range determines how far from the caster the spellâ€™s effect can originate. " +
+				"A spell’s range determines how far from the caster the spell’s effect can originate. " +
 				"Common forms are distance, Touch, and Self.",
 			"Components" to
-				"Spells can require Verbal, Somatic, and Material components. If the caster canâ€™t " +
-				"provide one or more required components, the spell canâ€™t be cast.",
+				"Spells can require Verbal, Somatic, and Material components. If the caster can’t " +
+				"provide one or more required components, the spell can’t be cast.",
 			"Duration" to
-				"A spellâ€™s duration might be Instantaneous, require Concentration, or last for a set " +
+				"A spell’s duration might be Instantaneous, require Concentration, or last for a set " +
 				"span of rounds, minutes, hours, or longer. Time-span spells you cast can usually be " +
-				"dismissed with no action if you arenâ€™t Incapacitated.",
+				"dismissed with no action if you aren’t Incapacitated.",
 			"Identifying an Ongoing Spell" to
 				"You can try to identify a non-instantaneous spell by its observable effects while its " +
 				"duration is ongoing. This requires the Study action and a successful DC 15 " +
 				"Intelligence (Arcana) check.",
 			"Targets" to
-				"A spellâ€™s description explains whether it targets creatures, objects, or something " +
-				"else. To target something, you usually need a clear path to it, so it canâ€™t be behind " +
+				"A spell’s description explains whether it targets creatures, objects, or something " +
+				"else. To target something, you usually need a clear path to it, so it can’t be behind " +
 				"Total Cover.",
 			"Saving Throws" to
 				"Spell save DC = 8 + your spellcasting ability modifier + your Proficiency Bonus. The " +
@@ -504,7 +504,7 @@ object SpellcastingReference {
 			"Attack Rolls" to "Spell attack modifier = your spellcasting ability modifier + your Proficiency Bonus.",
 			"Combining Spell Effects" to
 				"Effects of different spells add together while their durations overlap. Effects of the " +
-				"same spell cast multiple times donâ€™t combine; only the most potent or most recent " +
+				"same spell cast multiple times don’t combine; only the most potent or most recent " +
 				"overlapping effect applies."
 		)
 	}
@@ -589,15 +589,15 @@ object SpellcastingReference {
 		return listOf(
 			"A 1st-level spell fits into any slot, but a 2nd-level spell needs a 2nd-level slot or higher",
 			"Finishing a long rest restores all expended spell slots",
-			"You canâ€™t concentrate on two spells at once",
+			"You can’t concentrate on two spells at once",
 			"On your turn, you can expend only one spell slot to cast a spell",
-			"Ritual casting adds 10 minutes and doesnâ€™t use a spell slot, but the spell must be prepared",
+			"Ritual casting adds 10 minutes and doesn’t use a spell slot, but the spell must be prepared",
 			"Material components with a cost must be provided (can't use focus)",
 			"Consumed material components must be provided for each casting",
 			"You can target yourself with a creature-of-your-choice spell unless it requires a hostile " +
 				"creature or says otherwise",
 			"Invalid targets still waste the spell slot if a slotted spell was cast",
-			"The same spell doesnâ€™t stack with itself; use the most potent or most recent overlapping effect"
+			"The same spell doesn’t stack with itself; use the most potent or most recent overlapping effect"
 		)
 	}
 

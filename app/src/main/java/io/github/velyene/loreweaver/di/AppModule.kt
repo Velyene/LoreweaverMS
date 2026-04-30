@@ -24,6 +24,8 @@ import io.github.velyene.loreweaver.domain.repository.LogsRepository
 import io.github.velyene.loreweaver.domain.repository.NotesRepository
 import io.github.velyene.loreweaver.domain.repository.ReferencePreferencesRepository
 import io.github.velyene.loreweaver.domain.repository.SessionsRepository
+import io.github.velyene.loreweaver.ui.util.AndroidAppText
+import io.github.velyene.loreweaver.ui.util.AppText
 import javax.inject.Singleton
 
 @Suppress("unused")
@@ -67,6 +69,12 @@ object AppModule {
 		sharedPreferences: SharedPreferences
 	): ReferencePreferencesRepository {
 		return ReferencePreferencesRepositoryImpl(sharedPreferences)
+	}
+
+	@Provides
+	@Singleton
+	fun provideAppText(@ApplicationContext context: Context): AppText {
+		return AndroidAppText(context)
 	}
 
 	@Provides

@@ -1,9 +1,9 @@
 package io.github.velyene.loreweaver.ui.viewmodels
 
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.MainDispatcherRule
 import io.github.velyene.loreweaver.domain.model.Campaign
 import io.github.velyene.loreweaver.domain.model.Note
-import io.github.velyene.loreweaver.ui.util.CAMPAIGN_NOT_FOUND_MESSAGE
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -34,7 +34,7 @@ class CampaignDetailViewModelTest {
 
 			with(viewModel.uiState.value) {
 				assertFalse(isLoading)
-				assertEquals(CAMPAIGN_NOT_FOUND_MESSAGE, error)
+				assertEquals(expectedString(R.string.campaign_not_found_message), error)
 				assertNotNull(onRetry)
 			}
 		}

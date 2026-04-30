@@ -42,20 +42,23 @@ fun AddConditionDialog(
 	var hasDuration by remember { mutableStateOf(true) }
 	var persistsAcrossEncounters by remember { mutableStateOf(false) }
 	var expanded by remember { mutableStateOf(false) }
+	val selectedConditionLabel = ConditionConstants.ALL_CONDITIONS
+		.firstOrNull { it.name == selectedCondition }
+		?.let { stringResource(it.labelRes) }
+		.orEmpty()
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
 		title = { Text(stringResource(R.string.add_encounter_condition_dialog_title)) },
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-				// Condition selector
 				ExposedDropdownMenuBox(
 					expanded = expanded,
 					onExpandedChange = { expanded = !expanded },
 					modifier = Modifier.fillMaxWidth()
 				) {
 					OutlinedTextField(
-						value = selectedCondition,
+						value = selectedConditionLabel,
 						onValueChange = {},
 						readOnly = true,
 						label = { Text(stringResource(R.string.encounter_condition_label)) },
@@ -68,10 +71,11 @@ fun AddConditionDialog(
 						expanded = expanded,
 						onDismissRequest = { expanded = false }
 					) {
-						ConditionConstants.ALL_CONDITIONS.forEach { condition ->
+						ConditionConstants.ALL_STATUS_LABELS.forEach { condition ->
 							DropdownMenuItem(
-								text = { Text(condition) },
+								text = { Text(stringResource(condition.labelRes)) },
 								onClick = {
+									selectedCondition = condition.name
 									selectedCondition = condition
 												persistsAcrossEncounters = ConditionConstants.defaultPersistsAcrossEncounters(condition)
 									expanded = false
@@ -81,7 +85,6 @@ fun AddConditionDialog(
 					}
 				}
 
-				// Duration toggle
 				Row(
 					modifier = Modifier.fillMaxWidth(),
 					verticalAlignment = Alignment.CenterVertically
@@ -108,7 +111,6 @@ fun AddConditionDialog(
 					)
 				}
 
-				// Duration input
 				if (hasDuration) {
 					OutlinedTextField(
 						value = duration,

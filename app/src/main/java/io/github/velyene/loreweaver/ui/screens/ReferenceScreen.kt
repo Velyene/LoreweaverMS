@@ -7,7 +7,6 @@
  * 1. Screen entry point and category/list state setup
  * 2. Remembered derived content state
  * 3. Category content routing
- * 4. Monster availability placeholder helpers
  */
 
 package io.github.velyene.loreweaver.ui.screens
@@ -37,7 +36,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.util.DiseaseTemplate
-import io.github.velyene.loreweaver.domain.util.MonsterReferenceEntry
 import io.github.velyene.loreweaver.domain.util.PoisonTemplate
 import io.github.velyene.loreweaver.domain.util.ReferenceDetailResolver
 import io.github.velyene.loreweaver.domain.util.TrapTemplate
@@ -69,6 +67,8 @@ fun ReferenceScreen(
 	val categoryListStates = rememberReferenceCategoryListStates()
 
 	uiState.selectedReferenceDetail?.let { detail ->
+		// Detail views temporarily take over the screen instead of nesting inside the tab scaffold so
+		// deep links and in-app detail opens share one consistent back path.
 		GenericReferenceDetailView(
 			detail = detail,
 			onBack = viewModel::clearReferenceDetail
@@ -162,6 +162,8 @@ private fun rememberReferenceCategoryListStates(): Map<ReferenceCategory, LazyLi
 		coreRulesListState,
 		characterCreationListState
 	) {
+		// Keep a dedicated list state per category so switching tabs preserves each section's scroll
+		// position instead of snapping every category back to the top.
 		mapOf(
 			ReferenceCategory.TRAPS to trapsListState,
 			ReferenceCategory.POISONS to poisonsListState,
@@ -194,7 +196,8 @@ private fun rememberReferenceContentState(uiState: ReferenceUiState): ReferenceC
 		uiState.favoriteDiseaseNames,
 		uiState.filteredTraps,
 		uiState.filteredPoisons,
-		uiState.filteredDiseases
+		uiState.filteredDiseases,
+		uiState.filteredMonsters
 	) {
 		val favoriteCounts = mapOf(
 			ReferenceCategory.TRAPS to uiState.favoriteTrapNames.size,
@@ -212,6 +215,7 @@ private fun rememberReferenceContentState(uiState: ReferenceUiState): ReferenceC
 				ReferenceCategory.TRAPS -> uiState.filteredTraps.size
 				ReferenceCategory.POISONS -> uiState.filteredPoisons.size
 				ReferenceCategory.DISEASES -> uiState.filteredDiseases.size
+				ReferenceCategory.MONSTERS -> uiState.filteredMonsters.size
 				else -> null
 			}
 		)
@@ -285,7 +289,17 @@ private fun ReferenceCategoryContent(
 			onRoll = viewModel::rollMadness
 		)
 
-		ReferenceCategory.MONSTERS -> MonstersContent(searchQuery = uiState.appliedSearchQuery)
+		ReferenceCategory.MONSTERS -> MonstersContent(
+			monsters = uiState.filteredMonsters,
+			selectedGroup = uiState.selectedMonsterGroup,
+			selectedCreatureType = uiState.selectedMonsterCreatureType,
+			selectedChallengeRating = uiState.selectedMonsterChallengeRating,
+			listState = categoryListState,
+			onGroupSelected = viewModel::updateMonsterGroupFilter,
+			onCreatureTypeSelected = viewModel::updateMonsterCreatureTypeFilter,
+			onChallengeRatingSelected = viewModel::updateMonsterChallengeRatingFilter,
+			onOpenDetail = viewModel::openReferenceDetail
+		)
 		ReferenceCategory.CORE_RULES -> CoreRulesContent(
 			searchQuery = uiState.appliedSearchQuery,
 			listState = categoryListState
@@ -306,18 +320,3 @@ private fun ReferenceCategoryContent(
 // Madness content extracted to ReferenceScreenMadness.kt.
 // Spellcasting content extracted to ReferenceScreenSpellcasting.kt.
 
-@Composable
-private fun MonstersContent(searchQuery: String) {
-	ReferenceCenteredMessage(
-		message = if (searchQuery.isBlank()) {
-			stringResource(R.string.reference_monster_unavailable)
-		} else {
-			stringResource(R.string.reference_monster_search_unavailable)
-		}
-	)
-}
-
-
-internal fun filterMonsterEntries(): List<MonsterReferenceEntry> {
-	return emptyList()
-}

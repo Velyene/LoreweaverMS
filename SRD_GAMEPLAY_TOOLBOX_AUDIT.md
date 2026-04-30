@@ -2,7 +2,7 @@
 
 Snapshot date: 2026-04-20
 
-## Table of contents
+## Contents
 
 - [Summary](#summary)
 - [Hard release overlay](#hard-release-overlay)

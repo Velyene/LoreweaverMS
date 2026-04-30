@@ -2,70 +2,33 @@
  * FILE: CharacterListScreen.kt
  *
  * TABLE OF CONTENTS:
- * 1. Main List Screen (CharacterListScreen)
- *    a. Search & Filtering Logic
- *    b. Combat Mode State (Initiative, Rounds)
- *    c. Active Combat UI (Next Turn, Round Counter)
- * 2. State Bundles (SearchState, CombatState)
- * 3. Top Bar (CharacterListTopBar)
- * 4. Party Filter Tabs (PartyFilterTabs)
- * 5. Empty State (EmptyCharactersMessage)
- * 6. List Sections (InitiativeOrderList, GroupedCharacterList)
- * 7. UI Components (InitiativeItem, CharacterItem)
- * 8. Initiative Item Sub-sections
+ * 1. Character list route entry and screen state wiring
+ * 2. Initiative list item composable
+ * 3. Character list item composables
  */
 
 package io.github.velyene.loreweaver.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material3.Badge
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -88,7 +51,6 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -96,62 +58,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.util.CharacterParty
-import io.github.velyene.loreweaver.ui.theme.AntiqueGold
-import io.github.velyene.loreweaver.ui.theme.ArcaneTeal
-import io.github.velyene.loreweaver.ui.theme.MutedText
 import io.github.velyene.loreweaver.ui.viewmodels.CharacterViewModel
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
-private val CharacterEntry.partyLabel: String
+internal val CharacterEntry.partyLabel: String
 	get() = if (party == CharacterParty.ADVENTURERS) CharacterParty.ADVENTURERS else CharacterParty.MONSTERS
 
-// -----------------------------------------------------------------------------
-// 2. State Bundles
-// -----------------------------------------------------------------------------
-
-private data class SearchState(
-	val isActive: Boolean,
-	val query: String,
-	val onQueryChange: (String) -> Unit,
-	val onToggle: () -> Unit,
-	val selectedPartyFilter: String?,
-	val onPartyFilterChange: (String?) -> Unit
-)
-
-private data class CombatState(
-	val showInitiativeOrder: Boolean,
-	val onToggle: () -> Unit,
-	val sortByInitiative: Boolean,
-	val onToggleSort: () -> Unit,
-	val currentTurnIndex: Int,
-	val onNextTurn: () -> Unit,
-	val roundCount: Int,
-	val charactersSize: Int
-)
-
-// -----------------------------------------------------------------------------
-// View-state bundle for Scaffold body
-// -----------------------------------------------------------------------------
-
-private data class CharacterListViewState(
-	val showInitiativeOrder: Boolean,
-	val allParties: List<String>,
-	val selectedPartyFilter: String?,
-	val filteredCharacters: List<CharacterEntry>,
-	val searchQuery: String,
-	val groupedCharacters: Map<String, List<CharacterEntry>>,
-	val sortByInitiative: Boolean,
-	val currentTurnIndex: Int
-)
-
-// -----------------------------------------------------------------------------
-// 1. Main Screen
-// -----------------------------------------------------------------------------
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterListScreen(
 	onCharacterClick: (String) -> Unit,
@@ -206,7 +117,6 @@ fun CharacterListScreen(
 		query = searchQuery,
 		onQueryChange = { searchQuery = it },
 		onToggle = {
-// -----------------------------------------------------------------------------
 			@Suppress("UNUSED_VALUE")
 			isSearchActive = !isSearchActive
 			@Suppress("UNUSED_VALUE")

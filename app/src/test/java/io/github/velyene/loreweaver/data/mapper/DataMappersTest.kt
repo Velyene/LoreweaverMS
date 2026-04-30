@@ -1,8 +1,13 @@
 package io.github.velyene.loreweaver.data.mapper
 
 import io.github.velyene.loreweaver.data.entities.CharacterEntity
+import io.github.velyene.loreweaver.data.entities.SessionEntity
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
+import io.github.velyene.loreweaver.domain.model.DurationType
+import io.github.velyene.loreweaver.domain.util.CharacterParty
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 
 class DataMappersTest {

@@ -1,3 +1,12 @@
+/*
+ * FILE: ReferenceScreenDetail.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Generic reference detail composable
+ * 2. Detail section rendering helpers
+ * 3. Clipboard/share text formatting helpers
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
@@ -138,13 +147,13 @@ private fun buildReferenceDetailClipboardText(detail: ReferenceDetailContent): S
 		detail.sections.forEach { section ->
 			appendLine(section.title)
 			section.body?.takeIf { it.isNotBlank() }?.let { body -> appendLine(body) }
-			section.bullets.forEach { bullet -> appendLine("â€¢ $bullet") }
+			section.bullets.forEach { bullet -> appendLine("• $bullet") }
 			appendLine()
 		}
 		detail.tables.forEach { table ->
 			appendLine(table.title)
-			appendLine(table.columns.joinToString(" â€¢ "))
-			table.rows.forEach { row -> appendLine(row.joinToString(" â€¢ ")) }
+			appendLine(table.columns.joinToString(" • "))
+			table.rows.forEach { row -> appendLine(row.joinToString(" • ")) }
 			appendLine()
 		}
 		detail.note?.takeIf { it.isNotBlank() }?.let { note ->

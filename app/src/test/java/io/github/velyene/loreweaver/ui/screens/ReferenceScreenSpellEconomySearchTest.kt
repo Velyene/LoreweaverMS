@@ -1,57 +1,25 @@
 package io.github.velyene.loreweaver.ui.screens
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceScreenSpellEconomySearchTest {
 
 	@Test
 	fun filterEquipmentTables_matchesMagicItemReferenceTables() {
-		assertEquals(
-			listOf("Magic Item Categories"),
-			filterEquipmentTables("Immovable Rod").map { it.title }
-		)
-		assertEquals(
-			listOf("Potion Miscibility"),
-			filterEquipmentTables("4d10 Force damage").map { it.title }
-		)
-		assertEquals(
-			listOf("Magic Item Rarities and Values"),
-			filterEquipmentTables("Priceless").map { it.title }
-		)
-		assertEquals(
-			listOf("Magic Item Tools"),
-			filterEquipmentTables("nonmagical base item").map { it.title }
-		)
-		assertEquals(
-			listOf("Magic Item Crafting Time and Cost"),
-			filterEquipmentTables("250 days").map { it.title }
-		)
-		assertEquals(
-			listOf("Sentient Itemâ€™s Communication"),
-			filterEquipmentTables("telepathically").map { it.title }
-		)
-		assertEquals(
-			listOf("Sentient Itemâ€™s Senses"),
-			filterEquipmentTables("Darkvision out to 120 feet").map { it.title }
-		)
-		assertEquals(
-			listOf("Sentient Itemâ€™s Special Purpose"),
-			filterEquipmentTables("Soulmate Seeker").map { it.title }
-		)
-		assertTrue(filterEquipmentTables("Nonexistent Spell Economy Term").isEmpty())
+		assertQueryResults(listOf("Magic Item Categories"), "Immovable Rod", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Potion Miscibility"), "4d10 Force damage", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Magic Item Rarities and Values"), "Priceless", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Magic Item Tools"), "nonmagical base item", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Magic Item Crafting Time and Cost"), "250 days", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Sentient Item’s Communication"), "telepathically", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Sentient Item’s Senses"), "Darkvision out to 120 feet", ::filterEquipmentTables) { it.title }
+		assertQueryResults(listOf("Sentient Item’s Special Purpose"), "Soulmate Seeker", ::filterEquipmentTables) { it.title }
+		assertNoQueryResults("Nonexistent Spell Economy Term", ::filterEquipmentTables)
 	}
 
 	@Test
 	fun filterAdventuringGear_matchesGenericMagicItemRows() {
-		assertEquals(
-			listOf("Spell Scroll"),
-			filterAdventuringGear("stored magic").map { it.name }
-		)
-		assertEquals(
-			listOf("Potion of Healing"),
-			filterAdventuringGear("Potion Miscibility table").map { it.name }
-		)
+		assertQueryResults(listOf("Spell Scroll"), "stored magic", ::filterAdventuringGear) { it.name }
+		assertQueryResults(listOf("Potion of Healing"), "Potion Miscibility table", ::filterAdventuringGear) { it.name }
 	}
 }

@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. Reference data models (CoreRuleSection, CoreGlossaryEntry)
- * 2. CoreRulesReference singleton â€” section and glossary datasets
+ * 2. CoreRulesReference singleton — section and glossary datasets
  */
 
 package io.github.velyene.loreweaver.domain.util
@@ -48,7 +48,7 @@ data class CoreGlossaryEntry(
  */
 object CoreRulesReference {
 	// -----------------------------------------------------------------------
-	// Cross-reference term constants â€” extracted to satisfy SonarQube S1192
+	// Cross-reference term constants — extracted to satisfy SonarQube S1192
 	// -----------------------------------------------------------------------
 	private const val ABILITY_CHECK = "Ability Check"
 	private const val AREA_OF_EFFECT = "Area of Effect"
@@ -81,14 +81,10 @@ object CoreRulesReference {
 	// Section and glossary content
 	// -----------------------------------------------------------------------
 	const val INTRODUCTION =
-		"This tab condenses the system loop used most often at the table: scene framing, d20 resolution, " +
-			"movement, combat timing, and recovery. It is meant to be a fast rules digest rather than a full " +
-			"rulebook replacement."
+		"Fast table digest for scene framing, d20 resolution, movement, combat timing, and recovery."
 
 	const val GLOSSARY_INTRODUCTION =
-		"This glossary is organized for fast table lookups. Bracket tags group related rule families, search " +
-			"checks both terms and cross-references, and the entries stay concise so they work as a quick reminder " +
-			"rather than a full rulebook transcript."
+		"Glossary tags group related rules and keep search results quick, concise, and table-ready."
 
 	val GLOSSARY_CONVENTIONS = listOf(
 		"Bracket tags identify shared rule families such as actions, attitudes, conditions, hazards, and area shapes.",
@@ -113,9 +109,7 @@ object CoreRulesReference {
 		CoreRuleSection(
 			title = "Rhythm of Play",
 			summary =
-				"Play usually loops through the Game Master describing the scene, the players declaring actions, and " +
-					"the Game Master narrating the outcome. Combat keeps the same pattern but formalizes it with turns " +
-					"and rounds.",
+				"Play cycles through scene framing, declared actions, and narrated outcomes; combat formalizes that loop with turns and rounds.",
 			bullets = listOf(
 				"The Game Master establishes the location, threats, and opportunities.",
 				"Players explain what their characters attempt.",
@@ -154,8 +148,7 @@ object CoreRulesReference {
 		CoreRuleSection(
 			title = "Saving Throws",
 			summary =
-				"Saving throws represent resisting or avoiding threats that target the body, senses, or mind. You can " +
-					"also choose to fail a save voluntarily.",
+				"Saving throws resist or avoid threats aimed at the body, senses, or mind, and a creature can choose to fail one.",
 			bullets = listOf(
 				"Strength resists direct physical force.",
 				"Dexterity avoids blasts, traps, and sudden danger.",
@@ -169,9 +162,7 @@ object CoreRulesReference {
 		CoreRuleSection(
 			title = "Attack Rolls and Armor Class",
 			summary =
-				"Weapon attacks usually use Strength in melee and Dexterity at range, while spell attacks use the " +
-					"casting ability defined by the attacker. Base Armor Class starts at 10 plus Dexterity modifier " +
-					"unless armor, a feature, or magic supplies another formula.",
+				"Weapon attacks usually use Strength in melee and Dexterity at range, while Armor Class starts from the best available formula.",
 			bullets = listOf(
 				"A natural 20 on an attack is an automatic hit and a critical hit.",
 				"A natural 1 on an attack always misses.",
@@ -182,8 +173,7 @@ object CoreRulesReference {
 		CoreRuleSection(
 			title = "Advantage, Disadvantage, and Heroic Inspiration",
 			summary =
-				"Advantage means roll two d20s and keep the higher; disadvantage keeps the lower. They never stack, " +
-					"and if both apply, they cancel. Heroic Inspiration lets you reroll one die after you see it.",
+				"Advantage keeps the higher d20, disadvantage keeps the lower, and Heroic Inspiration lets you reroll one die after seeing it.",
 			bullets = listOf(
 				"Even if several effects grant advantage, you still roll only two d20s.",
 				"Even if several effects impose disadvantage, you still roll only two d20s.",
@@ -195,8 +185,7 @@ object CoreRulesReference {
 		CoreRuleSection(
 			title = "Proficiency",
 			summary =
-				"Proficiency shows trained competence. Add the proficiency bonus once when a rule says the creature is " +
-					"proficient in the relevant skill, save, tool, weapon, or spell attack.",
+				"Add the proficiency bonus once when a rule says the creature is trained with the relevant skill, save, tool, weapon, or spell attack.",
 			bullets = listOf(
 				"The same proficiency bonus cannot be added to the same roll more than once.",
 				"A doubled or halved proficiency bonus is still modified only one time each way.",
@@ -220,8 +209,7 @@ object CoreRulesReference {
 		CoreRuleSection(
 			title = "Social Interaction",
 			summary =
-				"Conversations can be resolved through roleplay alone or by checks when uncertainty matters. Nonplayer " +
-					"creatures usually begin from a friendly, indifferent, or hostile attitude.",
+				"Use roleplay first, then checks when uncertainty matters; most NPCs begin friendly, indifferent, or hostile.",
 			bullets = listOf(
 				"Roleplay can improve or worsen an attitude before any roll happens.",
 				"Use Influence when the outcome hinges on persuasion, deception, intimidation, performance, or animal handling.",
@@ -279,7 +267,7 @@ object CoreRulesReference {
 				"You can drop prone for free on your turn unless your speed is 0.",
 				"You can move through allies, tiny creatures, incapacitated creatures, or creatures that are much " +
 					"larger or smaller than you, but their spaces may count as difficult terrain.",
-				"You cannot willingly end movement in another creatureâ€™s space."
+				"You cannot willingly end movement in another creature’s space."
 			),
 			keywords = listOf("difficult terrain", "prone", "creature size", "grid")
 		),
@@ -292,7 +280,7 @@ object CoreRulesReference {
 				"Ranged attacks use a normal range and sometimes a longer range with disadvantage.",
 				"Ranged attacks made while an enemy is adjacent are usually at disadvantage.",
 				"Melee attacks usually reach 5 feet unless a feature or stat block extends that reach.",
-				"Leaving a hostile creatureâ€™s reach can provoke an opportunity attack unless something prevents " +
+				"Leaving a hostile creature’s reach can provoke an opportunity attack unless something prevents " +
 					"it."
 			),
 			keywords = listOf(
@@ -389,7 +377,7 @@ object CoreRulesReference {
 		CoreRuleSection(
 			title = "Damage, Healing, and Dying",
 			summary =
-				"Damage reduces hit points, critical hits roll the attackâ€™s damage dice twice, and " +
+				"Damage reduces hit points, critical hits roll the attack’s damage dice twice, and " +
 					"creatures at 0 hit points either die outright or fall unconscious and begin death " +
 					"saves.",
 			bullets = listOf(
@@ -439,11 +427,11 @@ object CoreRulesReference {
 		columns = listOf("Score", "Meaning"),
 		rows = listOf(
 			listOf("1", "Lowest normal value; effects explain what happens at 0."),
-			listOf("2â€“9", "Weak capability"),
-			listOf("10â€“11", "Human average"),
-			listOf("12â€“19", "Strong capability"),
+			listOf("2–9", "Weak capability"),
+			listOf("10–11", "Human average"),
+			listOf("12–19", "Strong capability"),
 			listOf("20", "Highest normal adventurer score unless a feature says otherwise"),
-			listOf("21â€“29", "Extraordinary capability"),
+			listOf("21–29", "Extraordinary capability"),
 			listOf("30", "Highest possible score")
 		)
 	)
@@ -452,21 +440,21 @@ object CoreRulesReference {
 		title = "Ability Modifiers",
 		columns = listOf("Score", "Modifier"),
 		rows = listOf(
-			listOf("1", "âˆ’5"),
-			listOf("2â€“3", "âˆ’4"),
-			listOf("4â€“5", "âˆ’3"),
-			listOf("6â€“7", "âˆ’2"),
-			listOf("8â€“9", "âˆ’1"),
-			listOf("10â€“11", "+0"),
-			listOf("12â€“13", "+1"),
-			listOf("14â€“15", "+2"),
-			listOf("16â€“17", "+3"),
-			listOf("18â€“19", "+4"),
-			listOf("20â€“21", "+5"),
-			listOf("22â€“23", "+6"),
-			listOf("24â€“25", "+7"),
-			listOf("26â€“27", "+8"),
-			listOf("28â€“29", "+9"),
+			listOf("1", "−5"),
+			listOf("2–3", "−4"),
+			listOf("4–5", "−3"),
+			listOf("6–7", "−2"),
+			listOf("8–9", "−1"),
+			listOf("10–11", "+0"),
+			listOf("12–13", "+1"),
+			listOf("14–15", "+2"),
+			listOf("16–17", "+3"),
+			listOf("18–19", "+4"),
+			listOf("20–21", "+5"),
+			listOf("22–23", "+6"),
+			listOf("24–25", "+7"),
+			listOf("26–27", "+8"),
+			listOf("28–29", "+9"),
 			listOf("30", "+10")
 		)
 	)
@@ -477,7 +465,7 @@ object CoreRulesReference {
 		rows = listOf(
 			listOf("Strength", "Melee weapon attacks and unarmed strikes"),
 			listOf("Dexterity", "Ranged weapon attacks"),
-			listOf("Varies", "Spell attacks use the attackerâ€™s spellcasting ability")
+			listOf("Varies", "Spell attacks use the attacker’s spellcasting ability")
 		)
 	)
 
@@ -499,13 +487,13 @@ object CoreRulesReference {
 		columns = listOf("Level or CR", "Bonus"),
 		rows = listOf(
 			listOf("Up to 4", "+2"),
-			listOf("5â€“8", "+3"),
-			listOf("9â€“12", "+4"),
-			listOf("13â€“16", "+5"),
-			listOf("17â€“20", "+6"),
-			listOf("21â€“24", "+7"),
-			listOf("25â€“28", "+8"),
-			listOf("29â€“30", "+9")
+			listOf("5–8", "+3"),
+			listOf("9–12", "+4"),
+			listOf("13–16", "+5"),
+			listOf("17–20", "+6"),
+			listOf("21–24", "+7"),
+			listOf("25–28", "+8"),
+			listOf("29–30", "+9")
 		)
 	)
 
@@ -545,9 +533,9 @@ object CoreRulesReference {
 				"Dodge",
 				"Attack rolls against you have disadvantage, and Dexterity saves have advantage until your next turn"
 			),
-			listOf("Help", "Aid another creatureâ€™s check or attack, or administer first aid"),
+			listOf("Help", "Aid another creature’s check or attack, or administer first aid"),
 			listOf("Hide", "Make a Dexterity (Stealth) check"),
-			listOf("Influence", "Try to change a creatureâ€™s attitude with a social check"),
+			listOf("Influence", "Try to change a creature’s attitude with a social check"),
 			listOf("Magic", "Cast a spell or use a magical feature or item"),
 			listOf("Ready", "Set a trigger and prepare an action"),
 			listOf("Search", "Use Wisdom to find clues, threats, or wounds"),
@@ -588,7 +576,7 @@ object CoreRulesReference {
 		title = "Creature Size and Space",
 		columns = listOf("Size", "Space (Feet)", "Space (Squares)"),
 		rows = listOf(
-			listOf("Tiny", "2Â½ by 2Â½ feet", "4 per square"),
+			listOf("Tiny", "2½ by 2½ feet", "4 per square"),
 			listOf("Small", "5 by 5 feet", "1 square"),
 			listOf("Medium", "5 by 5 feet", "1 square"),
 			listOf("Large", "10 by 10 feet", "4 squares (2 by 2)"),

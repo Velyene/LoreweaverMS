@@ -6,7 +6,7 @@ internal object EquipmentReferenceSectionsData {
 	val CHAPTER_SECTIONS = listOf(
 		CharacterCreationTextSection(
 			title = "Coins",
-			body = "Coins come in different denominations. The Coin Values table lists coins and how much theyâ€™re worth relative to the Gold Piece, the gameâ€™s main coin."
+			body = "Coins come in different denominations. The Coin Values table lists coins and how much they’re worth relative to the Gold Piece, the game’s main coin."
 		),
 		CharacterCreationTextSection(
 			title = "Weapons",
@@ -26,7 +26,7 @@ internal object EquipmentReferenceSectionsData {
 		),
 		CharacterCreationTextSection(
 			title = "Tools",
-			body = "A tool helps you make specialized ability checks, craft items, or both. A toolâ€™s description includes cost, weight, ability, utilize options, and variants."
+			body = "A tool helps you make specialized ability checks, craft items, or both. A tool’s description includes cost, weight, ability, utilize options, and variants."
 		),
 		CharacterCreationTextSection(
 			title = "Tool Proficiency",
@@ -112,11 +112,11 @@ internal object EquipmentReferenceSectionsData {
 		),
 		CharacterCreationTextSection(
 			title = "Sap",
-			body = "Sap hampers a targetâ€™s next strike."
+			body = "Sap hampers a target’s next strike."
 		),
 		CharacterCreationTextSection(
 			title = "Slow",
-			body = "Slow can reduce a targetâ€™s Speed after a hit."
+			body = "Slow can reduce a target’s Speed after a hit."
 		),
 		CharacterCreationTextSection(
 			title = "Topple",

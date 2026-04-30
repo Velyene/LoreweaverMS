@@ -1,3 +1,12 @@
+/*
+ * FILE: CombatantConditionsRow.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Combatant conditions row composable
+ * 2. Condition chip rendering helpers
+ * 3. Condition duration formatting helpers
+ */
+
 package io.github.velyene.loreweaver.ui.screens.tracker.live
 
 import androidx.compose.foundation.BorderStroke
@@ -27,7 +36,6 @@ import io.github.velyene.loreweaver.ui.screens.canonicalStatusLabel
 import io.github.velyene.loreweaver.ui.screens.statusChipDisplayText
 import io.github.velyene.loreweaver.ui.screens.statusChipModel
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun CombatantStatusRow(
 	combatant: CombatantState,
@@ -48,6 +56,10 @@ internal fun CombatantStatusRow(
 			}
 		)
 	}
+	val conditionsStateDescription = stringResource(
+		R.string.conditions_state_description,
+		conditionsStateValue
+	)
 
 	StatusChipFlowRow(
 		statuses = statuses,

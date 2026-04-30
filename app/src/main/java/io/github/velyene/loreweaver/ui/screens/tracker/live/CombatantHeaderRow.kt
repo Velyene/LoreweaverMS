@@ -33,12 +33,17 @@ internal fun CombatantHeaderRow(
 ) {
 	val initiativeSummary = stringResource(R.string.combatant_initiative_summary, combatant.initiative)
 	val hpSummary = formatCombatantHpLabel(combatant)
+	val stateSummary = stringResource(
+		R.string.combatant_header_state_description,
+		initiativeSummary,
+		hpSummary
+	)
 
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
 			.semantics {
-				stateDescription = "$initiativeSummary, $hpSummary"
+				stateDescription = stateSummary
 			},
 		verticalAlignment = Alignment.CenterVertically
 	) {
@@ -96,7 +101,21 @@ private fun combatantNameWeight(isActive: Boolean): FontWeight {
 	return if (isActive) FontWeight.Bold else FontWeight.Normal
 }
 
+@Composable
 private fun formatCombatantHpLabel(combatant: CombatantState): String {
-	return "HP: ${combatant.currentHp}/${combatant.maxHp}${if (combatant.tempHp > 0) " +${combatant.tempHp}" else ""}"
+	return if (combatant.tempHp > 0) {
+		stringResource(
+			R.string.combatant_hp_label_with_temp,
+			combatant.currentHp,
+			combatant.maxHp,
+			combatant.tempHp
+		)
+	} else {
+		stringResource(
+			R.string.combatant_hp_label,
+			combatant.currentHp,
+			combatant.maxHp
+		)
+	}
 }
 

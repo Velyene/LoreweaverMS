@@ -1,8 +1,6 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.CharacterCreationReference
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceScreenBackgroundSearchTest {
@@ -19,51 +17,45 @@ class ReferenceScreenBackgroundSearchTest {
 		val sage = CharacterCreationReference.BACKGROUNDS.first { it.name == "Sage" }
 		val soldier = CharacterCreationReference.BACKGROUNDS.first { it.name == "Soldier" }
 
-		assertTrue(acolyte.matchesSearchQuery(ACOLYTE))
-		assertTrue(acolyte.matchesSearchQuery("Religion"))
-		assertTrue(criminal.matchesSearchQuery(CROWBAR))
-		assertTrue(criminal.matchesSearchQuery("Thieves' Tools"))
-		assertTrue(sage.matchesSearchQuery("Magic Initiate"))
-		assertTrue(soldier.matchesSearchQuery("Gaming Set"))
+		assertMatchesAll(acolyte::matchesSearchQuery, ACOLYTE, "Religion")
+		assertMatchesAll(criminal::matchesSearchQuery, CROWBAR, "Thieves' Tools")
+		assertMatchesAll(sage::matchesSearchQuery, "Magic Initiate")
+		assertMatchesAll(soldier::matchesSearchQuery, "Gaming Set")
 	}
 
 	@Test
 	fun filterCharacterCreationBackgrounds_returnsExpectedMatchesForQuery() {
-		assertEquals(
+		assertQueryResults(
 			listOf(CRIMINAL),
-			filterCharacterCreationBackgrounds(CROWBAR).map { it.name })
-		assertEquals(
+			CROWBAR,
+			::filterCharacterCreationBackgrounds
+		) { it.name }
+		assertQueryResults(
 			listOf(ACOLYTE),
-			filterCharacterCreationBackgrounds("Religion").map { it.name })
-		assertEquals(listOf("Sage"), filterCharacterCreationBackgrounds("History").map { it.name })
-		assertTrue(filterCharacterCreationBackgrounds("Nonexistent Background Term").isEmpty())
+			"Religion",
+			::filterCharacterCreationBackgrounds
+		) { it.name }
+		assertQueryResults(listOf("Sage"), "History", ::filterCharacterCreationBackgrounds) { it.name }
+		assertNoQueryResults("Nonexistent Background Term", ::filterCharacterCreationBackgrounds)
 	}
 
 	@Test
 	fun visibleCharacterCreationBackgrounds_respectsSubsectionWhenQueryBlank() {
-		assertEquals(
+		assertVisibleWhenBlankInSubsection(
 			CharacterCreationReference.BACKGROUNDS.map { it.name },
-			visibleCharacterCreationBackgrounds(
-				"",
-				CharacterCreationSubsection.SPECIES_ORIGIN
-			).map { it.name }
-		)
-		assertTrue(
-			visibleCharacterCreationBackgrounds(
-				"",
-				CharacterCreationSubsection.ABILITIES
-			).isEmpty()
-		)
+			CharacterCreationSubsection.SPECIES_ORIGIN,
+			::visibleCharacterCreationBackgrounds
+		) { it.name }
+		assertHiddenWhenBlankInSubsection(CharacterCreationSubsection.ABILITIES, ::visibleCharacterCreationBackgrounds)
 	}
 
 	@Test
 	fun visibleCharacterCreationBackgrounds_usesAllSubsectionForActiveSearch() {
-		assertEquals(
+		assertVisibleForSearch(
 			listOf(CRIMINAL),
-			visibleCharacterCreationBackgrounds(
-				CROWBAR,
-				CharacterCreationSubsection.ABILITIES
-			).map { it.name }
-		)
+			CROWBAR,
+			CharacterCreationSubsection.ABILITIES,
+			::visibleCharacterCreationBackgrounds
+		) { it.name }
 	}
 }

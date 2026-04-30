@@ -22,6 +22,8 @@ import io.github.velyene.loreweaver.domain.util.DiseaseReference
 import io.github.velyene.loreweaver.domain.util.DiseaseTemplate
 import io.github.velyene.loreweaver.domain.util.MadnessDuration
 import io.github.velyene.loreweaver.domain.util.MadnessReference
+import io.github.velyene.loreweaver.domain.util.MonsterReferenceCatalog
+import io.github.velyene.loreweaver.domain.util.MonsterReferenceEntry
 import io.github.velyene.loreweaver.domain.util.PoisonReference
 import io.github.velyene.loreweaver.domain.util.PoisonTemplate
 import io.github.velyene.loreweaver.domain.util.ReferenceDetailContent
@@ -70,7 +72,11 @@ data class ReferenceUiState(
 	val filteredTraps: List<TrapTemplate> = TrapReference.TEMPLATES,
 	val filteredPoisons: List<PoisonTemplate> = PoisonReference.TEMPLATES,
 	val filteredDiseases: List<DiseaseTemplate> = DiseaseReference.TEMPLATES,
+	val filteredMonsters: List<MonsterReferenceEntry> = MonsterReferenceCatalog.ALL,
 	val showFavoritesOnly: Boolean = false,
+	val selectedMonsterGroup: String? = null,
+	val selectedMonsterCreatureType: String? = null,
+	val selectedMonsterChallengeRating: String? = null,
 	val favoriteTrapNames: Set<String> = emptySet(),
 	val favoritePoisonNames: Set<String> = emptySet(),
 	val favoriteDiseaseNames: Set<String> = emptySet(),
@@ -238,6 +244,30 @@ class ReferenceViewModel @Inject constructor(
 		applySearchImmediately(_uiState.value.appliedSearchQuery)
 	}
 
+	fun updateMonsterCreatureTypeFilter(creatureType: String?) {
+		cancelPendingSearch()
+		_uiState.update {
+			it.copy(selectedMonsterCreatureType = creatureType, selectedReferenceDetail = null)
+		}
+		applySearchImmediately(_uiState.value.appliedSearchQuery)
+	}
+
+	fun updateMonsterGroupFilter(group: String?) {
+		cancelPendingSearch()
+		_uiState.update {
+			it.copy(selectedMonsterGroup = group, selectedReferenceDetail = null)
+		}
+		applySearchImmediately(_uiState.value.appliedSearchQuery)
+	}
+
+	fun updateMonsterChallengeRatingFilter(challengeRating: String?) {
+		cancelPendingSearch()
+		_uiState.update {
+			it.copy(selectedMonsterChallengeRating = challengeRating, selectedReferenceDetail = null)
+		}
+		applySearchImmediately(_uiState.value.appliedSearchQuery)
+	}
+
 	/**
 	 * Select madness duration type
 	 */
@@ -345,6 +375,8 @@ class ReferenceViewModel @Inject constructor(
 			searchQuery = query,
 			appliedSearchQuery = query,
 			isSearchPending = false,
+			// Favorites-only survives category switches only on sections that actually expose stored
+			// favorites; other tabs reset to their normal full-content view.
 			showFavoritesOnly = category.supportsFavoritesFilter() && showFavoritesOnly
 		).clearSelectedDetails()
 	}
@@ -385,6 +417,15 @@ class ReferenceViewModel @Inject constructor(
 				filteredDiseases = DiseaseReference.TEMPLATES
 					.filterByQuery(query, ::matchesDiseaseQuery)
 					.filterFavoritesOnly(showFavoritesOnly) { disease -> disease.name in favoriteDiseaseNames }
+			)
+
+			ReferenceCategory.MONSTERS -> copy(
+				filteredMonsters = MonsterReferenceCatalog.filter(
+					query = query,
+					group = selectedMonsterGroup,
+					creatureType = selectedMonsterCreatureType,
+					challengeRating = selectedMonsterChallengeRating
+				)
 			)
 
 			else -> this

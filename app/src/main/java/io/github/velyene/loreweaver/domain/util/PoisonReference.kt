@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. PoisonType enum and PoisonTemplate model
- * 2. PoisonReference singleton â€” poison dataset and search utilities
+ * 2. PoisonReference singleton — poison dataset and search utilities
  */
 
 package io.github.velyene.loreweaver.domain.util

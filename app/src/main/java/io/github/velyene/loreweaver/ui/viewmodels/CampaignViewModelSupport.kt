@@ -1,22 +1,34 @@
 package io.github.velyene.loreweaver.ui.viewmodels
 
-internal const val CAMPAIGN_EDITOR_ADD_CAMPAIGN_ERROR_PREFIX = "Failed to add campaign"
-internal const val CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX = "Failed to add encounter"
-internal const val CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX = "Failed to add note"
-internal const val CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX = "Failed to update note"
-internal const val CAMPAIGN_EDITOR_DELETE_NOTE_ERROR_PREFIX = "Failed to delete note"
-internal const val UNKNOWN_ERROR_FALLBACK = "Unknown error"
+import androidx.annotation.StringRes
+import io.github.velyene.loreweaver.R
+import io.github.velyene.loreweaver.ui.util.AppText
 
-internal fun formatEncounterAddedWithMonstersMessage(monsterCount: Int): String {
-	return "Encounter created with $monsterCount monsters!"
+internal fun formatEncounterAddedWithMonstersMessage(
+	appText: AppText,
+	monsterCount: Int
+): String {
+	return appText.getQuantityString(
+		R.plurals.encounter_created_with_monsters_message,
+		monsterCount,
+		monsterCount
+	)
 }
 
-internal fun exceptionDetail(exception: Exception): String {
-	return exception.localizedMessage ?: exception.message ?: UNKNOWN_ERROR_FALLBACK
+internal fun exceptionDetail(appText: AppText, exception: Exception): String {
+	return exception.localizedMessage ?: exception.message ?: appText.getString(R.string.unknown_error)
 }
 
-internal fun formatCampaignError(prefix: String, exception: Exception): String {
-	return "$prefix: ${exceptionDetail(exception)}"
+internal fun formatCampaignError(
+	appText: AppText,
+	@StringRes prefixResId: Int,
+	exception: Exception
+): String {
+	return appText.getString(
+		R.string.message_with_detail,
+		appText.getString(prefixResId),
+		exceptionDetail(appText, exception)
+	)
 }
 
 internal fun CampaignListUiState.beginLoading(): CampaignListUiState =
@@ -31,7 +43,7 @@ internal fun CampaignListUiState.withError(
 	onRetry = onRetry
 )
 
-internal fun CampaignListUiState.clearErrorState(): CampaignListUiState = copy(error = null)
+internal fun CampaignListUiState.clearErrorState(): CampaignListUiState = copy(error = null, onRetry = null)
 
 internal fun CampaignDetailUiState.beginLoading(): CampaignDetailUiState =
 	copy(isLoading = true, error = null, onRetry = null)
@@ -45,4 +57,31 @@ internal fun CampaignDetailUiState.withError(
 	onRetry = onRetry
 )
 
-internal fun CampaignDetailUiState.clearErrorState(): CampaignDetailUiState = copy(error = null)
+internal fun CampaignDetailUiState.clearErrorState(): CampaignDetailUiState = copy(error = null, onRetry = null)
+
+internal fun CharacterUiState.beginLoading(): CharacterUiState = copy(isLoading = true, error = null)
+
+internal fun CharacterUiState.withError(message: String): CharacterUiState = copy(
+	isLoading = false,
+	error = message
+)
+
+internal fun CharacterUiState.clearErrorState(): CharacterUiState = copy(error = null)
+
+internal fun CombatUiState.beginLoading(): CombatUiState = copy(
+	isLoading = true,
+	error = null,
+	onRetry = null
+)
+
+internal fun CombatUiState.withError(
+	message: String?,
+	onRetry: (() -> Unit)? = null
+): CombatUiState = copy(
+	isLoading = false,
+	error = message,
+	onRetry = onRetry
+)
+
+internal fun CombatUiState.clearErrorState(): CombatUiState = copy(error = null, onRetry = null)
+

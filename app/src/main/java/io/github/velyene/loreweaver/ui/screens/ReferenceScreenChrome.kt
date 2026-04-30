@@ -95,6 +95,7 @@ internal fun SearchBar(
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(16.dp),
+		label = { Text(stringResource(R.string.reference_search_label)) },
 		placeholder = { Text(stringResource(R.string.reference_search_hint)) },
 		leadingIcon = { Icon(Icons.Default.Search, stringResource(R.string.search_button)) },
 		trailingIcon = { SearchBarTrailingIcon(query = query, onClear = onClear) },

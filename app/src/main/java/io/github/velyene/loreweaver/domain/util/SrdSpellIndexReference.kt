@@ -2,13 +2,13 @@
  * FILE: SrdSpellIndexReference.kt
  *
  * TABLE OF CONTENTS:
- * 1. SrdSpellIndexReference singleton â€” alphabetically ordered SRD spell names list
+ * 1. SrdSpellIndexReference singleton — alphabetically ordered SRD spell names list
  */
 
 package io.github.velyene.loreweaver.domain.util
 
 object SrdSpellIndexReference {
-	private val apostropheVariantRegex = Regex("â€™|â€˜|`|Â´")
+	private val apostropheVariantRegex = Regex("’|‘|\u00e2\u20ac\u2122|\u00e2\u20ac\u02dc|`|´|\u00c2\u00b4")
 	private val punctuationRegex = Regex("[^a-z0-9]+")
 	private val whitespaceRegex = Regex("\\s+")
 
@@ -30,7 +30,7 @@ object SrdSpellIndexReference {
 		Arcane Hand
 		Arcane Lock
 		Arcane Sword
-		Arcanistâ€™s Magic Aura
+		Arcanist’s Magic Aura
 		Astral Projection
 		Augury
 		Aura of Life
@@ -110,7 +110,7 @@ object SrdSpellIndexReference {
 		Dominate Beast
 		Dominate Monster
 		Dominate Person
-		Dragonâ€™s Breath
+		Dragon’s Breath
 		Dream
 		Druidcraft
 		Earthquake
@@ -176,14 +176,14 @@ object SrdSpellIndexReference {
 		Healing Word
 		Heat Metal
 		Hellish Rebuke
-		Heroesâ€™ Feast
+		Heroes’ Feast
 		Heroism
 		Hex
 		Hideous Laughter
 		Hold Monster
 		Hold Person
 		Holy Aura
-		Hunterâ€™s Mark
+		Hunter’s Mark
 		Hypnotic Pattern
 		Ice Knife
 		Ice Storm

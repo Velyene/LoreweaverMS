@@ -658,7 +658,7 @@ private fun SpellSlotCard(slotTable: SpellSlotTable) {
 		slotTable.slot9
 	)
 		.mapIndexedNotNull { index, value ->
-			if (value > 0) "${SpellcastingReference.getSpellLevelName(index + 1)} Ã—$value" else null
+			if (value > 0) "${SpellcastingReference.getSpellLevelName(index + 1)} ×$value" else null
 		}
 
 	Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
@@ -687,7 +687,7 @@ private fun SpellSlotCard(slotTable: SpellSlotTable) {
 			}
 			if (slots.isNotEmpty()) {
 				Text(
-					text = slots.joinToString("  â€¢  "),
+					text = slots.joinToString("  •  "),
 					style = MaterialTheme.typography.bodyMedium
 				)
 			}
@@ -731,7 +731,7 @@ private fun buildSpellcastingShareText(
 			slotTable.slot9
 		)
 			.mapIndexedNotNull { index, value ->
-				if (value > 0) "${SpellcastingReference.getSpellLevelName(index + 1)} Ã—$value" else null
+				if (value > 0) "${SpellcastingReference.getSpellLevelName(index + 1)} ×$value" else null
 			}
 			.forEach { appendLine(it) }
 	}

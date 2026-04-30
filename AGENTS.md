@@ -3,6 +3,26 @@
 Android TTRPG combat-tracker app built with Kotlin, Jetpack Compose, Hilt, Room, and a
 local-first MVVM + Clean Architecture structure.
 
+Use `ENGINEERING_STANDARDS.md` as the source of truth for repo-wide development expectations such
+as Kotlin/Compose conventions, ViewModel state patterns, accessibility, localization, testing,
+review, and release-readiness policy. This file stays focused on project-specific architecture,
+runtime behavior, content scope, and repo facts.
+
+## Contents
+
+- [Architecture Layers](#architecture-layers)
+- [Navigation](#navigation)
+- [Data Layer Conventions](#data-layer-conventions)
+- [Error Handling Pattern](#error-handling-pattern)
+- [External Integration](#external-integration)
+- [Theme](#theme)
+- [D&D 5e Encounter Difficulty](#dd-5e-encounter-difficulty)
+- [D&D 5e Reference UI](#dd-5e-reference-ui)
+- [Build & Run Commands](#build--run-commands)
+- [Known Build Quirks](#known-build-quirks)
+- [Repository Hygiene](#repository-hygiene)
+- [Key Files Reference](#key-files-reference)
+
 ## Architecture Layers
 
 ```text
@@ -127,8 +147,8 @@ The current runtime app source under `app/src/main` is local-first.
   `reference_preferences.xml`.
 - No Retrofit, OkHttp service layer, or runtime `ApiService` implementation is currently present in
   `app/src/main`.
-- `scripts/Test-DndApi.ps1` is a developer utility script for manually verifying external D&D API
-  endpoints; it is not part of the shipped Android app.
+- Legacy external-API smoke-test scripts are intentionally not kept in the active repo tree because
+  they can imply a runtime dependency that the current local-first app does not have.
 
 ## Theme
 
@@ -158,7 +178,7 @@ major areas:
 - Spellcasting
 - Objects
 - Madness
-- Monster placeholder state
+- Monsters
 - Core rules
 - Character creation
 
@@ -166,6 +186,8 @@ Reference behavior notes:
 
 - Trap, poison, and disease sections support favorites, copy, share, and favorites-only filtering.
 - Search is live for the searchable sections and debounced in `ReferenceViewModel`.
+- Monsters are available through a local catalog with shortcut/type/CR filters and deep-link detail
+  routing via `ReferenceDetailResolver`.
 - Spellcasting content includes slot tables, formulas, and caster progression helpers from
   `domain/util/SpellcastingReference.kt`.
 - The madness section includes a d100 roller backed by `ReferenceViewModel.rollMadness()`.
@@ -231,12 +253,17 @@ Key versions from `gradle/libs.versions.toml`:
 
 ## Repository Hygiene
 
+For cross-project engineering policy, prefer updating `ENGINEERING_STANDARDS.md`; keep this section
+focused on Loreweaver-specific repo hygiene facts and exceptions.
+
 - Shared JetBrains project settings are intentionally versioned from `.idea/inspectionProfiles/`,
   `.idea/codeStyles/`, `.idea/compiler.xml`, `.idea/gradle.xml`, `.idea/misc.xml`,
   `.idea/runConfigurations.xml`, `.idea/dictionaries/`, `.idea/.name`,
   `.idea/AndroidProjectSystem.xml`, `.idea/jsonCatalog.xml`, and `.idea/.gitignore`.
 - Machine-specific IDE state such as `.idea/workspace.xml`, caches, shelves, HTTP requests,
   device/emulator selectors, preview state, and similar local files should remain ignored.
+- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` is a locally regenerated audit artifact used for developer
+  review; it should remain ignored and uncommitted unless the project policy explicitly changes.
 - Root-level JetBrains inspection export XML files created from `Problems` / `Inspect Code`
   workflows are disposable local artifacts and should stay untracked.
 - Root-level markdown audit artifacts such as `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`,

@@ -178,7 +178,7 @@ class CharacterCreationReferenceTest {
 		val common = CharacterCreationReference.STANDARD_LANGUAGES.first()
 		assertEquals("Common", common.name)
 		assertEquals("Standard", common.group)
-		assertEquals("â€”", common.roll)
+		assertEquals("—", common.roll)
 
 		val commonSign =
 			CharacterCreationReference.STANDARD_LANGUAGES.first { it.name == "Common Sign Language" }
@@ -212,7 +212,7 @@ class CharacterCreationReferenceTest {
 
 		assertEquals(expectedStandardRows, standardTable.rows)
 		assertEquals(expectedRareRows, rareTable.rows)
-		assertTrue(standardTable.rows.contains(listOf("3â€“4", "Dwarvish")))
+		assertTrue(standardTable.rows.contains(listOf("3–4", "Dwarvish")))
 		assertTrue(rareTable.rows.contains(listOf("Infernal", "")))
 	}
 
@@ -249,7 +249,7 @@ class CharacterCreationReferenceTest {
 		assertEquals("Level 4+", feats.getValue("Ability Score Improvement").prerequisite)
 		assertTrue(feats.getValue("Magic Initiate").repeatable)
 		assertTrue(feats.getValue("Skilled").repeatable)
-		assertTrue(feats.getValue("Boon of Spell Recall").benefits.any { it.contains("level 1â€“4 spell slot") })
+		assertTrue(feats.getValue("Boon of Spell Recall").benefits.any { it.contains("level 1–4 spell slot") })
 		assertTrue(feats.getValue("Boon of the Night Spirit").benefits.any { it.contains("Invisible condition") })
 	}
 }

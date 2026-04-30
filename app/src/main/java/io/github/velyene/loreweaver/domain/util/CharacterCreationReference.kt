@@ -133,7 +133,7 @@ object CharacterCreationReference {
 			body = (
 				"The great cities of many fantasy worlds bring many peoples together: dwarves, elves, " +
 					"halflings, humans, and rarer folk such as dragonborn, goliaths, orcs, and tieflings. " +
-					"Your ancestry shapes your characterâ€™s natural gifts, appearance, culture, and place in the world.\n\n" +
+					"Your ancestry shapes your character’s natural gifts, appearance, culture, and place in the world.\n\n" +
 					"Most adventuring parties are built from the common peoples, but less common species can add unusual " +
 					"history, social tension, or magical flavor to a campaign. Adventurers often stand apart from the " +
 					"usual expectations of their people, so a species choice is also a prompt for backstory and personality."
@@ -157,7 +157,7 @@ object CharacterCreationReference {
 					"speed, languages, and sometimes notable variants. Those traits define the baseline assumptions " +
 					"for your character, while your class and background build on top of them.\n\n" +
 					"Some peoples also present recognizable cultural or mystical branches. These variants keep the " +
-					"parent speciesâ€™ broad identity while adding a few details that nudge a character toward a " +
+					"parent species’ broad identity while adding a few details that nudge a character toward a " +
 					"particular fantasy archetype."
 				)
 		),
@@ -208,7 +208,7 @@ object CharacterCreationReference {
 				),
 				RacialTraitReference(
 					"Tool Proficiency",
-					"Choose smithâ€™s tools, brewerâ€™s supplies, or masonâ€™s tools."
+					"Choose smith’s tools, brewer’s supplies, or mason’s tools."
 				),
 				RacialTraitReference(
 					"Stonecunning",
@@ -271,7 +271,7 @@ object CharacterCreationReference {
 				RacialTraitReference("Keen Senses", "You are proficient in the Perception skill."),
 				RacialTraitReference(
 					"Fey Ancestry",
-					"You have advantage on saves against being charmed, and magic canâ€™t put you to sleep."
+					"You have advantage on saves against being charmed, and magic can’t put you to sleep."
 				),
 				RacialTraitReference(
 					"Trance",
@@ -463,7 +463,7 @@ object CharacterCreationReference {
 			traits = listOf(
 				RacialTraitReference(
 					"Draconic Ancestry",
-					"Choose a dragon type. It determines your breath weaponâ€™s damage type, shape, and " +
+					"Choose a dragon type. It determines your breath weapon’s damage type, shape, and " +
 						"saving throw, as well as your damage resistance."
 				),
 				RacialTraitReference(
@@ -536,12 +536,12 @@ object CharacterCreationReference {
 					abilityScoreIncrease = "Constitution +1",
 					traits = listOf(
 						RacialTraitReference(
-							"Artificerâ€™s Lore",
+										"Artificer’s Lore",
 							"History checks related to magic items, alchemy, or technological devices can add double your proficiency bonus."
 						),
 						RacialTraitReference(
 							"Tinker",
-							"With tinkerâ€™s tools, time, and materials, you can build tiny clockwork toys, fire starters, or music boxes."
+										"With tinker’s tools, time, and materials, you can build tiny clockwork toys, fire starters, or music boxes."
 						)
 					)
 				)
@@ -779,8 +779,8 @@ object CharacterCreationReference {
 			body =
 				"Multiclassing lets a character gain levels in more than one class. To qualify, the " +
 					"character must meet the primary-ability prerequisites for both the current class and " +
-					"the new class, and some benefitsâ€”such as proficiencies, Extra Attack, spell slots, " +
-					"and alternative Armor Class formulasâ€”follow special multiclass rules."
+					"the new class, and some benefits—such as proficiencies, Extra Attack, spell slots, " +
+					"and alternative Armor Class formulas—follow special multiclass rules."
 		),
 		CharacterCreationTextSection(
 			title = "Spellcasting Across Classes",
@@ -974,15 +974,15 @@ object CharacterCreationReference {
 	)
 
 	val STANDARD_LANGUAGES = listOf(
-		LanguageReference(name = "Common", group = "Standard", roll = "â€”"),
+		LanguageReference(name = "Common", group = "Standard", roll = "—"),
 		LanguageReference(name = "Common Sign Language", group = "Standard", roll = "1"),
 		LanguageReference(name = "Draconic", group = "Standard", roll = "2"),
-		LanguageReference(name = "Dwarvish", group = "Standard", roll = "3â€“4"),
-		LanguageReference(name = "Elvish", group = "Standard", roll = "5â€“6"),
+		LanguageReference(name = "Dwarvish", group = "Standard", roll = "3–4"),
+		LanguageReference(name = "Elvish", group = "Standard", roll = "5–6"),
 		LanguageReference(name = "Giant", group = "Standard", roll = "7"),
 		LanguageReference(name = "Gnomish", group = "Standard", roll = "8"),
 		LanguageReference(name = "Goblin", group = "Standard", roll = "9"),
-		LanguageReference(name = "Halfling", group = "Standard", roll = "10â€“11"),
+		LanguageReference(name = "Halfling", group = "Standard", roll = "10–11"),
 		LanguageReference(name = "Orc", group = "Standard", roll = "12")
 	)
 
@@ -1146,7 +1146,7 @@ object CharacterCreationReference {
 			prerequisite = "Level 19+, Spellcasting Feature",
 			benefits = listOf(
 				"Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30.",
-				"Free Casting. Whenever you cast a spell with a level 1â€“4 spell slot, roll 1d4; if the " +
+				"Free Casting. Whenever you cast a spell with a level 1–4 spell slot, roll 1d4; if the " +
 					"result matches the slot's level, the slot isn't expended."
 			)
 		),
@@ -1175,21 +1175,21 @@ object CharacterCreationReference {
 
 
 	val ABILITY_MODIFIERS = mapOf(
-		"1" to "âˆ’5",
-		"2â€“3" to "âˆ’4",
-		"4â€“5" to "âˆ’3",
-		"6â€“7" to "âˆ’2",
-		"8â€“9" to "âˆ’1",
-		"10â€“11" to "+0",
-		"12â€“13" to "+1",
-		"14â€“15" to "+2",
-		"16â€“17" to "+3",
-		"18â€“19" to "+4",
-		"20â€“21" to "+5",
-		"22â€“23" to "+6",
-		"24â€“25" to "+7",
-		"26â€“27" to "+8",
-		"28â€“29" to "+9",
+		"1" to "−5",
+		"2–3" to "−4",
+		"4–5" to "−3",
+		"6–7" to "−2",
+		"8–9" to "−1",
+		"10–11" to "+0",
+		"12–13" to "+1",
+		"14–15" to "+2",
+		"16–17" to "+3",
+		"18–19" to "+4",
+		"20–21" to "+5",
+		"22–23" to "+6",
+		"24–25" to "+7",
+		"26–27" to "+8",
+		"28–29" to "+9",
 		"30" to "+10"
 	)
 
@@ -1271,15 +1271,15 @@ object CharacterCreationReference {
 			title = "Ability Scores and Modifiers (Creation Range)",
 			columns = listOf("Score", "Modifier"),
 			rows = listOf(
-				listOf("3", "âˆ’4"),
-				listOf("4â€“5", "âˆ’3"),
-				listOf("6â€“7", "âˆ’2"),
-				listOf("8â€“9", "âˆ’1"),
-				listOf("10â€“11", "+0"),
-				listOf("12â€“13", "+1"),
-				listOf("14â€“15", "+2"),
-				listOf("16â€“17", "+3"),
-				listOf("18â€“19", "+4"),
+				listOf("3", "−4"),
+				listOf("4–5", "−3"),
+				listOf("6–7", "−2"),
+				listOf("8–9", "−1"),
+				listOf("10–11", "+0"),
+				listOf("12–13", "+1"),
+				listOf("14–15", "+2"),
+				listOf("16–17", "+3"),
+				listOf("18–19", "+4"),
 				listOf("20", "+5")
 			)
 		),
@@ -1333,20 +1333,20 @@ object CharacterCreationReference {
 			title = "Starting Equipment at Higher Levels",
 			columns = listOf("Starting Level", "Equipment and Money", "Magic Items"),
 			rows = listOf(
-				listOf("2â€“4", "Normal starting equipment", "1 Common"),
+				listOf("2–4", "Normal starting equipment", "1 Common"),
 				listOf(
-					"5â€“10",
-					"500 GP plus 1d10 Ã— 25 GP plus normal starting equipment",
+					"5–10",
+					"500 GP plus 1d10 × 25 GP plus normal starting equipment",
 					"1 Common, 1 Uncommon"
 				),
 				listOf(
-					"11â€“16",
-					"5,000 GP plus 1d10 Ã— 250 GP plus normal starting equipment",
+					"11–16",
+					"5,000 GP plus 1d10 × 250 GP plus normal starting equipment",
 					"2 Common, 3 Uncommon, 1 Rare"
 				),
 				listOf(
-					"17â€“20",
-					"20,000 GP plus 1d10 Ã— 250 GP plus normal starting equipment",
+					"17–20",
+					"20,000 GP plus 1d10 × 250 GP plus normal starting equipment",
 					"2 Common, 4 Uncommon, 3 Rare, 1 Very Rare"
 				)
 			)
@@ -1355,22 +1355,22 @@ object CharacterCreationReference {
 			title = "Multiclass Spellcaster: Spell Slots per Spell Level",
 			columns = listOf("Level", "1", "2", "3", "4", "5", "6", "7", "8", "9"),
 			rows = listOf(
-				listOf("1", "2", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”"),
-				listOf("2", "3", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”"),
-				listOf("3", "4", "2", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”"),
-				listOf("4", "4", "3", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”"),
-				listOf("5", "4", "3", "2", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”"),
-				listOf("6", "4", "3", "3", "â€”", "â€”", "â€”", "â€”", "â€”", "â€”"),
-				listOf("7", "4", "3", "3", "1", "â€”", "â€”", "â€”", "â€”", "â€”"),
-				listOf("8", "4", "3", "3", "2", "â€”", "â€”", "â€”", "â€”", "â€”"),
-				listOf("9", "4", "3", "3", "3", "1", "â€”", "â€”", "â€”", "â€”"),
-				listOf("10", "4", "3", "3", "3", "2", "â€”", "â€”", "â€”", "â€”"),
-				listOf("11", "4", "3", "3", "3", "2", "1", "â€”", "â€”", "â€”"),
-				listOf("12", "4", "3", "3", "3", "2", "1", "â€”", "â€”", "â€”"),
-				listOf("13", "4", "3", "3", "3", "2", "1", "1", "â€”", "â€”"),
-				listOf("14", "4", "3", "3", "3", "2", "1", "1", "â€”", "â€”"),
-				listOf("15", "4", "3", "3", "3", "2", "1", "1", "1", "â€”"),
-				listOf("16", "4", "3", "3", "3", "2", "1", "1", "1", "â€”"),
+				listOf("1", "2", "—", "—", "—", "—", "—", "—", "—", "—"),
+				listOf("2", "3", "—", "—", "—", "—", "—", "—", "—", "—"),
+				listOf("3", "4", "2", "—", "—", "—", "—", "—", "—", "—"),
+				listOf("4", "4", "3", "—", "—", "—", "—", "—", "—", "—"),
+				listOf("5", "4", "3", "2", "—", "—", "—", "—", "—", "—"),
+				listOf("6", "4", "3", "3", "—", "—", "—", "—", "—", "—"),
+				listOf("7", "4", "3", "3", "1", "—", "—", "—", "—", "—"),
+				listOf("8", "4", "3", "3", "2", "—", "—", "—", "—", "—"),
+				listOf("9", "4", "3", "3", "3", "1", "—", "—", "—", "—"),
+				listOf("10", "4", "3", "3", "3", "2", "—", "—", "—", "—"),
+				listOf("11", "4", "3", "3", "3", "2", "1", "—", "—", "—"),
+				listOf("12", "4", "3", "3", "3", "2", "1", "—", "—", "—"),
+				listOf("13", "4", "3", "3", "3", "2", "1", "1", "—", "—"),
+				listOf("14", "4", "3", "3", "3", "2", "1", "1", "—", "—"),
+				listOf("15", "4", "3", "3", "3", "2", "1", "1", "1", "—"),
+				listOf("16", "4", "3", "3", "3", "2", "1", "1", "1", "—"),
 				listOf("17", "4", "3", "3", "3", "2", "1", "1", "1", "1"),
 				listOf("18", "4", "3", "3", "3", "3", "1", "1", "1", "1"),
 				listOf("19", "4", "3", "3", "3", "3", "2", "1", "1", "1"),
@@ -1510,7 +1510,7 @@ object CharacterCreationReference {
 		When your character gains a level, his or her class often grants additional features, as
 		detailed in the class description. Some of these features allow you to increase your
 		ability scores, either increasing two scores by 1 each or increasing one score by 2. You
-		canâ€™t increase an ability score above 20. In addition, every character's proficiency bonus
+		can’t increase an ability score above 20. In addition, every character's proficiency bonus
 		increases at certain levels.
 
 		Each time you gain a level, you gain 1 additional Hit Die. Roll that Hit Die, add your

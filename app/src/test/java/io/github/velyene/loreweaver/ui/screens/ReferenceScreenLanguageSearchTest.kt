@@ -1,8 +1,6 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.CharacterCreationReference
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReferenceScreenLanguageSearchTest {
@@ -16,53 +14,49 @@ class ReferenceScreenLanguageSearchTest {
 		val dwarvish = CharacterCreationReference.STANDARD_LANGUAGES.first { it.name == "Dwarvish" }
 		val primordial = CharacterCreationReference.RARE_LANGUAGES.first { it.name == PRIMORDIAL }
 
-		assertTrue(common.matchesSearchQuery("Common"))
-		assertTrue(dwarvish.matchesSearchQuery("3â€“4"))
-		assertTrue(dwarvish.matchesSearchQuery("Standard"))
-		assertTrue(primordial.matchesSearchQuery(PRIMORDIAL))
-		assertTrue(primordial.matchesSearchQuery("Rare"))
+		assertMatchesAll(common::matchesSearchQuery, "Common")
+		assertMatchesAll(dwarvish::matchesSearchQuery, "3–4", "Standard")
+		assertMatchesAll(primordial::matchesSearchQuery, PRIMORDIAL, "Rare")
 	}
 
 	@Test
 	fun filterCharacterCreationLanguages_returnsExpectedMatchesForQuery() {
-		assertEquals(listOf("Dwarvish"), filterCharacterCreationLanguages("3â€“4").map { it.name })
-		assertEquals(
+		assertQueryResults(listOf("Dwarvish"), "3–4", ::filterCharacterCreationLanguages) { it.name }
+		assertQueryResults(
 			listOf("Common Sign Language"),
-			filterCharacterCreationLanguages("sign").map { it.name })
-		assertEquals(
+			"sign",
+			::filterCharacterCreationLanguages
+		) { it.name }
+		assertQueryResults(
 			listOf(PRIMORDIAL),
-			filterCharacterCreationLanguages(PRIMORDIAL).map { it.name })
-		assertEquals(
+			PRIMORDIAL,
+			::filterCharacterCreationLanguages
+		) { it.name }
+		assertQueryResults(
 			CharacterCreationReference.RARE_LANGUAGES.map { it.name },
-			filterCharacterCreationLanguages("Rare").map { it.name })
-		assertTrue(filterCharacterCreationLanguages("Nonexistent Language Term").isEmpty())
+			"Rare",
+			::filterCharacterCreationLanguages
+		) { it.name }
+		assertNoQueryResults("Nonexistent Language Term", ::filterCharacterCreationLanguages)
 	}
 
 	@Test
 	fun visibleCharacterCreationLanguages_respectsSubsectionWhenQueryBlank() {
-		assertEquals(
+		assertVisibleWhenBlankInSubsection(
 			(CharacterCreationReference.STANDARD_LANGUAGES + CharacterCreationReference.RARE_LANGUAGES).map { it.name },
-			visibleCharacterCreationLanguages(
-				"",
-				CharacterCreationSubsection.SPECIES_ORIGIN
-			).map { it.name }
-		)
-		assertTrue(
-			visibleCharacterCreationLanguages(
-				"",
-				CharacterCreationSubsection.ABILITIES
-			).isEmpty()
-		)
+			CharacterCreationSubsection.SPECIES_ORIGIN,
+			::visibleCharacterCreationLanguages
+		) { it.name }
+		assertHiddenWhenBlankInSubsection(CharacterCreationSubsection.ABILITIES, ::visibleCharacterCreationLanguages)
 	}
 
 	@Test
 	fun visibleCharacterCreationLanguages_usesAllSubsectionForActiveSearch() {
-		assertEquals(
+		assertVisibleForSearch(
 			listOf(PRIMORDIAL),
-			visibleCharacterCreationLanguages(
-				PRIMORDIAL,
-				CharacterCreationSubsection.ABILITIES
-			).map { it.name }
-		)
+			PRIMORDIAL,
+			CharacterCreationSubsection.ABILITIES,
+			::visibleCharacterCreationLanguages
+		) { it.name }
 	}
 }

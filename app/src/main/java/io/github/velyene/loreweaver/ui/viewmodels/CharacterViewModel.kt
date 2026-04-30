@@ -3,6 +3,7 @@ package io.github.velyene.loreweaver.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.LogEntry
 import io.github.velyene.loreweaver.domain.use_case.AddCharacterUseCase
@@ -11,6 +12,8 @@ import io.github.velyene.loreweaver.domain.use_case.GetCharacterByIdUseCase
 import io.github.velyene.loreweaver.domain.use_case.GetCharactersUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertLogUseCase
 import io.github.velyene.loreweaver.domain.use_case.UpdateCharacterUseCase
+import io.github.velyene.loreweaver.ui.util.AppText
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,7 +35,8 @@ class CharacterViewModel @Inject constructor(
 	private val addCharacterUseCase: AddCharacterUseCase,
 	private val updateCharacterUseCase: UpdateCharacterUseCase,
 	private val deleteCharacterUseCase: DeleteCharacterUseCase,
-	private val insertLogUseCase: InsertLogUseCase
+	private val insertLogUseCase: InsertLogUseCase,
+	private val appText: AppText
 ) : ViewModel() {
 	private companion object {
 		const val DEFAULT_LOG_TYPE = "Roll"
@@ -62,8 +66,10 @@ class CharacterViewModel @Inject constructor(
 						)
 					}
 				}
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
-				reportError(formatError("Failed to load characters", e))
+				reportError(formatCampaignError(appText, R.string.character_error_load, e))
 			}
 		}
 	}
@@ -75,8 +81,10 @@ class CharacterViewModel @Inject constructor(
 			try {
 				val character = getCharacterByIdUseCase(id)
 				_uiState.update { it.copy(selectedCharacter = character, isLoading = false) }
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
-				reportError(formatError("Character not found", e))
+				reportError(formatCampaignError(appText, R.string.character_error_not_found, e))
 			}
 		}
 	}
@@ -112,11 +120,11 @@ class CharacterViewModel @Inject constructor(
 	}
 
 	private fun beginLoading() {
-		_uiState.update { it.copy(isLoading = true, error = null) }
+		_uiState.update { it.beginLoading() }
 	}
 
 	private fun reportError(message: String) {
-		_uiState.update { it.copy(isLoading = false, error = message) }
+		_uiState.update { it.withError(message) }
 	}
 
 	private fun formatError(prefix: String, exception: Exception): String {
@@ -133,13 +141,13 @@ class CharacterViewModel @Inject constructor(
 				action()
 				onSuccess()
 			} catch (e: Exception) {
-				reportError(formatError(errorPrefix, e))
+				reportError(formatCampaignError(appText, errorPrefixResId, e))
 			}
 		}
 	}
 
 	fun clearError() {
-		_uiState.update { it.copy(error = null) }
+		_uiState.update { it.clearErrorState() }
 	}
 
 	fun logAction(message: String, type: String = DEFAULT_LOG_TYPE) {

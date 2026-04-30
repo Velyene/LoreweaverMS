@@ -670,7 +670,7 @@ private fun AttributeSection(
 						singleLine = true,
 						supportingText = {
 							Text(
-								"${CharacterFormConstants.MIN_ATTRIBUTE}â€“${CharacterFormConstants.MAX_ATTRIBUTE}",
+								"${CharacterFormConstants.MIN_ATTRIBUTE}–${CharacterFormConstants.MAX_ATTRIBUTE}",
 								style = MaterialTheme.typography.labelSmall,
 								color = MutedText
 							)
