@@ -6,7 +6,7 @@
  * 2. Foundation, guidance, and tail lazy-list renderers
  * 3. Shared filter-chip and text-section components
  * 4. Character creation reference cards
- * 5. Search and matching helpers
+ * 5. Search and matching support
  */
 
 package io.github.velyene.loreweaver.ui.screens

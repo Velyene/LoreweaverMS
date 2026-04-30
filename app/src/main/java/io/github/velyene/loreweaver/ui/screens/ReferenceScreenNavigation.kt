@@ -3,8 +3,8 @@
  *
  * TABLE OF CONTENTS:
  * 1. Character creation subsection enum
- * 2. Character creation section-matching helpers
- * 3. Character creation visibility helpers
+ * 2. Character creation section matching
+ * 3. Character creation visibility support
  */
 
 package io.github.velyene.loreweaver.ui.screens

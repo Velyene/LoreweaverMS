@@ -17,6 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.Note
+import io.github.velyene.loreweaver.domain.util.generateRandomCampaignCalendarNote
+import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_GENERAL
 
 @Composable
 internal fun LoreAndNotesSection(
@@ -39,7 +41,12 @@ internal fun LoreAndNotesSection(
 			.visibleVerticalScrollbar(listState)
 	) {
 		item {
-			NotesQuickActions(onAddNoteClick = { dialogMode = NoteDialogMode.Adding })
+			NotesQuickActions(
+				{ dialogMode = NoteDialogMode.Adding },
+				{
+					onAddNote(generateRandomCampaignCalendarNote(), NOTE_TYPE_GENERAL, "")
+				}
+			)
 			Spacer(modifier = Modifier.size(16.dp))
 		}
 

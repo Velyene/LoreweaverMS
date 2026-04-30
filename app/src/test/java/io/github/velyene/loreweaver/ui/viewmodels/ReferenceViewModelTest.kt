@@ -4,14 +4,14 @@
  * TABLE OF CONTENTS:
  * 1. Category selection and favorites-filter behavior
  * 2. Debounced search and canonical reference filtering
- * 3. Madness, spellcasting, and navigation-detail helpers
+ * 3. Hysteria, spellcasting, and navigation-detail helpers
  * 4. Fake preferences repository support helpers
  */
 
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import io.github.velyene.loreweaver.MainDispatcherRule
-import io.github.velyene.loreweaver.domain.util.MadnessDuration
+import io.github.velyene.loreweaver.domain.util.HysteriaDuration
 import io.github.velyene.loreweaver.domain.util.MonsterReferenceCatalog
 import io.github.velyene.loreweaver.domain.util.PoisonReference
 import io.github.velyene.loreweaver.domain.util.ReferenceDetailResolver
@@ -106,6 +106,66 @@ class ReferenceViewModelTest {
 	}
 
 	@Test
+	fun toggleTrapFavorite_whenRepositoryFails_setsRecoverableLocalizedError() {
+		runTest {
+			val repository = TestReferencePreferencesRepository().apply {
+				toggleTrapFavoriteException = IllegalStateException("boom")
+			}
+			val viewModel = createViewModel(repository)
+
+			viewModel.toggleTrapFavorite(ROLLING_STONE)
+			advanceUntilIdle()
+
+			with(viewModel.uiState.value) {
+				assertEquals("Failed to update reference favorites.", error)
+				assertNotNull(onRetry)
+				assertFalse(isLoading)
+			}
+		}
+	}
+
+	@Test
+	fun clearError_clearsReferenceErrorAndRetryAction() {
+		runTest {
+			val repository = TestReferencePreferencesRepository().apply {
+				toggleTrapFavoriteException = IllegalStateException("boom")
+			}
+			val viewModel = createViewModel(repository)
+
+			viewModel.toggleTrapFavorite(ROLLING_STONE)
+			advanceUntilIdle()
+			assertNotNull(viewModel.uiState.value.error)
+
+			viewModel.clearError()
+			advanceUntilIdle()
+
+			assertNull(viewModel.uiState.value.error)
+			assertNull(viewModel.uiState.value.onRetry)
+		}
+	}
+
+	@Test
+	fun retryAction_retriesFailedFavoriteToggleAfterRepositoryRecovers() {
+		runTest {
+			val repository = TestReferencePreferencesRepository().apply {
+				toggleTrapFavoriteException = IllegalStateException("boom")
+			}
+			val viewModel = createViewModel(repository)
+
+			viewModel.toggleTrapFavorite(ROLLING_STONE)
+			advanceUntilIdle()
+
+			repository.toggleTrapFavoriteException = null
+			viewModel.uiState.value.onRetry?.invoke()
+			advanceUntilIdle()
+
+			assertTrue(ROLLING_STONE in viewModel.uiState.value.favoriteTrapNames)
+			assertNull(viewModel.uiState.value.error)
+			assertNull(viewModel.uiState.value.onRetry)
+		}
+	}
+
+	@Test
 	fun search_usesExactCanonicalTrapContentOnly() {
 		runTest {
 			val viewModel = createViewModel()
@@ -187,22 +247,22 @@ class ReferenceViewModelTest {
 	}
 
 	@Test
-	fun selectMadnessDuration_clearsLastRollAndResult() {
+	fun selectHysteriaDuration_clearsLastRollAndResult() {
 		runTest {
 			val viewModel = createViewModel()
 
-			viewModel.rollMadness()
+			viewModel.rollHysteria()
 			advanceUntilIdle()
-			assertNotNull(viewModel.uiState.value.madnessLastRoll)
-			assertNotNull(viewModel.uiState.value.madnessLastResult)
+			assertNotNull(viewModel.uiState.value.hysteriaLastRoll)
+			assertNotNull(viewModel.uiState.value.hysteriaLastResult)
 
-			viewModel.selectMadnessDuration(MadnessDuration.LONG_TERM)
+			viewModel.selectHysteriaDuration(HysteriaDuration.LONG_TERM)
 			advanceUntilIdle()
 
 			with(viewModel.uiState.value) {
-				assertEquals(MadnessDuration.LONG_TERM, selectedMadnessDuration)
-				assertNull(madnessLastRoll)
-				assertNull(madnessLastResult)
+				assertEquals(HysteriaDuration.LONG_TERM, selectedHysteriaDuration)
+				assertNull(hysteriaLastRoll)
+				assertNull(hysteriaLastResult)
 			}
 		}
 	}
@@ -280,7 +340,7 @@ class ReferenceViewModelTest {
 	}
 
 	@Test
-	fun openReferenceDetail_andClearReferenceDetail_updatesGenericDetailState() {
+	fun initializeFromNavigation_setsMonsterDetailState() {
 		runTest {
 			val viewModel = createViewModel()
 

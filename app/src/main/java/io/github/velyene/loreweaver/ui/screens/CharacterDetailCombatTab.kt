@@ -7,14 +7,14 @@
  * 3. Spell slot section
  * 4. Actions section and action cards
  * 5. Dice tray section
- * 6. Dice parsing helpers
+ * 6. Dice parsing support
  */
 
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

@@ -2,7 +2,7 @@
  * FILE: CharacterListSharedComponents.kt
  *
  * TABLE OF CONTENTS:
- * 1. Accessibility text helpers
+ * 1. Accessibility text support
  * 2. Initiative and dying-state UI components
  * 3. Character count and section-header composables
  */

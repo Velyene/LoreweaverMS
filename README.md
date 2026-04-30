@@ -4,6 +4,17 @@ Loreweaver is an Android companion app for tabletop RPG groups. It helps Game Ma
 players manage campaigns, characters, encounters, and quick rules lookups from one local-first
 app.
 
+## Contents
+
+- [App Description](#app-description)
+- [Key Features](#key-features)
+- [Architecture Overview](#architecture-overview)
+- [Project Structure](#project-structure)
+- [Developer Workflow & Repository Hygiene](#developer-workflow--repository-hygiene)
+  - [Security / Hardening](#security--hardening)
+- [Notes on data and networking](#notes-on-data-and-networking)
+- [SRD Notice](#srd-notice)
+
 ## App Description
 
 The app is built around encounter flow. It reduces session bookkeeping by keeping combat state,
@@ -22,7 +33,7 @@ Compose with a fixed dark-fantasy theme for a consistent in-game presentation.
 - **Adventure logs**: Persist important session events in a Room-backed log capped to the most
   recent 100 entries.
 - **Reference**: Browse local rules content for traps, poisons, diseases, spellcasting,
-  objects, madness, core rules, and character creation.
+  objects, hysteria, core rules, and character creation.
 - **Favorites, copy, and share**: Star reference entries, copy prompt/reference text, and share
   selected reference content with other apps.
 - **Prompt library**: Access a small set of narrative prompts and copy them to the clipboard while
@@ -76,6 +87,18 @@ ViewModel state conventions, accessibility, localization, testing, audits, and r
 - Local-only IDE state stays ignored: `.idea/workspace.xml`, caches, shelves, HTTP requests,
   device/emulator selectors, preview state, `local.properties`, keystores, and all `build/`
   directories.
+
+### Security / Hardening
+
+- `app/build.gradle.kts` suppresses AGP dependency metadata in APKs and bundles, and release
+  builds skip `extractReleaseVersionControlInfo` so shipped artifacts do not embed
+  `META-INF/version-control-info.textproto` git provenance metadata.
+- `gradle/verification-metadata.xml` pins trusted SHA-256 checksums for dependency and plugin
+  resolution.
+- `app/src/main/AndroidManifest.xml` removes Room's unused
+  `androidx.room.MultiInstanceInvalidationService` because Loreweaver does not enable
+  multi-instance invalidation.
+
 - Root-level JetBrains inspection-export XML files created from `Problems` / `Inspect Code` runs
   are treated as disposable local artifacts and should not be committed.
 - Prefer fixing shared inspection entry points in `.idea/inspectionProfiles/` before adding

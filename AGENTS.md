@@ -177,7 +177,7 @@ major areas:
 - Diseases
 - Spellcasting
 - Objects
-- Madness
+- Hysteria
 - Monsters
 - Core rules
 - Character creation
@@ -190,7 +190,7 @@ Reference behavior notes:
   routing via `ReferenceDetailResolver`.
 - Spellcasting content includes slot tables, formulas, and caster progression helpers from
   `domain/util/SpellcastingReference.kt`.
-- The madness section includes a d100 roller backed by `ReferenceViewModel.rollMadness()`.
+- The hysteria section includes a d100 roller backed by `ReferenceViewModel.rollHysteria()`.
 - Deep-link/detail content is centralized in `domain/util/ReferenceDetailResolver.kt`, which
   resolves spells, conditions, feats, weapons, armor, tools, adventuring gear, magic items,
   ammunition, spellcasting focuses, mounts/vehicles, lifestyles, food/lodging, and hirelings.
@@ -226,9 +226,9 @@ Key versions from `gradle/libs.versions.toml`:
 - Room `2.8.4`
 - KSP `2.3.6`
 - Hilt `2.59.2`
-- Compose BOM `2026.03.01`
+- Compose BOM `2026.04.01`
 - Lifecycle `2.10.0`
-- Navigation `2.9.7`
+- Navigation `2.9.8`
 - Activity Compose `1.13.0`
 
 ## Known Build Quirks
@@ -237,6 +237,11 @@ Key versions from `gradle/libs.versions.toml`:
   plugin is intentionally absent.
 - The Kotlin serialization plugin must remain enabled because the nav routes use
   `@Serializable` types.
+- Release packaging is intentionally hardened in `app/build.gradle.kts`: `dependenciesInfo`
+  excludes AGP dependency metadata from APKs/bundles, and the release
+  `extractReleaseVersionControlInfo` task is disabled so
+  `META-INF/version-control-info.textproto` git provenance metadata is not embedded in shipped
+  artifacts.
 - Room 2.8.x DAO methods return `Long` and `Int`; `CampaignRepositoryImpl` uses block bodies so
   those return values do not leak through `Unit`-typed repository methods.
 - All six migrations are wired into `Room.databaseBuilder()`.
@@ -247,7 +252,7 @@ Key versions from `gradle/libs.versions.toml`:
   Android components, Hilt providers/constructors, Room converters, and JUnit entry points even
   when Gradle builds and tests pass.
 - Targeted `@Suppress("UNUSED_VALUE")` markers now appear across split Compose screen files such as
-  `CampaignDetailEncountersSection.kt`, `CharacterListScreen.kt`, `ReferenceScreenMadness.kt`, and
+  `CampaignDetailEncountersSection.kt`, `CharacterListScreen.kt`, `ReferenceScreenHysteria.kt`, and
   `ui/screens/tracker/setup/EncounterSetupView.kt` to silence false positives on state writes
   inside callbacks.
 
@@ -255,6 +260,19 @@ Key versions from `gradle/libs.versions.toml`:
 
 For cross-project engineering policy, prefer updating `ENGINEERING_STANDARDS.md`; keep this section
 focused on Loreweaver-specific repo hygiene facts and exceptions.
+
+- `gradle/verification-metadata.xml` is repo-owned and should be updated whenever dependency or
+  plugin resolution changes. On Windows PowerShell, regenerate it with a command such as:
+
+```powershell
+.\gradlew.bat --refresh-dependencies --write-verification-metadata sha256 help :app:assembleDebug :app:assembleRelease :app:assembleDebugAndroidTest :app:testDebugUnitTest --console=plain
+```
+
+- Verify checksum enforcement after regeneration with:
+
+```powershell
+.\gradlew.bat --refresh-dependencies help :app:assembleDebug :app:assembleRelease :app:assembleDebugAndroidTest :app:testDebugUnitTest --console=plain
+```
 
 - Shared JetBrains project settings are intentionally versioned from `.idea/inspectionProfiles/`,
   `.idea/codeStyles/`, `.idea/compiler.xml`, `.idea/gradle.xml`, `.idea/misc.xml`,
@@ -269,6 +287,10 @@ focused on Loreweaver-specific repo hygiene facts and exceptions.
 - Root-level markdown audit artifacts such as `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`,
   `HARD_DO_NOT_SHIP_AUDIT.md`, and the `SRD_*_AUDIT.md` files are intentional repo-owned
   documentation, not disposable inspection exports.
+- `app/src/main/AndroidManifest.xml` explicitly removes
+  `androidx.room.MultiInstanceInvalidationService` because Loreweaver does not enable Room
+  multi-instance invalidation; do not restore that service unless `enableMultiInstanceInvalidation()`
+  is intentionally adopted in `AppDatabase` creation.
 - Prefer adjusting shared inspection entry points for Android/Hilt/Room/JUnit before adding
   `@Suppress("unused")` in source. If suppression is still required, keep it narrowly scoped to a
   verified framework-owned declaration.
@@ -299,11 +321,11 @@ focused on Loreweaver-specific repo hygiene facts and exceptions.
   text is intentionally unavailable.
 - `domain/util/SpellcastingReference.kt` — spellcasting rules, slot tables, and formulas.
 - `domain/util/ObjectStats.kt` — object AC, HP, and threshold tables.
-- `domain/util/MadnessReference.kt` — short-, long-, and indefinite-madness tables.
+- `domain/util/HysteriaReference.kt` — short-, long-, and indefinite-hysteria tables.
 - `domain/util/ReferenceDetailResolver.kt` — detail/deep-link resolution across core rules,
   character creation, equipment, and spell index datasets.
 - `ui/viewmodels/CombatViewModel.kt` — combat tracker state and difficulty updates.
-- `ui/viewmodels/ReferenceViewModel.kt` — reference state, favorites, search, and madness.
+- `ui/viewmodels/ReferenceViewModel.kt` — reference state, favorites, search, and hysteria.
 - `ui/screens/CampaignDetailScreen.kt` — campaign detail UI and note-entry workflow.
 - `ui/screens/CombatTrackerRoute.kt` — combat tracker route entry; setup/live views are split under
   `ui/screens/tracker/`.

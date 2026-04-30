@@ -4,8 +4,8 @@
  * TABLE OF CONTENTS:
  * 1. Spellcasting content entry point and derived state
  * 2. Overview, rules, glossary, and progression sections
- * 3. Spellcasting calculators and presentation helpers
- * 4. Search, filtering, and share-text helpers
+ * 3. Spellcasting calculators and presentation
+ * 4. Search, filtering, and share-text support
  */
 
 package io.github.velyene.loreweaver.ui.screens

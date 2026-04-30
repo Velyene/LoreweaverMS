@@ -40,8 +40,9 @@ class ReferenceAccessibilityTest {
 
 	@Test
 	fun categoryTabs_usesFavoritesCountContentDescription() {
-		val expectedDescription = context.getString(
-			R.string.reference_tab_with_favorites_count,
+		val expectedDescription = context.resources.getQuantityString(
+			R.plurals.reference_tab_with_favorites_count,
+			2,
 			context.getString(R.string.reference_tab_traps),
 			2
 		)

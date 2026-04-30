@@ -1,3 +1,12 @@
+/*
+ * FILE: StatusEffectChips.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Status chip models and builders
+ * 2. Status chip row composables
+ * 3. Display and accessibility support
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.BorderStroke
@@ -141,6 +150,10 @@ internal fun statusChipDisplayText(
 	persistentSuffix: String = "Persistent"
 ): String {
 	return buildString {
+		metadata.iconGlyph.takeIf(String::isNotBlank)?.let {
+			append(it)
+			append(' ')
+		}
 		append(status.name)
 		append(status.durationText)
 		if (status.isPersistent) {

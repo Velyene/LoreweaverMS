@@ -1,6 +1,16 @@
+/*
+ * FILE: AppDatabase.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Room database declaration
+ * 2. DAO accessors
+ * 3. Singleton, migrations, and builder helpers
+ */
+
 package io.github.velyene.loreweaver.data
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -45,26 +55,7 @@ abstract class AppDatabase : RoomDatabase() {
 		@Volatile
 		private var INSTANCE: AppDatabase? = null
 
-		private val MIGRATION_10_11 = object : Migration(10, 11) {
-			override fun migrate(db: SupportSQLiteDatabase) {
-				db.execSQL("ALTER TABLE characters ADD COLUMN persistentConditions TEXT NOT NULL DEFAULT '[]'")
-				db.execSQL("UPDATE characters SET persistentConditions = activeConditions")
-				db.execSQL("UPDATE characters SET activeConditions = '[]'")
-			}
-		}
-
-		private val MIGRATION_9_10 = object : Migration(9, 10) {
-			override fun migrate(db: SupportSQLiteDatabase) {
-				db.execSQL("ALTER TABLE characters ADD COLUMN spells TEXT NOT NULL DEFAULT '[]'")
-			}
-		}
-
-		private val MIGRATION_8_9 = object : Migration(8, 9) {
-			override fun migrate(db: SupportSQLiteDatabase) {
-				db.execSQL("ALTER TABLE characters ADD COLUMN species TEXT NOT NULL DEFAULT ''")
-				db.execSQL("ALTER TABLE characters ADD COLUMN background TEXT NOT NULL DEFAULT ''")
-			}
-		}
+		internal const val DATABASE_NAME = "loreweaver_database"
 
 		private val MIGRATION_7_8 = object : Migration(7, 8) {
 			override fun migrate(db: SupportSQLiteDatabase) {
@@ -129,23 +120,41 @@ abstract class AppDatabase : RoomDatabase() {
 			}
 		}
 
+		internal fun isDebuggableBuild(context: Context): Boolean {
+			return (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+		}
+
+		internal fun createDatabaseBuilder(
+			context: Context,
+			databaseName: String = DATABASE_NAME,
+			isDebuggableBuild: Boolean = isDebuggableBuild(context)
+		): RoomDatabase.Builder<AppDatabase> {
+			val builder = Room.databaseBuilder(
+				context.applicationContext,
+				AppDatabase::class.java,
+				databaseName
+			)
+				.addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+
+			// Local/dev installs can legitimately open a newer on-device database after switching
+			// branches or testing older builds. Allow destructive downgrade fallback only in debug
+			// so development does not get stuck on missing downgrade paths, while release builds
+			// still fail fast unless an explicit production-safe migration policy is added.
+			if (isDebuggableBuild) {
+				builder.fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
+			}
+
+			return builder
+		}
+
+		internal fun resetInstanceForTesting() {
+			INSTANCE?.close()
+			INSTANCE = null
+		}
+
 		fun getDatabase(context: Context): AppDatabase {
 			return INSTANCE ?: synchronized(this) {
-				val instance = Room.databaseBuilder(
-					context.applicationContext,
-					AppDatabase::class.java,
-					"loreweaver_database"
-				)
-					.addMigrations(
-						MIGRATION_4_5,
-						MIGRATION_5_6,
-						MIGRATION_6_7,
-						MIGRATION_7_8,
-						MIGRATION_8_9,
-						MIGRATION_9_10,
-						MIGRATION_10_11
-					)
-					.build()
+				val instance = createDatabaseBuilder(context).build()
 				INSTANCE = instance
 				instance
 			}

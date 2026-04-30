@@ -5,57 +5,33 @@
  * 1. Turn progression and condition lifecycle behavior
  * 2. Status-log and condition mutation coverage
  * 3. Encounter difficulty recalculation
- * 4. Fake repository support helpers
+ * 4. Shared test-support integration
  */
 
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import io.github.velyene.loreweaver.MainDispatcherRule
-import io.github.velyene.loreweaver.domain.model.Campaign
 import io.github.velyene.loreweaver.domain.model.CharacterAction
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.domain.model.Encounter
 import io.github.velyene.loreweaver.domain.model.EncounterSnapshot
 import io.github.velyene.loreweaver.domain.model.EncounterStatus
-import io.github.velyene.loreweaver.domain.model.LogEntry
-import io.github.velyene.loreweaver.domain.model.Note
 import io.github.velyene.loreweaver.domain.model.SessionRecord
-import io.github.velyene.loreweaver.domain.repository.CampaignRepository
-import io.github.velyene.loreweaver.domain.use_case.GetActiveEncounterUseCase
-import io.github.velyene.loreweaver.domain.use_case.GetCharactersUseCase
-import io.github.velyene.loreweaver.domain.use_case.GetEncounterByIdUseCase
-import io.github.velyene.loreweaver.domain.use_case.GetSessionsForEncounterUseCase
-import io.github.velyene.loreweaver.domain.use_case.InsertEncounterUseCase
-import io.github.velyene.loreweaver.domain.use_case.InsertLogUseCase
-import io.github.velyene.loreweaver.domain.use_case.InsertSessionRecordUseCase
-import io.github.velyene.loreweaver.domain.use_case.SetActiveEncounterUseCase
-import io.github.velyene.loreweaver.domain.use_case.UpdateCharacterUseCase
 import io.github.velyene.loreweaver.domain.util.DifficultyRating
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CombatViewModelTest {
-
-	private companion object {
-		const val HERO_ID = "hero-1"
-		const val HERO_NAME = "Hero"
-		const val GOBLIN_ID = "goblin-1"
-		const val GOBLIN_NAME = "Goblin"
-		const val MONSTER_ID = "monster-1"
-	}
-
 	@get:Rule
 	val mainDispatcherRule = MainDispatcherRule()
 
@@ -63,7 +39,7 @@ class CombatViewModelTest {
 	fun nextTurn_advancesToNextCombatantWithinRound() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val combatants = listOf(
 				combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12),
 				combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
@@ -84,7 +60,7 @@ class CombatViewModelTest {
 	fun nextTurn_wrapsRound_decrementsAndExpiresConditions() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val first = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
 			val second = combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
 
@@ -110,7 +86,7 @@ class CombatViewModelTest {
 	fun updateCombatantHp_logsDamageAndDefeatedUnitEvent() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val combatant = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 5)
 
 			viewModel.addParty(listOf(combatant))
@@ -129,7 +105,7 @@ class CombatViewModelTest {
 	fun addCondition_addsConditionAndStatusMessage() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val combatant = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
 
 			viewModel.addParty(listOf(combatant))
@@ -189,7 +165,7 @@ class CombatViewModelTest {
 	fun removeCondition_removesConditionAndLogsStatus() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val combatant = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
 
 			viewModel.addParty(listOf(combatant))
@@ -220,20 +196,9 @@ class CombatViewModelTest {
 	fun removeCondition_withPersistentFlag_clearsSavedPersistentCondition() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
-			repository.setCharacters(
-				listOf(
-					CharacterEntry(
-						id = HERO_ID,
-						name = HERO_NAME,
-						party = "Adventurers",
-						hp = 12,
-						maxHp = 12,
-						persistentConditions = setOf("Restrained")
-					)
-				)
-			)
-			val viewModel = createViewModel(repository)
-			advanceUntilIdle()
+			val viewModel = createCombatViewModel(repository)
+			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
+			val goblin = combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
 
 			viewModel.addParty(listOf(combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)))
 			advanceUntilIdle()
@@ -279,7 +244,7 @@ class CombatViewModelTest {
 				maxHp = 59
 			)
 			repository.setCharacters(listOf(hero, monster))
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			advanceUntilIdle()
 
 			viewModel.addParty(
@@ -332,7 +297,7 @@ class CombatViewModelTest {
 					)
 				)
 			)
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 
 			viewModel.loadEncounter("encounter-invalid-index")
 			advanceUntilIdle()
@@ -359,7 +324,7 @@ class CombatViewModelTest {
 					)
 				)
 			)
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
 			val goblin = combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
 
@@ -389,7 +354,7 @@ class CombatViewModelTest {
 					)
 				)
 			)
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
 			val goblin = combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
 
@@ -421,7 +386,7 @@ class CombatViewModelTest {
 					)
 				)
 			)
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			viewModel.addParty(listOf(combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)))
 			advanceUntilIdle()
 
@@ -456,7 +421,7 @@ class CombatViewModelTest {
 					)
 				)
 			)
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			viewModel.addParty(listOf(combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)))
 			advanceUntilIdle()
 
@@ -468,6 +433,44 @@ class CombatViewModelTest {
 			)
 			assertTrue(
 				viewModel.uiState.value.activeStatuses.any { it.contains("$HERO_NAME is no longer Exhaustion") }
+			)
+		}
+	}
+
+	@Test
+	fun addCondition_persistentConditionUpdatesUseLatestCharacterStateAcrossRapidWrites() {
+		runTest {
+			val repository = FakeCombatCampaignRepository().apply {
+				updateCharacterDelayMillis = 1
+				setCharacters(
+					listOf(
+						CharacterEntry(
+							id = HERO_ID,
+							name = HERO_NAME,
+							party = "Adventurers"
+						)
+					)
+				)
+			}
+			val viewModel = createCombatViewModel(repository)
+			viewModel.addParty(listOf(combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)))
+			advanceUntilIdle()
+
+			viewModel.addCondition(
+				characterId = HERO_ID,
+				conditionName = "Exhaustion",
+				persistsAcrossEncounters = true
+			)
+			viewModel.addCondition(
+				characterId = HERO_ID,
+				conditionName = "Cursed",
+				persistsAcrossEncounters = true
+			)
+			advanceUntilIdle()
+
+			assertEquals(
+				setOf("Exhaustion", "Cursed"),
+				repository.getStoredCharacter(HERO_ID)?.activeConditions
 			)
 		}
 	}
@@ -501,7 +504,7 @@ class CombatViewModelTest {
 					)
 				)
 			)
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 
 			viewModel.loadEncounter("encounter-draft")
 			advanceUntilIdle()
@@ -528,7 +531,7 @@ class CombatViewModelTest {
 					status = EncounterStatus.PENDING
 				)
 			)
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
 
 			viewModel.loadEncounter("encounter-existing")
@@ -560,7 +563,7 @@ class CombatViewModelTest {
 					status = EncounterStatus.ACTIVE
 				)
 			)
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
 			var completed = false
 
@@ -584,6 +587,51 @@ class CombatViewModelTest {
 	}
 
 	@Test
+	fun saveAndPauseEncounter_failureReportsRetryableErrorAndRetryCanCompletePause() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			repository.insertSessionFailure = IllegalStateException("Disk full")
+			repository.setEncounter(
+				Encounter(
+					id = "encounter-active",
+					campaignId = "campaign-1",
+					name = "Boss Chamber",
+					status = EncounterStatus.ACTIVE
+				)
+			)
+			val viewModel = createCombatViewModel(repository)
+			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
+			var completed = false
+
+			viewModel.loadEncounter("encounter-active")
+			advanceUntilIdle()
+			viewModel.addParty(listOf(hero))
+			viewModel.saveAndPauseEncounter { completed = true }
+			advanceUntilIdle()
+
+			with(viewModel.uiState.value) {
+				assertFalse(completed)
+				assertEquals(EncounterLifecycle.ACTIVE, encounterLifecycle)
+				assertEquals("Failed to save encounter: Disk full", error)
+				assertNotNull(onRetry)
+			}
+			assertNull(repository.getRecentSession())
+
+			repository.insertSessionFailure = null
+			viewModel.uiState.value.onRetry?.invoke()
+			advanceUntilIdle()
+
+			val storedEncounter = repository.getStoredEncounter("encounter-active")
+			val recentSession = repository.getRecentSession()
+			assertTrue(completed)
+			assertNull(viewModel.uiState.value.error)
+			assertEquals(EncounterStatus.PENDING, storedEncounter?.status)
+			assertEquals(null, repository.activeEncounterId)
+			assertNotNull(recentSession)
+		}
+	}
+
+	@Test
 	fun saveAndPauseEncounter_reloadRestoresHpTurnRoundAndConditionsFromSnapshot() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
@@ -595,7 +643,7 @@ class CombatViewModelTest {
 					status = EncounterStatus.PENDING
 				)
 			)
-			val initialViewModel = createViewModel(repository)
+			val initialViewModel = createCombatViewModel(repository)
 			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
 			val goblin = combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
 			var completed = false
@@ -614,7 +662,7 @@ class CombatViewModelTest {
 			advanceUntilIdle()
 
 			assertTrue(completed)
-			val reloadedViewModel = createViewModel(repository)
+			val reloadedViewModel = createCombatViewModel(repository)
 			reloadedViewModel.loadEncounter("encounter-restore")
 			advanceUntilIdle()
 
@@ -645,7 +693,7 @@ class CombatViewModelTest {
 	fun nextTurn_expiresRoundDurationExactlyOnExpectedRoundAdvance() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
 			val goblin = combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
 
@@ -708,7 +756,7 @@ class CombatViewModelTest {
 
 			repository.setEncounter(encounter)
 			repository.setSessionsForEncounter(encounter.id, listOf(session))
-			val viewModel = createViewModel(repository)
+			val viewModel = createCombatViewModel(repository)
 			advanceUntilIdle()
 
 			viewModel.loadEncounter(encounter.id)
@@ -723,131 +771,5 @@ class CombatViewModelTest {
 				assertEquals(session.log, activeStatuses)
 			}
 		}
-	}
-
-	private fun createViewModel(repository: FakeCombatCampaignRepository): CombatViewModel {
-		return CombatViewModel(
-			getCharactersUseCase = GetCharactersUseCase(repository),
-			getActiveEncounterUseCase = GetActiveEncounterUseCase(repository),
-			getEncounterByIdUseCase = GetEncounterByIdUseCase(repository),
-			getSessionsForEncounterUseCase = GetSessionsForEncounterUseCase(repository),
-			insertEncounterUseCase = InsertEncounterUseCase(repository),
-			setActiveEncounterUseCase = SetActiveEncounterUseCase(repository),
-			insertLogUseCase = InsertLogUseCase(repository),
-			insertSessionRecordUseCase = InsertSessionRecordUseCase(repository),
-			updateCharacterUseCase = UpdateCharacterUseCase(repository)
-		)
-	}
-
-	private fun combatant(id: String, name: String, initiative: Int, hp: Int): CombatantState {
-		return CombatantState(
-			characterId = id,
-			name = name,
-			initiative = initiative,
-			currentHp = hp,
-			maxHp = hp
-		)
-	}
-}
-
-private class FakeCombatCampaignRepository : CampaignRepository {
-	private val campaignsFlow = MutableStateFlow<List<Campaign>>(emptyList())
-	private val charactersFlow = MutableStateFlow<List<CharacterEntry>>(emptyList())
-	private val allSessionsFlow = MutableStateFlow<List<SessionRecord>>(emptyList())
-	private val logsFlow = MutableStateFlow<List<LogEntry>>(emptyList())
-	private val encountersById = mutableMapOf<String, Encounter>()
-	private val sessionsByEncounterId = mutableMapOf<String, List<SessionRecord>>()
-	private var activeEncounter: Encounter? = Encounter(
-		id = "encounter-1",
-		name = "Fallback",
-		status = EncounterStatus.ACTIVE
-	)
-	private var recentSession: SessionRecord? = null
-
-	override fun getAllCampaigns(): Flow<List<Campaign>> = campaignsFlow
-
-	override suspend fun getCampaignById(id: String): Campaign? =
-		campaignsFlow.value.firstOrNull { it.id == id }
-
-	override suspend fun insertCampaign(campaign: Campaign) {
-		campaignsFlow.value += campaign
-	}
-
-	override fun getEncountersForCampaign(campaignId: String): Flow<List<Encounter>> =
-		flowOf(encountersById.values.filter { it.campaignId == campaignId })
-
-	override suspend fun getEncounterById(encounterId: String): Encounter? = encountersById[encounterId]
-
-	override suspend fun insertEncounter(encounter: Encounter) {
-		encountersById[encounter.id] = encounter
-	}
-
-	override suspend fun addCombatantsToEncounter(
-
-		encounterId: String,
-		combatants: List<CombatantState>
-
-	) = Unit
-
-	override fun getSessionsForEncounter(encounterId: String): Flow<List<SessionRecord>> =
-		flowOf(sessionsByEncounterId[encounterId].orEmpty())
-
-	override fun getAllSessions(): Flow<List<SessionRecord>> = allSessionsFlow
-
-	override suspend fun insertSessionRecord(session: SessionRecord) {
-		allSessionsFlow.value += session
-		session.encounterId?.let { encounterId ->
-			sessionsByEncounterId[encounterId] = listOf(session) + sessionsByEncounterId[encounterId].orEmpty()
-		}
-		recentSession = session
-	}
-
-	override fun getNotesForCampaign(campaignId: String): Flow<List<Note>> = flowOf(emptyList())
-
-	override suspend fun insertNote(note: Note) = Unit
-
-	override suspend fun updateNote(note: Note) = Unit
-
-	override suspend fun deleteNote(note: Note) = Unit
-
-	override fun getAllCharacters(): Flow<List<CharacterEntry>> = charactersFlow
-
-	override suspend fun getCharacterById(id: String): CharacterEntry? =
-		charactersFlow.value.firstOrNull { it.id == id }
-
-	override suspend fun insertCharacter(character: CharacterEntry) = Unit
-
-	override suspend fun updateCharacter(character: CharacterEntry) {
-		charactersFlow.value = charactersFlow.value.map { existing ->
-			if (existing.id == character.id) character else existing
-		}
-	}
-
-	override suspend fun deleteCharacter(character: CharacterEntry) = Unit
-
-	override suspend fun getActiveEncounter(): Encounter? = activeEncounter
-
-	override suspend fun setActiveEncounter(encounterId: String) {
-		activeEncounter = encountersById[encounterId]
-	}
-
-	override suspend fun getRecentSession(): SessionRecord? = recentSession
-
-	override fun getAllLogs(): Flow<List<LogEntry>> = logsFlow
-
-	override suspend fun insertLog(log: LogEntry) {
-		logsFlow.value += log
-	}
-
-	override suspend fun clearLogs() {
-		logsFlow.value = emptyList()
-	}
-
-	fun setCharacters(characters: List<CharacterEntry>) {
-		charactersFlow.value = characters
-	}
-
-	fun requireCharacter(characterId: String): CharacterEntry {
-		return charactersFlow.value.first { it.id == characterId }
 	}
 }

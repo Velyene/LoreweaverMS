@@ -2,13 +2,13 @@
  * FILE: CampaignNoteDialog.kt
  *
  * TABLE OF CONTENTS:
- * 1. Dialog Mode (NoteDialogMode)
- * 2. Dialog Host (NoteDialogHost)
- * 3. Entry Dialog (NoteEntryDialog)
- * 4. Submit Helper (handleNoteConfirm)
- * 5. Dialog Fields (NoteDialogFields)
- * 6. Type Helpers (initialNoteType, initialExtraField, localized helpers)
- * 7. Updated Note Mapping (buildUpdatedNote)
+ * 1. Dialog mode (NoteDialogMode)
+ * 2. Dialog host (NoteDialogHost)
+ * 3. Entry dialog (NoteEntryDialog)
+ * 4. Submit handling (handleNoteConfirm)
+ * 5. Dialog fields (NoteDialogFields)
+ * 6. Type support (initialNoteType, initialExtraField, localized text)
+ * 7. Updated note mapping (buildUpdatedNote)
  */
 
 package io.github.velyene.loreweaver.ui.screens

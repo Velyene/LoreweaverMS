@@ -10,6 +10,11 @@ android {
 	namespace = "io.github.velyene.loreweaver"
 	compileSdk = 37
 
+	dependenciesInfo {
+		includeInApk = false
+		includeInBundle = false
+	}
+
 	defaultConfig {
 		applicationId = "io.github.velyene.loreweaver"
 		minSdk = 24
@@ -38,6 +43,18 @@ android {
 
 	buildFeatures {
 		compose = true
+	}
+
+	packaging {
+		resources {
+			excludes += "META-INF/version-control-info.textproto"
+		}
+	}
+}
+
+tasks.configureEach {
+	if (name == "extractReleaseVersionControlInfo") {
+		enabled = false
 	}
 }
 

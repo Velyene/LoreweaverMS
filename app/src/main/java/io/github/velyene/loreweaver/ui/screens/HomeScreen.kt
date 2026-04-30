@@ -58,7 +58,7 @@ private fun ErrorSnackbarHandler(
 	error: String?,
 	onRetry: (() -> Unit)?,
 	snackbarHostState: SnackbarHostState,
-	onClear: () -> Unit,
+	onClear: (String) -> Unit,
 	retryActionLabel: String,
 ) {
 	LaunchedEffect(error) {
@@ -71,9 +71,10 @@ private fun ErrorSnackbarHandler(
 		)
 
 		if (result == SnackbarResult.ActionPerformed) {
+			onClear(error)
 			onRetry?.invoke()
+		} else {
+			onClear(error)
 		}
-
-		onClear()
 	}
 }

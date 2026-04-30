@@ -3,6 +3,14 @@ package io.github.velyene.loreweaver.domain.util
 object MonsterReferenceCatalog {
 	const val ANIMAL_GROUP = MONSTER_GROUP_ANIMALS
 
+	private data class IndexedMonsterEntry(
+		val entry: MonsterReferenceEntry,
+		val searchCorpus: String,
+		val normalizedCreatureType: String,
+		val normalizedGroup: String,
+		val challengeRating: String
+	)
+
 	val ALL: List<MonsterReferenceEntry> = run {
 		val entries =
 			MonsterReferenceDataAnimals.ENTRIES +
@@ -27,18 +35,32 @@ object MonsterReferenceCatalog {
 		.distinct()
 		.sortedBy(::parseMonsterChallengeRatingValue)
 
+	private val INDEXED_ALL: List<IndexedMonsterEntry> = ALL.map { entry ->
+		IndexedMonsterEntry(
+			entry = entry,
+			searchCorpus = buildMonsterSearchCorpus(entry),
+			normalizedCreatureType = entry.creatureType.lowercase(),
+			normalizedGroup = entry.group.orEmpty().lowercase(),
+			challengeRating = entry.challengeRating
+		)
+	}
+
 	fun filter(
 		query: String,
 		creatureType: String? = null,
 		challengeRating: String? = null,
 		group: String? = null
 	): List<MonsterReferenceEntry> {
-		return ALL.filter { monster ->
-			monster.matchesGroup(group) &&
-				monster.matchesCreatureType(creatureType) &&
-				monster.matchesChallengeRating(challengeRating) &&
-				(query.isBlank() || monster.matchesSearchQuery(query))
-		}
+		val normalizedQuery = query.trim().lowercase()
+		val normalizedCreatureType = creatureType?.trim()?.lowercase().orEmpty()
+		val normalizedGroup = group?.trim()?.lowercase().orEmpty()
+
+		return INDEXED_ALL.filter { indexedMonster ->
+			indexedMonster.matchesGroup(normalizedGroup) &&
+				indexedMonster.matchesCreatureType(normalizedCreatureType) &&
+				indexedMonster.matchesChallengeRating(challengeRating) &&
+				(normalizedQuery.isBlank() || indexedMonster.searchCorpus.contains(normalizedQuery))
+		}.map(IndexedMonsterEntry::entry)
 	}
 
 	fun findEntry(identifier: String): MonsterReferenceEntry? {
@@ -52,34 +74,41 @@ object MonsterReferenceCatalog {
 		return findEntry(slug)?.toReferenceDetailContent()
 	}
 
-	private fun MonsterReferenceEntry.matchesSearchQuery(query: String): Boolean {
-		return listOf(name, subtitle, body, group.orEmpty(), creatureType, challengeRating)
-			.any { it.contains(query, ignoreCase = true) } ||
-			statRows.any { (label, value) ->
-				label.contains(query, ignoreCase = true) || value.contains(query, ignoreCase = true)
-			} ||
-			sections.any { section ->
-				section.title.contains(query, ignoreCase = true) ||
-					section.body?.contains(query, ignoreCase = true) == true ||
-					section.bullets.any { bullet -> bullet.contains(query, ignoreCase = true) }
-			} ||
-			tables.any { table ->
-				table.title.contains(query, ignoreCase = true) ||
-					table.columns.any { column -> column.contains(query, ignoreCase = true) } ||
-					table.rows.any { row -> row.any { cell -> cell.contains(query, ignoreCase = true) } }
-			}
+	private fun IndexedMonsterEntry.matchesCreatureType(selectedType: String): Boolean {
+		return selectedType.isBlank() || normalizedCreatureType == selectedType
 	}
 
-	private fun MonsterReferenceEntry.matchesCreatureType(selectedType: String?): Boolean {
-		return selectedType.isNullOrBlank() || creatureType.equals(selectedType, ignoreCase = true)
+	private fun IndexedMonsterEntry.matchesGroup(selectedGroup: String): Boolean {
+		return selectedGroup.isBlank() || normalizedGroup == selectedGroup
 	}
 
-	private fun MonsterReferenceEntry.matchesGroup(selectedGroup: String?): Boolean {
-		return selectedGroup.isNullOrBlank() || group.equals(selectedGroup, ignoreCase = true)
-	}
-
-	private fun MonsterReferenceEntry.matchesChallengeRating(selectedRating: String?): Boolean {
+	private fun IndexedMonsterEntry.matchesChallengeRating(selectedRating: String?): Boolean {
 		return selectedRating.isNullOrBlank() || challengeRating == selectedRating
+	}
+
+	private fun buildMonsterSearchCorpus(entry: MonsterReferenceEntry): String {
+		return buildString {
+			appendLine(entry.name)
+			appendLine(entry.subtitle)
+			appendLine(entry.body)
+			appendLine(entry.group.orEmpty())
+			appendLine(entry.creatureType)
+			appendLine(entry.challengeRating)
+			entry.statRows.forEach { (label, value) ->
+				appendLine(label)
+				appendLine(value)
+			}
+			entry.sections.forEach { section ->
+				appendLine(section.title)
+				section.body?.let(::appendLine)
+				section.bullets.forEach(::appendLine)
+			}
+			entry.tables.forEach { table ->
+				appendLine(table.title)
+				table.columns.forEach(::appendLine)
+				table.rows.forEach { row -> row.forEach(::appendLine) }
+			}
+		}.lowercase()
 	}
 
 	private fun MonsterReferenceEntry.toReferenceDetailContent(): ReferenceDetailContent {

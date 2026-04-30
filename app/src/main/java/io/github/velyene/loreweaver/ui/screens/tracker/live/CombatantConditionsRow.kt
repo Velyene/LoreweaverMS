@@ -3,8 +3,8 @@
  *
  * TABLE OF CONTENTS:
  * 1. Combatant conditions row composable
- * 2. Condition chip rendering helpers
- * 3. Condition duration formatting helpers
+ * 2. Condition chip rendering support
+ * 3. Condition duration formatting
  */
 
 package io.github.velyene.loreweaver.ui.screens.tracker.live
@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CombatantState
-import io.github.velyene.loreweaver.domain.model.Condition
 import io.github.velyene.loreweaver.ui.screens.StatusChipFlowRow
 import io.github.velyene.loreweaver.ui.screens.StatusChipModel
 import io.github.velyene.loreweaver.ui.screens.canonicalStatusLabel
@@ -45,16 +44,14 @@ internal fun CombatantStatusRow(
 ) {
 	val statuses = buildCombatantStatusChips(combatant, persistentConditions)
 	val addConditionDescription = stringResource(R.string.add_condition_desc)
-	val conditionsStateDescription = buildString {
-		append(stringResource(R.string.encounter_conditions_title))
-		append(": ")
-		append(
-			if (statuses.isEmpty()) {
-				stringResource(R.string.empty_label)
-			} else {
-				statuses.joinToString { status -> statusChipDisplayText(status) }
-			}
-		)
+	val persistentSuffix = stringResource(R.string.condition_persistent_chip_suffix)
+	val statuses = buildCombatantStatusChips(combatant, persistentConditions)
+	val conditionsStateValue = if (statuses.isEmpty()) {
+		stringResource(R.string.empty_label)
+	} else {
+		statuses.joinToString { status ->
+			statusChipStateText(status, persistentSuffix)
+		}
 	}
 	val conditionsStateDescription = stringResource(
 		R.string.conditions_state_description,
@@ -96,11 +93,23 @@ internal fun CombatantStatusRow(
 	)
 }
 
-private fun conditionDurationText(condition: Condition): String {
+private fun conditionDurationText(condition: io.github.velyene.loreweaver.domain.model.Condition): String {
 	return condition.duration?.let { " ($it)" } ?: ""
 }
 
-internal fun buildCombatantStatusChips(
+private fun statusChipStateText(status: StatusChipModel, persistentSuffix: String): String {
+	return buildString {
+		append(status.name)
+		if (status.isPersistent) {
+			append(' ')
+			append(persistentSuffix)
+		} else {
+			append(status.durationText)
+		}
+	}
+}
+
+private fun buildCombatantStatusChips(
 	combatant: CombatantState,
 	persistentConditions: Set<String>
 ): List<StatusChipModel> {

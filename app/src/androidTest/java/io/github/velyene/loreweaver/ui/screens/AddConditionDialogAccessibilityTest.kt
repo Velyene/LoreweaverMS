@@ -26,7 +26,7 @@ class AddConditionDialogAccessibilityTest {
 		composeRule.setContent {
 			MaterialTheme {
 				AddConditionDialog(
-					onConfirm = { _, _ -> },
+					onConfirm = { _, _, _ -> },
 					onDismiss = {}
 				)
 			}

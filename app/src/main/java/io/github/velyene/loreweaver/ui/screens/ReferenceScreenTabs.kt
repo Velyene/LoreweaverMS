@@ -9,6 +9,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -47,7 +48,12 @@ private fun ReferenceCategoryTab(
 ) {
 	val label = stringResource(category.labelResId())
 	val favoriteCountDescription = if (favoriteCount > 0 && category.supportsFavoritesFilter()) {
-		stringResource(R.string.reference_tab_with_favorites_count, label, favoriteCount)
+		pluralStringResource(
+			R.plurals.reference_tab_with_favorites_count,
+			favoriteCount,
+			label,
+			favoriteCount
+		)
 	} else {
 		null
 	}
@@ -116,7 +122,7 @@ internal fun ReferenceCategory.labelResId(): Int = when (this) {
 	ReferenceCategory.DISEASES -> R.string.reference_tab_diseases
 	ReferenceCategory.SPELLCASTING -> R.string.reference_tab_spellcasting
 	ReferenceCategory.OBJECTS -> R.string.reference_tab_objects
-	ReferenceCategory.MADNESS -> R.string.reference_tab_madness
+	ReferenceCategory.HYSTERIA -> R.string.reference_tab_hysteria
 	ReferenceCategory.MONSTERS -> R.string.reference_tab_monsters
 	ReferenceCategory.CORE_RULES -> R.string.reference_tab_core_rules
 	ReferenceCategory.CHARACTER_CREATION -> R.string.reference_tab_character_creation

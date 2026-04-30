@@ -2,8 +2,8 @@
  * FILE: PromptLibraryScreen.kt
  *
  * TABLE OF CONTENTS:
- * 1. Main Screen (PromptLibraryScreen)
- * 2. Prompt Card (PromptCard)
+ * 1. Prompt library screen entry point
+ * 2. Prompt card composable
  */
 
 package io.github.velyene.loreweaver.ui.screens

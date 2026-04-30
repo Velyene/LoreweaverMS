@@ -17,8 +17,8 @@ import io.github.velyene.loreweaver.domain.model.LogEntry
 import io.github.velyene.loreweaver.domain.model.Note
 import io.github.velyene.loreweaver.domain.model.SessionRecord
 import io.github.velyene.loreweaver.domain.repository.CampaignRepository
-import io.github.velyene.loreweaver.domain.use_case.AddCharacterUseCase
 import io.github.velyene.loreweaver.domain.use_case.AddCampaignUseCase
+import io.github.velyene.loreweaver.domain.use_case.AddCharacterUseCase
 import io.github.velyene.loreweaver.domain.use_case.AddEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.AddMonstersToEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.AddNoteUseCase
@@ -40,7 +40,6 @@ import io.github.velyene.loreweaver.domain.use_case.UpdateNoteUseCase
 import io.github.velyene.loreweaver.ui.util.AppText
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 
 internal val fakeAppText: AppText = FakeAppText()
 
@@ -255,6 +254,7 @@ internal class FakeAppText : AppText {
 		return when (resId) {
 			R.string.unknown_error -> "Unknown error"
 			R.string.message_with_detail -> "${formatArgs[0]}: ${formatArgs[1]}"
+			R.string.combatant_hp_label -> "HP: ${formatArgs[0]}/${formatArgs[1]}"
 			R.string.campaign_not_found_message -> "Campaign not found."
 			R.string.campaign_error_critical -> "Critical error"
 			R.string.campaign_error_load_campaigns -> "Failed to load campaigns"
@@ -271,11 +271,16 @@ internal class FakeAppText : AppText {
 			R.string.encounter_not_found_message -> "Encounter not found."
 			R.string.encounter_error_load -> "Failed to load encounter"
 			R.string.encounter_error_start -> "Failed to start encounter"
+			R.string.encounter_error_save -> "Failed to save encounter"
 			R.string.character_error_load -> "Failed to load characters"
 			R.string.character_error_not_found -> "Character not found"
 			R.string.character_error_add -> "Failed to add character"
 			R.string.character_error_update -> "Failed to update character"
 			R.string.character_error_delete -> "Failed to delete character"
+			R.string.reference_preferences_load_error -> "Failed to load reference favorites."
+			R.string.reference_preferences_update_error -> "Failed to update reference favorites."
+			R.string.session_summary_error_no_recent -> "No recent encounter summary is available."
+			R.string.session_summary_error_load -> "Failed to load encounter summary."
 			else -> error("Unhandled string resource id $resId in FakeAppText")
 		}
 	}

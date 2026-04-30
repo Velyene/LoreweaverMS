@@ -5,7 +5,7 @@
  * 1. Objects reference screen entry point
  * 2. Armor Class and hit point reference cards
  * 3. Common object cards and stat rows
- * 4. Share-text helpers for the objects reference section
+ * 4. Share-text support for the objects reference section
  */
 
 package io.github.velyene.loreweaver.ui.screens

@@ -85,3 +85,27 @@ internal fun CombatUiState.withError(
 
 internal fun CombatUiState.clearErrorState(): CombatUiState = copy(error = null, onRetry = null)
 
+internal fun SessionSummaryUiState.beginLoading(): SessionSummaryUiState = copy(
+	isLoading = true,
+	summary = null,
+	error = null,
+	onRetry = null
+)
+
+internal fun SessionSummaryUiState.withError(
+	message: String,
+	onRetry: (() -> Unit)? = null
+): SessionSummaryUiState = copy(
+	isLoading = false,
+	summary = null,
+	error = message,
+	onRetry = onRetry
+)
+
+internal fun SessionSummaryUiState.withSummary(summary: SessionSummaryUiModel): SessionSummaryUiState = copy(
+	isLoading = false,
+	summary = summary,
+	error = null,
+	onRetry = null
+)
+

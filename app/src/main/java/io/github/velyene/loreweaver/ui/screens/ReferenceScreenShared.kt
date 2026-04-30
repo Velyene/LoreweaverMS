@@ -5,8 +5,8 @@
  * 1. Shared master-detail scaffolding
  * 2. Reference headers, actions, and detail chrome
  * 3. Shared cards, bullet rows, and detail rows
- * 4. Query, share-text, and table helpers
- * 5. Empty-state presentation helpers
+ * 4. Query, share-text, and table support
+ * 5. Empty-state presentation
  */
 
 package io.github.velyene.loreweaver.ui.screens

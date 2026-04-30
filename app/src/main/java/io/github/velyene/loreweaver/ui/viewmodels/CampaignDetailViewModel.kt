@@ -73,8 +73,14 @@ class CampaignDetailViewModel @Inject constructor(
 		}
 	}
 
-	fun clearError() {
-		_uiState.update(CampaignDetailUiState::clearErrorState)
+	fun clearError(expectedMessage: String? = null) {
+		_uiState.update {
+			if (expectedMessage == null || it.error == expectedMessage) {
+				it.clearErrorState()
+			} else {
+				it
+			}
+		}
 	}
 
 	private fun reportError(message: String, onRetry: (() -> Unit)? = null) {
