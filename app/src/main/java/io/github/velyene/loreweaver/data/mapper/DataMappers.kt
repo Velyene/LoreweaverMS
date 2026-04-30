@@ -217,6 +217,7 @@ fun CharacterEntity.toDomain(): CharacterEntry {
 		resources = gson.fromJson(resourcesJson, resourceListType),
 		hitDieType = hitDieType,
 		hitDiceCurrent = hitDiceCurrent,
+			persistentConditions = persistentConditions,
 		activeConditions = activeConditions,
 		actions = gson.fromJson(actionsJson, actionListType),
 		proficiencies = proficiencies,
@@ -228,7 +229,10 @@ fun CharacterEntity.toDomain(): CharacterEntry {
 			spellSlotsJson,
 			spellSlotsMapType
 		)?.mapValues { (it.value.getOrElse(0) { 0 }) to (it.value.getOrElse(1) { 0 }) }
-			?: emptyMap()
+			?: emptyMap(),
+		species = species,
+		background = background,
+		spells = spells
 	)
 }
 
@@ -264,6 +268,7 @@ fun CharacterEntry.toEntity(): CharacterEntity {
 		resourcesJson = gson.toJson(resources),
 		hitDieType = hitDieType,
 		hitDiceCurrent = hitDiceCurrent,
+			persistentConditions = persistentConditions,
 		activeConditions = activeConditions,
 		actionsJson = gson.toJson(actions),
 		proficiencies = proficiencies,
@@ -277,7 +282,10 @@ fun CharacterEntry.toEntity(): CharacterEntity {
 				it.value.first,
 				it.value.second
 			)
-		})
+		}),
+		species = species,
+		background = background,
+		spells = spells
 	)
 }
 

@@ -30,7 +30,9 @@ internal fun CharacterEntry.toFormState(): CharacterFormState {
 	return CharacterFormState()
 		.copy(
 			name = name,
-			type = if (party == CharacterParty.ADVENTURERS) normalizeClassName(type) else type.ifBlank { "Monster" },
+			type = normalizeClassName(type),
+			species = species,
+			background = background,
 			party = party,
 			level = level.toString(),
 			challengeRating = challengeRating.toString()
@@ -60,9 +62,12 @@ internal fun CharacterEntry.toFormState(): CharacterFormState {
 		.copy(
 			selectedProficiencies = proficiencies,
 			selectedSaveProficiencies = saveProficiencies,
+			spellsText = spells.joinToString("\n"),
 			inventoryText = inventory.joinToString("\n"),
 			resources = resources,
 			actions = actions,
+			encounterConditions = activeConditions,
+			persistentConditions = persistentConditions,
 			status = status,
 			notes = notes
 		)

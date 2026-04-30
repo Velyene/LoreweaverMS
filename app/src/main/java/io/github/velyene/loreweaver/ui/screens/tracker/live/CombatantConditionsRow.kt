@@ -10,7 +10,7 @@
 package io.github.velyene.loreweaver.ui.screens.tracker.live
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,39 +33,43 @@ import io.github.velyene.loreweaver.domain.model.Condition
 import io.github.velyene.loreweaver.ui.screens.StatusChipFlowRow
 import io.github.velyene.loreweaver.ui.screens.StatusChipModel
 import io.github.velyene.loreweaver.ui.screens.canonicalStatusLabel
-import io.github.velyene.loreweaver.ui.screens.persistentStatusChipModels
+import io.github.velyene.loreweaver.ui.screens.statusChipDisplayText
 import io.github.velyene.loreweaver.ui.screens.statusChipModel
 
 @Composable
-internal fun CombatantConditionsRow(
+internal fun CombatantStatusRow(
 	combatant: CombatantState,
 	persistentConditions: Set<String> = emptySet(),
-	onRemoveCondition: (String, String) -> Unit,
+	onRemoveCondition: (String, String, Boolean) -> Unit,
 	onAddConditionClick: () -> Unit
 ) {
+	val statuses = buildCombatantStatusChips(combatant, persistentConditions)
 	val addConditionDescription = stringResource(R.string.add_condition_desc)
-	val conditionsStateValue = if (combatant.conditions.isEmpty()) {
-		stringResource(R.string.empty_label)
-	} else {
-		combatant.conditions.joinToString { condition ->
-			condition.name + conditionDurationText(condition)
-		}
+	val conditionsStateDescription = buildString {
+		append(stringResource(R.string.encounter_conditions_title))
+		append(": ")
+		append(
+			if (statuses.isEmpty()) {
+				stringResource(R.string.empty_label)
+			} else {
+				statuses.joinToString { status -> statusChipDisplayText(status) }
+			}
+		)
 	}
 	val conditionsStateDescription = stringResource(
 		R.string.conditions_state_description,
 		conditionsStateValue
 	)
 
-	// Conditions remain inline with the combatant row so status effect changes stay visible
-	// without forcing players to open a secondary detail surface during live combat.
 	StatusChipFlowRow(
-		statuses = buildCombatantStatusChips(combatant, persistentConditions),
+		statuses = statuses,
 		modifier = Modifier
-			.fillMaxWidth()
 			.semantics {
 				stateDescription = conditionsStateDescription
 			},
-		onStatusRemove = { status -> onRemoveCondition(combatant.characterId, status.name) },
+		onStatusRemove = { status ->
+			onRemoveCondition(combatant.characterId, status.name, status.isPersistent)
+		},
 		trailingContent = {
 			AssistChip(
 				onClick = onAddConditionClick,
@@ -88,45 +92,7 @@ internal fun CombatantConditionsRow(
 					color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
 				)
 			)
-		)
-	}
-}
-
-@Composable
-private fun ConditionChip(
-	condition: Condition,
-	onRemove: () -> Unit
-) {
-	val removeConditionDescription = stringResource(
-		R.string.remove_condition_desc_with_name,
-		condition.name
-	)
-
-	FilterChip(
-		selected = true,
-		onClick = {},
-		enabled = false,
-		label = {
-			Text(
-				"${condition.name}${conditionDurationText(condition)}",
-				fontSize = 11.sp
-			)
-		},
-		trailingIcon = {
-			IconButton(
-				onClick = onRemove,
-				modifier = Modifier.size(16.dp)
-			) {
-				Icon(
-					Icons.Default.Close,
-					contentDescription = removeConditionDescription,
-					modifier = Modifier.size(12.dp)
-				)
-			}
-		},
-		colors = FilterChipDefaults.filterChipColors(
-			selectedContainerColor = getConditionColor(condition.name)
-		)
+		}
 	)
 }
 
@@ -134,27 +100,29 @@ private fun conditionDurationText(condition: Condition): String {
 	return condition.duration?.let { " ($it)" } ?: ""
 }
 
-private fun buildCombatantStatusChips(
+internal fun buildCombatantStatusChips(
 	combatant: CombatantState,
 	persistentConditions: Set<String>
 ): List<StatusChipModel> {
-	val activeEncounterConditionLabels = combatant.conditions
-		.map { condition -> canonicalStatusLabel(condition.name) }
-		.toSet()
-	val encounterStatuses = combatant.conditions
-		.sortedBy { condition -> canonicalStatusLabel(condition.name).lowercase() }
-		.map { condition ->
-			statusChipModel(
+	val encounterStatusesByLabel = combatant.conditions
+		.associate { condition ->
+			canonicalStatusLabel(condition.name) to statusChipModel(
 				name = condition.name,
 				durationText = conditionDurationText(condition),
 				isPersistent = false
 			)
 		}
-	val persistentStatuses = persistentStatusChipModels(
-		persistentConditions.filterNot { persistentName ->
-			canonicalStatusLabel(persistentName) in activeEncounterConditionLabels
+	val mergedStatuses = encounterStatusesByLabel.toMutableMap()
+	for (persistentCondition in persistentConditions) {
+		val canonicalLabel = canonicalStatusLabel(persistentCondition)
+		val encounterStatus = mergedStatuses[canonicalLabel]
+		mergedStatuses[canonicalLabel] = if (encounterStatus != null) {
+			encounterStatus.copy(isPersistent = true)
+		} else {
+			statusChipModel(name = persistentCondition, isPersistent = true)
 		}
-	)
-	return encounterStatuses + persistentStatuses
+	}
+	return mergedStatuses.values.sortedBy { status -> status.name.lowercase() }
 }
+
 

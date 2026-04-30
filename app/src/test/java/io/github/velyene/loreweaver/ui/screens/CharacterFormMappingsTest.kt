@@ -160,16 +160,21 @@ class CharacterFormMappingsTest {
 	}
 
 	@Test
-	fun toFormState_preservesMonsterType_forNonAdventurerEntries() {
+	fun toFormState_mapsSpeciesBackgroundEncounterAndPersistentConditions() {
 		val formState = CharacterEntry(
-			name = "Ancient White Dragon",
-			type = "Dragon",
-			party = CharacterParty.MONSTERS,
-			hp = 333,
-			maxHp = 333,
-			ac = 20
+			name = "Lia",
+			type = CLASS_WIZARD,
+			species = "Elf",
+			background = "Sage",
+			spells = listOf("Magic Missile", "Shield"),
+			activeConditions = setOf("Poisoned"),
+			persistentConditions = setOf("Blessed")
 		).toFormState()
 
-		assertEquals("Dragon", formState.type)
+		assertEquals("Elf", formState.species)
+		assertEquals("Sage", formState.background)
+		assertEquals("Magic Missile\nShield", formState.spellsText)
+		assertEquals(setOf("Poisoned"), formState.encounterConditions)
+		assertEquals(setOf("Blessed"), formState.persistentConditions)
 	}
 }

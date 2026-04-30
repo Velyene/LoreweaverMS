@@ -29,7 +29,7 @@ import io.github.velyene.loreweaver.data.entities.SessionEntity
 		NoteEntity::class,
 		LogEntryEntity::class
 	],
-	version = 8,
+	version = 11,
 	exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -44,6 +44,27 @@ abstract class AppDatabase : RoomDatabase() {
 	companion object {
 		@Volatile
 		private var INSTANCE: AppDatabase? = null
+
+		private val MIGRATION_10_11 = object : Migration(10, 11) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL("ALTER TABLE characters ADD COLUMN persistentConditions TEXT NOT NULL DEFAULT '[]'")
+				db.execSQL("UPDATE characters SET persistentConditions = activeConditions")
+				db.execSQL("UPDATE characters SET activeConditions = '[]'")
+			}
+		}
+
+		private val MIGRATION_9_10 = object : Migration(9, 10) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL("ALTER TABLE characters ADD COLUMN spells TEXT NOT NULL DEFAULT '[]'")
+			}
+		}
+
+		private val MIGRATION_8_9 = object : Migration(8, 9) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL("ALTER TABLE characters ADD COLUMN species TEXT NOT NULL DEFAULT ''")
+				db.execSQL("ALTER TABLE characters ADD COLUMN background TEXT NOT NULL DEFAULT ''")
+			}
+		}
 
 		private val MIGRATION_7_8 = object : Migration(7, 8) {
 			override fun migrate(db: SupportSQLiteDatabase) {
@@ -115,7 +136,15 @@ abstract class AppDatabase : RoomDatabase() {
 					AppDatabase::class.java,
 					"loreweaver_database"
 				)
-					.addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+					.addMigrations(
+						MIGRATION_4_5,
+						MIGRATION_5_6,
+						MIGRATION_6_7,
+						MIGRATION_7_8,
+						MIGRATION_8_9,
+						MIGRATION_9_10,
+						MIGRATION_10_11
+					)
 					.build()
 				INSTANCE = instance
 				instance

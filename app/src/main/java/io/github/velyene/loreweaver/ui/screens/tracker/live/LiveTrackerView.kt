@@ -130,9 +130,23 @@ private data class CurrentParticipantPanelState(
 	val targetableParticipants: List<LiveParticipantUiModel>
 )
 
+@Suppress("kotlin:S107")
+internal data class LiveTrackerCallbacks(
+	val onAction: (String) -> Unit,
+	val onNextTurn: () -> Unit,
+	val onHpChange: (characterId: String, delta: Int) -> Unit,
+	val onAddCondition: (characterId: String, condition: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
+	val onRemoveCondition: (characterId: String, conditionName: String, removePersistentCondition: Boolean) -> Unit,
+	val onEnd: () -> Unit
+)
+
 @Composable
 internal fun LiveTrackerView(
-	state: LiveTrackerViewState,
+	round: Int,
+	combatants: List<CombatantState>,
+	persistentConditionsByCharacterId: Map<String, Set<String>>,
+	turnIndex: Int,
+	statuses: List<String>,
 	callbacks: LiveTrackerCallbacks
 ) {
 	val trackerState = rememberLiveTrackerUiState(
@@ -164,16 +178,13 @@ internal fun LiveTrackerView(
 			modifier = Modifier.fillMaxWidth()
 		)
 
-		Spacer(modifier = Modifier.height(12.dp))
-		LiveTrackerContentList(
-			encounterName = state.encounterName,
-			encounterNotes = state.encounterNotes,
-			statuses = state.statuses,
-			turnStep = state.turnStep,
-			pendingAction = state.pendingAction,
-			selectedTargetId = state.selectedTargetId,
-			trackerState = trackerState,
-			callbacks = callbacks,
+		CombatantHpList(
+			combatants = combatants,
+			persistentConditionsByCharacterId = persistentConditionsByCharacterId,
+			turnIndex = turnIndex,
+			onHpChange = callbacks.onHpChange,
+			onAddCondition = callbacks.onAddCondition,
+			onRemoveCondition = callbacks.onRemoveCondition,
 			modifier = Modifier
 				.fillMaxWidth()
 				.weight(1f)
@@ -229,35 +240,13 @@ private fun rememberLiveTrackerUiState(
 	}
 }
 
-@Composable
-private fun LiveTrackerContentList(
-	encounterName: String,
-	encounterNotes: String,
-	statuses: List<String>,
-	turnStep: CombatTurnStep,
-	pendingAction: PendingTurnAction?,
-	selectedTargetId: String?,
-	trackerState: LiveTrackerUiState,
-	callbacks: LiveTrackerCallbacks,
-	modifier: Modifier = Modifier,
-	contentListState: androidx.compose.foundation.lazy.LazyListState
-) {
-	LazyColumn(
-		state = contentListState,
-		modifier = modifier,
-		verticalArrangement = Arrangement.spacedBy(12.dp)
-	) {
-		item {
-			CurrentParticipantPanel(
-				state = CurrentParticipantPanelState(
-					encounterName = encounterName,
-					participant = trackerState.currentParticipant,
-					pendingAction = pendingAction,
-					selectedTarget = trackerState.selectedTarget,
-					turnStep = turnStep,
-					targetableParticipants = trackerState.targetableParticipants
-				),
-				callbacks = callbacks
+		// The current combatant section is only shown when the turn index resolves to a live
+		// combatant, which prevents stale controls from showing during edge-case transitions.
+		current?.let {
+			CurrentCombatantControls(
+				combatant = it,
+				onAction = callbacks.onAction,
+				onHpChange = callbacks.onHpChange
 			)
 		}
 
@@ -276,47 +265,9 @@ private fun LiveTrackerContentList(
 			)
 		}
 
-		item {
-			EnemyPanel(
-				enemies = trackerState.enemies,
-				selectedTargetId = selectedTargetId,
-				selectableTargetIds = trackerState.selectableTargetIds,
-				onSelectTarget = callbacks.onSelectTarget
-			)
-		}
-
-		item {
-			CombatLogSection(statuses = statuses)
-		}
-	}
-}
-
-private fun buildLiveParticipants(
-	combatants: List<CombatantState>,
-	availableCharacters: List<CharacterEntry>
-): List<LiveParticipantUiModel> {
-	val charactersById = availableCharacters.associateBy(CharacterEntry::id)
-	return combatants.map { combatant ->
-		val character = charactersById[combatant.characterId]
-		val isPlayer = character?.party == CharacterParty.ADVENTURERS
-		val customActionLabels = character
-			?.actions
-			?.map { it.name.trim() }
-			?.filter(String::isNotBlank)
-			.orEmpty()
-		LiveParticipantUiModel(
-			combatant = combatant,
-			typeLabel = character?.type?.takeIf(String::isNotBlank) ?: if (isPlayer) {
-				CharacterParty.ADVENTURERS
-			} else {
-				stringLiteralEnemy
-			},
-			isPlayer = isPlayer,
-			isEliminated = combatant.currentHp <= 0,
-			notes = character?.notes.orEmpty(),
-			persistentConditions = character?.activeConditions.orEmpty(),
-			actionLabels = if (customActionLabels.isNotEmpty()) customActionLabels else defaultActionLabels,
-			resourceLines = buildResourceLines(character, combatant)
+		EncounterActionButtons(
+			onNextTurn = callbacks.onNextTurn,
+			onEnd = callbacks.onEnd
 		)
 	}
 }
@@ -347,10 +298,13 @@ private fun buildResourceLines(
 }
 
 @Composable
-private fun TurnTrackerStrip(
-	round: Int,
-	participants: List<LiveParticipantUiModel>,
+private fun CombatantHpList(
+	combatants: List<CombatantState>,
+	persistentConditionsByCharacterId: Map<String, Set<String>>,
 	turnIndex: Int,
+	onHpChange: (characterId: String, delta: Int) -> Unit,
+	onAddCondition: (characterId: String, condition: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
+	onRemoveCondition: (characterId: String, conditionName: String, removePersistentCondition: Boolean) -> Unit,
 	modifier: Modifier = Modifier
 ) {
 	Column(
@@ -358,26 +312,14 @@ private fun TurnTrackerStrip(
 			.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(10.dp))
 			.padding(12.dp)
 	) {
-		Text(
-			text = stringResource(R.string.encounter_turn_tracker_title),
-			style = MaterialTheme.typography.labelSmall,
-			color = MaterialTheme.colorScheme.onSurfaceVariant,
-			modifier = Modifier.semantics { heading() }
-		)
-		Spacer(modifier = Modifier.height(6.dp))
-		Text(
-			text = stringResource(R.string.round_counter, round),
-			style = MaterialTheme.typography.bodyMedium,
-			fontWeight = FontWeight.Bold,
-			color = MaterialTheme.colorScheme.onSurface
-		)
-		Spacer(modifier = Modifier.height(8.dp))
-
-		if (participants.isEmpty()) {
-			Text(
-				text = stringResource(R.string.encounter_turn_tracker_empty_message),
-				style = MaterialTheme.typography.bodySmall,
-				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+		itemsIndexed(combatants, key = { _, combatant -> combatant.characterId }) { index, combatant ->
+			CombatantListItem(
+				combatant = combatant,
+				persistentConditions = persistentConditionsByCharacterId[combatant.characterId].orEmpty(),
+				isActive = index == turnIndex,
+				onHpChange = onHpChange,
+				onAddCondition = onAddCondition,
+				onRemoveCondition = onRemoveCondition
 			)
 			return@Column
 		}

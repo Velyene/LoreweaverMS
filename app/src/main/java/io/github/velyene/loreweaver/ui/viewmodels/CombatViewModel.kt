@@ -118,7 +118,7 @@ class CombatViewModel @Inject constructor(
 	private val setActiveEncounterUseCase: SetActiveEncounterUseCase,
 	private val insertLogUseCase: InsertLogUseCase,
 	private val insertSessionRecordUseCase: InsertSessionRecordUseCase,
-	private val appText: AppText
+	private val updateCharacterUseCase: UpdateCharacterUseCase
 ) : ViewModel() {
 	private val _uiState = MutableStateFlow(CombatUiState())
 	val uiState: StateFlow<CombatUiState> = _uiState.asStateFlow()
@@ -522,75 +522,41 @@ class CombatViewModel @Inject constructor(
 				)
 			}
 		}
+		if (persistsAcrossEncounters) {
+			updatePersistedCharacterCondition(
+				characterId = characterId,
+				conditionName = conditionName,
+				shouldAddCondition = true
+			)
+		}
 
-		appendConditionStatus(
-			characterId = characterId,
-			conditionName = conditionName,
-			duration = duration,
-			persistsAcrossEncounters = persistsAcrossEncounters,
-			wasConditionAdded = true
-		)
+		val combatant = _uiState.value.combatants.find { it.characterId == characterId }
+		combatant?.let {
+			val durationText = if (duration != null) " ($duration rounds)" else ""
+			val persistenceText = if (persistsAcrossEncounters) " (persistent)" else ""
+			val msg = "${it.name} is now $conditionName$durationText$persistenceText"
+			appendStatus(msg)
+		}
 	}
 
 	/**
 	 * Removes a condition from a combatant.
 	 */
-	fun removeCondition(characterId: String, conditionName: String) {
+	fun removeCondition(
+		characterId: String,
+		conditionName: String,
+		removePersistentCondition: Boolean = false
+	) {
 		updateCombatant(characterId) { combatant ->
 			combatant.copy(conditions = combatant.conditions.filter { it.name != conditionName })
 		}
-		updatePersistedCharacterCondition(characterId, conditionName, shouldAddCondition = false)
-		appendConditionStatus(
-			characterId = characterId,
-			conditionName = conditionName,
-			wasConditionAdded = false
-		)
-	}
-
-	private fun updatePersistedCharacterCondition(
-		characterId: String,
-		conditionName: String,
-		shouldAddCondition: Boolean
-	) {
-		val character = _uiState.value.availableCharacters.firstOrNull { it.id == characterId } ?: return
-		viewModelScope.launch {
-			val updatedCharacter = character.withPersistedCondition(conditionName, shouldAddCondition)
-			updateCharacterUseCase(updatedCharacter)
-		}
-	}
-
-	private fun buildEncounterCondition(
-		conditionName: String,
-		duration: Int?,
-		currentRound: Int
-	): Condition {
-		return Condition(
-			name = conditionName,
-			duration = duration,
-			durationType = if (duration != null) DurationType.ROUNDS else DurationType.ENCOUNTER,
-			addedOnRound = currentRound
-		)
-	}
-
-	private fun appendConditionStatus(
-		characterId: String,
-		conditionName: String,
-		duration: Int? = null,
-		persistsAcrossEncounters: Boolean = false,
-		wasConditionAdded: Boolean
-	) {
-		combatantById(characterId)?.let { combatant ->
-			appendStatus(
-				buildConditionStatusMessage(
-					combatantName = combatant.name,
-					conditionName = conditionName,
-					duration = duration,
-					persistsAcrossEncounters = persistsAcrossEncounters,
-					wasConditionAdded = wasConditionAdded
-				)
+		if (removePersistentCondition) {
+			updatePersistedCharacterCondition(
+				characterId = characterId,
+				conditionName = conditionName,
+				shouldAddCondition = false
 			)
 		}
-	}
 
 	private fun buildConditionStatusMessage(
 		combatantName: String,
@@ -605,6 +571,24 @@ class CombatViewModel @Inject constructor(
 		val durationText = if (duration != null) " ($duration rounds)" else ""
 		val persistenceText = if (persistsAcrossEncounters) " (persistent)" else durationText
 		return "$combatantName is now $conditionName$persistenceText"
+	}
+
+	private fun updatePersistedCharacterCondition(
+		characterId: String,
+		conditionName: String,
+		shouldAddCondition: Boolean
+	) {
+		val character = _uiState.value.availableCharacters.firstOrNull { it.id == characterId } ?: return
+		viewModelScope.launch {
+			val updatedCharacter = character.copy(
+				persistentConditions = if (shouldAddCondition) {
+					character.persistentConditions + conditionName
+				} else {
+					character.persistentConditions - conditionName
+				}
+			)
+			updateCharacterUseCase(updatedCharacter)
+		}
 	}
 
 	/**

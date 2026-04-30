@@ -85,9 +85,9 @@ fun CombatTrackerScreen(
 			round = uiState.currentRound,
 			turnIndex = uiState.currentTurnIndex,
 			statuses = uiState.activeStatuses,
-			turnStep = uiState.turnStep,
-			pendingAction = uiState.pendingAction,
-			selectedTargetId = uiState.selectedTargetId,
+			persistentConditionsByCharacterId = uiState.availableCharacters.associate { character ->
+				character.id to character.persistentConditions
+			},
 			onNotesChange = viewModel::updateNotes,
 			onStartEncounter = viewModel::startEncounter,
 			onTogglePartyMember = { character ->
@@ -106,9 +106,13 @@ fun CombatTrackerScreen(
 			onClearPendingTurn = viewModel::clearPendingTurn,
 			onNextTurn = viewModel::nextTurn,
 			onHpChange = viewModel::updateCombatantHp,
-			onAddCondition = viewModel::addCondition,
-			onRemoveCondition = viewModel::removeCondition,
-			onEndEncounter = { viewModel.saveAndPauseEncounter(onEndEncounter) }
+			onAddCondition = { characterId, condition, duration, persistsAcrossEncounters ->
+				viewModel.addCondition(characterId, condition, duration, persistsAcrossEncounters)
+			},
+			onRemoveCondition = { characterId, conditionName, removePersistentCondition ->
+				viewModel.removeCondition(characterId, conditionName, removePersistentCondition)
+			},
+			onEndEncounter = { viewModel.saveAndEndEncounter(onEndEncounter) }
 		)
 	}
 	val retryActionLabel = stringResource(R.string.retry_action)
@@ -239,9 +243,7 @@ private data class TrackerScreenModel(
 	val round: Int,
 	val turnIndex: Int,
 	val statuses: List<String>,
-	val turnStep: CombatTurnStep,
-	val pendingAction: PendingTurnAction?,
-	val selectedTargetId: String?,
+	val persistentConditionsByCharacterId: Map<String, Set<String>>,
 	val onNotesChange: (String) -> Unit,
 	val onStartEncounter: (String?) -> Unit,
 	val onTogglePartyMember: (CharacterEntry) -> Unit,
@@ -254,7 +256,7 @@ private data class TrackerScreenModel(
 	val onNextTurn: () -> Unit,
 	val onHpChange: (String, Int) -> Unit,
 	val onAddCondition: (String, String, Int?, Boolean) -> Unit,
-	val onRemoveCondition: (String, String) -> Unit,
+	val onRemoveCondition: (String, String, Boolean) -> Unit,
 	val onEndEncounter: () -> Unit
 )
 
@@ -280,23 +282,13 @@ private fun TrackerContent(
 	}
 
 	LiveTrackerView(
-		state = LiveTrackerViewState(
-			encounterName = model.encounterName,
-			encounterNotes = model.notes,
-			round = model.round,
-			combatants = model.combatants,
-			availableCharacters = model.availableCharacters,
-			turnIndex = model.turnIndex,
-			statuses = model.statuses,
-			turnStep = model.turnStep,
-			pendingAction = model.pendingAction,
-			selectedTargetId = model.selectedTargetId
-		),
+		round = model.round,
+		combatants = model.combatants,
+		persistentConditionsByCharacterId = model.persistentConditionsByCharacterId,
+		turnIndex = model.turnIndex,
+		statuses = model.statuses,
 		callbacks = LiveTrackerCallbacks(
-			onSelectAction = model.onSelectAction,
-			onSelectTarget = model.onSelectTarget,
-			onApplyActionResult = model.onApplyActionResult,
-			onClearPendingTurn = model.onClearPendingTurn,
+			onAction = model.onAction,
 			onNextTurn = model.onNextTurn,
 			onHpChange = model.onHpChange,
 			onAddCondition = model.onAddCondition,

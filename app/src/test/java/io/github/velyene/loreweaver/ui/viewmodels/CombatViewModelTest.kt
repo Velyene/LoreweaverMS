@@ -152,6 +152,40 @@ class CombatViewModelTest {
 	}
 
 	@Test
+	fun addCondition_withPersistentFlag_updatesSavedCharacterConditions() {
+		runTest {
+			val repository = FakeCombatCampaignRepository()
+			repository.setCharacters(
+				listOf(
+					CharacterEntry(
+						id = HERO_ID,
+						name = HERO_NAME,
+						party = "Adventurers",
+						hp = 12,
+						maxHp = 12
+					)
+				)
+			)
+			val viewModel = createViewModel(repository)
+			advanceUntilIdle()
+
+			viewModel.addParty(listOf(combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)))
+			advanceUntilIdle()
+			viewModel.addCondition(
+				characterId = HERO_ID,
+				conditionName = "Blessed",
+				duration = null,
+				persistsAcrossEncounters = true
+			)
+			advanceUntilIdle()
+
+			assertEquals(setOf("Blessed"), repository.requireCharacter(HERO_ID).persistentConditions)
+			assertEquals("Blessed", viewModel.uiState.value.combatants.first().conditions.single().name)
+			assertTrue(viewModel.uiState.value.activeStatuses.last().contains("persistent"))
+		}
+	}
+
+	@Test
 	fun removeCondition_removesConditionAndLogsStatus() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
@@ -183,29 +217,43 @@ class CombatViewModelTest {
 	}
 
 	@Test
-	fun removeCombatant_normalizesTurnStateWhenCurrentCombatantIsRemoved() {
+	fun removeCondition_withPersistentFlag_clearsSavedPersistentCondition() {
 		runTest {
 			val repository = FakeCombatCampaignRepository()
+			repository.setCharacters(
+				listOf(
+					CharacterEntry(
+						id = HERO_ID,
+						name = HERO_NAME,
+						party = "Adventurers",
+						hp = 12,
+						maxHp = 12,
+						persistentConditions = setOf("Restrained")
+					)
+				)
+			)
 			val viewModel = createViewModel(repository)
-			val hero = combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)
-			val goblin = combatant(id = GOBLIN_ID, name = GOBLIN_NAME, initiative = 10, hp = 7)
-
-			viewModel.addParty(listOf(hero, goblin))
-			advanceUntilIdle()
-			viewModel.nextTurn()
-			viewModel.selectAction("Heal")
 			advanceUntilIdle()
 
-			viewModel.removeCombatant(GOBLIN_ID)
+			viewModel.addParty(listOf(combatant(id = HERO_ID, name = HERO_NAME, initiative = 15, hp = 12)))
+			advanceUntilIdle()
+			viewModel.addCondition(
+				characterId = HERO_ID,
+				conditionName = "Restrained",
+				duration = 2,
+				persistsAcrossEncounters = true
+			)
 			advanceUntilIdle()
 
-			with(viewModel.uiState.value) {
-				assertEquals(listOf(HERO_ID), combatants.map { it.characterId })
-				assertEquals(0, currentTurnIndex)
-				assertEquals(CombatTurnStep.SELECT_ACTION, turnStep)
-				assertEquals(null, pendingAction)
-				assertEquals(null, selectedTargetId)
-			}
+			viewModel.removeCondition(
+				characterId = HERO_ID,
+				conditionName = "Restrained",
+				removePersistentCondition = true
+			)
+			advanceUntilIdle()
+
+			assertTrue(repository.requireCharacter(HERO_ID).persistentConditions.isEmpty())
+			assertTrue(viewModel.uiState.value.combatants.first().conditions.isEmpty())
 		}
 	}
 
@@ -687,7 +735,7 @@ class CombatViewModelTest {
 			setActiveEncounterUseCase = SetActiveEncounterUseCase(repository),
 			insertLogUseCase = InsertLogUseCase(repository),
 			insertSessionRecordUseCase = InsertSessionRecordUseCase(repository),
-			appText = fakeAppText
+			updateCharacterUseCase = UpdateCharacterUseCase(repository)
 		)
 	}
 
@@ -799,13 +847,7 @@ private class FakeCombatCampaignRepository : CampaignRepository {
 		charactersFlow.value = characters
 	}
 
-	fun setEncounter(encounter: Encounter) {
-		encountersById[encounter.id] = encounter
-	}
-
-	fun setSessionsForEncounter(encounterId: String, sessions: List<SessionRecord>) {
-		sessionsByEncounterId[encounterId] = sessions
-		allSessionsFlow.value = sessions
-		recentSession = sessions.firstOrNull()
+	fun requireCharacter(characterId: String): CharacterEntry {
+		return charactersFlow.value.first { it.id == characterId }
 	}
 }
