@@ -2,15 +2,15 @@
  * FILE: CharacterDetailScreen.kt
  *
  * TABLE OF CONTENTS:
- * 1. Main Screen (CharacterDetailScreen)
- *    a. State & Storage Initialization
- *    b. Update Handlers (HP, Mana, Stamina)
- *    c. Tab Navigation and Content Routing
- * 2. Roll Result Presentation
- * 3. Shared UI Components
+ * 1. Character detail screen entry point
+ *    a. State and storage initialization
+ *    b. Update handlers for HP, mana, and stamina
+ *    c. Tab navigation and content routing
+ * 2. Roll result presentation
+ * 3. Shared UI components
  *    a. StatDisplayRow
  *    b. DeathSaveRow
- * 4. Pure Update Helper
+ * 4. Pure update support
  *    a. applyStatDelta
  */
 
@@ -108,7 +108,7 @@ private fun applyStatDelta(
 
 
 // -----------------------------------------------------------------------------
-// 1. Main Screen
+// 1. Character detail screen entry point
 // -----------------------------------------------------------------------------
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -373,7 +373,7 @@ private fun RollResultCard(result: Pair<String, Int>, onClear: () -> Unit) {
 
 
 // -----------------------------------------------------------------------------
-// 6. UI Components
+// 3. Shared UI components
 // -----------------------------------------------------------------------------
 
 @Composable

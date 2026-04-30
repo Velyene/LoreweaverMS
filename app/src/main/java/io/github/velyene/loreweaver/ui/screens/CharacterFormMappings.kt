@@ -4,7 +4,7 @@
  * TABLE OF CONTENTS:
  * 1. CharacterEntry → CharacterFormState mapping (toFormState)
  * 2. CharacterFormState → CharacterEntry mapping (toCharacterEntry)
- * 3. Derived-field helpers for HP, mana, resources, spell slots, and actions
+ * 3. Derived-field support for HP, mana, resources, spell slots, and actions
  */
 
 package io.github.velyene.loreweaver.ui.screens

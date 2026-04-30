@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. Shared screen state models
- * 2. Scaffold content and filtering helpers
+ * 2. Scaffold content and filtering support
  * 3. Top app bar and party-filter chrome
  * 4. Empty state and grouped list sections
  */

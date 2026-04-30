@@ -2,7 +2,7 @@
  * FILE: CampaignListScreen.kt
  *
  * TABLE OF CONTENTS:
- * 1. Main Screen (CampaignListScreen)
+ * 1. Campaign list screen entry point
  */
 
 package io.github.velyene.loreweaver.ui.screens
