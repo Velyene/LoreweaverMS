@@ -46,4 +46,28 @@ class DataMappersTest {
 		assertEquals("Wizard", CharacterEntry(name = "Caster", type = "Mage").toEntity().type)
 		assertEquals("Fighter", CharacterEntry(name = "Monster", type = "Enemy").toEntity().type)
 	}
+
+	@Test
+	fun characterIdentityFields_roundTripSpeciesBackgroundAndSplitConditions() {
+		val entity = CharacterEntry(
+			name = "Mira",
+			type = "Wizard",
+			species = "Elf",
+			background = "Sage",
+			spells = listOf("Magic Missile", "Shield"),
+			persistentConditions = setOf("Blessed"),
+			activeConditions = setOf("Poisoned")
+		).toEntity()
+
+		assertEquals("Elf", entity.species)
+		assertEquals("Sage", entity.background)
+		assertEquals(listOf("Magic Missile", "Shield"), entity.spells)
+		assertEquals(setOf("Blessed"), entity.persistentConditions)
+		assertEquals(setOf("Poisoned"), entity.activeConditions)
+		assertEquals("Elf", entity.toDomain().species)
+		assertEquals("Sage", entity.toDomain().background)
+		assertEquals(listOf("Magic Missile", "Shield"), entity.toDomain().spells)
+		assertEquals(setOf("Blessed"), entity.toDomain().persistentConditions)
+		assertEquals(setOf("Poisoned"), entity.toDomain().activeConditions)
+	}
 }

@@ -90,6 +90,8 @@ class CharacterEntryTest {
 			maxHp = 100,
 			mana = 0,
 			maxMana = 50,
+			persistentConditions = setOf("Blessed"),
+			activeConditions = setOf("Poisoned"),
 			deathSaveFailures = 2,
 			hitDiceCurrent = 2
 		)
@@ -99,8 +101,21 @@ class CharacterEntryTest {
 		assertEquals(100, rested.hp)
 		assertEquals(50, rested.mana)
 		assertEquals(0, rested.deathSaveFailures)
+		assertEquals(setOf("Blessed"), rested.persistentConditions)
+		assertEquals(emptySet<String>(), rested.activeConditions)
 		// Recovers half of max (10/2 = 5). 2 + 5 = 7.
 		assertEquals(7, rested.hitDiceCurrent)
+	}
+
+	@Test
+	fun effectiveSpeed_usesCombinedEncounterAndPersistentConditions() {
+		val character = CharacterEntry(
+			speed = 30,
+			persistentConditions = setOf("Restrained"),
+			activeConditions = setOf("Prone")
+		)
+
+		assertEquals(0, character.effectiveSpeed)
 	}
 
 	@Test

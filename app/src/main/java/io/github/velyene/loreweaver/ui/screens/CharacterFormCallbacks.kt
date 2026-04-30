@@ -136,11 +136,10 @@ internal fun createCharacterFormCallbacks(
 			)
 
 			if (existingCharacter != null) {
-				viewModel.updateCharacter(newCharacter)
+					viewModel.updateCharacter(newCharacter, onSuccess = onSave)
 			} else {
-				viewModel.addCharacter(newCharacter)
+					viewModel.addCharacter(newCharacter, onSuccess = onSave)
 			}
-			onSave()
 		}
 	}
 }
@@ -158,6 +157,25 @@ internal fun validateCharacterForm(name: String, hp: String): CharacterFormValid
 		nameError = name.isBlank(),
 		hpError = hp.toIntOrNull() == null
 	)
+}
+
+internal fun validateCharacterBuilderSection(
+	section: CharacterBuilderSection,
+	formState: CharacterFormState
+): CharacterFormValidation {
+	return when (section) {
+		CharacterBuilderSection.IDENTITY -> CharacterFormValidation(
+			nameError = formState.name.isBlank(),
+			hpError = formState.hpError
+		)
+
+		CharacterBuilderSection.CORE_STATS -> CharacterFormValidation(
+			nameError = formState.nameError,
+			hpError = formState.hp.toIntOrNull() == null
+		)
+
+		else -> validateCharacterForm(name = formState.name, hp = formState.hp)
+	}
 }
 
 internal fun buildCharacterEntry(
@@ -217,13 +235,17 @@ internal fun buildCharacterEntry(
 		hitDiceCurrent = existingCharacter?.hitDiceCurrent ?: parsedLevel,
 		deathSaveSuccesses = existingCharacter?.deathSaveSuccesses ?: 0,
 		deathSaveFailures = existingCharacter?.deathSaveFailures ?: 0,
-		activeConditions = existingCharacter?.activeConditions ?: emptySet(),
+		persistentConditions = formState.persistentConditions,
+		activeConditions = formState.encounterConditions,
 		spellSlots = existingCharacter?.spellSlots
 			?: classInfo?.defaultSpellSlotsL1?.mapValues { (_, max) -> max to max }
 			?: emptyMap(),
 		actions = formState.actions,
 		status = formState.status,
-		notes = formState.notes
+		notes = formState.notes,
+		species = formState.species,
+		background = formState.background,
+		spells = formState.spellsText.lineSequence().map(String::trim).filter { it.isNotBlank() }.toList()
 	)
 }
 

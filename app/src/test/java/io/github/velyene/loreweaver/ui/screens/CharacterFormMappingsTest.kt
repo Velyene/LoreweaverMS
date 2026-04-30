@@ -8,6 +8,7 @@ import io.github.velyene.loreweaver.domain.model.ATTRIBUTE_WISDOM
 import io.github.velyene.loreweaver.domain.model.CLASS_FIGHTER
 import io.github.velyene.loreweaver.domain.model.CLASS_WIZARD
 import io.github.velyene.loreweaver.domain.model.CharacterAction
+import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CharacterResource
 import io.github.velyene.loreweaver.domain.model.ClassInfo
 import org.junit.Assert.assertEquals
@@ -146,5 +147,24 @@ class CharacterFormMappingsTest {
 		val nameParts = generatedName.split(" ")
 		assertEquals(2, nameParts.size)
 		assertTrue(nameParts.all { it.isNotBlank() })
+	}
+
+	@Test
+	fun toFormState_mapsSpeciesBackgroundEncounterAndPersistentConditions() {
+		val formState = CharacterEntry(
+			name = "Lia",
+			type = CLASS_WIZARD,
+			species = "Elf",
+			background = "Sage",
+			spells = listOf("Magic Missile", "Shield"),
+			activeConditions = setOf("Poisoned"),
+			persistentConditions = setOf("Blessed")
+		).toFormState()
+
+		assertEquals("Elf", formState.species)
+		assertEquals("Sage", formState.background)
+		assertEquals("Magic Missile\nShield", formState.spellsText)
+		assertEquals(setOf("Poisoned"), formState.encounterConditions)
+		assertEquals(setOf("Blessed"), formState.persistentConditions)
 	}
 }

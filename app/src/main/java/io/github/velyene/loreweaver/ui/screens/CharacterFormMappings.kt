@@ -30,6 +30,8 @@ internal fun CharacterEntry.toFormState(): CharacterFormState {
 		.copy(
 			name = name,
 			type = normalizeClassName(type),
+			species = species,
+			background = background,
 			party = party,
 			level = level.toString(),
 			challengeRating = challengeRating.toString()
@@ -59,9 +61,12 @@ internal fun CharacterEntry.toFormState(): CharacterFormState {
 		.copy(
 			selectedProficiencies = proficiencies,
 			selectedSaveProficiencies = saveProficiencies,
+			spellsText = spells.joinToString("\n"),
 			inventoryText = inventory.joinToString("\n"),
 			resources = resources,
 			actions = actions,
+			encounterConditions = activeConditions,
+			persistentConditions = persistentConditions,
 			status = status,
 			notes = notes
 		)
