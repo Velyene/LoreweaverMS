@@ -50,6 +50,7 @@ internal fun RecentCampaignsSection(
 				HomeItem(
 					title = campaign.title,
 					icon = Icons.Default.Fort,
+					onClickLabel = stringResource(R.string.open_campaign_action, campaign.title),
 					onClick = { onCampaignClick(campaign.id) }
 				)
 			}

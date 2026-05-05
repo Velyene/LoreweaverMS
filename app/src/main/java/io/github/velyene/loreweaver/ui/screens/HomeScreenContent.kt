@@ -28,6 +28,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,6 +40,8 @@ import io.github.velyene.loreweaver.ui.theme.ArcaneTeal
 import io.github.velyene.loreweaver.ui.theme.MutedText
 import io.github.velyene.loreweaver.ui.theme.PanelSurface
 import io.github.velyene.loreweaver.ui.viewmodels.CampaignListUiState
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 internal fun HomeScreenContent(
@@ -46,11 +49,16 @@ internal fun HomeScreenContent(
 	padding: PaddingValues,
 	onNewEncounter: () -> Unit,
 	onResumeEncounter: () -> Unit,
+	onLatestSessionClick: (String) -> Unit,
 	onCampaigns: () -> Unit,
 	onCampaignClick: (String) -> Unit,
 	onRulesReference: () -> Unit
 ) {
 	val scrollState = rememberScrollState()
+	val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()) }
+	val showFirstRunHint = !uiState.hasActiveEncounter &&
+		uiState.latestCompletedSession == null &&
+		uiState.campaigns.isEmpty()
 
 	Column(
 		modifier = Modifier
@@ -81,7 +89,7 @@ internal fun HomeScreenContent(
 			HomeSectionHeader(stringResource(R.string.quick_actions))
 
 			QuickActionRow(
-				primaryTitle = stringResource(R.string.start_new_session),
+				primaryTitle = stringResource(R.string.open_session_hub),
 				primaryIcon = Icons.Default.Add,
 				onPrimaryClick = onNewEncounter,
 				secondaryTitle = stringResource(R.string.browse_campaigns),
@@ -98,10 +106,16 @@ internal fun HomeScreenContent(
 			)
 
 			EncounterActionButton(
-				hasActiveEncounter = false,
-				onResumeEncounter = onResumeEncounter,
-				onCampaigns = onCampaigns
+				uiState.hasActiveEncounter,
+				uiState.activeEncounterName,
+				uiState.activeEncounterRound,
+				onResumeEncounter,
+				onCampaigns,
 			)
+
+			if (showFirstRunHint) {
+				HomeFirstRunHintCard()
+			}
 		}
 
 		Spacer(modifier = Modifier.height(24.dp))
@@ -117,6 +131,12 @@ internal fun HomeScreenContent(
 				.padding(horizontal = 16.dp),
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
+			LatestCompletedSessionSection(
+				session = uiState.latestCompletedSession,
+				dateFormat = dateFormat,
+				onSessionClick = onLatestSessionClick,
+			)
+
 			RecentCampaignsSection(
 				campaigns = uiState.campaigns,
 				onCampaignClick = onCampaignClick

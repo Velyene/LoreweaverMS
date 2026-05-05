@@ -7,6 +7,15 @@ import kotlinx.serialization.Serializable
 object HomeRoute
 
 @Serializable
+object DmSessionHubRoute
+
+@Serializable
+object SavedEncounterPickerRoute
+
+@Serializable
+object EnemyLibraryRoute
+
+@Serializable
 object CampaignListRoute
 
 @Serializable
@@ -33,10 +42,22 @@ data class ReferenceRoute(
 data class CampaignDetailRoute(val id: String)
 
 @Serializable
-data class CombatTrackerRoute(val encounterId: String? = null)
+data class CombatTrackerRoute(
+	val encounterId: String? = null,
+	val startFresh: Boolean = false,
+)
+
+@Serializable
+object RewardReviewRoute
+
+@Serializable
+data class EncounterSummaryRoute(val sessionId: String? = null)
 
 @Serializable
 object SessionSummaryRoute
+
+@Serializable
+data class SessionDetailRoute(val id: String)
 
 @Serializable
 data class CharacterDetailRoute(val id: String)
