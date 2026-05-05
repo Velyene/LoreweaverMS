@@ -19,6 +19,15 @@ interface SessionDao {
 	@Query("SELECT * FROM session_records ORDER BY date DESC LIMIT 1")
 	suspend fun getRecentSession(): SessionEntity?
 
+	@Query("SELECT * FROM session_records WHERE id = :sessionId LIMIT 1")
+	suspend fun getSessionById(sessionId: String): SessionEntity?
+
+	@Query("SELECT * FROM session_records WHERE encounterId = :encounterId ORDER BY date DESC LIMIT 1")
+	suspend fun getRecentSessionForEncounter(encounterId: String): SessionEntity?
+
+	@Query("UPDATE session_records SET encounterId = NULL WHERE encounterId IN (:encounterIds)")
+	suspend fun clearEncounterReferences(encounterIds: List<String>): Int
+
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insertSession(session: SessionEntity): Long
 

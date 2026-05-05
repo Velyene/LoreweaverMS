@@ -7,5 +7,7 @@ interface SessionsRepository {
 	fun getSessionsForEncounter(encounterId: String): Flow<List<SessionRecord>>
 	fun getAllSessions(): Flow<List<SessionRecord>>
 	suspend fun insertSessionRecord(session: SessionRecord)
+	suspend fun getSessionById(sessionId: String): SessionRecord?
 	suspend fun getRecentSession(): SessionRecord?
+	suspend fun getRecentSessionForEncounter(encounterId: String): SessionRecord?
 }

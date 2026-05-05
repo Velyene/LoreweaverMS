@@ -1,7 +1,6 @@
 package io.github.velyene.loreweaver.data.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -19,6 +18,9 @@ interface CampaignDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insertCampaign(campaign: CampaignEntity): Long
 
-	@Delete
-	suspend fun deleteCampaign(campaign: CampaignEntity): Int
+	@Query("UPDATE campaigns SET name = :name, description = :description WHERE id = :campaignId")
+	suspend fun updateCampaign(campaignId: String, name: String, description: String): Int
+
+	@Query("DELETE FROM campaigns WHERE id = :campaignId")
+	suspend fun deleteCampaignById(campaignId: String): Int
 }

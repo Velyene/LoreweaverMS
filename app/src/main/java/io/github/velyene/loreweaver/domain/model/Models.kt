@@ -1,5 +1,19 @@
 /*
  * FILE: Models.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: Campaign
+ * 2. Value: id
+ * 3. Value: title
+ * 4. Value: description
+ * 5. Value: characterIds
+ * 6. Value: noteIds
+ * 7. Value: encounterIds
+ * 8. Value: settings
+ */
+
+/*
+ * FILE: Models.kt
  */
 
 package io.github.velyene.loreweaver.domain.model
@@ -20,7 +34,51 @@ data class Campaign(
 	val characterIds: List<String> = emptyList(),
 	val noteIds: List<String> = emptyList(),
 	val encounterIds: List<String> = emptyList(),
+	val inventoryState: CampaignInventoryState = CampaignInventoryState(),
 	val settings: Map<String, String> = emptyMap() // Campaign Settings
+)
+
+enum class InventoryItemType {
+	GENERAL,
+	EQUIPMENT,
+	CONSUMABLE,
+	QUEST,
+	SPECIAL
+}
+
+enum class InventoryItemSource {
+	SRD,
+	CUSTOM,
+	DM_CREATED
+}
+
+data class InventoryItem(
+	val id: String = UUID.randomUUID().toString(),
+	val name: String,
+	val itemType: InventoryItemType = InventoryItemType.GENERAL,
+	val quantity: Int = 1,
+	val valueCp: Int = 0,
+	val weight: Double? = null,
+	val description: String = "",
+	val source: InventoryItemSource = InventoryItemSource.DM_CREATED,
+	val assignedOwnerId: String? = null,
+	val stackable: Boolean = true,
+	val consumable: Boolean = false,
+	val specialItem: Boolean = false
+)
+
+data class CharacterInventoryState(
+	val personalInventory: List<InventoryItem> = emptyList(),
+	val equippedItems: List<InventoryItem> = emptyList(),
+	val currencyCp: Int = 0,
+	val carryingNotes: String = ""
+)
+
+data class CampaignInventoryState(
+	val partyStash: List<InventoryItem> = emptyList(),
+	val unclaimedLoot: List<InventoryItem> = emptyList(),
+	val encounterRewardPool: List<InventoryItem> = emptyList(),
+	val sharedCurrencyCp: Int = 0
 )
 
 /**
@@ -35,7 +93,11 @@ data class Encounter(
 	val currentRound: Int = 1,
 	val currentTurnIndex: Int = 0,
 	val participants: List<CombatantState> = emptyList(),
-	val activeTrackers: List<TrackerEntity> = emptyList()
+	val activeLog: List<String> = emptyList(),
+	val activeTrackers: List<TrackerEntity> = emptyList(),
+	val rewardTemplate: EncounterRewardTemplate = EncounterRewardTemplate(),
+	val generationSettings: EncounterGenerationSettings = EncounterGenerationSettings(),
+	val generationDetails: EncounterGenerationDetails? = null
 )
 
 enum class EncounterStatus { PENDING, ACTIVE }
@@ -63,7 +125,139 @@ data class SessionRecord(
 	val date: Long = System.currentTimeMillis(),
 	val log: List<String> = emptyList(),
 	val snapshot: EncounterSnapshot? = null,
-	val reuseFlag: Boolean = false // Tracker Reuse
+	val reuseFlag: Boolean = false, // Tracker Reuse
+	val isCompleted: Boolean = false,
+	val encounterResult: String? = null,
+	val rewards: EncounterRewardSummary? = null,
+	val rewardReview: RewardReviewState? = null
+)
+
+enum class EncounterDifficultyTarget {
+	LOW,
+	MODERATE,
+	HIGH,
+	CUSTOM
+}
+
+enum class EncounterGenerationSourceFilter {
+	SRD_ONLY,
+	CUSTOM_ONLY,
+	BOTH
+}
+
+data class EncounterGenerationSettings(
+	val difficultyTarget: EncounterDifficultyTarget = EncounterDifficultyTarget.MODERATE,
+	val customTargetXp: Int? = null,
+	val minimumTargetPercent: Int = 100,
+	val maximumTargetPercent: Int = 105,
+	val allowSingleHighCrEnemy: Boolean = false,
+	val maximumEnemyCr: Double? = null,
+	val allowDuplicateEnemies: Boolean = true,
+	val maximumEnemyQuantity: Int? = null,
+	val creatureTypeFilter: String? = null,
+	val groupFilter: String? = null,
+	val sourceFilter: EncounterGenerationSourceFilter = EncounterGenerationSourceFilter.SRD_ONLY
+)
+
+data class EncounterGeneratedEnemy(
+	val combatantId: String,
+	val name: String,
+	val challengeRating: Double,
+	val challengeRatingLabel: String,
+	val xpValue: Int,
+	val hp: Int,
+	val initiative: Int,
+	val creatureType: String,
+	val sourceLabel: String = "SRD 5.2",
+	val quantityGroupKey: String = ""
+)
+
+data class EncounterGenerationAttempt(
+	val attemptNumber: Int,
+	val selectedEnemies: List<String> = emptyList(),
+	val totalEnemyXp: Int,
+	val accepted: Boolean,
+	val resultMessage: String
+)
+
+data class EncounterPartyPowerEntry(
+	val characterId: String,
+	val characterName: String,
+	val level: Int,
+	val budgetXp: Int
+)
+
+data class EncounterGenerationDetails(
+	val participantLevels: List<Int> = emptyList(),
+	val participantCount: Int = 0,
+	val targetDifficulty: EncounterDifficultyTarget = EncounterDifficultyTarget.MODERATE,
+	val partyPower: Int = 0,
+	val minimumTargetXp: Int = 0,
+	val maximumTargetXp: Int = 0,
+	val appliedMaximumEnemyCr: Double = 0.0,
+	val requiresDmReview: Boolean = false,
+	val finalTotalEnemyXp: Int = 0,
+	val finalVariancePercent: Double = 0.0,
+	val partyPowerEntries: List<EncounterPartyPowerEntry> = emptyList(),
+	val attempts: List<EncounterGenerationAttempt> = emptyList(),
+	val finalEnemies: List<EncounterGeneratedEnemy> = emptyList(),
+	val logLines: List<String> = emptyList()
+)
+
+data class EncounterRewardTemplate(
+	val difficultyTarget: EncounterDifficultyTarget = EncounterDifficultyTarget.MODERATE,
+	val customTargetBudgetXp: Int? = null,
+	val preloadedCurrencyCp: Int = 0,
+	val preloadedLoot: List<String> = emptyList(),
+	val specialItemRewards: List<String> = emptyList(),
+	val currencyRateCpPerXp: Double = 5.0,
+	val economyMultiplier: Double = 1.0
+)
+
+data class ParticipantRewardShare(
+	val characterId: String,
+	val characterName: String,
+	val experiencePoints: Int = 0,
+	val currencyCp: Int = 0
+)
+
+enum class RewardItemDisposition {
+	CHARACTER,
+	PARTY_STASH,
+	UNCLAIMED
+}
+
+data class RewardReviewItem(
+	val item: InventoryItem,
+	val disposition: RewardItemDisposition = RewardItemDisposition.UNCLAIMED,
+	val assignedCharacterId: String? = null
+)
+
+data class RewardReviewState(
+	val currencyPoolCp: Int = 0,
+	val useSharedCurrency: Boolean = false,
+	val items: List<RewardReviewItem> = emptyList(),
+	val applied: Boolean = false,
+	val appliedLog: List<String> = emptyList(),
+	val lastUpdated: Long = System.currentTimeMillis()
+)
+
+data class EncounterRewardSummary(
+	val experiencePoints: Int = 0,
+	val experiencePerParticipant: Int = 0,
+	val experienceRoundingSurplus: Int = 0,
+	val participantCount: Int = 0,
+	val participantRewards: List<ParticipantRewardShare> = emptyList(),
+	val currencyReward: String? = null,
+	val currencyPerParticipant: String? = null,
+	val totalCurrencyCp: Int = 0,
+	val currencyPerParticipantCp: Int = 0,
+	val currencyRoundingSurplusCp: Int = 0,
+	val itemRewards: List<String> = emptyList(),
+	val equipmentRewards: List<String> = emptyList(),
+	val skillPoints: Int = 0,
+	val storyRewards: List<String> = emptyList(),
+	val rewardLog: List<String> = emptyList()
 )
 
 /**
@@ -149,6 +343,12 @@ data class CharacterAction(
 	val attackBonus: Int = 0,
 	val damageDice: String = "",
 	val isAttack: Boolean = true,
-	val notes: String = ""
+	val notes: String = "",
+	val manaCost: Int = 0,
+	val staminaCost: Int = 0,
+	val spellSlotLevel: Int? = null,
+	val resourceName: String? = null,
+	val resourceCost: Int = 0,
+	val itemName: String? = null
 )
 

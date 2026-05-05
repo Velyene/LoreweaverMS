@@ -10,6 +10,7 @@ package io.github.velyene.loreweaver.domain.util
 
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CombatantState
+import io.github.velyene.loreweaver.domain.model.EncounterDifficultyTarget
 
 /**
  * Represents the standard fifth-edition encounter difficulty categories.
@@ -232,6 +233,30 @@ object EncounterDifficulty {
 	 */
 	fun getXpForCr(cr: Double): Int {
 		return CR_TO_XP[cr] ?: 0
+	}
+
+	fun getXpBudgetForLevel(level: Int, difficultyTarget: EncounterDifficultyTarget): Int {
+		if (difficultyTarget == EncounterDifficultyTarget.CUSTOM) return 0
+		val normalizedLevel = level.coerceIn(1, 20)
+		val thresholds = XP_THRESHOLDS[normalizedLevel].orEmpty()
+		val rating = when (difficultyTarget) {
+			EncounterDifficultyTarget.LOW -> DifficultyRating.EASY
+			EncounterDifficultyTarget.MODERATE -> DifficultyRating.MEDIUM
+			EncounterDifficultyTarget.HIGH -> DifficultyRating.HARD
+		}
+		return thresholds[rating] ?: 0
+	}
+
+	fun calculatePartyPower(
+		partyMembers: List<CharacterEntry>,
+		difficultyTarget: EncounterDifficultyTarget,
+		customTargetXp: Int? = null
+	): Int {
+		if (partyMembers.isEmpty()) return 0
+		if (difficultyTarget == EncounterDifficultyTarget.CUSTOM) {
+			return customTargetXp?.coerceAtLeast(0) ?: 0
+		}
+		return partyMembers.sumOf { getXpBudgetForLevel(it.level, difficultyTarget) }
 	}
 
 	/**
