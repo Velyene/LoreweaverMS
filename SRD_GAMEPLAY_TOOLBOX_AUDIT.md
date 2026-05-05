@@ -2,6 +2,27 @@
 
 Snapshot date: 2026-04-20
 
+
+## Contents
+
+- [Table of contents](#table-of-contents)
+- [Summary](#summary)
+- [Hard release overlay](#hard-release-overlay)
+- [Scope reviewed](#scope-reviewed)
+  - [Directly matched structured datasets](#directly-matched-structured-datasets)
+  - [Related adjacent datasets or systems](#related-adjacent-datasets-or-systems)
+- [Findings by category](#findings-by-category)
+  - [Travel Pace](#travel-pace)
+  - [Creating a Background](#creating-a-background)
+  - [Curses and Magical Contagions](#curses-and-magical-contagions)
+  - [Environmental Effects](#environmental-effects)
+  - [Fear and Mental Stress](#fear-and-mental-stress)
+  - [Poison](#poison)
+  - [Traps](#traps)
+  - [Combat Encounters / Combat Encounter Difficulty](#combat-encounters-combat-encounter-difficulty)
+- [Verification anchors](#verification-anchors)
+- [Notes for future updates](#notes-for-future-updates)
+
 ## Table of contents
 
 - [Summary](#summary)
