@@ -5,6 +5,40 @@ Snapshot date: 2026-04-20
 This note translates the project's current repo state into the user's **"If I cannot prove this came
 from SRD 5.2.1, it does not go in the shipped app"** rule.
 
+
+## Contents
+
+- [Release-blocking do-not-ship checklist](#release-blocking-do-not-ship-checklist)
+  - [One-line decision rule](#one-line-decision-rule)
+- [Loreweaver hard do-not-ship check](#loreweaver-hard-do-not-ship-check)
+  - [1. Source check](#1-source-check)
+  - [2. Spells](#2-spells)
+  - [3. Feats](#3-feats)
+  - [4. Weapons](#4-weapons)
+  - [5. Armor](#5-armor)
+  - [6. Tools](#6-tools)
+  - [7. Adventuring gear](#7-adventuring-gear)
+  - [8. Text blocks](#8-text-blocks)
+  - [9. Branding / presentation](#9-branding-presentation)
+  - [10. Unknown or messy content](#10-unknown-or-messy-content)
+- [Safe replacement rule](#safe-replacement-rule)
+- [File-by-file one-line rule](#file-by-file-one-line-rule)
+- [Audit basis used for this snapshot](#audit-basis-used-for-this-snapshot)
+- [Current repo state note](#current-repo-state-note)
+- [High-level result](#high-level-result)
+- [Existing checks that already pass](#existing-checks-that-already-pass)
+- [Historical hard do-not-ship findings](#historical-hard-do-not-ship-findings)
+  - [1. Quarantine now — bundled reference corpora with explicit risk signals](#1-quarantine-now-bundled-reference-corpora-with-explicit-risk-signals)
+  - [2. Re-verify before ship — specific structured entries that conflict with the hard checklist](#2-re-verify-before-ship-specific-structured-entries-that-conflict-with-the-hard-checklist)
+  - [3. Search-surface warning — current UI still exposes high-risk corpora](#3-search-surface-warning-current-ui-still-exposes-high-risk-corpora)
+- [Items that currently look comparatively safer](#items-that-currently-look-comparatively-safer)
+- [Branding / presentation check](#branding-presentation-check)
+- [Recommended ship gate](#recommended-ship-gate)
+  - [KEEP in shipped build only after proof](#keep-in-shipped-build-only-after-proof)
+  - [QUARANTINE before ship](#quarantine-before-ship)
+- [Minimal next-step checklist](#minimal-next-step-checklist)
+- [Fast Android Studio search terms](#fast-android-studio-search-terms)
+
 ## Release-blocking do-not-ship checklist
 
 Treat the following as a **hard release gate** for Loreweaver. If any item below fails, the content
