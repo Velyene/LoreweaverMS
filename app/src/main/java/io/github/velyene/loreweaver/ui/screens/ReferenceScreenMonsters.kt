@@ -1,3 +1,17 @@
+/*
+ * FILE: ReferenceScreenMonsters.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Value: monsterListContentPadding
+ * 2. Value: monsterListItemSpacing
+ * 3. Value: monsterFilterSectionSpacing
+ * 4. Value: monsterShortcutChipSpacing
+ * 5. Value: monsterCardContentPadding
+ * 6. Value: monsterCardSectionSpacing
+ * 7. Value: monsterCardPreviewSpacerHeight
+ * 8. Value: monsterBadgePadding
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.clickable
@@ -19,6 +33,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,7 +67,8 @@ internal fun MonstersContent(
 	onGroupSelected: (String?) -> Unit,
 	onCreatureTypeSelected: (String?) -> Unit,
 	onChallengeRatingSelected: (String?) -> Unit,
-	onOpenDetail: (String, String) -> Unit
+	onOpenDetail: (String, String) -> Unit,
+	onStageMonster: ((String) -> Unit)? = null,
 ) {
 	LazyColumn(
 		state = listState,
@@ -72,13 +88,14 @@ internal fun MonstersContent(
 				onChallengeRatingSelected = onChallengeRatingSelected
 			)
 		}
-		monsterListItems(monsters = monsters, onOpenDetail = onOpenDetail)
+		monsterListItems(monsters = monsters, onOpenDetail = onOpenDetail, onStageMonster = onStageMonster)
 	}
 }
 
 private fun LazyListScope.monsterListItems(
 	monsters: List<MonsterReferenceEntry>,
-	onOpenDetail: (String, String) -> Unit
+	onOpenDetail: (String, String) -> Unit,
+	onStageMonster: ((String) -> Unit)? = null,
 ) {
 	if (monsters.isEmpty()) {
 		item(key = MONSTER_NO_RESULTS_ITEM_KEY) { ReferenceNoResultsState() }
@@ -86,12 +103,16 @@ private fun LazyListScope.monsterListItems(
 	}
 
 	items(monsters, key = { it.name }) { monster ->
-		MonsterCard(monster = monster) {
-			onOpenDetail(
-				ReferenceDetailResolver.CATEGORY_MONSTERS,
-				ReferenceDetailResolver.slugFor(monster.name)
-			)
-		}
+		MonsterCard(
+			monster = monster,
+			onClick = {
+				onOpenDetail(
+					ReferenceDetailResolver.CATEGORY_MONSTERS,
+					ReferenceDetailResolver.slugFor(monster.name)
+				)
+			},
+			onStageMonster = onStageMonster,
+		)
 	}
 }
 
@@ -166,7 +187,11 @@ private fun nextMonsterGroupSelection(selectedGroup: String?): String? =
 	}
 
 @Composable
-private fun MonsterCard(monster: MonsterReferenceEntry, onClick: () -> Unit) {
+private fun MonsterCard(
+	monster: MonsterReferenceEntry,
+	onClick: () -> Unit,
+	onStageMonster: ((String) -> Unit)? = null,
+) {
 	Card(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -177,29 +202,39 @@ private fun MonsterCard(monster: MonsterReferenceEntry, onClick: () -> Unit) {
 			modifier = Modifier.padding(monsterCardContentPadding),
 			verticalArrangement = Arrangement.spacedBy(monsterCardSectionSpacing)
 		) {
-			MonsterCardHeader(monster)
+			MonsterCardHeader(monster = monster, onStageMonster = onStageMonster)
 			MonsterCardDetails(monster)
 		}
 	}
 }
 
 @Composable
-private fun MonsterCardHeader(monster: MonsterReferenceEntry) {
-	Text(
-		text = monster.name,
-		style = MaterialTheme.typography.titleMedium,
-		fontWeight = FontWeight.Bold
-	)
-	FlowRow(
-		horizontalArrangement = Arrangement.spacedBy(monsterShortcutChipSpacing),
-		verticalArrangement = Arrangement.spacedBy(monsterCardSectionSpacing)
-	) {
-		monster.group?.let { group -> MonsterGroupBadge(group) }
+private fun MonsterCardHeader(
+	monster: MonsterReferenceEntry,
+	onStageMonster: ((String) -> Unit)? = null,
+) {
+	Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
 		Text(
-			text = monster.subtitle,
-			style = MaterialTheme.typography.bodySmall,
-			color = MaterialTheme.colorScheme.secondary
+			text = monster.name,
+			style = MaterialTheme.typography.titleMedium,
+			fontWeight = FontWeight.Bold
 		)
+		FlowRow(
+			horizontalArrangement = Arrangement.spacedBy(monsterShortcutChipSpacing),
+			verticalArrangement = Arrangement.spacedBy(monsterCardSectionSpacing)
+		) {
+			monster.group?.let { group -> MonsterGroupBadge(group) }
+			Text(
+				text = monster.subtitle,
+				style = MaterialTheme.typography.bodySmall,
+				color = MaterialTheme.colorScheme.secondary
+			)
+		}
+		onStageMonster?.let { stageMonster ->
+			TextButton(onClick = { stageMonster(monster.name) }) {
+				Text(text = stringResource(R.string.enemy_library_stage_button))
+			}
+		}
 	}
 }
 

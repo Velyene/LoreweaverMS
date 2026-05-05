@@ -45,8 +45,6 @@ import io.github.velyene.loreweaver.domain.util.CoreRuleSection
 import io.github.velyene.loreweaver.domain.util.CoreRulesReference
 import io.github.velyene.loreweaver.domain.util.ReferenceTable
 
-private const val CORE_RULES_SEARCH_LABEL = "Core Rules"
-
 @Composable
 @Suppress("kotlin:S3776")
 internal fun CoreRulesContent(searchQuery: String, listState: LazyListState) {
@@ -66,7 +64,7 @@ internal fun CoreRulesContent(searchQuery: String, listState: LazyListState) {
 			options = CoreRulesSubtab.entries,
 			selectedOption = state.effectiveSubtab,
 			onOptionSelected = { selectedSubtabName = it.name },
-			label = { it.label }
+			label = { stringResource(it.labelResId) }
 		)
 
 		LazyColumn(
@@ -101,6 +99,10 @@ private fun rememberCoreRulesContentState(
 	selectedSubtab: CoreRulesSubtab
 ): CoreRulesContentState {
 	val normalizedQuery = searchQuery.trim()
+	val coreRulesTitle = stringResource(R.string.reference_tab_core_rules)
+	val systemLoopTitle = stringResource(R.string.reference_core_rules_system_loop_title)
+	val glossaryTitle = stringResource(R.string.reference_core_rules_glossary)
+	val glossaryConventionsTitle = stringResource(R.string.reference_core_rules_glossary_conventions)
 	val searchActive = normalizedQuery.isNotBlank()
 	val effectiveSubtab = if (searchActive) CoreRulesSubtab.ALL else selectedSubtab
 	val filteredSections = remember(normalizedQuery) {
@@ -129,15 +131,15 @@ private fun rememberCoreRulesContentState(
 	}
 	val showIntroduction = matchesQuery(
 		normalizedQuery,
-		CORE_RULES_SEARCH_LABEL,
-		"System Loop",
+		coreRulesTitle,
+		systemLoopTitle,
 		CoreRulesReference.INTRODUCTION
 	) && effectiveSubtab.showsIntroduction()
 	val showGlossaryIntroduction =
 		effectiveSubtab.showsGlossaryIntroduction(searchActive) && matchesQuery(
 			normalizedQuery,
-			"Rules Glossary",
-			"Glossary Conventions",
+			glossaryTitle,
+			glossaryConventionsTitle,
 			CoreRulesReference.GLOSSARY_INTRODUCTION,
 			*CoreRulesReference.GLOSSARY_CONVENTIONS.toTypedArray()
 		)
@@ -233,6 +235,9 @@ private fun LazyListScope.renderCoreRulesGlossaryIntro(state: CoreRulesContentSt
 		InfoCard(title = stringResource(R.string.reference_core_rules_glossary_overview), body = CoreRulesReference.GLOSSARY_INTRODUCTION)
 	}
 	item {
+		ReferenceSectionHeader(stringResource(R.string.reference_core_rules_glossary_conventions))
+	}
+	item {
 		BulletListCard(CoreRulesReference.GLOSSARY_CONVENTIONS)
 	}
 }
@@ -320,7 +325,7 @@ private fun CoreGlossarySeeAlso(seeAlso: List<String>) {
 	if (seeAlso.isEmpty()) return
 	ReferenceSubtleDivider()
 	Text(
-		text = "See also: ${seeAlso.joinToString()}",
+		text = stringResource(R.string.reference_core_rules_see_also, seeAlso.joinToString()),
 		style = MaterialTheme.typography.bodySmall,
 		color = MaterialTheme.colorScheme.onSurfaceVariant
 	)
@@ -336,7 +341,7 @@ private fun <T> ReferenceSubtabRow(
 	options: List<T>,
 	selectedOption: T,
 	onOptionSelected: (T) -> Unit,
-	label: (T) -> String
+	label: @Composable (T) -> String
 ) {
 	PrimaryScrollableTabRow(
 		selectedTabIndex = options.indexOf(selectedOption).coerceAtLeast(0),

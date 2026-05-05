@@ -280,7 +280,7 @@ class ReferenceViewModelTest {
 	}
 
 	@Test
-	fun openReferenceDetail_andClearReferenceDetail_updatesGenericDetailState() {
+	fun initializeFromNavigation_setsMonsterCategorySearchAndDetailState() {
 		runTest {
 			val viewModel = createViewModel()
 
