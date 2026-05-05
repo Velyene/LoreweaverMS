@@ -3,6 +3,7 @@ package io.github.velyene.loreweaver.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.LogEntry
 import io.github.velyene.loreweaver.domain.use_case.AddCharacterUseCase
@@ -11,6 +12,7 @@ import io.github.velyene.loreweaver.domain.use_case.GetCharacterByIdUseCase
 import io.github.velyene.loreweaver.domain.use_case.GetCharactersUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertLogUseCase
 import io.github.velyene.loreweaver.domain.use_case.UpdateCharacterUseCase
+import io.github.velyene.loreweaver.ui.util.UiText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +24,7 @@ data class CharacterUiState(
 	val characters: List<CharacterEntry> = emptyList(),
 	val selectedCharacter: CharacterEntry? = null,
 	val isLoading: Boolean = false,
-	val error: String? = null
+	val error: UiText? = null
 )
 
 @HiltViewModel
@@ -53,7 +55,7 @@ class CharacterViewModel @Inject constructor(
 					_uiState.update { it.copy(characters = characters, isLoading = false) }
 				}
 			} catch (e: Exception) {
-				reportError(formatError("Failed to load characters", e))
+				reportError(formatError(UiText.StringResource(R.string.error_load_characters), e))
 			}
 		}
 	}
@@ -65,36 +67,50 @@ class CharacterViewModel @Inject constructor(
 				val character = getCharacterByIdUseCase(id)
 				_uiState.update { it.copy(selectedCharacter = character, isLoading = false) }
 			} catch (e: Exception) {
-				reportError(formatError("Character not found", e))
+				reportError(formatError(UiText.StringResource(R.string.error_character_not_found), e))
 			}
 		}
 	}
 
 	fun addCharacter(character: CharacterEntry) {
-		launchActionWithError("Failed to add character") { addCharacterUseCase(character) }
+		launchActionWithError(UiText.StringResource(R.string.error_add_character)) { addCharacterUseCase(character) }
 	}
 
 	fun updateCharacter(character: CharacterEntry) {
-		launchActionWithError("Failed to update character") { updateCharacterUseCase(character) }
+		_uiState.update { state ->
+			if (state.selectedCharacter?.id == character.id) {
+				state.copy(selectedCharacter = character)
+			} else {
+				state
+			}
+		}
+		launchActionWithError(UiText.StringResource(R.string.error_update_character)) { updateCharacterUseCase(character) }
 	}
 
 	fun deleteCharacter(character: CharacterEntry) {
-		launchActionWithError("Failed to delete character") { deleteCharacterUseCase(character) }
+		_uiState.update { state ->
+			if (state.selectedCharacter?.id == character.id) {
+				state.copy(selectedCharacter = null)
+			} else {
+				state
+			}
+		}
+		launchActionWithError(UiText.StringResource(R.string.error_delete_character)) { deleteCharacterUseCase(character) }
 	}
 
 	private fun beginLoading() {
 		_uiState.update { it.copy(isLoading = true, error = null) }
 	}
 
-	private fun reportError(message: String) {
+	private fun reportError(message: UiText) {
 		_uiState.update { it.copy(isLoading = false, error = message) }
 	}
 
-	private fun formatError(prefix: String, exception: Exception): String {
-		return "$prefix: ${exceptionDetail(exception)}"
+	private fun formatError(prefix: UiText, exception: Exception): UiText {
+		return UiText.StringResource(R.string.error_with_detail, listOf(prefix, exceptionDetail(exception)))
 	}
 
-	private fun launchActionWithError(errorPrefix: String, action: suspend () -> Unit) {
+	private fun launchActionWithError(errorPrefix: UiText, action: suspend () -> Unit) {
 		viewModelScope.launch {
 			try {
 				action()

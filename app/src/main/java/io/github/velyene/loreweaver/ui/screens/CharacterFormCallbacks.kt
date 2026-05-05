@@ -10,6 +10,7 @@ package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.ClassInfo
+import io.github.velyene.loreweaver.domain.model.InventoryItemType
 import io.github.velyene.loreweaver.domain.model.classInfoFor
 import io.github.velyene.loreweaver.ui.viewmodels.CharacterViewModel
 
@@ -32,6 +33,12 @@ internal class CharacterFormCallbacks {
 	var onActionNameChange: (Int, String) -> Unit = { _, _ -> }
 	var onActionAttackBonusChange: (Int, String) -> Unit = { _, _ -> }
 	var onActionDamageChange: (Int, String) -> Unit = { _, _ -> }
+	var onActionManaCostChange: (Int, String) -> Unit = { _, _ -> }
+	var onActionStaminaCostChange: (Int, String) -> Unit = { _, _ -> }
+	var onActionSpellSlotLevelChange: (Int, String) -> Unit = { _, _ -> }
+	var onActionResourceNameChange: (Int, String) -> Unit = { _, _ -> }
+	var onActionResourceCostChange: (Int, String) -> Unit = { _, _ -> }
+	var onActionItemNameChange: (Int, String) -> Unit = { _, _ -> }
 	var onRemoveAction: (Int) -> Unit = {}
 	var onAddAction: () -> Unit = {}
 	var onSaveCharacter: () -> Unit = {}
@@ -114,6 +121,24 @@ internal fun createCharacterFormCallbacks(
 		onActionDamageChange = { index, damageDice ->
 			updateFormState(formState.withActionDamage(index, damageDice))
 		}
+		onActionManaCostChange = { index, rawManaCost ->
+			updateFormState(formState.withActionManaCost(index, rawManaCost))
+		}
+		onActionStaminaCostChange = { index, rawStaminaCost ->
+			updateFormState(formState.withActionStaminaCost(index, rawStaminaCost))
+		}
+		onActionSpellSlotLevelChange = { index, rawSpellSlotLevel ->
+			updateFormState(formState.withActionSpellSlotLevel(index, rawSpellSlotLevel))
+		}
+		onActionResourceNameChange = { index, resourceName ->
+			updateFormState(formState.withActionResourceName(index, resourceName))
+		}
+		onActionResourceCostChange = { index, rawResourceCost ->
+			updateFormState(formState.withActionResourceCost(index, rawResourceCost))
+		}
+		onActionItemNameChange = { index, itemName ->
+			updateFormState(formState.withActionItemName(index, itemName))
+		}
 		onRemoveAction = { index ->
 			updateFormState(formState.withoutAction(index))
 		}
@@ -186,6 +211,8 @@ internal fun buildCharacterEntry(
 	val parsedCharisma = parseAttributeScore(formState.cha)
 	val parsedHitDieType =
 		formState.hitDieType.toIntOrNull() ?: CharacterFormConstants.DEFAULT_HIT_DIE.toInt()
+	val personalInventory = parseInventoryLines(formState.inventoryText)
+	val equippedItems = parseInventoryLines(formState.equippedItemsText, InventoryItemType.EQUIPMENT)
 
 	return CharacterEntry(
 		id = existingCharacter?.id ?: java.util.UUID.randomUUID().toString(),
@@ -211,7 +238,13 @@ internal fun buildCharacterEntry(
 		charisma = parsedCharisma,
 		proficiencies = formState.selectedProficiencies,
 		saveProficiencies = formState.selectedSaveProficiencies,
-		inventory = formState.inventoryText.split("\n").filter { it.isNotBlank() },
+		inventory = personalInventory.map { it.name },
+		inventoryState = (existingCharacter?.inventoryState ?: io.github.velyene.loreweaver.domain.model.CharacterInventoryState()).copy(
+			personalInventory = personalInventory,
+			equippedItems = equippedItems,
+			currencyCp = formState.walletCp.toIntOrNull() ?: 0,
+			carryingNotes = formState.carryingNotes
+		),
 		resources = formState.resources,
 		hitDieType = parsedHitDieType,
 		hitDiceCurrent = existingCharacter?.hitDiceCurrent ?: parsedLevel,

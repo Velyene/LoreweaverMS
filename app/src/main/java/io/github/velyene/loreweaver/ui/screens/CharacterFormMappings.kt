@@ -17,6 +17,8 @@ import io.github.velyene.loreweaver.domain.model.ATTRIBUTE_STRENGTH
 import io.github.velyene.loreweaver.domain.model.ATTRIBUTE_WISDOM
 import io.github.velyene.loreweaver.domain.model.CharacterAction
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
+import io.github.velyene.loreweaver.domain.model.InventoryItem
+import io.github.velyene.loreweaver.domain.model.InventoryItemType
 import io.github.velyene.loreweaver.domain.model.CharacterResource
 import io.github.velyene.loreweaver.domain.model.ClassInfo
 import io.github.velyene.loreweaver.domain.model.calcMaxHp
@@ -60,7 +62,10 @@ internal fun CharacterEntry.toFormState(): CharacterFormState {
 		.copy(
 			selectedProficiencies = proficiencies,
 			selectedSaveProficiencies = saveProficiencies,
-			inventoryText = inventory.joinToString("\n"),
+			inventoryText = personalInventoryItems().joinToString("\n") { it.name },
+			equippedItemsText = inventoryState.equippedItems.joinToString("\n") { it.name },
+			walletCp = inventoryState.currencyCp.toString(),
+			carryingNotes = inventoryState.carryingNotes,
 			resources = resources,
 			actions = actions,
 			status = status,
@@ -159,6 +164,8 @@ internal fun CharacterFormState.quickBuild(classInfo: ClassInfo?): CharacterForm
 
 	val calculatedAc = determineQuickBuildArmorClass(primary)
 	val calculatedInventory = buildQuickBuildInventoryText(classInfo)
+	val calculatedResources = buildQuickBuildResources(classInfo)
+	val calculatedActions = buildQuickBuildActions(classInfo)
 
 	return copy(
 		name = generateRandomName(),
@@ -170,9 +177,133 @@ internal fun CharacterFormState.quickBuild(classInfo: ClassInfo?): CharacterForm
 		wis = stats[ATTRIBUTE_WISDOM].toString(),
 		cha = stats[ATTRIBUTE_CHARISMA].toString(),
 		inventoryText = calculatedInventory,
+		equippedItemsText = "",
+		walletCp = "0",
+		carryingNotes = "",
+		resources = calculatedResources,
 		ac = calculatedAc,
+		actions = calculatedActions,
 		selectedSaveProficiencies = classInfo?.defaultSaveProficiencies ?: emptySet()
 	).recalculatedHp(classInfo).recalculatedMana(classInfo).recalculatedStamina()
+}
+
+internal fun parseInventoryLines(text: String, itemType: InventoryItemType = InventoryItemType.GENERAL): List<InventoryItem> {
+	return text.lines()
+		.map(String::trim)
+		.filter(String::isNotBlank)
+		.map { itemName ->
+			InventoryItem(
+				name = itemName,
+				itemType = itemType,
+				stackable = itemType != InventoryItemType.SPECIAL,
+				consumable = itemType == InventoryItemType.CONSUMABLE,
+				specialItem = itemType == InventoryItemType.SPECIAL
+			)
+		}
+}
+
+private fun buildQuickBuildActions(classInfo: ClassInfo?): List<CharacterAction> {
+	val actions = mutableListOf<CharacterAction>()
+
+	val className = classInfo?.displayName?.lowercase() ?: ""
+	val quickBuildCasterClasses = setOf(
+		"bard",
+		"cleric",
+		"druid",
+		"paladin",
+		"ranger",
+		"sorcerer",
+		"warlock",
+		"wizard"
+	)
+	when (className) {
+		"barbarian", "fighter", "paladin" -> {
+			actions.add(CharacterAction("Longsword", attackBonus = 5, damageDice = "1d8+3", isAttack = true))
+			actions.add(CharacterAction("Javelin", attackBonus = 5, damageDice = "1d6+3", isAttack = true))
+		}
+		"rogue", "monk", "ranger" -> {
+			actions.add(CharacterAction("Shortsword", attackBonus = 5, damageDice = "1d6+3", isAttack = true, staminaCost = 1))
+			actions.add(CharacterAction("Shortbow", attackBonus = 5, damageDice = "1d6+3", isAttack = true))
+		}
+		"wizard", "sorcerer", "warlock" -> {
+			actions.add(CharacterAction("Fire Bolt", attackBonus = 5, damageDice = "1d10", isAttack = true))
+			actions.add(CharacterAction("Dagger", attackBonus = 4, damageDice = "1d4+2", isAttack = true))
+		}
+		"cleric", "druid", "bard" -> {
+			actions.add(CharacterAction("Mace", attackBonus = 4, damageDice = "1d6+2", isAttack = true))
+			actions.add(CharacterAction("Sacred Flame", attackBonus = 0, damageDice = "1d8", isAttack = true))
+		}
+		else -> {
+			actions.add(CharacterAction("Unarmed Strike", attackBonus = 2, damageDice = "1", isAttack = true))
+		}
+	}
+
+	// Only add 'Use Item' if quick-build inventory is not empty
+	// Only add 'Cast Spell' if class has spell slots
+	// Only add 'Use Ability' if class is known to have resources (for now, add for all except default/monster)
+	if (classInfo != null) {
+		if (classInfo.displayName.lowercase() !in listOf("monster", "enemy") ) {
+			actions.add(
+				CharacterAction(
+					"Use Ability",
+					attackBonus = 0,
+					damageDice = "",
+					isAttack = false,
+					staminaCost = 1,
+					resourceName = calculatedAbilityResourceName(className),
+					resourceCost = if (calculatedAbilityResourceName(className) != null) 1 else 0
+				)
+			)
+		}
+		if (classInfo.defaultSpellSlotsL1.isNotEmpty() || className in quickBuildCasterClasses) {
+			actions.add(
+				CharacterAction(
+					"Cast Spell",
+					attackBonus = 0,
+					damageDice = "",
+					isAttack = false,
+					spellSlotLevel = 1,
+					manaCost = if (classInfo.defaultSpellSlotsL1.isEmpty()) 1 else 0
+				)
+			)
+		}
+	}
+	// Always add 'Use Item' for quick-build, since inventory is always non-empty
+	actions.add(CharacterAction("Use Item", attackBonus = 0, damageDice = "", isAttack = false))
+
+	return actions
+}
+
+private fun buildQuickBuildResources(classInfo: ClassInfo?): List<CharacterResource> {
+	val className = classInfo?.displayName?.lowercase() ?: return emptyList()
+	return when (className) {
+		"barbarian" -> listOf(CharacterResource(name = "Rage", current = 2, max = 2))
+		"fighter" -> listOf(
+			CharacterResource(name = "Action Surge", current = 1, max = 1),
+			CharacterResource(name = "Second Wind", current = 1, max = 1)
+		)
+		"monk" -> listOf(CharacterResource(name = "Ki", current = 2, max = 2))
+		"bard" -> listOf(CharacterResource(name = "Bardic Inspiration", current = 3, max = 3))
+		"cleric" -> listOf(CharacterResource(name = "Channel Divinity", current = 1, max = 1))
+		"druid" -> listOf(CharacterResource(name = "Wild Shape", current = 2, max = 2))
+		"paladin" -> listOf(CharacterResource(name = "Lay on Hands", current = 5, max = 5))
+		"sorcerer" -> listOf(CharacterResource(name = "Sorcery Points", current = 2, max = 2))
+		else -> emptyList()
+	}
+}
+
+private fun calculatedAbilityResourceName(className: String): String? {
+	return when (className) {
+		"barbarian" -> "Rage"
+		"fighter" -> "Action Surge"
+		"monk" -> "Ki"
+		"bard" -> "Bardic Inspiration"
+		"cleric" -> "Channel Divinity"
+		"druid" -> "Wild Shape"
+		"paladin" -> "Lay on Hands"
+		"sorcerer" -> "Sorcery Points"
+		else -> null
+	}
 }
 
 private fun buildGeneratedName(firstName: String, lastName: String): String {
@@ -280,6 +411,60 @@ internal fun CharacterFormState.withActionDamage(
 	damageDice: String
 ): CharacterFormState {
 	return copy(actions = actions.updateActionAt(index) { copy(damageDice = damageDice) })
+}
+
+internal fun CharacterFormState.withActionManaCost(
+	index: Int,
+	rawManaCost: String
+): CharacterFormState {
+	return copy(actions = actions.updateActionAt(index) { copy(manaCost = rawManaCost.toIntOrNull() ?: 0) })
+}
+
+internal fun CharacterFormState.withActionStaminaCost(
+	index: Int,
+	rawStaminaCost: String
+): CharacterFormState {
+	return copy(actions = actions.updateActionAt(index) { copy(staminaCost = rawStaminaCost.toIntOrNull() ?: 0) })
+}
+
+internal fun CharacterFormState.withActionSpellSlotLevel(
+	index: Int,
+	rawSpellSlotLevel: String
+): CharacterFormState {
+	return copy(
+		actions = actions.updateActionAt(index) {
+			copy(spellSlotLevel = rawSpellSlotLevel.toIntOrNull()?.takeIf { it > 0 })
+		}
+	)
+}
+
+internal fun CharacterFormState.withActionResourceName(
+	index: Int,
+	resourceName: String
+): CharacterFormState {
+	return copy(
+		actions = actions.updateActionAt(index) {
+			copy(resourceName = resourceName.trim().ifBlank { null })
+		}
+	)
+}
+
+internal fun CharacterFormState.withActionResourceCost(
+	index: Int,
+	rawResourceCost: String
+): CharacterFormState {
+	return copy(actions = actions.updateActionAt(index) { copy(resourceCost = rawResourceCost.toIntOrNull() ?: 0) })
+}
+
+internal fun CharacterFormState.withActionItemName(
+	index: Int,
+	itemName: String
+): CharacterFormState {
+	return copy(
+		actions = actions.updateActionAt(index) {
+			copy(itemName = itemName.trim().ifBlank { null })
+		}
+	)
 }
 
 internal fun CharacterFormState.withoutAction(index: Int): CharacterFormState {
