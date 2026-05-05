@@ -174,7 +174,13 @@ internal fun CharacterFormContent(
 
 			InventorySection(
 				inventoryText = formState.inventoryText,
-				onInventoryChange = callbacks.onInventoryChange
+				equippedItemsText = formState.equippedItemsText,
+				walletCp = formState.walletCp,
+				carryingNotes = formState.carryingNotes,
+				onInventoryChange = callbacks.onInventoryChange,
+				onEquippedItemsChange = { callbacks.onFormStateChange(formState.copy(equippedItemsText = it)) },
+				onWalletCpChange = { callbacks.onFormStateChange(formState.copy(walletCp = it)) },
+				onCarryingNotesChange = { callbacks.onFormStateChange(formState.copy(carryingNotes = it)) }
 			)
 
 			HorizontalDivider()
@@ -191,6 +197,12 @@ internal fun CharacterFormContent(
 				onActionNameChange = callbacks.onActionNameChange,
 				onActionAttackBonusChange = callbacks.onActionAttackBonusChange,
 				onActionDamageChange = callbacks.onActionDamageChange,
+				onActionManaCostChange = callbacks.onActionManaCostChange,
+				onActionStaminaCostChange = callbacks.onActionStaminaCostChange,
+				onActionSpellSlotLevelChange = callbacks.onActionSpellSlotLevelChange,
+				onActionResourceNameChange = callbacks.onActionResourceNameChange,
+				onActionResourceCostChange = callbacks.onActionResourceCostChange,
+				onActionItemNameChange = callbacks.onActionItemNameChange,
 				onRemoveAction = callbacks.onRemoveAction,
 				onAddAction = callbacks.onAddAction
 			)
@@ -714,7 +726,13 @@ private fun ResourcesSection(
 @Composable
 private fun InventorySection(
 	inventoryText: String,
-	onInventoryChange: (String) -> Unit
+	equippedItemsText: String,
+	walletCp: String,
+	carryingNotes: String,
+	onInventoryChange: (String) -> Unit,
+	onEquippedItemsChange: (String) -> Unit,
+	onWalletCpChange: (String) -> Unit,
+	onCarryingNotesChange: (String) -> Unit
 ) {
 	CharacterFormSectionTitle(R.string.inventory_section_title)
 	OutlinedTextField(
@@ -725,6 +743,34 @@ private fun InventorySection(
 		placeholder = {
 			Text(stringResource(R.string.inventory_placeholder_one_per_line), color = MutedText)
 		}
+	)
+	Spacer(modifier = Modifier.height(8.dp))
+	OutlinedTextField(
+		value = equippedItemsText,
+		onValueChange = onEquippedItemsChange,
+		modifier = Modifier.fillMaxWidth(),
+		minLines = 2,
+		label = { Text(stringResource(R.string.equipped_items_label)) },
+		placeholder = {
+			Text(stringResource(R.string.inventory_placeholder_one_per_line), color = MutedText)
+		}
+	)
+	Spacer(modifier = Modifier.height(8.dp))
+	OutlinedTextField(
+		value = walletCp,
+		onValueChange = onWalletCpChange,
+		label = { Text(stringResource(R.string.character_wallet_cp_label)) },
+		modifier = Modifier.fillMaxWidth(),
+		keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+		singleLine = true
+	)
+	Spacer(modifier = Modifier.height(8.dp))
+	OutlinedTextField(
+		value = carryingNotes,
+		onValueChange = onCarryingNotesChange,
+		label = { Text(stringResource(R.string.carrying_notes_label)) },
+		modifier = Modifier.fillMaxWidth(),
+		minLines = 2
 	)
 }
 
@@ -750,6 +796,12 @@ private fun ActionsSection(
 	onActionNameChange: (Int, String) -> Unit,
 	onActionAttackBonusChange: (Int, String) -> Unit,
 	onActionDamageChange: (Int, String) -> Unit,
+	onActionManaCostChange: (Int, String) -> Unit,
+	onActionStaminaCostChange: (Int, String) -> Unit,
+	onActionSpellSlotLevelChange: (Int, String) -> Unit,
+	onActionResourceNameChange: (Int, String) -> Unit,
+	onActionResourceCostChange: (Int, String) -> Unit,
+	onActionItemNameChange: (Int, String) -> Unit,
 	onRemoveAction: (Int) -> Unit,
 	onAddAction: () -> Unit
 ) {
@@ -793,6 +845,60 @@ private fun ActionsSection(
 						singleLine = true
 					)
 				}
+				Text(
+					text = stringResource(R.string.action_costs_section_label),
+					style = MaterialTheme.typography.labelMedium
+				)
+				Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+					OutlinedTextField(
+						value = action.manaCost.toString(),
+						onValueChange = { onActionManaCostChange(index, it) },
+						label = { Text(stringResource(R.string.action_mana_cost_label)) },
+						modifier = Modifier.weight(1f),
+						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+						singleLine = true
+					)
+					OutlinedTextField(
+						value = action.staminaCost.toString(),
+						onValueChange = { onActionStaminaCostChange(index, it) },
+						label = { Text(stringResource(R.string.action_stamina_cost_label)) },
+						modifier = Modifier.weight(1f),
+						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+						singleLine = true
+					)
+					OutlinedTextField(
+						value = action.spellSlotLevel?.toString().orEmpty(),
+						onValueChange = { onActionSpellSlotLevelChange(index, it) },
+						label = { Text(stringResource(R.string.action_spell_slot_label)) },
+						modifier = Modifier.weight(1f),
+						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+						singleLine = true
+					)
+				}
+				Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+					OutlinedTextField(
+						value = action.resourceName.orEmpty(),
+						onValueChange = { onActionResourceNameChange(index, it) },
+						label = { Text(stringResource(R.string.action_resource_name_label)) },
+						modifier = Modifier.weight(1f),
+						singleLine = true
+					)
+					OutlinedTextField(
+						value = action.resourceCost.toString(),
+						onValueChange = { onActionResourceCostChange(index, it) },
+						label = { Text(stringResource(R.string.action_resource_cost_label)) },
+						modifier = Modifier.weight(1f),
+						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+						singleLine = true
+					)
+				}
+				OutlinedTextField(
+					value = action.itemName.orEmpty(),
+					onValueChange = { onActionItemNameChange(index, it) },
+					label = { Text(stringResource(R.string.action_item_name_label)) },
+					modifier = Modifier.fillMaxWidth(),
+					singleLine = true
+				)
 			}
 		}
 	}

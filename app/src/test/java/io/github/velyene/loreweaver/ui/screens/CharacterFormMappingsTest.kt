@@ -1,3 +1,17 @@
+/*
+ * FILE: CharacterFormMappingsTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: CharacterFormMappingsTest
+ * 2. Function: withNewResource_usesProvidedName
+ * 3. Value: updatedState
+ * 4. Function: withNewAction_usesProvidedName
+ * 5. Function: resourceAndActionEditHelpers_applyIncomingValues
+ * 6. Value: initialState
+ * 7. Function: withResourceMax_clampsCurrentToNewMaximum
+ * 8. Function: withAttribute_updatesOnlyRequestedAbility
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.model.ATTRIBUTE_CONSTITUTION
@@ -56,6 +70,41 @@ class CharacterFormMappingsTest {
 		assertEquals("Arcane Bolt", updatedState.actions.single().name)
 		assertEquals(7, updatedState.actions.single().attackBonus)
 		assertEquals("2d8+3", updatedState.actions.single().damageDice)
+	}
+
+	@Test
+	fun actionCostEditHelpers_applyIncomingValuesAndNormalizeBlankFields() {
+		val initialState = CharacterFormState(
+			actions = listOf(CharacterAction(name = "Radiant Burst"))
+		)
+
+		val updatedState = initialState
+			.withActionManaCost(index = 0, rawManaCost = "3")
+			.withActionStaminaCost(index = 0, rawStaminaCost = "2")
+			.withActionSpellSlotLevel(index = 0, rawSpellSlotLevel = "1")
+			.withActionResourceName(index = 0, resourceName = "Channel Divinity")
+			.withActionResourceCost(index = 0, rawResourceCost = "1")
+			.withActionItemName(index = 0, itemName = "Holy Symbol")
+
+		with(updatedState.actions.single()) {
+			assertEquals(3, manaCost)
+			assertEquals(2, staminaCost)
+			assertEquals(1, spellSlotLevel)
+			assertEquals("Channel Divinity", resourceName)
+			assertEquals(1, resourceCost)
+			assertEquals("Holy Symbol", itemName)
+		}
+
+		val normalizedState = updatedState
+			.withActionSpellSlotLevel(index = 0, rawSpellSlotLevel = "0")
+			.withActionResourceName(index = 0, resourceName = "   ")
+			.withActionItemName(index = 0, itemName = " ")
+
+		with(normalizedState.actions.single()) {
+			assertEquals(null, spellSlotLevel)
+			assertEquals(null, resourceName)
+			assertEquals(null, itemName)
+		}
 	}
 
 	@Test
@@ -139,6 +188,29 @@ class CharacterFormMappingsTest {
 		val updatedState = CharacterFormState().quickBuild(classInfo)
 
 		assertEquals("14", updatedState.ac)
+	}
+
+	@Test
+	fun quickBuild_autoAssignsActionsBasedOnClass() {
+		val classInfo = ClassInfo(
+			displayName = "Wizard",
+			hitDie = 6,
+			primaryStats = listOf(ATTRIBUTE_INTELLIGENCE, ATTRIBUTE_CONSTITUTION),
+			defaultSaveProficiencies = setOf(ATTRIBUTE_INTELLIGENCE, ATTRIBUTE_WISDOM),
+			defaultSpellSlotsL1 = emptyMap()
+		)
+
+		val updatedState = CharacterFormState().quickBuild(classInfo)
+
+		val actionNames = updatedState.actions.map { it.name }
+		assertTrue("Missing Fire Bolt", actionNames.contains("Fire Bolt"))
+		assertTrue("Missing Dagger", actionNames.contains("Dagger"))
+		assertTrue("Missing Use Item", actionNames.contains("Use Item"))
+		assertTrue("Missing Cast Spell", actionNames.contains("Cast Spell"))
+		assertTrue("Missing Use Ability", actionNames.contains("Use Ability"))
+
+		// Total actions should be 5 for Wizard
+		assertEquals(5, updatedState.actions.size)
 	}
 
 	@Test

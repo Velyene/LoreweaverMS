@@ -1,6 +1,7 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.model.ClassInfo
+import io.github.velyene.loreweaver.domain.model.CharacterAction
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -117,5 +118,43 @@ class CharacterFormCallbacksTest {
 		assertEquals(1, builtCharacter.deathSaveFailures)
 		assertEquals(setOf("Poisoned"), builtCharacter.activeConditions)
 		assertEquals(mapOf(1 to (1 to 2)), builtCharacter.spellSlots)
+	}
+
+	@Test
+	fun buildCharacterEntry_preservesCustomActionCostsFromFormState() {
+		val formState = CharacterFormState(
+			name = "Sister Vale",
+			actions = listOf(
+				CharacterAction(
+					name = "Radiant Burst",
+					attackBonus = 5,
+					damageDice = "2d8",
+					isAttack = true,
+					manaCost = 3,
+					staminaCost = 1,
+					spellSlotLevel = 2,
+					resourceName = "Channel Divinity",
+					resourceCost = 1,
+					itemName = "Holy Symbol"
+				)
+			)
+		)
+
+		val builtCharacter = buildCharacterEntry(
+			existingCharacter = null,
+			formState = formState,
+			classInfo = null,
+			hp = 18
+		)
+
+		with(builtCharacter.actions.single()) {
+			assertEquals("Radiant Burst", name)
+			assertEquals(3, manaCost)
+			assertEquals(1, staminaCost)
+			assertEquals(2, spellSlotLevel)
+			assertEquals("Channel Divinity", resourceName)
+			assertEquals(1, resourceCost)
+			assertEquals("Holy Symbol", itemName)
+		}
 	}
 }

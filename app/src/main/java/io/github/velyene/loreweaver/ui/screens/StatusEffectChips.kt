@@ -1,3 +1,17 @@
+/*
+ * FILE: StatusEffectChips.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: StatusChipModel
+ * 2. Value: name
+ * 3. Value: durationText
+ * 4. Value: isPersistent
+ * 5. Value: isInteractive
+ * 6. Function: statusChipModel
+ * 7. Value: canonicalName
+ * 8. Function: persistentStatusChipModels
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.BorderStroke
@@ -16,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -66,6 +81,17 @@ internal fun normalizedStatusLabels(labels: Iterable<String>): List<String> {
 
 internal fun canonicalStatusLabel(label: String): String =
 	ConditionConstants.metadataFor(label.trim()).label
+
+internal fun statusChipTag(label: String): String =
+	"status_chip_${statusChipTagKey(label)}"
+
+internal fun statusChipRemoveButtonTag(label: String): String =
+	"status_chip_remove_${statusChipTagKey(label)}"
+
+private fun statusChipTagKey(label: String): String = canonicalStatusLabel(label)
+	.lowercase()
+	.replace(Regex("[^a-z0-9]+"), "_")
+	.trim('_')
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -130,10 +156,12 @@ fun StatusEffectChip(
 	FilterChip(
 		selected = true,
 		onClick = onClick ?: {},
-		modifier = modifier.semantics {
-			contentDescription = announcement
-			this.stateDescription = stateDescription
-		},
+		modifier = modifier
+			.testTag(statusChipTag(status.name))
+			.semantics {
+				contentDescription = announcement
+				this.stateDescription = stateDescription
+			},
 		label = {
 			Text(
 				text = chipLabel,
@@ -145,7 +173,9 @@ fun StatusEffectChip(
 			{
 				IconButton(
 					onClick = it,
-					modifier = Modifier.size(16.dp)
+					modifier = Modifier
+						.size(16.dp)
+						.testTag(statusChipRemoveButtonTag(status.name))
 				) {
 					Icon(
 						imageVector = Icons.Default.Close,

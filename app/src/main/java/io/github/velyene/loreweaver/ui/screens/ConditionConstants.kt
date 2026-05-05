@@ -1,3 +1,17 @@
+/*
+ * FILE: ConditionConstants.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Object: ConditionConstants
+ * 2. Class: StatusPolicyBucket
+ * 3. Class: StatusCategory
+ * 4. Class: StatusMetadata
+ * 5. Value: label
+ * 6. Value: category
+ * 7. Value: color
+ * 8. Value: borderColor
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.ui.graphics.Color
