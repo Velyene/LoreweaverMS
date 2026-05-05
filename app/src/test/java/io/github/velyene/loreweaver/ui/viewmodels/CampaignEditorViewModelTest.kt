@@ -1,6 +1,23 @@
+/*
+ * FILE: CampaignEditorViewModelTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: CampaignEditorViewModelTest
+ * 2. Value: CAMPAIGN_ID
+ * 3. Value: mainDispatcherRule
+ * 4. Function: addCampaign_setsValidationMessage_whenNameIsBlank
+ * 5. Value: repository
+ * 6. Value: viewModel
+ * 7. Function: addEncounter_setsValidationMessage_whenNameIsBlank
+ * 8. Function: updateCampaign_setsValidationMessage_whenNameIsBlank
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import io.github.velyene.loreweaver.MainDispatcherRule
+import io.github.velyene.loreweaver.R
+import io.github.velyene.loreweaver.domain.model.Campaign
+import io.github.velyene.loreweaver.domain.model.Encounter
 import io.github.velyene.loreweaver.domain.model.Note
 import io.github.velyene.loreweaver.domain.model.RemoteItem
 import io.github.velyene.loreweaver.domain.use_case.ValidationMessages.CAMPAIGN_NAME_EMPTY_MESSAGE
@@ -14,6 +31,7 @@ import io.github.velyene.loreweaver.domain.util.ReferenceDetailResolver
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LOCATION
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LORE
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_NPC
+import io.github.velyene.loreweaver.ui.util.UiText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -28,6 +46,13 @@ class CampaignEditorViewModelTest {
 
 	private companion object {
 		const val CAMPAIGN_ID = "campaign-1"
+
+		fun expectedValidationMessage(prefix: UiText, detail: String): UiText {
+			return UiText.StringResource(
+				R.string.error_with_detail,
+				listOf(prefix, UiText.DynamicString(detail))
+			)
+		}
 	}
 
 	@get:Rule
@@ -43,7 +68,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_CAMPAIGN_ERROR_PREFIX: $CAMPAIGN_NAME_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_ADD_CAMPAIGN_ERROR_PREFIX, CAMPAIGN_NAME_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -59,9 +84,114 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX: $ENCOUNTER_NAME_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX, ENCOUNTER_NAME_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
+		}
+	}
+
+	@Test
+	fun updateCampaign_setsValidationMessage_whenNameIsBlank() {
+		runTest {
+			val repository = SplitFakeCampaignRepository()
+			val viewModel = createCampaignEditorViewModel(repository)
+			val campaign = Campaign(id = CAMPAIGN_ID, title = "Harbor Watch", description = "Before")
+
+			viewModel.updateCampaign(campaign, name = "   ", description = "After")
+			advanceUntilIdle()
+
+			assertEquals(
+				expectedValidationMessage(CAMPAIGN_EDITOR_UPDATE_CAMPAIGN_ERROR_PREFIX, CAMPAIGN_NAME_EMPTY_MESSAGE),
+				viewModel.uiState.value.message
+			)
+		}
+	}
+
+	@Test
+	fun updateCampaign_updatesRepositoryAndPublishesUpdatedId_whenNameIsValid() {
+		runTest {
+			val repository = SplitFakeCampaignRepository()
+			val viewModel = createCampaignEditorViewModel(repository)
+			val originalCampaign = Campaign(id = CAMPAIGN_ID, title = "Harbor Watch", description = "Before")
+			repository.setCampaigns(listOf(originalCampaign))
+
+			viewModel.updateCampaign(originalCampaign, name = "Harbor Watch Revised", description = "After")
+			advanceUntilIdle()
+
+			assertEquals(
+				"Harbor Watch Revised",
+				repository.getCampaignById(CAMPAIGN_ID)?.title
+			)
+			assertEquals("After", repository.getCampaignById(CAMPAIGN_ID)?.description)
+			assertEquals(CAMPAIGN_ID, viewModel.uiState.value.updatedCampaignId)
+		}
+	}
+
+	@Test
+	fun deleteCampaign_removesCampaignAndPublishesDeletedId() {
+		runTest {
+			val repository = SplitFakeCampaignRepository()
+			val viewModel = createCampaignEditorViewModel(repository)
+			val campaign = Campaign(id = CAMPAIGN_ID, title = "Harbor Watch", description = "Before")
+			repository.setCampaigns(listOf(campaign))
+
+			viewModel.deleteCampaign(campaign)
+			advanceUntilIdle()
+
+			assertEquals(null, repository.getCampaignById(CAMPAIGN_ID))
+			assertEquals(CAMPAIGN_ID, viewModel.uiState.value.deletedCampaignId)
+		}
+	}
+
+	@Test
+	fun updateEncounter_setsValidationMessage_whenNameIsBlank() {
+		runTest {
+			val repository = SplitFakeCampaignRepository()
+			val viewModel = createCampaignEditorViewModel(repository)
+			val encounter = Encounter(id = "encounter-1", campaignId = CAMPAIGN_ID, name = "Bridge Ambush")
+
+			viewModel.updateEncounter(encounter, name = "   ")
+			advanceUntilIdle()
+
+			assertEquals(
+				expectedValidationMessage(CAMPAIGN_EDITOR_UPDATE_ENCOUNTER_ERROR_PREFIX, ENCOUNTER_NAME_EMPTY_MESSAGE),
+				viewModel.uiState.value.message
+			)
+		}
+	}
+
+	@Test
+	fun updateEncounter_updatesRepositoryAndPublishesUpdatedEncounterId() {
+		runTest {
+			val repository = SplitFakeCampaignRepository()
+			val viewModel = createCampaignEditorViewModel(repository)
+			val encounter = Encounter(id = "encounter-1", campaignId = CAMPAIGN_ID, name = "Bridge Ambush")
+			repository.insertEncounter(encounter)
+
+			viewModel.updateEncounter(encounter, name = "Bridge Ambush Revised")
+			advanceUntilIdle()
+
+			assertEquals(
+				"Bridge Ambush Revised",
+				repository.getEncounterById(encounter.id)?.name
+			)
+			assertEquals(encounter.id, viewModel.uiState.value.updatedEncounterId)
+		}
+	}
+
+	@Test
+	fun deleteEncounter_removesEncounterAndPublishesDeletedEncounterId() {
+		runTest {
+			val repository = SplitFakeCampaignRepository()
+			val viewModel = createCampaignEditorViewModel(repository)
+			val encounter = Encounter(id = "encounter-1", campaignId = CAMPAIGN_ID, name = "Bridge Ambush")
+			repository.insertEncounter(encounter)
+
+			viewModel.deleteEncounter(encounter)
+			advanceUntilIdle()
+
+			assertEquals(null, repository.getEncounterById(encounter.id))
+			assertEquals(encounter.id, viewModel.uiState.value.deletedEncounterId)
 		}
 	}
 
@@ -79,7 +209,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX: $ENCOUNTER_NAME_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX, ENCOUNTER_NAME_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -186,7 +316,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_CONTENT_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX, NOTE_CONTENT_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -207,7 +337,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX, NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -228,7 +358,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_NPC_FACTION_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX, NOTE_NPC_FACTION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -249,7 +379,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX: $NOTE_LOCATION_REGION_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_ADD_NOTE_ERROR_PREFIX, NOTE_LOCATION_REGION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -265,7 +395,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_CONTENT_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX, NOTE_CONTENT_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -281,7 +411,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX, NOTE_LORE_HISTORICAL_ERA_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -297,7 +427,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_NPC_FACTION_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX, NOTE_NPC_FACTION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}
@@ -313,7 +443,7 @@ class CampaignEditorViewModelTest {
 			advanceUntilIdle()
 
 			assertEquals(
-				"$CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX: $NOTE_LOCATION_REGION_EMPTY_MESSAGE",
+				expectedValidationMessage(CAMPAIGN_EDITOR_UPDATE_NOTE_ERROR_PREFIX, NOTE_LOCATION_REGION_EMPTY_MESSAGE),
 				viewModel.uiState.value.message
 			)
 		}

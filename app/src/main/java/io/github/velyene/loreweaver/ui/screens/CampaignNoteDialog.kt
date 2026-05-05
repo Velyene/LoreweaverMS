@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +42,7 @@ import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LOCATION
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LORE
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_NPC
 import io.github.velyene.loreweaver.ui.util.buildNpcExtra
+import io.github.velyene.loreweaver.ui.util.noteTypeMetadata
 import io.github.velyene.loreweaver.ui.util.parseNpcExtra
 
 internal sealed interface NoteDialogMode {
@@ -48,6 +50,11 @@ internal sealed interface NoteDialogMode {
 	data object Adding : NoteDialogMode
 	data class Editing(val note: Note) : NoteDialogMode
 }
+
+internal const val NOTE_DIALOG_CONTENT_FIELD_TAG = "note_dialog_content_field"
+internal const val NOTE_DIALOG_EXTRA_FIELD_TAG = "note_dialog_extra_field"
+internal const val NOTE_DIALOG_FACTION_FIELD_TAG = "note_dialog_faction_field"
+internal const val NOTE_DIALOG_ATTITUDE_FIELD_TAG = "note_dialog_attitude_field"
 
 @Composable
 internal fun NoteDialogHost(
@@ -210,7 +217,9 @@ private fun NoteDialogFields(
 			value = content,
 			onValueChange = onContentChange,
 			label = { Text(stringResource(R.string.note_content_label)) },
-			modifier = Modifier.fillMaxWidth()
+			modifier = Modifier
+				.fillMaxWidth()
+				.testTag(NOTE_DIALOG_CONTENT_FIELD_TAG)
 		)
 		// Only note types with additional structured metadata render extra inputs so the
 		// dialog stays compact for general notes while still supporting richer note subtypes.
@@ -222,6 +231,7 @@ private fun NoteDialogFields(
 					label = { Text(stringResource(R.string.note_faction_label)) },
 					modifier = Modifier
 						.fillMaxWidth()
+						.testTag(NOTE_DIALOG_FACTION_FIELD_TAG)
 						.padding(top = 8.dp)
 				)
 				OutlinedTextField(
@@ -230,6 +240,7 @@ private fun NoteDialogFields(
 					label = { Text(stringResource(R.string.note_attitude_label)) },
 					modifier = Modifier
 						.fillMaxWidth()
+						.testTag(NOTE_DIALOG_ATTITUDE_FIELD_TAG)
 						.padding(top = 8.dp)
 				)
 			}
@@ -241,6 +252,7 @@ private fun NoteDialogFields(
 					label = { Text(localizedExtraFieldLabel(selectedType)) },
 					modifier = Modifier
 						.fillMaxWidth()
+						.testTag(NOTE_DIALOG_EXTRA_FIELD_TAG)
 						.padding(top = 8.dp)
 				)
 			}
@@ -263,20 +275,12 @@ private fun initialExtraField(note: Note?) = when (note) {
 }
 
 @Composable
-private fun localizedNoteType(type: String): String = when (type) {
-	NOTE_TYPE_GENERAL -> stringResource(R.string.note_type_general)
-	NOTE_TYPE_LORE -> stringResource(R.string.note_type_lore)
-	NOTE_TYPE_NPC -> stringResource(R.string.note_type_npc)
-	NOTE_TYPE_LOCATION -> stringResource(R.string.note_type_location)
-	else -> type
-}
+private fun localizedNoteType(type: String): String = stringResource(noteTypeMetadata(type).chipLabelResId)
 
 @Composable
-private fun localizedExtraFieldLabel(type: String): String = when (type) {
-	NOTE_TYPE_LORE -> stringResource(R.string.note_extra_historical_era_label)
-	NOTE_TYPE_LOCATION -> stringResource(R.string.note_extra_region_label)
-	else -> ""
-}
+private fun localizedExtraFieldLabel(type: String): String = noteTypeMetadata(type).extraFieldLabelResId
+	?.let { stringResource(it) }
+	.orEmpty()
 
 private fun buildUpdatedNote(
 	editingNote: Note,

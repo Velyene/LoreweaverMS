@@ -1,3 +1,17 @@
+/*
+ * FILE: CampaignDetailEncounterDialogsTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: CampaignDetailEncounterDialogsTest
+ * 2. Function: filteredEncounterMonsterEntries_appliesSearchAndMonsterFilters
+ * 3. Value: results
+ * 4. Function: filteredEncounterMonsterEntries_sortsByChallengeRatingDescending_thenName
+ * 5. Value: currentCr
+ * 6. Value: nextCr
+ * 7. Function: filteredEncounterMonsterEntries_selectedOnly_limitsResultsToSelectedKeys
+ * 8. Function: filteredEncounterMonsterEntries_animalsOnly_limitsResultsToAnimalGroup
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.MonsterReferenceCatalog

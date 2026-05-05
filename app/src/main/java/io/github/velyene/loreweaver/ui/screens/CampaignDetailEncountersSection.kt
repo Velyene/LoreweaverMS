@@ -1,5 +1,24 @@
+/*
+ * FILE: CampaignDetailEncountersSection.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Value: EDIT_ENCOUNTER_NAME_FIELD_TAG
+ * 2. Function: LinkedEncounterList
+ * 3. Value: showAddDialog
+ * 4. Value: encounterBeingEdited
+ * 5. Value: encounterPendingDelete
+ * 6. Value: encounterName
+ * 7. Value: monsterSearchQuery
+ * 8. Value: showAnimalsOnly
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,9 +29,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.Encounter
 import io.github.velyene.loreweaver.domain.model.RemoteItem
+
+internal const val EDIT_ENCOUNTER_NAME_FIELD_TAG = "edit_encounter_name_field"
 
 @Composable
 internal fun LinkedEncounterList(
@@ -20,8 +44,12 @@ internal fun LinkedEncounterList(
 	onEncounterClick: (String) -> Unit,
 	onAddEncounter: (String) -> Unit,
 	onAddEncounterWithMonsters: (String, List<RemoteItem>) -> Unit,
+	onUpdateEncounter: (Encounter, String) -> Unit,
+	onDeleteEncounter: (Encounter) -> Unit,
 ) {
 	var showAddDialog by remember { mutableStateOf(false) }
+	var encounterBeingEdited by remember { mutableStateOf<Encounter?>(null) }
+	var encounterPendingDelete by remember { mutableStateOf<Encounter?>(null) }
 	var encounterName by remember { mutableStateOf("") }
 	var monsterSearchQuery by remember { mutableStateOf("") }
 	var showAnimalsOnly by remember { mutableStateOf(false) }
@@ -73,6 +101,8 @@ internal fun LinkedEncounterList(
 		EncounterListBody(
 			encounters = encounters,
 			onEncounterClick = onEncounterClick,
+			onEditEncounter = { encounterBeingEdited = it },
+			onDeleteEncounter = { encounterPendingDelete = it },
 			modifier = Modifier
 				.fillMaxWidth()
 				.weight(1f),
@@ -165,5 +195,75 @@ internal fun LinkedEncounterList(
 				resetEncounterDialogState()
 			},
 		),
+	)
+
+	encounterBeingEdited?.let { encounter ->
+		EditEncounterDialog(
+			encounter = encounter,
+			onDismiss = {
+				@Suppress("UNUSED_VALUE")
+				encounterBeingEdited = null
+			},
+			onConfirm = { updatedName ->
+				onUpdateEncounter(encounter, updatedName)
+				@Suppress("UNUSED_VALUE")
+				encounterBeingEdited = null
+			}
+		)
+	}
+
+	encounterPendingDelete?.let { encounter ->
+		ConfirmationDialog(
+			title = stringResource(R.string.confirm_delete_encounter_title),
+			message = stringResource(R.string.confirm_delete_encounter_message, encounter.name),
+			onConfirm = {
+				onDeleteEncounter(encounter)
+				@Suppress("UNUSED_VALUE")
+				encounterPendingDelete = null
+			},
+			onDismiss = {
+				@Suppress("UNUSED_VALUE")
+				encounterPendingDelete = null
+			},
+			confirmLabel = stringResource(R.string.delete_button),
+		)
+	}
+}
+
+@Composable
+private fun EditEncounterDialog(
+	encounter: Encounter,
+	onDismiss: () -> Unit,
+	onConfirm: (String) -> Unit,
+) {
+	var name by remember(encounter.id) { mutableStateOf(encounter.name) }
+	val trimmedName = name.trim()
+
+	AlertDialog(
+		onDismissRequest = onDismiss,
+		title = { Text(text = stringResource(R.string.edit_encounter_title)) },
+		text = {
+			OutlinedTextField(
+				value = name,
+				onValueChange = { name = it },
+				label = { Text(text = stringResource(R.string.encounter_name_label)) },
+				modifier = Modifier
+					.fillMaxWidth()
+					.testTag(EDIT_ENCOUNTER_NAME_FIELD_TAG)
+			)
+		},
+		confirmButton = {
+			Button(
+				onClick = { if (trimmedName.isNotEmpty()) onConfirm(trimmedName) },
+				enabled = trimmedName.isNotEmpty(),
+			) {
+				Text(text = stringResource(R.string.save_button))
+			}
+		},
+		dismissButton = {
+			TextButton(onClick = onDismiss) {
+				Text(text = stringResource(R.string.cancel_button))
+			}
+		}
 	)
 }

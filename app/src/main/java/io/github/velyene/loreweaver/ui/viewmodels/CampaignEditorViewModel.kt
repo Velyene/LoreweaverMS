@@ -1,15 +1,36 @@
+/*
+ * FILE: CampaignEditorViewModel.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: CampaignEditorViewModel
+ * 2. Value: addCampaignUseCase
+ * 3. Value: updateCampaignUseCase
+ * 4. Value: deleteCampaignUseCase
+ * 5. Value: addEncounterUseCase
+ * 6. Value: updateEncounterUseCase
+ * 7. Value: deleteEncounterUseCase
+ * 8. Value: addMonstersToEncounterUseCase
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.velyene.loreweaver.ui.util.UiText
+import io.github.velyene.loreweaver.domain.model.Campaign
+import io.github.velyene.loreweaver.domain.model.Encounter
 import io.github.velyene.loreweaver.domain.model.Note
 import io.github.velyene.loreweaver.domain.model.RemoteItem
 import io.github.velyene.loreweaver.domain.use_case.AddCampaignUseCase
 import io.github.velyene.loreweaver.domain.use_case.AddEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.AddMonstersToEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.AddNoteUseCase
+import io.github.velyene.loreweaver.domain.use_case.DeleteCampaignUseCase
+import io.github.velyene.loreweaver.domain.use_case.DeleteEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.DeleteNoteUseCase
+import io.github.velyene.loreweaver.domain.use_case.UpdateCampaignUseCase
+import io.github.velyene.loreweaver.domain.use_case.UpdateEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.UpdateNoteUseCase
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LOCATION
 import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LORE
@@ -26,7 +47,11 @@ import javax.inject.Inject
 @HiltViewModel
 class CampaignEditorViewModel @Inject constructor(
 	private val addCampaignUseCase: AddCampaignUseCase,
+	private val updateCampaignUseCase: UpdateCampaignUseCase,
+	private val deleteCampaignUseCase: DeleteCampaignUseCase,
 	private val addEncounterUseCase: AddEncounterUseCase,
+	private val updateEncounterUseCase: UpdateEncounterUseCase,
+	private val deleteEncounterUseCase: DeleteEncounterUseCase,
 	private val addMonstersToEncounterUseCase: AddMonstersToEncounterUseCase,
 	private val addNoteUseCase: AddNoteUseCase,
 	private val updateNoteUseCase: UpdateNoteUseCase,
@@ -39,15 +64,64 @@ class CampaignEditorViewModel @Inject constructor(
 		_uiState.update { it.copy(message = null) }
 	}
 
+	fun clearUpdatedCampaignId() {
+		_uiState.update { it.copy(updatedCampaignId = null) }
+	}
+
+	fun clearDeletedCampaignId() {
+		_uiState.update { it.copy(deletedCampaignId = null) }
+	}
+
+	fun clearUpdatedEncounterId() {
+		_uiState.update { it.copy(updatedEncounterId = null) }
+	}
+
+	fun clearDeletedEncounterId() {
+		_uiState.update { it.copy(deletedEncounterId = null) }
+	}
+
 	fun addCampaign(name: String, description: String) {
 		launchMutation(CAMPAIGN_EDITOR_ADD_CAMPAIGN_ERROR_PREFIX) {
 			addCampaignUseCase(name, description)
 		}
 	}
 
+	fun updateCampaign(campaign: Campaign, name: String, description: String) {
+		launchMutation(CAMPAIGN_EDITOR_UPDATE_CAMPAIGN_ERROR_PREFIX) {
+			updateCampaignUseCase(
+				campaign.copy(
+					title = name.trim(),
+					description = description
+				)
+			)
+			_uiState.update { it.copy(updatedCampaignId = campaign.id) }
+		}
+	}
+
+	fun deleteCampaign(campaign: Campaign) {
+		launchMutation(CAMPAIGN_EDITOR_DELETE_CAMPAIGN_ERROR_PREFIX) {
+			deleteCampaignUseCase(campaign)
+			_uiState.update { it.copy(deletedCampaignId = campaign.id) }
+		}
+	}
+
 	fun addEncounter(campaignId: String, name: String) {
 		launchMutation(CAMPAIGN_EDITOR_ADD_ENCOUNTER_ERROR_PREFIX) {
 			addEncounterUseCase(campaignId, name)
+		}
+	}
+
+	fun updateEncounter(encounter: Encounter, name: String) {
+		launchMutation(CAMPAIGN_EDITOR_UPDATE_ENCOUNTER_ERROR_PREFIX) {
+			updateEncounterUseCase(encounter.copy(name = name.trim()))
+			_uiState.update { it.copy(updatedEncounterId = encounter.id) }
+		}
+	}
+
+	fun deleteEncounter(encounter: Encounter) {
+		launchMutation(CAMPAIGN_EDITOR_DELETE_ENCOUNTER_ERROR_PREFIX) {
+			deleteEncounterUseCase(encounter)
+			_uiState.update { it.copy(deletedEncounterId = encounter.id) }
 		}
 	}
 
@@ -97,7 +171,7 @@ class CampaignEditorViewModel @Inject constructor(
 	}
 
 	private fun launchMutation(
-		errorPrefix: String,
+		errorPrefix: UiText,
 		action: suspend () -> Unit
 	) {
 		viewModelScope.launch {

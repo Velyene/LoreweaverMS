@@ -41,10 +41,38 @@ class EncounterNameValidationUseCaseTest {
 		assertEquals("campaign-1", insertedEncounter?.campaignId)
 		assertEquals("Whispers in the Catacombs", insertedEncounter?.name)
 	}
+
+	@Test
+	fun updateEncounterUseCase_rejectsBlankName_whenNameIsBlank() = runBlocking {
+		val repository = FakeEncountersRepository()
+		val useCase = UpdateEncounterUseCase(repository)
+
+		try {
+			useCase(Encounter(id = "encounter-1", campaignId = "campaign-1", name = "   "))
+			fail("Expected IllegalArgumentException for blank encounter name")
+		} catch (exception: IllegalArgumentException) {
+			assertEquals(ValidationMessages.ENCOUNTER_NAME_EMPTY_MESSAGE, exception.message)
+			assertNull(repository.updatedEncounter)
+		}
+	}
+
+	@Test
+	fun updateEncounterUseCase_updatesEncounter_whenNameIsNotBlank() = runBlocking {
+		val repository = FakeEncountersRepository()
+		val useCase = UpdateEncounterUseCase(repository)
+		val encounter = Encounter(id = "encounter-1", campaignId = "campaign-1", name = "Whispers in the Catacombs")
+
+		useCase(encounter)
+
+		assertEquals(encounter, repository.updatedEncounter)
+	}
 }
 
 private class FakeEncountersRepository : EncountersRepository {
 	var insertedEncounter: Encounter? = null
+	var updatedEncounter: Encounter? = null
+
+	override fun getAllEncounters(): Flow<List<Encounter>> = emptyFlow()
 
 	override fun getEncountersForCampaign(campaignId: String): Flow<List<Encounter>> = emptyFlow()
 
@@ -53,6 +81,12 @@ private class FakeEncountersRepository : EncountersRepository {
 	override suspend fun insertEncounter(encounter: Encounter) {
 		insertedEncounter = encounter
 	}
+
+	override suspend fun updateEncounter(encounter: Encounter) {
+		updatedEncounter = encounter
+	}
+
+	override suspend fun deleteEncounter(encounter: Encounter) = Unit
 
 	override suspend fun addCombatantsToEncounter(
 		encounterId: String,
