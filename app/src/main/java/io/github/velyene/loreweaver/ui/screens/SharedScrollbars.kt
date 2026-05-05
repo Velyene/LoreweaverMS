@@ -1,3 +1,17 @@
+/*
+ * FILE: SharedScrollbars.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Value: ScrollbarThickness
+ * 2. Value: ScrollbarEndPadding
+ * 3. Value: ScrollbarMinThumbHeight
+ * 4. Class: ScrollbarDrawParams
+ * 5. Value: thumbColor
+ * 6. Value: trackColor
+ * 7. Value: thicknessPx
+ * 8. Value: endPaddingPx
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.ScrollState

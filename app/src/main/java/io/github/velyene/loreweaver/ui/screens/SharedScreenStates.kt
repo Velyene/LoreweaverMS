@@ -1,8 +1,11 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -38,16 +41,28 @@ internal fun CenteredLoadingState(modifier: Modifier = Modifier) {
 @Composable
 internal fun CenteredEmptyState(
 	message: String,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	actionLabel: String? = null,
+	onAction: (() -> Unit)? = null,
 ) {
 	Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-		Text(
-			text = message,
-			color = MutedText,
-			style = MaterialTheme.typography.bodyMedium,
-			textAlign = TextAlign.Center,
-			modifier = Modifier.padding(24.dp)
-		)
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			modifier = Modifier.padding(24.dp),
+		) {
+			Text(
+				text = message,
+				color = MutedText,
+				style = MaterialTheme.typography.bodyMedium,
+				textAlign = TextAlign.Center,
+			)
+			if (!actionLabel.isNullOrBlank() && onAction != null) {
+				Spacer(modifier = Modifier.height(12.dp))
+				TextButton(onClick = onAction) {
+					Text(actionLabel)
+				}
+			}
+		}
 	}
 }
 
