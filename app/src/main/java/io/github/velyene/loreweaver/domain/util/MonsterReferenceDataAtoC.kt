@@ -1,3 +1,12 @@
+/*
+ * FILE: MonsterReferenceDataAtoC.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Object: MonsterReferenceDataAtoC
+ * 2. Value: ENTRIES
+ * 3. Function: monster
+ */
+
 package io.github.velyene.loreweaver.domain.util
 
 object MonsterReferenceDataAtoC {
