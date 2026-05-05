@@ -8,6 +8,8 @@ import io.github.velyene.loreweaver.domain.repository.SessionsRepository
 import io.github.velyene.loreweaver.domain.util.Resource
 import javax.inject.Inject
 
+const val NO_ACTIVE_ENCOUNTER_MESSAGE = "No active encounter found"
+
 class GetActiveEncounterUseCase @Inject constructor(
 	private val encountersRepository: EncountersRepository,
 	private val sessionsRepository: SessionsRepository
@@ -21,11 +23,10 @@ class GetActiveEncounterUseCase @Inject constructor(
 		return try {
 			val encounter = encountersRepository.getActiveEncounter()
 			if (encounter != null) {
-				val session = sessionsRepository.getRecentSession()
-					?.takeIf { it.encounterId == encounter.id }
+				val session = sessionsRepository.getRecentSessionForEncounter(encounter.id)
 				Resource.Success(Pair(encounter, session))
 			} else {
-				Resource.Error("No active encounter found")
+				Resource.Error(NO_ACTIVE_ENCOUNTER_MESSAGE)
 			}
 		} catch (e: Exception) {
 			Resource.Error(e.localizedMessage ?: "An unexpected error occurred")

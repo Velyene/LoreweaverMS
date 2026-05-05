@@ -11,7 +11,9 @@ package io.github.velyene.loreweaver
 
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CharacterEntryTest {
@@ -202,5 +204,55 @@ class CharacterEntryTest {
 		val rested = bard.shortRest()
 
 		assertEquals(5, rested.resources.find { it.name == "Bardic Inspiration" }?.current)
+	}
+
+	@Test
+	fun canAffordAction_requiresAllTrackedCostsToBeAvailable() {
+		val character = CharacterEntry(
+			mana = 2,
+			stamina = 3,
+			spellSlots = mapOf(1 to (1 to 2)),
+			resources = listOf(io.github.velyene.loreweaver.domain.model.CharacterResource("Ki", 2, 2)),
+			inventory = listOf("Potion of Healing")
+		)
+
+		assertTrue(
+			character.canAffordAction(
+				manaCost = 2,
+				staminaCost = 1,
+				spellSlotLevel = 1,
+				resourceName = "Ki",
+				resourceCost = 1,
+				itemName = "Potion of Healing"
+			)
+		)
+		assertFalse(character.canAffordAction(manaCost = 3))
+		assertFalse(character.canAffordAction(spellSlotLevel = 2))
+	}
+
+	@Test
+	fun spendActionCosts_reducesTrackedPoolsAndConsumesItem() {
+		val character = CharacterEntry(
+			mana = 4,
+			stamina = 3,
+			spellSlots = mapOf(1 to (2 to 2)),
+			resources = listOf(io.github.velyene.loreweaver.domain.model.CharacterResource("Ki", 2, 2)),
+			inventory = listOf("Potion of Healing", "Rope")
+		)
+
+		val updated = character.spendActionCosts(
+			manaCost = 1,
+			staminaCost = 2,
+			spellSlotLevel = 1,
+			resourceName = "Ki",
+			resourceCost = 1,
+			itemName = "Potion of Healing"
+		)
+
+		assertEquals(3, updated.mana)
+		assertEquals(1, updated.stamina)
+		assertEquals(1, updated.spellSlots[1]?.first)
+		assertEquals(1, updated.resources.single { it.name == "Ki" }.current)
+		assertEquals(listOf("Rope"), updated.inventory)
 	}
 }

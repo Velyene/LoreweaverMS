@@ -11,11 +11,17 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EncounterDao {
+	@Query("SELECT * FROM encounters ORDER BY isActive DESC, createdAt DESC")
+	fun getAllEncounters(): Flow<List<EncounterEntity>>
+
 	@Query("SELECT * FROM encounters WHERE campaignId = :campaignId ORDER BY createdAt DESC")
 	fun getEncountersForCampaign(campaignId: String): Flow<List<EncounterEntity>>
 
 	@Query("SELECT * FROM encounters WHERE id = :encounterId")
 	suspend fun getEncounterById(encounterId: String): EncounterEntity?
+
+	@Query("SELECT id FROM encounters WHERE campaignId = :campaignId")
+	suspend fun getEncounterIdsForCampaign(campaignId: String): List<String>
 
 	@Query("SELECT * FROM encounters WHERE isActive = 1 LIMIT 1")
 	suspend fun getActiveEncounter(): EncounterEntity?

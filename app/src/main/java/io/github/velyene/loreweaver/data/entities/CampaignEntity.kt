@@ -9,5 +9,6 @@ data class CampaignEntity(
 	@PrimaryKey val id: String = UUID.randomUUID().toString(),
 	val name: String,
 	val description: String = "",
+	val inventoryStateJson: String = "{}",
 	val createdAt: Long = System.currentTimeMillis()
 )
