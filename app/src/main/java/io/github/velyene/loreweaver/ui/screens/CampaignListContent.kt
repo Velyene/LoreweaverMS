@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import io.github.velyene.loreweaver.R
+import io.github.velyene.loreweaver.domain.model.Campaign
 import io.github.velyene.loreweaver.ui.viewmodels.CampaignListUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,6 +31,8 @@ internal fun CampaignListContent(
 	snackbarHostState: SnackbarHostState,
 	onBack: () -> Unit,
 	onCampaignClick: (String) -> Unit,
+	onEditCampaign: (Campaign) -> Unit,
+	onDeleteCampaign: (Campaign) -> Unit,
 	onShowCreateDialog: () -> Unit
 ) {
 	val listState = rememberLazyListState()
@@ -67,6 +70,15 @@ internal fun CampaignListContent(
 				CenteredLoadingState(modifier = Modifier.padding(padding))
 			}
 
+			uiState.campaigns.isEmpty() && uiState.onRetry != null -> {
+				CenteredEmptyState(
+					message = stringResource(R.string.campaigns_load_failed_message),
+					actionLabel = stringResource(R.string.retry_action),
+					onAction = uiState.onRetry,
+					modifier = Modifier.padding(padding),
+				)
+			}
+
 			uiState.campaigns.isEmpty() -> {
 				CenteredEmptyState(
 					message = stringResource(R.string.campaigns_empty_message),
@@ -86,6 +98,8 @@ internal fun CampaignListContent(
 						CampaignListItem(
 							campaign = campaign,
 							onCampaignClick = onCampaignClick,
+							onEditCampaign = onEditCampaign,
+							onDeleteCampaign = onDeleteCampaign,
 						)
 					}
 				}

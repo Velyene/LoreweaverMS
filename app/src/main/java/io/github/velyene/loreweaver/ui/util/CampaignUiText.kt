@@ -1,3 +1,5 @@
 package io.github.velyene.loreweaver.ui.util
 
-internal const val CAMPAIGN_NOT_FOUND_MESSAGE = "Campaign not found."
+import io.github.velyene.loreweaver.R
+
+internal val CAMPAIGN_NOT_FOUND_MESSAGE = UiText.StringResource(R.string.campaign_not_found_message)

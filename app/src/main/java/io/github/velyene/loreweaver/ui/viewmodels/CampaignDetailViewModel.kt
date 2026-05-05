@@ -1,8 +1,23 @@
+/*
+ * FILE: CampaignDetailViewModel.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: CampaignDetailViewModel
+ * 2. Value: getCampaignByIdUseCase
+ * 3. Value: getEncountersForCampaignUseCase
+ * 4. Value: getNotesForCampaignUseCase
+ * 5. Value: getSessionsForEncounterUseCase
+ * 6. Value: _uiState
+ * 7. Value: uiState
+ * 8. Value: encountersJob
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.Encounter
 import io.github.velyene.loreweaver.domain.model.SessionRecord
 import io.github.velyene.loreweaver.domain.use_case.GetCampaignByIdUseCase
@@ -10,6 +25,7 @@ import io.github.velyene.loreweaver.domain.use_case.GetEncountersForCampaignUseC
 import io.github.velyene.loreweaver.domain.use_case.GetNotesForCampaignUseCase
 import io.github.velyene.loreweaver.domain.use_case.GetSessionsForEncounterUseCase
 import io.github.velyene.loreweaver.ui.util.CAMPAIGN_NOT_FOUND_MESSAGE
+import io.github.velyene.loreweaver.ui.util.UiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -43,7 +59,7 @@ class CampaignDetailViewModel @Inject constructor(
 			try {
 				val campaign = getCampaignByIdUseCase(campaignId)
 				if (campaign == null) {
-					handleCampaignNotFound(campaignId)
+					handleCampaignNotFound()
 					return@launch
 				}
 
@@ -54,7 +70,7 @@ class CampaignDetailViewModel @Inject constructor(
 				throw e
 			} catch (e: Exception) {
 				reportError(
-					message = formatCampaignError("Critical error", e),
+					message = formatCampaignError(UiText.StringResource(R.string.error_critical_prefix), e),
 					onRetry = retrySelectCampaign(campaignId)
 				)
 			}
@@ -65,16 +81,16 @@ class CampaignDetailViewModel @Inject constructor(
 		_uiState.update(CampaignDetailUiState::clearErrorState)
 	}
 
-	private fun reportError(message: String, onRetry: (() -> Unit)? = null) {
+	private fun reportError(message: UiText, onRetry: (() -> Unit)? = null) {
 		_uiState.update { it.withError(message, onRetry) }
 	}
 
 	private fun retrySelectCampaign(campaignId: String): () -> Unit = { selectCampaign(campaignId) }
 
-	private fun handleCampaignNotFound(campaignId: String) {
+	private fun handleCampaignNotFound() {
 		reportError(
 			message = CAMPAIGN_NOT_FOUND_MESSAGE,
-			onRetry = retrySelectCampaign(campaignId)
+			onRetry = null
 		)
 	}
 
@@ -93,7 +109,7 @@ class CampaignDetailViewModel @Inject constructor(
 
 	private fun launchCampaignObserver(
 		campaignId: String,
-		errorPrefix: String,
+		errorPrefix: UiText,
 		assignJob: (Job) -> Unit,
 		collector: suspend () -> Unit
 	) {
@@ -115,7 +131,7 @@ class CampaignDetailViewModel @Inject constructor(
 	private fun loadCampaignEncounters(campaignId: String) {
 		launchCampaignObserver(
 			campaignId = campaignId,
-			errorPrefix = "Failed to load encounters",
+			errorPrefix = UiText.StringResource(R.string.error_load_encounters),
 			assignJob = { encountersJob = it }
 		) {
 			getEncountersForCampaignUseCase(campaignId).collect { encounters ->
@@ -127,7 +143,7 @@ class CampaignDetailViewModel @Inject constructor(
 	private fun loadCampaignSessions(campaignId: String) {
 		launchCampaignObserver(
 			campaignId = campaignId,
-			errorPrefix = "Failed to load sessions",
+			errorPrefix = UiText.StringResource(R.string.error_load_sessions),
 			assignJob = { sessionsJob = it }
 		) {
 			@OptIn(ExperimentalCoroutinesApi::class)
@@ -142,7 +158,7 @@ class CampaignDetailViewModel @Inject constructor(
 	private fun loadCampaignNotes(campaignId: String) {
 		launchCampaignObserver(
 			campaignId = campaignId,
-			errorPrefix = "Failed to load notes",
+			errorPrefix = UiText.StringResource(R.string.error_load_notes),
 			assignJob = { notesJob = it }
 		) {
 			getNotesForCampaignUseCase(campaignId).collect { notes ->
