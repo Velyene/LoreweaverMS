@@ -25,7 +25,7 @@ import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.domain.model.Condition
 import io.github.velyene.loreweaver.domain.model.DurationType
 import io.github.velyene.loreweaver.domain.model.Encounter
-import io.github.velyene.loreweaver.domain.model.EncounterSnapshot
+import io.github.velyene.loreweaver.domain.model.EncounterGenerationSettings
 import io.github.velyene.loreweaver.domain.model.EncounterStatus
 import io.github.velyene.loreweaver.domain.model.LogEntry
 import io.github.velyene.loreweaver.domain.model.SessionRecord
@@ -38,9 +38,7 @@ import io.github.velyene.loreweaver.domain.use_case.InsertLogUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertSessionRecordUseCase
 import io.github.velyene.loreweaver.domain.use_case.SetActiveEncounterUseCase
 import io.github.velyene.loreweaver.domain.use_case.UpdateCharacterUseCase
-import io.github.velyene.loreweaver.domain.util.CharacterParty
-import io.github.velyene.loreweaver.domain.util.EncounterDifficulty
-import io.github.velyene.loreweaver.domain.util.EncounterDifficultyResult
+import io.github.velyene.loreweaver.domain.util.generateRandomEncounter
 import io.github.velyene.loreweaver.domain.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,59 +48,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
-
-data class CombatUiState(
-	val isCombatActive: Boolean = false,
-	val currentEncounterId: String? = null,
-	val currentEncounterName: String = "",
-	val encounterLifecycle: EncounterLifecycle = EncounterLifecycle.DRAFT,
-	val combatants: List<CombatantState> = emptyList(),
-	val availableCharacters: List<CharacterEntry> = emptyList(),
-	val currentTurnIndex: Int = 0,
-	val currentRound: Int = 1,
-	val encounterNotes: String = "",
-	val activeStatuses: List<String> = emptyList(),
-	val turnStep: CombatTurnStep = CombatTurnStep.SELECT_ACTION,
-	val pendingAction: PendingTurnAction? = null,
-	val selectedTargetId: String? = null,
-	val encounterDifficulty: EncounterDifficultyResult? = null,
-	val isLoading: Boolean = false,
-	val error: String? = null,
-	val onRetry: (() -> Unit)? = null
-)
-
-enum class CombatTurnStep {
-	SELECT_ACTION,
-	SELECT_TARGET,
-	APPLY_RESULT,
-	READY_TO_END
-}
-
-enum class EncounterLifecycle {
-	DRAFT,
-	ACTIVE,
-	PAUSED,
-	COMPLETED,
-	ARCHIVED
-}
-
-enum class ActionResolutionType {
-	MISS,
-	DAMAGE,
-	HEAL
-}
-
-data class PendingTurnAction(
-	val name: String,
-	val isAttack: Boolean,
-	val allowsSelfTarget: Boolean
-)
-
-private data class HpChangeResult(
-	val combatant: CombatantState,
-	val oldHp: Int,
-	val newHp: Int
-)
+import kotlin.random.Random
 
 @HiltViewModel
 class CombatViewModel @Inject constructor(
@@ -114,10 +60,26 @@ class CombatViewModel @Inject constructor(
 	private val setActiveEncounterUseCase: SetActiveEncounterUseCase,
 	private val insertLogUseCase: InsertLogUseCase,
 	private val insertSessionRecordUseCase: InsertSessionRecordUseCase,
-	private val updateCharacterUseCase: UpdateCharacterUseCase
+	private val updateCharacterUseCase: UpdateCharacterUseCase,
+	private val combatTextProvider: CombatTextProvider
 ) : ViewModel() {
+	private data class TurnHistoryEntry(
+		val currentRound: Int,
+		val currentTurnIndex: Int,
+		val combatants: List<CombatantState>,
+		val activeStatuses: List<String>,
+		val turnStep: CombatTurnStep,
+		val pendingAction: PendingTurnAction?,
+		val selectedTargetId: String?,
+		val availableCharacters: List<CharacterEntry>,
+		val encounterNotes: String,
+		val generationDetails: io.github.velyene.loreweaver.domain.model.EncounterGenerationDetails?
+	)
+
 	private val _uiState = MutableStateFlow(CombatUiState())
 	val uiState: StateFlow<CombatUiState> = _uiState.asStateFlow()
+	private val turnHistory = ArrayDeque<TurnHistoryEntry>()
+	private var currentTurnAnchor: TurnHistoryEntry? = null
 
 	init {
 		observeCharacters()
@@ -132,43 +94,52 @@ class CombatViewModel @Inject constructor(
 		}
 	}
 
+	private suspend fun syncAvailableCharactersFromRepository() {
+		_uiState.update { it.copy(availableCharacters = getCharactersUseCase().first()) }
+	}
+
 	/**
 	 * Recalculates encounter difficulty based on current combatants and party.
 	 */
 	private fun updateEncounterDifficulty() {
-		val state = _uiState.value
-		val charactersById = state.availableCharacters.associateBy(CharacterEntry::id)
-		val selectedCharacters = state.combatants.mapNotNull { combatant ->
-			charactersById[combatant.characterId]
-		}
-		val partyMembers = selectedCharacters.filter { it.isAdventurer() }
-		val enemies = state.combatants.filter { combatant ->
-			charactersById[combatant.characterId]?.isAdventurer() != true
-		}
-		val enemyCRMap = enemies.associate { combatant ->
-			combatant.characterId to (charactersById[combatant.characterId]?.challengeRating ?: 0.0)
-		}
-
-		_uiState.update {
-			it.copy(
-				encounterDifficulty = EncounterDifficulty.calculateDifficulty(
-					partyMembers = partyMembers,
-					enemies = enemies,
-					enemyCRMap = enemyCRMap
-				)
-			)
-		}
+		_uiState.update { it.copy(encounterDifficulty = calculateEncounterDifficulty(it)) }
 	}
 
-	fun loadEncounter(encounterId: String? = null) {
+	fun loadEncounter(
+		encounterId: String? = null,
+		startFresh: Boolean = false,
+		stagedEnemies: List<StagedEnemyItem> = emptyList(),
+	) {
 		beginLoading()
+		clearTurnHistory()
 		viewModelScope.launch {
-			if (encounterId == null) {
+			if (startFresh) {
+				_uiState.update { it.clearLoadedEncounterState() }
+				if (stagedEnemies.isNotEmpty()) {
+					applyStagedEnemyDrafts(stagedEnemies)
+				}
+			} else if (encounterId == null) {
 				loadActiveEncounter()
 			} else {
 				loadSpecificEncounter(encounterId)
 			}
 		}
+	}
+
+	private fun applyStagedEnemyDrafts(stagedEnemies: List<StagedEnemyItem>) {
+		_uiState.update { state ->
+			state.withAppendedCombatants(
+				stagedEnemies.flatMap { stagedEnemy ->
+					buildEnemyCombatants(
+						name = stagedEnemy.name,
+						hp = stagedEnemy.hp,
+						initiative = stagedEnemy.initiative,
+						quantity = stagedEnemy.quantity,
+					)
+				},
+			).copy(generationDetails = null)
+		}
+		updateEncounterDifficulty()
 	}
 
 	/**
@@ -195,13 +166,13 @@ class CombatViewModel @Inject constructor(
 	 * Handles successful retrieval of active encounter.
 	 * Restores combat state from snapshot if available.
 	 */
-	private fun handleActiveEncounterSuccess(
+	private suspend fun handleActiveEncounterSuccess(
 		data: Pair<Encounter, SessionRecord?>
 	) {
 		val (encounter, lastSession) = data
 
 		if (encounter.status != EncounterStatus.ACTIVE) {
-			_uiState.update { it.copy(isLoading = false) }
+			_uiState.update { it.clearLoadedEncounterState() }
 			return
 		}
 
@@ -211,8 +182,9 @@ class CombatViewModel @Inject constructor(
 	/**
 	 * Restores combat state from a session snapshot.
 	 */
-	private fun restoreCombatFromSnapshot(encounter: Encounter, session: SessionRecord) {
+	private suspend fun restoreCombatFromSnapshot(encounter: Encounter, session: SessionRecord) {
 		val snapshot = session.snapshot ?: return
+		syncAvailableCharactersFromRepository()
 		updateEncounterPresentation(
 			encounter = encounter,
 			combatants = snapshot.combatants,
@@ -223,16 +195,18 @@ class CombatViewModel @Inject constructor(
 			isCombatActive = true
 		)
 		updateEncounterDifficulty()
+		refreshTurnAnchorFromCurrentState()
 	}
 
 	/**
 	 * Handles errors when loading active encounter.
 	 */
 	private fun handleActiveEncounterError(message: String?) {
-		reportError(
-			message = if (message == "No active encounter found") null else message,
-			onRetry = retryLoadEncounter(null)
-		)
+		if (message == "No active encounter found") {
+			_uiState.update { it.clearLoadedEncounterState() }
+			return
+		}
+		reportError(message = message, onRetry = retryLoadEncounter(null))
 	}
 
 	/**
@@ -262,8 +236,8 @@ class CombatViewModel @Inject constructor(
 		_uiState.update { it.copy(isLoading = true, error = null, onRetry = null) }
 	}
 
-	private fun retryLoadEncounter(encounterId: String?): () -> Unit =
-		{ loadEncounter(encounterId) }
+	private fun retryLoadEncounter(encounterId: String?, startFresh: Boolean = false): () -> Unit =
+		{ loadEncounter(encounterId = encounterId, startFresh = startFresh) }
 
 	private fun formatError(prefix: String, exception: Exception): String {
 		return "$prefix: ${exceptionDetail(exception)}"
@@ -273,7 +247,7 @@ class CombatViewModel @Inject constructor(
 		_uiState.update {
 			it.copy(
 				isLoading = false,
-				error = message,
+				error = message?.let { msg -> io.github.velyene.loreweaver.ui.util.UiText.DynamicString(msg) },
 				onRetry = onRetry
 			)
 		}
@@ -303,7 +277,7 @@ class CombatViewModel @Inject constructor(
 		}
 	}
 
-	private fun showEncounter(encounter: Encounter, lastSession: SessionRecord?) {
+	private suspend fun showEncounter(encounter: Encounter, lastSession: SessionRecord?) {
 		if (encounter.status == EncounterStatus.ACTIVE) {
 			showActiveEncounter(encounter, lastSession)
 			return
@@ -312,21 +286,23 @@ class CombatViewModel @Inject constructor(
 		showSetupEncounter(encounter, lastSession)
 	}
 
-	private fun showActiveEncounter(encounter: Encounter, lastSession: SessionRecord?) {
+	private suspend fun showActiveEncounter(encounter: Encounter, lastSession: SessionRecord?) {
 		if (lastSession?.snapshot != null) {
 			restoreCombatFromSnapshot(encounter, lastSession)
 			return
 		}
+		syncAvailableCharactersFromRepository()
 		updateEncounterPresentation(
 			encounter = encounter,
 			combatants = encounter.participants,
 			encounterLifecycle = EncounterLifecycle.ACTIVE,
 			requestedTurnIndex = encounter.currentTurnIndex,
 			currentRound = encounter.currentRound,
-			activeStatuses = lastSession?.log ?: emptyList(),
+			activeStatuses = encounter.activeLog.ifEmpty { lastSession?.log ?: emptyList() },
 			isCombatActive = true
 		)
 		updateEncounterDifficulty()
+		refreshTurnAnchorFromCurrentState()
 	}
 
 	private fun showSetupEncounter(encounter: Encounter, lastSession: SessionRecord?) {
@@ -334,13 +310,18 @@ class CombatViewModel @Inject constructor(
 		updateEncounterPresentation(
 			encounter = encounter,
 			combatants = encounterCombatants,
-			encounterLifecycle = if (lastSession != null) EncounterLifecycle.PAUSED else EncounterLifecycle.DRAFT,
+			encounterLifecycle = when {
+				lastSession?.isCompleted == true -> EncounterLifecycle.COMPLETED
+				lastSession != null -> EncounterLifecycle.PAUSED
+				else -> EncounterLifecycle.DRAFT
+			},
 			requestedTurnIndex = lastSession?.snapshot?.currentTurnIndex ?: encounter.currentTurnIndex,
 			currentRound = encounter.currentRound,
 			activeStatuses = lastSession?.log ?: emptyList(),
 			isCombatActive = false
 		)
 		updateEncounterDifficulty()
+		clearTurnHistory()
 	}
 
 	fun clearError() {
@@ -348,7 +329,39 @@ class CombatViewModel @Inject constructor(
 	}
 
 	fun updateNotes(newNotes: String) {
-		_uiState.update { it.copy(encounterNotes = newNotes) }
+		val encounterInfo = parseEncounterInfo(_uiState.value.encounterNotes)
+		_uiState.update {
+			it.copy(
+				encounterNotes = encodeEncounterInfo(
+					locationTerrain = encounterInfo.locationTerrain,
+					notesBody = newNotes,
+				)
+			)
+		}
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun updateEncounterName(newName: String) {
+		_uiState.update { it.copy(currentEncounterName = newName) }
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun updateLocationTerrain(newLocationTerrain: String) {
+		val encounterInfo = parseEncounterInfo(_uiState.value.encounterNotes)
+		_uiState.update {
+			it.copy(
+				encounterNotes = encodeEncounterInfo(
+					locationTerrain = newLocationTerrain,
+					notesBody = encounterInfo.notesBody,
+				)
+			)
+		}
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun updateInitiativeMode(initiativeMode: InitiativeMode) {
+		_uiState.update { it.copy(initiativeMode = initiativeMode) }
+		persistActiveEncounterCheckpoint()
 	}
 
 	fun startEncounter(encounterId: String? = null) {
@@ -356,20 +369,22 @@ class CombatViewModel @Inject constructor(
 		if (state.combatants.isEmpty()) return
 
 		val existingEncounterId = encounterId ?: state.currentEncounterId
-		val id = existingEncounterId ?: UUID.randomUUID().toString()
+		val id = encounterId ?: state.currentEncounterId ?: UUID.randomUUID().toString()
 		viewModelScope.launch {
 			try {
+				clearTurnHistory()
+				syncAvailableCharactersFromRepository()
 				val existingEncounter = existingEncounterId?.let { getEncounterByIdUseCase(it) }
-				val sortedCombatants = state.combatants.sortedByDescending { it.initiative }
-				val encounter = Encounter(
-					id = id,
-					campaignId = existingEncounter?.campaignId,
-					name = resolveEncounterName(existingEncounter, state.currentEncounterName),
-					notes = state.encounterNotes,
-					status = EncounterStatus.ACTIVE,
-					currentRound = state.currentRound.coerceAtLeast(1),
-					currentTurnIndex = state.currentTurnIndex.coerceIn(0, sortedCombatants.lastIndex),
-					participants = sortedCombatants
+				val sortedCombatants = resolveEncounterStartCombatants(
+					combatants = state.combatants,
+					initiativeMode = state.initiativeMode,
+				)
+				val encounter = buildStartedEncounter(
+					encounterId = id,
+					existingEncounter = existingEncounter,
+					state = state,
+					sortedCombatants = sortedCombatants,
+					combatTextProvider = combatTextProvider
 				)
 				insertEncounterUseCase(encounter)
 				setActiveEncounterUseCase(id)
@@ -384,6 +399,8 @@ class CombatViewModel @Inject constructor(
 					resetTransientTurnState = false
 				)
 				updateEncounterDifficulty()
+				refreshTurnAnchorFromCurrentState()
+				runEnemyTurnIfNeeded()
 			} catch (e: Exception) {
 				reportError(formatError("Failed to start encounter", e))
 			}
@@ -391,69 +408,209 @@ class CombatViewModel @Inject constructor(
 	}
 
 	fun addParty(partyCombatants: List<CombatantState>) {
-		_uiState.update { currentState ->
-			val updatedList =
-				(currentState.combatants + partyCombatants).distinctBy { it.characterId }
-			currentState.copy(
-				combatants = updatedList,
-				currentTurnIndex = normalizedTurnIndex(updatedList, currentState.currentTurnIndex)
-			)
+		_uiState.update {
+			it.withAppendedCombatants(partyCombatants, distinctByCharacterId = true).copy(generationDetails = null)
 		}
 		updateEncounterDifficulty()
+		persistActiveEncounterCheckpoint()
 	}
 
 	fun addEnemy(name: String, hp: Int, initiative: Int) {
-		val enemy = CombatantState(
-			characterId = UUID.randomUUID().toString(),
-			name = name,
-			initiative = initiative,
-			currentHp = hp,
-			maxHp = hp
+		addEnemies(name = name, hp = hp, initiative = initiative, quantity = 1)
+	}
+
+	fun addEnemies(name: String, hp: Int, initiative: Int, quantity: Int) {
+		_uiState.update {
+			it.withAppendedCombatants(buildEnemyCombatants(name, hp, initiative, quantity)).copy(generationDetails = null)
+		}
+		updateEncounterDifficulty()
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun updateGenerationSettings(settings: EncounterGenerationSettings) {
+		_uiState.update { it.copy(generationSettings = settings) }
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun generateEncounter() {
+		val state = _uiState.value
+		val partyIds = state.availableCharacters.filter { it.party == io.github.velyene.loreweaver.domain.util.CharacterParty.ADVENTURERS }
+			.map(CharacterEntry::id)
+			.toSet()
+		val partyMembers = state.combatants
+			.mapNotNull { combatant ->
+				state.availableCharacters.firstOrNull { character ->
+					character.id == combatant.characterId && character.id in partyIds
+				}
+			}
+		val generationDetails = generateRandomEncounter(
+			partyMembers = partyMembers,
+			settings = state.generationSettings,
+			random = Random(
+				(listOf(
+					state.currentEncounterName,
+					partyMembers.joinToString("|") { "${it.id}:${it.level}" },
+					state.generationSettings.toString()
+				).joinToString("#").hashCode()).toLong()
+			),
+			idFactory = { UUID.randomUUID().toString() }
 		)
-		_uiState.update { state ->
-			val updatedCombatants = state.combatants + enemy
-			state.copy(
-				combatants = updatedCombatants,
-				currentTurnIndex = normalizedTurnIndex(updatedCombatants, state.currentTurnIndex)
+		val existingPartyCombatants = state.combatants.filter { it.characterId in partyIds }
+		val generatedCombatants = generationDetails.finalEnemies.map { generatedEnemy ->
+			CombatantState(
+				characterId = generatedEnemy.combatantId,
+				name = generatedEnemy.name,
+				initiative = generatedEnemy.initiative,
+				currentHp = generatedEnemy.hp,
+				maxHp = generatedEnemy.hp
+			)
+		}
+		_uiState.update {
+			it.copy(
+				combatants = existingPartyCombatants + generatedCombatants,
+				generationDetails = generationDetails,
+				currentTurnIndex = normalizedTurnIndex(existingPartyCombatants + generatedCombatants, it.currentTurnIndex)
 			)
 		}
 		updateEncounterDifficulty()
+		appendStatus(
+			if (generationDetails.finalEnemies.isEmpty()) {
+				"Encounter generation found no valid SRD match."
+			} else if (generationDetails.requiresDmReview) {
+				"Random encounter generated as the closest match. DM review suggested."
+			} else {
+				"Random encounter generated at ${generationDetails.finalTotalEnemyXp} XP."
+			}
+		)
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun updateCombatantInitiative(characterId: String, initiative: Int) {
+		_uiState.update { it.withUpdatedCombatantInitiative(characterId, initiative) }
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun moveCombatantUp(characterId: String) {
+		_uiState.update { it.reorderedCombatant(characterId, moveBy = -1) }
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun moveCombatantDown(characterId: String) {
+		_uiState.update { it.reorderedCombatant(characterId, moveBy = 1) }
+		persistActiveEncounterCheckpoint()
 	}
 
 	fun removeCombatant(characterId: String) {
-		_uiState.update { state ->
-			val updatedCombatants = state.combatants.filter { combatant -> combatant.characterId != characterId }
-			val removedCurrentCombatant = state.currentCombatant()?.characterId == characterId
-			val shouldClearPendingTurn =
-				updatedCombatants.isEmpty() || removedCurrentCombatant || state.selectedTargetId == characterId
-			val requestedIndex = if (removedCurrentCombatant && state.currentTurnIndex > 0) {
-				state.currentTurnIndex - 1
-			} else {
-				state.currentTurnIndex
-			}
-			val baseState = if (shouldClearPendingTurn) {
-				state.clearPendingTurnState()
-			} else {
-				state
-			}
-			baseState.copy(
-				combatants = updatedCombatants,
-				currentTurnIndex = normalizedTurnIndex(updatedCombatants, requestedIndex)
-			)
-		}
+		_uiState.update { it.withRemovedCombatant(characterId).copy(generationDetails = null) }
 		updateEncounterDifficulty()
+		persistOrCompleteEncounterAfterStateChange()
 	}
 
 	fun updateCombatantHp(characterId: String, delta: Int) {
 		val hpChange = applyHpDelta(characterId, delta) ?: return
 		appendHpStatus(hpChange = hpChange, delta = delta)
 		appendDefeatRecoveryStatus(hpChange)
+		persistOrCompleteEncounterAfterStateChange()
+	}
+
+	fun setCombatantHp(characterId: String, newHp: Int) {
+		val combatant = combatantById(characterId) ?: return
+		val clampedHp = newHp.coerceIn(0, combatant.maxHp)
+		if (combatant.currentHp == clampedHp && combatant.tempHp == 0) return
+
+		_uiState.update { state ->
+			state.copy(
+				combatants = state.combatants.map { currentCombatant ->
+					if (currentCombatant.characterId == characterId) {
+						currentCombatant.copy(currentHp = clampedHp, tempHp = 0)
+					} else {
+						currentCombatant
+					}
+				}
+			)
+		}
+		appendStatus("${combatant.name} HP set to $clampedHp/${combatant.maxHp}.")
+		appendDefeatRecoveryStatus(
+			HpChangeResult(
+				combatant = combatant,
+				oldHp = combatant.currentHp,
+				newHp = clampedHp,
+			)
+		)
+		persistOrCompleteEncounterAfterStateChange()
+	}
+
+	fun markCombatantDefeated(characterId: String) {
+		val combatant = combatantById(characterId) ?: return
+		if (combatant.currentHp == 0 && combatant.tempHp == 0) return
+
+		_uiState.update { state ->
+			state.copy(
+				combatants = state.combatants.map { currentCombatant ->
+					if (currentCombatant.characterId == characterId) {
+						currentCombatant.copy(currentHp = 0, tempHp = 0)
+					} else {
+						currentCombatant
+					}
+				}
+			)
+		}
+		appendStatus("${combatant.name} marked as defeated.")
+		persistOrCompleteEncounterAfterStateChange()
+	}
+
+	fun addParticipantNote(characterId: String, note: String) {
+		val trimmedNote = note.trim()
+		if (trimmedNote.isBlank()) return
+		val combatant = combatantById(characterId) ?: return
+		appendAndPersistStatus("Note — ${combatant.name}: $trimmedNote")
+		persistCharacterNote(characterId, trimmedNote)
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun duplicateEnemy(characterId: String) {
+		val state = _uiState.value
+		val combatant = state.combatants.firstOrNull { it.characterId == characterId } ?: return
+		val sourceCharacter = state.availableCharacters.firstOrNull { it.id == characterId }
+		if (sourceCharacter?.isAdventurer() == true) return
+
+		val duplicatedCombatant = buildDuplicatedEnemyCombatant(combatant, state.combatants)
+		_uiState.update {
+			it.withAppendedCombatants(listOf(duplicatedCombatant)).copy(generationDetails = null)
+		}
+		appendStatus("${duplicatedCombatant.name} joins the encounter.")
+		updateEncounterDifficulty()
+		persistOrCompleteEncounterAfterStateChange()
+	}
+
+	fun advanceRound() {
+		val state = _uiState.value
+		if (state.combatants.isEmpty()) return
+		pushCurrentTurnAnchor()
+		val nextRound = state.currentRound + 1
+		val firstLivingIndex = state.combatants.indexOfFirst { it.currentHp > 0 }.coerceAtLeast(0)
+		_uiState.update {
+			it.clearPendingTurnState().copy(
+				currentRound = nextRound,
+				currentTurnIndex = firstLivingIndex,
+				activeStatuses = it.activeStatuses + "DM advanced to round $nextRound." + combatTextProvider.roundBeginsStatus(nextRound),
+			)
+		}
+		persistOrCompleteEncounterAfterStateChange()
+		refreshTurnAnchorFromCurrentState()
+		runEnemyTurnIfNeeded()
 	}
 
 	fun selectAction(action: String) {
 		val state = _uiState.value
 		val current = state.currentCombatant() ?: return
 		val pendingAction = resolvePendingAction(current.characterId, action)
+		val actorCharacter = state.availableCharacters.firstOrNull { it.id == current.characterId }
+		val affordabilityIssue = actorCharacter.pendingActionAffordabilityIssue(pendingAction)
+		if (affordabilityIssue != null) {
+			appendStatus("${current.name} can't use ${pendingAction.name}: $affordabilityIssue")
+			return
+		}
 		val targetCandidates = targetCandidates(state, pendingAction)
 
 		_uiState.update {
@@ -467,6 +624,7 @@ class CombatViewModel @Inject constructor(
 				}
 			)
 		}
+		persistActiveEncounterCheckpoint()
 	}
 
 	fun selectTarget(targetId: String) {
@@ -482,10 +640,12 @@ class CombatViewModel @Inject constructor(
 				turnStep = CombatTurnStep.APPLY_RESULT
 			)
 		}
+		persistActiveEncounterCheckpoint()
 	}
 
 	fun clearPendingTurn() {
 		_uiState.update { it.clearPendingTurnState() }
+		persistActiveEncounterCheckpoint()
 	}
 
 	fun applyActionResult(resultType: ActionResolutionType, amount: Int? = null) {
@@ -493,6 +653,19 @@ class CombatViewModel @Inject constructor(
 		val actor = state.currentCombatant() ?: return
 		val pendingAction = state.pendingAction ?: return
 		val target = state.resolveSelectedTarget() ?: return
+		when (val spendOutcome = spendPendingActionCosts(actor.characterId, pendingAction)) {
+			is ActionSpendOutcome.Blocked -> {
+				appendStatus("${actor.name} can't use ${pendingAction.name}: ${spendOutcome.reason}")
+				_uiState.update { it.clearPendingTurnState() }
+				return
+			}
+			is ActionSpendOutcome.Spent -> {
+				if (spendOutcome.summary.isNotBlank()) {
+					appendStatus("${actor.name} spends ${spendOutcome.summary}.")
+				}
+			}
+			ActionSpendOutcome.NotApplicable -> Unit
+		}
 
 		when (resultType) {
 			ActionResolutionType.MISS -> {
@@ -527,10 +700,22 @@ class CombatViewModel @Inject constructor(
 				selectedTargetId = target.characterId
 			)
 		}
+		persistOrCompleteEncounterAfterStateChange()
 	}
 
 	fun nextTurn() {
+		pushCurrentTurnAnchor()
 		_uiState.update { it.clearPendingTurnState().advanceTurn() }
+		persistOrCompleteEncounterAfterStateChange()
+		refreshTurnAnchorFromCurrentState()
+		runEnemyTurnIfNeeded()
+	}
+
+	fun previousTurn() {
+		val historyEntry = turnHistory.removeLastOrNull() ?: return
+		viewModelScope.launch {
+			restoreTurnHistoryEntry(historyEntry)
+		}
 	}
 
 	/**
@@ -564,6 +749,7 @@ class CombatViewModel @Inject constructor(
 			persistsAcrossEncounters = persistsAcrossEncounters,
 			wasConditionAdded = true
 		)
+		persistActiveEncounterCheckpoint()
 	}
 
 	/**
@@ -579,6 +765,7 @@ class CombatViewModel @Inject constructor(
 			conditionName = conditionName,
 			wasConditionAdded = false
 		)
+		persistActiveEncounterCheckpoint()
 	}
 
 	private fun updatePersistedCharacterCondition(
@@ -641,28 +828,6 @@ class CombatViewModel @Inject constructor(
 		return "$combatantName is now $conditionName$persistenceText"
 	}
 
-	/**
-	 * Decrements all condition durations and removes expired ones.
-	 * Called at the start of each new round.
-	 */
-	private fun decrementConditionDurations(combatants: List<CombatantState>): Pair<List<CombatantState>, List<String>> {
-		val expiredMessages = mutableListOf<String>()
-		val updatedCombatants = combatants.map { combatant ->
-			val updatedConditions = combatant.conditions.mapNotNull { condition ->
-				when {
-					condition.duration == null -> condition
-					condition.duration > 1 -> condition.copy(duration = condition.duration - 1)
-					else -> {
-						expiredMessages += "${combatant.name}'s ${condition.name} condition has expired"
-						null
-					}
-				}
-			}
-			combatant.copy(conditions = updatedConditions)
-		}
-		return updatedCombatants to expiredMessages
-	}
-
 	private fun updateCombatant(
 		characterId: String,
 		transform: (CombatantState) -> CombatantState
@@ -678,6 +843,108 @@ class CombatViewModel @Inject constructor(
 
 	private fun combatantById(characterId: String): CombatantState? =
 		_uiState.value.combatants.find { it.characterId == characterId }
+
+	private fun persistCharacterNote(characterId: String, note: String) {
+		val character = _uiState.value.availableCharacters.firstOrNull { it.id == characterId } ?: return
+		viewModelScope.launch {
+			updateCharacterUseCase(
+				character.copy(
+					notes = character.notes.appendEncounterNote(note)
+				)
+			)
+		}
+	}
+
+	private fun snapshotTurnState(state: CombatUiState): TurnHistoryEntry {
+		return TurnHistoryEntry(
+			currentRound = state.currentRound,
+			currentTurnIndex = state.currentTurnIndex,
+			combatants = state.combatants.map { combatant ->
+				combatant.copy(conditions = combatant.conditions.map { condition -> condition.copy() })
+			},
+			activeStatuses = state.activeStatuses.toList(),
+			turnStep = state.turnStep,
+			pendingAction = state.pendingAction,
+			selectedTargetId = state.selectedTargetId,
+			availableCharacters = state.availableCharacters.map { character ->
+				character.copy(
+					inventory = character.inventory.toList(),
+					inventoryState = character.inventoryState.copy(
+						personalInventory = character.inventoryState.personalInventory.toList(),
+						equippedItems = character.inventoryState.equippedItems.toList(),
+					),
+					resources = character.resources.map { resource -> resource.copy() },
+					spellSlots = character.spellSlots.toMap(),
+					activeConditions = character.activeConditions.toSet(),
+					actions = character.actions.map { action -> action.copy() },
+				)
+			},
+			encounterNotes = state.encounterNotes,
+			generationDetails = state.generationDetails,
+		)
+	}
+
+	private fun clearTurnHistory() {
+		turnHistory.clear()
+		currentTurnAnchor = null
+		_uiState.update { it.copy(canGoToPreviousTurn = false) }
+	}
+
+	private fun refreshTurnAnchorFromCurrentState() {
+		val currentState = _uiState.value
+		currentTurnAnchor = currentState
+			.takeIf { it.isCombatActive && it.combatants.isNotEmpty() }
+			?.let(::snapshotTurnState)
+		_uiState.update { it.copy(canGoToPreviousTurn = turnHistory.isNotEmpty()) }
+	}
+
+	private fun pushCurrentTurnAnchor() {
+		val anchor = currentTurnAnchor ?: return
+		if (turnHistory.size >= MAX_TURN_HISTORY) {
+			turnHistory.removeFirst()
+		}
+		turnHistory.addLast(anchor)
+		_uiState.update { it.copy(canGoToPreviousTurn = true) }
+	}
+
+	private suspend fun restoreTurnHistoryEntry(entry: TurnHistoryEntry) {
+		val previousCharacters = _uiState.value.availableCharacters
+		persistRestoredCharacters(previousCharacters, entry.availableCharacters)
+		syncAvailableCharactersFromRepository()
+		val restoredCharacters = _uiState.value.availableCharacters
+		_uiState.update {
+			it.copy(
+				currentRound = entry.currentRound,
+				currentTurnIndex = entry.currentTurnIndex,
+				combatants = entry.combatants,
+				activeStatuses = entry.activeStatuses,
+				turnStep = entry.turnStep,
+				pendingAction = entry.pendingAction,
+				selectedTargetId = entry.selectedTargetId,
+				availableCharacters = restoredCharacters,
+				encounterNotes = entry.encounterNotes,
+				generationDetails = entry.generationDetails,
+				canGoToPreviousTurn = turnHistory.isNotEmpty(),
+			)
+		}
+		currentTurnAnchor = snapshotTurnState(_uiState.value)
+		updateEncounterDifficulty()
+		persistActiveEncounterCheckpoint()
+	}
+
+	private suspend fun persistRestoredCharacters(
+		previousCharacters: List<CharacterEntry>,
+		restoredCharacters: List<CharacterEntry>
+	) {
+		val previousCharacterIds = previousCharacters.map(CharacterEntry::id).toSet()
+		val changedCharacters = restoredCharacters.filter { restoredCharacter ->
+			restoredCharacter.id in previousCharacterIds
+		}
+		if (changedCharacters.isEmpty()) return
+		changedCharacters.forEach { updatedCharacter ->
+			updateCharacterUseCase(updatedCharacter)
+		}
+	}
 
 	private fun appendStatus(message: String) {
 		_uiState.update { it.copy(activeStatuses = it.activeStatuses + message) }
@@ -715,12 +982,24 @@ class CombatViewModel @Inject constructor(
 
 	private fun applyHpDelta(characterId: String, delta: Int): HpChangeResult? {
 		val combatant = _uiState.value.combatants.find { it.characterId == characterId } ?: return null
-		val newHp = (combatant.currentHp + delta).coerceIn(0, combatant.maxHp)
+		val damage = (-delta).coerceAtLeast(0)
+		val absorbedByTempHp = damage.coerceAtMost(combatant.tempHp)
+		val remainingDamage = damage - absorbedByTempHp
+		val newTempHp = if (delta < 0) {
+			(combatant.tempHp - absorbedByTempHp).coerceAtLeast(0)
+		} else {
+			combatant.tempHp
+		}
+		val newHp = if (delta < 0) {
+			(combatant.currentHp - remainingDamage).coerceAtLeast(0)
+		} else {
+			(combatant.currentHp + delta).coerceAtMost(combatant.maxHp)
+		}
 		_uiState.update { state ->
 			state.copy(
 				combatants = state.combatants.map { currentCombatant ->
 					if (currentCombatant.characterId == characterId) {
-						currentCombatant.copy(currentHp = newHp)
+						currentCombatant.copy(currentHp = newHp, tempHp = newTempHp)
 					} else {
 						currentCombatant
 					}
@@ -734,21 +1013,100 @@ class CombatViewModel @Inject constructor(
 		)
 	}
 
+	private fun buildDuplicatedEnemyCombatant(
+		source: CombatantState,
+		existingCombatants: List<CombatantState>
+	): CombatantState {
+		val baseName = source.name.enemyGroupKey()
+		val nextIndex = existingCombatants
+			.filter { it.name.enemyGroupKey().equals(baseName, ignoreCase = true) }
+			.mapNotNull { combatant ->
+				Regex("""^(.*?)(?:\s+(\d+))?$""")
+					.matchEntire(combatant.name.trim())
+					?.groupValues
+					?.getOrNull(2)
+					?.toIntOrNull()
+			}
+			.maxOrNull()
+			?.plus(1)
+			?: if (existingCombatants.any { it.name.equals(baseName, ignoreCase = true) }) 2 else 1
+		val duplicateName = if (nextIndex <= 1) baseName else "$baseName $nextIndex"
+		return CombatantState(
+			characterId = UUID.randomUUID().toString(),
+			name = duplicateName,
+			initiative = source.initiative,
+			currentHp = source.maxHp,
+			maxHp = source.maxHp,
+		)
+	}
+
+	private fun String.appendEncounterNote(note: String): String {
+		return if (isBlank()) note else "$this\n$note"
+	}
+
+	private fun String.enemyGroupKey(): String = trim().replace(Regex("""\s+\d+$"""), "")
+
 	private fun CombatUiState.advanceTurn(): CombatUiState {
 		if (combatants.isEmpty()) return this
+		val activeCombatant = currentCombatant() ?: return this
+		val (postTurnCombatants, endOfTurnMessages) = processEndOfTurnEffects(
+			combatants = combatants,
+			actingCombatantId = activeCombatant.characterId
+		)
 
-		val nextIndex = currentTurnIndex + 1
-		if (nextIndex < combatants.size) {
-			return copy(currentTurnIndex = nextIndex)
+		val nextLivingIndex = findNextLivingCombatantIndex(
+			combatants = postTurnCombatants,
+			startingAfterIndex = currentTurnIndex
+		)
+		if (nextLivingIndex != null) {
+			return copy(
+				currentTurnIndex = nextLivingIndex,
+				combatants = postTurnCombatants,
+				activeStatuses = activeStatuses + "${activeCombatant.name} ended turn." + endOfTurnMessages
+			)
 		}
 
-		val (updatedCombatants, expiredMessages) = decrementConditionDurations(combatants)
+		val firstLivingIndex = postTurnCombatants.indexOfFirst { it.currentHp > 0 }
 		return copy(
-			currentTurnIndex = 0,
+			currentTurnIndex = firstLivingIndex.coerceAtLeast(0),
 			currentRound = currentRound + 1,
-			combatants = updatedCombatants,
-			activeStatuses = activeStatuses + expiredMessages + "Round ${currentRound + 1} begins"
+			combatants = postTurnCombatants,
+			activeStatuses = activeStatuses + "${activeCombatant.name} ended turn." + endOfTurnMessages + combatTextProvider.roundBeginsStatus(currentRound + 1)
 		)
+	}
+
+	private fun processEndOfTurnEffects(
+		combatants: List<CombatantState>,
+		actingCombatantId: String
+	): Pair<List<CombatantState>, List<String>> {
+		val endOfTurnMessages = mutableListOf<String>()
+		val updatedCombatants = combatants.map { combatant ->
+			if (combatant.characterId != actingCombatantId) return@map combatant
+
+			val updatedConditions = combatant.conditions.mapNotNull { condition ->
+				when {
+					condition.duration == null -> condition
+					condition.duration > 1 -> condition.copy(duration = condition.duration - 1)
+					else -> {
+						endOfTurnMessages += "${combatant.name}'s ${condition.name} condition has expired"
+						null
+					}
+				}
+			}
+			combatant.copy(conditions = updatedConditions)
+		}
+		return updatedCombatants to endOfTurnMessages
+	}
+
+	private fun findNextLivingCombatantIndex(
+		combatants: List<CombatantState>,
+		startingAfterIndex: Int
+	): Int? {
+		if (combatants.isEmpty()) return null
+		for (index in (startingAfterIndex + 1) until combatants.size) {
+			if (combatants[index].currentHp > 0) return index
+		}
+		return null
 	}
 
 	private fun CombatUiState.currentCombatant(): CombatantState? =
@@ -774,10 +1132,46 @@ class CombatViewModel @Inject constructor(
 		val actor = _uiState.value.availableCharacters.firstOrNull { it.id == actorId }
 		val customAction = actor?.actions?.firstOrNull { it.name.equals(actionName, ignoreCase = true) }
 		val isAttack = customAction?.isAttack ?: defaultActionIsAttack(actionName)
+		val resolvedSpellSlotLevel = customAction?.spellSlotLevel
+			?: actor.resolveImplicitSpellSlotLevel(actionName)
+		val resolvedResourceName = customAction?.resourceName
+			?: actor.resolveImplicitAbilityResourceName(actionName)
+		val resolvedResourceCost = if (customAction?.resourceCost ?: 0 > 0) {
+			customAction?.resourceCost ?: 0
+		} else if (resolvedResourceName != null) {
+			1
+		} else {
+			0
+		}
+		val resolvedStaminaCost = when {
+			(customAction?.staminaCost ?: 0) > 0 -> customAction?.staminaCost ?: 0
+			actionName.equals("Use Ability", ignoreCase = true) && resolvedResourceName == null -> 1
+			else -> 0
+		}
+		val resolvedManaCost = when {
+			(customAction?.manaCost ?: 0) > 0 -> customAction?.manaCost ?: 0
+			actionName.equals("Cast Spell", ignoreCase = true) && resolvedSpellSlotLevel == null && ((actor?.maxMana ?: 0) > 0) -> 1
+			else -> 0
+		}
+		val resolvedItemName = customAction?.itemName ?: actor.resolveImplicitConsumableItemName(actionName)
 		return PendingTurnAction(
 			name = customAction?.name ?: actionName,
 			isAttack = isAttack,
-			allowsSelfTarget = !isAttack
+			allowsSelfTarget = !isAttack,
+			manaCost = resolvedManaCost,
+			staminaCost = resolvedStaminaCost,
+			spellSlotLevel = resolvedSpellSlotLevel,
+			resourceName = resolvedResourceName,
+			resourceCost = resolvedResourceCost,
+			itemName = resolvedItemName,
+			useSummary = buildActionUseSummary(
+				manaCost = resolvedManaCost,
+				staminaCost = resolvedStaminaCost,
+				spellSlotLevel = resolvedSpellSlotLevel,
+				resourceName = resolvedResourceName,
+				resourceCost = resolvedResourceCost,
+				itemName = resolvedItemName
+			)
 		)
 	}
 
@@ -797,20 +1191,13 @@ class CombatViewModel @Inject constructor(
 		return if (combatants.isEmpty()) 0 else requestedIndex.coerceIn(0, combatants.lastIndex)
 	}
 
-	private fun resolveEncounterName(existingEncounter: Encounter?, currentEncounterName: String): String {
-		return existingEncounter?.name ?: currentEncounterName.ifBlank {
-			"Quick Encounter ${System.currentTimeMillis()}"
-		}
-	}
-
 	private fun defaultActionIsAttack(actionName: String): Boolean {
 		return when (actionName.lowercase()) {
-			"dodge", "help", "heal", "hide" -> false
+			"dodge", "help", "heal", "hide", "use item", "cast spell", "use ability" -> false
 			else -> true
 		}
 	}
 
-	private fun CharacterEntry.isAdventurer(): Boolean = party == CharacterParty.ADVENTURERS
 
 	private fun CharacterEntry.withPersistedCondition(
 		conditionName: String,
@@ -827,50 +1214,119 @@ class CombatViewModel @Inject constructor(
 	 * Updates temp HP for a combatant.
 	 */
 	fun updateTempHp(characterId: String, tempHp: Int) {
-		_uiState.update { state ->
-			val updated = state.combatants.map { c ->
-				if (c.characterId == characterId) {
-					c.copy(tempHp = tempHp.coerceAtLeast(0))
-				} else c
-			}
-			state.copy(combatants = updated)
+		_uiState.update { it.withUpdatedTempHp(characterId, tempHp) }
+		persistActiveEncounterCheckpoint()
+	}
+
+	fun endEncounter(
+		result: EncounterResult? = null,
+		onComplete: () -> Unit = {}
+	) {
+		viewModelScope.launch {
+			completeEncounter(result = result)
+			onComplete()
+		}
+	}
+
+	fun endEncounterToSummary(
+		result: EncounterResult? = null,
+		onComplete: (String) -> Unit,
+	) {
+		viewModelScope.launch {
+			val sessionId = completeEncounter(result = result)
+			onComplete(sessionId)
 		}
 	}
 
 	fun saveAndPauseEncounter(onComplete: () -> Unit) {
 		val state = _uiState.value
 		val encounterId = state.currentEncounterId ?: UUID.randomUUID().toString()
-		val session = SessionRecord(
-			encounterId = encounterId,
-			title = state.currentEncounterName.ifBlank {
-				"Encounter Session - ${System.currentTimeMillis()}"
-			},
-			log = state.activeStatuses,
-			snapshot = EncounterSnapshot(
-				combatants = state.combatants,
-				currentTurnIndex = state.currentTurnIndex,
-				currentRound = state.currentRound
-			)
-		)
 
 		viewModelScope.launch {
+			clearTurnHistory()
 			_uiState.update { it.copy(encounterLifecycle = EncounterLifecycle.PAUSED) }
 			val existingEncounter = state.currentEncounterId?.let { getEncounterByIdUseCase(it) }
 			insertEncounterUseCase(
-				Encounter(
-					id = encounterId,
-					campaignId = existingEncounter?.campaignId,
-					name = resolveEncounterName(existingEncounter, state.currentEncounterName),
-					notes = state.encounterNotes,
-					status = EncounterStatus.PENDING,
-					currentRound = state.currentRound,
-					currentTurnIndex = state.currentTurnIndex,
-					participants = state.combatants
+				buildPendingEncounter(
+					encounterId = encounterId,
+					existingEncounter = existingEncounter,
+					state = state,
+					combatTextProvider = combatTextProvider
 				)
 			)
-			insertSessionRecordUseCase(session)
+			insertSessionRecordUseCase(
+				buildEncounterSession(
+					encounterId = encounterId,
+					state = state,
+					isCompleted = false,
+					encounterResult = null,
+					rewardTemplate = existingEncounter?.rewardTemplate ?: io.github.velyene.loreweaver.domain.model.EncounterRewardTemplate(),
+					combatTextProvider = combatTextProvider
+				)
+			)
 			onComplete()
 		}
+	}
+
+	private fun persistOrCompleteEncounterAfterStateChange() {
+		if (!_uiState.value.isCombatActive) return
+		persistActiveEncounterCheckpoint()
+	}
+
+	private fun persistActiveEncounterCheckpoint() {
+		val state = _uiState.value
+		val encounterId = state.currentEncounterId ?: return
+		if (!state.isCombatActive || state.encounterLifecycle != EncounterLifecycle.ACTIVE) return
+
+		viewModelScope.launch {
+			val existingEncounter = getEncounterByIdUseCase(encounterId)
+			insertEncounterUseCase(
+				buildActiveEncounterCheckpoint(
+					encounterId = encounterId,
+					existingEncounter = existingEncounter,
+					state = _uiState.value,
+					combatTextProvider = combatTextProvider
+				)
+			)
+		}
+	}
+
+	private suspend fun completeEncounter(result: EncounterResult?): String {
+		val state = _uiState.value
+		val encounterId = state.currentEncounterId ?: UUID.randomUUID().toString()
+		val existingEncounter = state.currentEncounterId?.let { getEncounterByIdUseCase(it) }
+		val encounterResult = result?.name ?: deriveEncounterResultFromState(state)
+		val session = buildEncounterSession(
+			encounterId = encounterId,
+			state = state,
+			isCompleted = true,
+			encounterResult = encounterResult,
+			rewardTemplate = existingEncounter?.rewardTemplate ?: io.github.velyene.loreweaver.domain.model.EncounterRewardTemplate(),
+			combatTextProvider = combatTextProvider
+		)
+
+		insertEncounterUseCase(
+			buildPendingEncounter(
+				encounterId = encounterId,
+				existingEncounter = existingEncounter,
+				state = state,
+				combatTextProvider = combatTextProvider
+			)
+		)
+		insertSessionRecordUseCase(session)
+		setActiveEncounterUseCase("")
+		_uiState.update {
+			it.copy(
+				isCombatActive = false,
+				encounterLifecycle = EncounterLifecycle.COMPLETED,
+				canGoToPreviousTurn = false,
+				turnStep = CombatTurnStep.SELECT_ACTION,
+				pendingAction = null,
+				selectedTargetId = null
+			)
+		}
+		clearTurnHistory()
+		return session.id
 	}
 
 	private fun CombatUiState.withEncounterPresentation(
@@ -892,6 +1348,8 @@ class CombatViewModel @Inject constructor(
 			currentRound = currentRound.coerceAtLeast(1),
 			encounterNotes = encounter.notes,
 			activeStatuses = activeStatuses,
+			generationSettings = encounter.generationSettings,
+			generationDetails = encounter.generationDetails,
 			isCombatActive = isCombatActive,
 			isLoading = false
 		)
@@ -900,5 +1358,374 @@ class CombatViewModel @Inject constructor(
 		} else {
 			presentedState
 		}
+	}
+
+	private fun runEnemyTurnIfNeeded() {
+		val state = _uiState.value
+		if (!state.isCombatActive) return
+		val actor = state.currentCombatant() ?: return
+		if (actor.currentHp <= 0) return
+		if (isPlayerControlled(actor.characterId, state.availableCharacters)) return
+
+		val decision = decideEnemyTurn(state, actor) ?: return
+		when (val spendOutcome = spendPendingActionCosts(actor.characterId, decision.pendingAction)) {
+			is ActionSpendOutcome.Blocked -> {
+				appendStatus("${actor.name} can't use ${decision.pendingAction.name}: ${spendOutcome.reason}")
+				if (_uiState.value.isCombatActive) {
+					nextTurn()
+				}
+				return
+			}
+			is ActionSpendOutcome.Spent -> {
+				if (spendOutcome.summary.isNotBlank()) {
+					appendStatus("${actor.name} spends ${spendOutcome.summary}.")
+				}
+			}
+			ActionSpendOutcome.NotApplicable -> Unit
+		}
+		if (decision.appliedCondition != null) {
+			applyEnemySupportCondition(
+				targetId = decision.targetId,
+				conditionName = decision.appliedCondition,
+				duration = decision.conditionDurationRounds
+			)
+			appendAndPersistStatus(
+				"${actor.name} used ${decision.pendingAction.name} on ${decision.targetName}, applying ${decision.appliedCondition}."
+			)
+			persistOrCompleteEncounterAfterStateChange()
+			if (_uiState.value.isCombatActive) {
+				nextTurn()
+			}
+			return
+		}
+		when (decision.resultType) {
+			ActionResolutionType.MISS -> {
+				appendAndPersistStatus(
+					"${actor.name} used ${decision.pendingAction.name} on ${decision.targetName}, but missed."
+				)
+			}
+			ActionResolutionType.DAMAGE -> {
+				val hpChange = applyHpDelta(decision.targetId, -(decision.amount ?: DEFAULT_ENEMY_ACTION_AMOUNT)) ?: return
+				appendAndPersistStatus(
+					"${actor.name} used ${decision.pendingAction.name} on ${decision.targetName} for ${decision.amount ?: DEFAULT_ENEMY_ACTION_AMOUNT} damage."
+				)
+				appendDefeatRecoveryStatus(hpChange)
+			}
+			ActionResolutionType.HEAL -> {
+				val hpChange = applyHpDelta(decision.targetId, decision.amount ?: DEFAULT_ENEMY_ACTION_AMOUNT) ?: return
+				appendAndPersistStatus(
+					"${actor.name} used ${decision.pendingAction.name} on ${decision.targetName}, restoring ${decision.amount ?: DEFAULT_ENEMY_ACTION_AMOUNT} HP."
+				)
+				appendDefeatRecoveryStatus(hpChange)
+			}
+		}
+
+		persistOrCompleteEncounterAfterStateChange()
+		if (_uiState.value.isCombatActive) {
+			nextTurn()
+		}
+	}
+
+	private fun decideEnemyTurn(
+		state: CombatUiState,
+		actor: CombatantState
+	): EnemyTurnDecision? {
+		val charactersById = state.availableCharacters.associateBy(CharacterEntry::id)
+		val actorCharacter = charactersById[actor.characterId]
+		val livingEnemies = state.combatants
+			.filter { combatant ->
+				!isPlayerControlled(combatant.characterId, state.availableCharacters) && combatant.currentHp > 0
+			}
+			.sortedWith(compareBy<CombatantState> { it.currentHp + it.tempHp }.thenByDescending { it.initiative })
+		val livingPlayers = state.combatants
+			.filter { combatant ->
+				isPlayerControlled(combatant.characterId, state.availableCharacters) && combatant.currentHp > 0
+			}
+			.sortedWith(compareBy<CombatantState> { it.currentHp + it.tempHp }.thenByDescending { it.initiative })
+		if (livingPlayers.isEmpty()) return null
+		val resolvedActions = actorCharacter
+			?.actions
+			?.map { resolvePendingAction(actor.characterId, it.name) }
+			?.filterNot { action -> actionAffordabilityIssue(actorCharacter, action) != null }
+			.orEmpty()
+
+		val healingAction = resolvedActions.firstOrNull { action ->
+			isHealingAction(action.name)
+		}
+		val healingTarget = livingEnemies.firstOrNull { ally ->
+			ally.maxHp > 0 && ally.currentHp.toFloat() / ally.maxHp <= ENEMY_HEAL_THRESHOLD
+		} ?: livingEnemies.firstOrNull { it.currentHp < it.maxHp }
+		if (healingAction != null && healingTarget != null) {
+			return EnemyTurnDecision(
+				pendingAction = healingAction,
+				targetId = healingTarget.characterId,
+				targetName = healingTarget.name,
+				resultType = ActionResolutionType.HEAL,
+				amount = actorCharacter
+					?.actions
+					?.firstOrNull { it.name.equals(healingAction.name, ignoreCase = true) }
+					?.damageDice
+					?.toAverageActionAmount() ?: DEFAULT_ENEMY_ACTION_AMOUNT
+			)
+		}
+
+		val buffAction = resolvedActions.firstOrNull { action ->
+			!action.isAttack && supportConditionName(action.name, beneficial = true) != null
+		}
+		val buffConditionName = buffAction?.let { supportConditionName(it.name, beneficial = true) }
+		if (state.currentRound <= 2 && buffAction != null && buffConditionName != null) {
+			val buffTarget = livingEnemies
+				.filterNot { combatant -> combatant.hasCondition(buffConditionName) }
+				.maxByOrNull { it.currentHp + it.tempHp }
+			if (buffTarget != null) {
+				return EnemyTurnDecision(
+					pendingAction = buffAction,
+					targetId = buffTarget.characterId,
+					targetName = buffTarget.name,
+					resultType = ActionResolutionType.HEAL,
+					amount = 0,
+					appliedCondition = buffConditionName,
+					conditionDurationRounds = DEFAULT_SUPPORT_CONDITION_DURATION
+				)
+			}
+		}
+
+		val debuffAction = resolvedActions.firstOrNull { action ->
+			!action.isAttack && supportConditionName(action.name, beneficial = false) != null
+		}
+		val debuffConditionName = debuffAction?.let { supportConditionName(it.name, beneficial = false) }
+		if (debuffAction != null && debuffConditionName != null) {
+			val debuffTarget = livingPlayers
+				.filterNot { combatant -> combatant.hasCondition(debuffConditionName) }
+				.maxByOrNull { it.currentHp + it.tempHp }
+			if (debuffTarget != null) {
+				return EnemyTurnDecision(
+					pendingAction = debuffAction,
+					targetId = debuffTarget.characterId,
+					targetName = debuffTarget.name,
+					resultType = ActionResolutionType.DAMAGE,
+					amount = 0,
+					appliedCondition = debuffConditionName,
+					conditionDurationRounds = DEFAULT_SUPPORT_CONDITION_DURATION
+				)
+			}
+		}
+
+		val attackAction = resolvedActions
+			.filter { it.isAttack }
+			.maxByOrNull { action ->
+				actorCharacter
+					?.actions
+					?.firstOrNull { it.name.equals(action.name, ignoreCase = true) }
+					?.damageDice
+					?.toAverageActionAmount() ?: DEFAULT_ENEMY_ACTION_AMOUNT
+			}
+		val target = livingPlayers.first()
+		val attackMisses = ((state.currentRound + actor.initiative + target.initiative) % ENEMY_MISS_DIVISOR) == 0
+		return EnemyTurnDecision(
+			pendingAction = attackAction ?: resolvePendingAction(actor.characterId, DEFAULT_ENEMY_ACTION_NAME),
+			targetId = target.characterId,
+			targetName = target.name,
+			resultType = if (attackMisses) ActionResolutionType.MISS else ActionResolutionType.DAMAGE,
+			amount = actorCharacter
+				?.actions
+				?.firstOrNull { it.name.equals(attackAction?.name, ignoreCase = true) }
+				?.damageDice
+				?.toAverageActionAmount() ?: DEFAULT_ENEMY_ACTION_AMOUNT
+		)
+	}
+
+	private fun spendPendingActionCosts(
+		actorId: String,
+		pendingAction: PendingTurnAction
+	): ActionSpendOutcome {
+		val actorCharacter = _uiState.value.availableCharacters.firstOrNull { it.id == actorId }
+			?: return ActionSpendOutcome.NotApplicable
+		val affordabilityIssue = actionAffordabilityIssue(actorCharacter, pendingAction)
+		if (affordabilityIssue != null) {
+			return ActionSpendOutcome.Blocked(affordabilityIssue)
+		}
+
+		val updatedCharacter = actorCharacter.spendActionCosts(
+			manaCost = pendingAction.manaCost,
+			staminaCost = pendingAction.staminaCost,
+			spellSlotLevel = pendingAction.spellSlotLevel,
+			resourceName = pendingAction.resourceName,
+			resourceCost = pendingAction.resourceCost,
+			itemName = pendingAction.itemName
+		)
+		replaceAvailableCharacter(updatedCharacter)
+		viewModelScope.launch {
+			updateCharacterUseCase(updatedCharacter)
+		}
+		return ActionSpendOutcome.Spent(pendingAction.useSummary)
+	}
+
+	private fun replaceAvailableCharacter(updatedCharacter: CharacterEntry) {
+		_uiState.update { state ->
+			state.copy(
+				availableCharacters = state.availableCharacters.map { character ->
+					if (character.id == updatedCharacter.id) updatedCharacter else character
+				}
+			)
+		}
+	}
+
+	private fun actionAffordabilityIssue(
+		actorCharacter: CharacterEntry,
+		pendingAction: PendingTurnAction
+	): String? {
+		val currentSpellSlots = pendingAction.spellSlotLevel?.let { level ->
+			actorCharacter.spellSlots[level]?.first ?: 0
+		}
+		val currentResource = pendingAction.resourceName?.let { resourceName ->
+			actorCharacter.resources.firstOrNull { it.name.equals(resourceName, ignoreCase = true) }
+		}
+		return when {
+			pendingAction.spellSlotLevel != null && (currentSpellSlots ?: 0) <= 0 ->
+				"no level ${pendingAction.spellSlotLevel} spell slot is available"
+			pendingAction.manaCost > actorCharacter.mana -> "not enough mana"
+			pendingAction.staminaCost > actorCharacter.stamina -> "not enough stamina"
+			pendingAction.resourceName != null && (currentResource == null || currentResource.current < pendingAction.resourceCost.coerceAtLeast(0)) ->
+				"${pendingAction.resourceName} is depleted"
+			pendingAction.itemName != null && actorCharacter.availableInventoryNames().none { it.equals(pendingAction.itemName, ignoreCase = true) } ->
+				"${pendingAction.itemName} is not available"
+			else -> null
+		}
+	}
+
+	private fun CharacterEntry?.pendingActionAffordabilityIssue(pendingAction: PendingTurnAction): String? {
+		return this?.let { actionAffordabilityIssue(it, pendingAction) }
+	}
+
+	private fun CharacterEntry?.resolveImplicitSpellSlotLevel(actionName: String): Int? {
+		if (this == null || !actionName.equals("Cast Spell", ignoreCase = true)) return null
+		return spellSlots.entries
+			.filter { it.value.first > 0 }
+			.minByOrNull { it.key }
+			?.key
+	}
+
+	private fun CharacterEntry?.resolveImplicitAbilityResourceName(actionName: String): String? {
+		if (this == null || !actionName.equals("Use Ability", ignoreCase = true)) return null
+		return resources.firstOrNull { it.name.isNotBlank() && it.current > 0 }?.name
+	}
+
+	private fun CharacterEntry?.resolveImplicitConsumableItemName(actionName: String): String? {
+		if (this == null || !actionName.equals("Use Item", ignoreCase = true)) return null
+		return availableInventoryNames().firstOrNull { item ->
+			item.contains("potion", ignoreCase = true) ||
+				item.contains("scroll", ignoreCase = true) ||
+				item.contains("elixir", ignoreCase = true) ||
+				item.contains("bomb", ignoreCase = true)
+		}
+	}
+
+	private fun buildActionUseSummary(
+		manaCost: Int,
+		staminaCost: Int,
+		spellSlotLevel: Int?,
+		resourceName: String?,
+		resourceCost: Int,
+		itemName: String?
+	): String {
+		return buildList {
+			if (manaCost > 0) add("$manaCost mana")
+			if (staminaCost > 0) add("$staminaCost stamina")
+			if (spellSlotLevel != null) add("1 level $spellSlotLevel spell slot")
+			if (!resourceName.isNullOrBlank() && resourceCost > 0) add("$resourceCost $resourceName")
+			if (!itemName.isNullOrBlank()) add(itemName)
+		}.joinToString(" • ")
+	}
+
+	private fun isPlayerControlled(
+		characterId: String,
+		availableCharacters: List<CharacterEntry>
+	): Boolean {
+		return availableCharacters.firstOrNull { it.id == characterId }?.party == io.github.velyene.loreweaver.domain.util.CharacterParty.ADVENTURERS
+	}
+
+	private fun applyEnemySupportCondition(
+		targetId: String,
+		conditionName: String,
+		duration: Int?
+	) {
+		val currentRound = _uiState.value.currentRound
+		updateCombatant(targetId) { combatant ->
+			if (combatant.hasCondition(conditionName)) {
+				combatant
+			} else {
+				combatant.copy(
+					conditions = combatant.conditions + buildEncounterCondition(
+						conditionName = conditionName,
+						duration = duration,
+						currentRound = currentRound
+					)
+				)
+			}
+		}
+	}
+
+	private fun isHealingAction(actionName: String): Boolean {
+		return actionName.contains("heal", ignoreCase = true) ||
+			actionName.contains("mend", ignoreCase = true) ||
+			actionName.contains("restore", ignoreCase = true) ||
+			actionName.contains("cure", ignoreCase = true)
+	}
+
+	private fun supportConditionName(actionName: String, beneficial: Boolean): String? {
+		val normalizedName = actionName.lowercase()
+		return when {
+			beneficial && ("bless" in normalizedName || "inspire" in normalizedName) -> "Blessed"
+			beneficial && "shield" in normalizedName -> "Shielded"
+			beneficial && ("haste" in normalizedName || "rally" in normalizedName) -> "Empowered"
+			!beneficial && ("poison" in normalizedName || "venom" in normalizedName) -> "Poisoned"
+			!beneficial && ("hex" in normalizedName || "curse" in normalizedName || "bane" in normalizedName) -> "Cursed"
+			!beneficial && ("slow" in normalizedName || "web" in normalizedName) -> "Restrained"
+			!beneficial && ("fear" in normalizedName || "terror" in normalizedName) -> "Frightened"
+			else -> null
+		}
+	}
+
+	private fun CombatantState.hasCondition(conditionName: String): Boolean {
+		return conditions.any { it.name.equals(conditionName, ignoreCase = true) }
+	}
+
+	private fun String.toAverageActionAmount(): Int? {
+		val trimmed = trim()
+		if (trimmed.isBlank()) return null
+		trimmed.toIntOrNull()?.let { return it.coerceAtLeast(1) }
+
+		val match = Regex("""^(\\d+)d(\\d+)([+-]\\d+)?$""").matchEntire(trimmed) ?: return null
+		val diceCount = match.groupValues[1].toIntOrNull() ?: return null
+		val diceSize = match.groupValues[2].toIntOrNull() ?: return null
+		val modifier = match.groupValues[3].takeIf(String::isNotBlank)?.toIntOrNull() ?: 0
+		val averageRoll = diceCount * ((diceSize + 1) / 2.0)
+		return (averageRoll + modifier).toInt().coerceAtLeast(1)
+	}
+
+	private data class EnemyTurnDecision(
+		val pendingAction: PendingTurnAction,
+		val targetId: String,
+		val targetName: String,
+		val resultType: ActionResolutionType,
+		val amount: Int?,
+		val appliedCondition: String? = null,
+		val conditionDurationRounds: Int? = null
+	)
+
+	private sealed interface ActionSpendOutcome {
+		data object NotApplicable : ActionSpendOutcome
+		data class Blocked(val reason: String) : ActionSpendOutcome
+		data class Spent(val summary: String) : ActionSpendOutcome
+	}
+
+	private companion object {
+		const val MAX_TURN_HISTORY = 25
+		const val DEFAULT_ENEMY_ACTION_NAME = "Strike"
+		const val DEFAULT_ENEMY_ACTION_AMOUNT = 4
+		const val DEFAULT_SUPPORT_CONDITION_DURATION = 2
+		const val ENEMY_MISS_DIVISOR = 5
+		const val ENEMY_HEAL_THRESHOLD = 0.4f
 	}
 }
