@@ -1,8 +1,11 @@
 package io.github.velyene.loreweaver.domain.util
 
-enum class ToolCategory(val label: String) {
-	ARTISANS("Artisan's Tools"),
-	OTHER("Other Tools")
+import androidx.annotation.StringRes
+import io.github.velyene.loreweaver.R
+
+enum class ToolCategory(val canonicalLabel: String, @param:StringRes val labelResId: Int) {
+	ARTISANS("Artisan's Tools", R.string.reference_character_creation_tool_category_artisans),
+	OTHER("Other Tools", R.string.reference_character_creation_tool_category_other)
 }
 
 data class ToolReferenceEntry(
@@ -59,10 +62,10 @@ data class AmmunitionReferenceEntry(
 	val cost: String
 )
 
-enum class FocusGroup(val label: String) {
-	ARCANE("Arcane Focus"),
-	DRUIDIC("Druidic Focus"),
-	HOLY_SYMBOL("Holy Symbol")
+enum class FocusGroup(val canonicalLabel: String, @param:StringRes val labelResId: Int) {
+	ARCANE("Arcane Focus", R.string.reference_character_creation_focus_group_arcane),
+	DRUIDIC("Druidic Focus", R.string.reference_character_creation_focus_group_druidic),
+	HOLY_SYMBOL("Holy Symbol", R.string.reference_character_creation_focus_group_holy_symbol)
 }
 
 data class FocusReferenceEntry(

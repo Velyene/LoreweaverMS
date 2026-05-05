@@ -1,3 +1,12 @@
+/*
+ * FILE: MonsterReferenceDataOtoR.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Object: MonsterReferenceDataOtoR
+ * 2. Value: ENTRIES
+ * 3. Function: monster
+ */
+
 package io.github.velyene.loreweaver.domain.util
 
 object MonsterReferenceDataOtoR {

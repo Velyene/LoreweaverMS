@@ -1,3 +1,17 @@
+/*
+ * FILE: ReferenceDetailResolverTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: ReferenceDetailResolverTest
+ * 2. Value: ALLOSAURUS
+ * 3. Value: SWARM_OF_BATS
+ * 4. Function: resolve_returnsFeatDetailsForSrdFeatSlug
+ * 5. Value: detail
+ * 6. Function: resolve_returnsWeaponDetailsForSrdEquipmentSlug
+ * 7. Function: resolve_returnsSafeSpellIndexEntryForCanonicalSpellSlug
+ * 8. Function: resolve_returnsMonsterDetailsForRestoredMonsterCorpus
+ */
+
 package io.github.velyene.loreweaver.domain.util
 
 import org.junit.Assert.assertEquals

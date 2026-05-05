@@ -233,7 +233,7 @@ object ReferenceDetailResolver {
 			EquipmentReference.ALL_TOOLS.firstOrNull { matchesLookup(it.name, slug) } ?: return null
 		return ReferenceDetailContent(
 			title = tool.name,
-			subtitle = tool.category.label,
+			subtitle = tool.category.canonicalLabel,
 			statRows = listOf(
 				"Ability" to tool.ability,
 				STAT_LABEL_WEIGHT to tool.weight,
@@ -309,10 +309,10 @@ object ReferenceDetailResolver {
 			EquipmentReference.FOCUSES.firstOrNull { matchesLookup(it.name, slug) } ?: return null
 		return ReferenceDetailContent(
 			title = focus.name,
-			subtitle = focus.group.label,
+			subtitle = focus.group.canonicalLabel,
 			overview = focus.usage,
 			statRows = listOf(
-				"Group" to focus.group.label,
+				"Group" to focus.group.canonicalLabel,
 				STAT_LABEL_WEIGHT to focus.weight,
 				STAT_LABEL_COST to focus.cost
 			),
