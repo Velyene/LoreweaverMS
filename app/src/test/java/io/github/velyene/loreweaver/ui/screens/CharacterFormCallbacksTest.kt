@@ -22,6 +22,28 @@ class CharacterFormCallbacksTest {
 	}
 
 	@Test
+	fun validateCharacterBuilderSection_identityOnlyRequiresName() {
+		val validation = validateCharacterBuilderSection(
+			section = CharacterBuilderSection.IDENTITY,
+			formState = CharacterFormState(name = "", hp = "")
+		)
+
+		assertTrue(validation.nameError)
+		assertFalse(validation.hpError)
+	}
+
+	@Test
+	fun validateCharacterBuilderSection_coreStatsRequiresNumericHp() {
+		val validation = validateCharacterBuilderSection(
+			section = CharacterBuilderSection.CORE_STATS,
+			formState = CharacterFormState(name = "Aria", hp = "abc")
+		)
+
+		assertFalse(validation.nameError)
+		assertTrue(validation.hpError)
+	}
+
+	@Test
 	fun buildCharacterEntry_withInvalidInputs_usesExpectedFallbacks() {
 		val classInfo = ClassInfo(
 			displayName = "Wizard",
@@ -80,6 +102,8 @@ class CharacterFormCallbacksTest {
 		assertEquals(8, builtCharacter.hitDieType)
 		assertEquals(1, builtCharacter.hitDiceCurrent)
 		assertEquals(mapOf(1 to (2 to 2)), builtCharacter.spellSlots)
+		assertEquals("", builtCharacter.species)
+		assertEquals("", builtCharacter.background)
 	}
 
 	@Test
@@ -90,12 +114,18 @@ class CharacterFormCallbacksTest {
 			deathSaveSuccesses = 2,
 			deathSaveFailures = 1,
 			activeConditions = setOf("Poisoned"),
+			persistentConditions = setOf("Blessed"),
 			spellSlots = mapOf(1 to (1 to 2))
 		)
 		val formState = CharacterFormState(
 			name = "Updated Hero",
 			level = "5",
-			hitDieType = "10"
+			hitDieType = "10",
+			encounterConditions = setOf("Poisoned"),
+			persistentConditions = setOf("Blessed"),
+			species = "Elf",
+			background = "Sage",
+			spellsText = "Bless\nShield of Faith"
 		)
 		val classInfo = ClassInfo(
 			displayName = "Paladin",
@@ -117,7 +147,11 @@ class CharacterFormCallbacksTest {
 		assertEquals(2, builtCharacter.deathSaveSuccesses)
 		assertEquals(1, builtCharacter.deathSaveFailures)
 		assertEquals(setOf("Poisoned"), builtCharacter.activeConditions)
+		assertEquals(setOf("Blessed"), builtCharacter.persistentConditions)
 		assertEquals(mapOf(1 to (1 to 2)), builtCharacter.spellSlots)
+		assertEquals("Elf", builtCharacter.species)
+		assertEquals("Sage", builtCharacter.background)
+		assertEquals(listOf("Bless", "Shield of Faith"), builtCharacter.spells)
 	}
 
 	@Test

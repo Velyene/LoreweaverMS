@@ -30,7 +30,7 @@ internal object EquipmentReferenceToolsData {
 			"8 lb.",
 			"50 GP",
 			listOf("Identify a chemical or poison (DC 15)", "Start a fire with reagents (DC 10)"),
-			listOf("Acid", "Alchemistâ€™s Fire", "Antitoxin", "Basic Poison")
+			listOf("Acid", "Alchemist’s Fire", "Antitoxin", "Basic Poison")
 		),
 		artisan("Brewer's Supplies", "Intelligence", "9 lb.", "20 GP", listOf("Detect spoiled drink (DC 10)", "Brew ale (DC 15)"), listOf("Ale")),
 		artisan(
@@ -43,7 +43,7 @@ internal object EquipmentReferenceToolsData {
 		),
 		artisan("Carpenter's Tools", "Strength", "6 lb.", "8 GP", listOf("Brace a door or window (DC 10)", "Build a simple wooden structure (DC 15)"), listOf("Club", "Greatclub", "Quarterstaff")),
 		artisan("Cartographer's Tools", "Wisdom", "6 lb.", "15 GP", listOf("Draw a map from memory (DC 15)", "Survey terrain (DC 10)"), listOf("Map")),
-		artisan("Cobbler's Tools", "Dexterity", "5 lb.", "5 GP", listOf("Repair footwear (DC 10)", "Modify shoes for travel (DC 15)"), listOf("Travelerâ€™s Shoes")),
+		artisan("Cobbler's Tools", "Dexterity", "5 lb.", "5 GP", listOf("Repair footwear (DC 10)", "Modify shoes for travel (DC 15)"), listOf("Traveler’s Shoes")),
 		artisan("Cook's Utensils", "Wisdom", "8 lb.", "1 GP", listOf("Prepare a nourishing meal (DC 10)", "Improve camp rations (DC 15)"), listOf("Meal")),
 		artisan("Glassblower's Tools", "Dexterity", "5 lb.", "30 GP", listOf("Shape a simple glass object (DC 15)"), listOf("Bottle, Glass", "Vial")),
 		artisan("Jeweler's Tools", "Dexterity", "2 lb.", "25 GP", listOf("Appraise a gem (DC 15)", "Set a jewel in metal (DC 15)"), listOf("Gem Setting")),
@@ -63,7 +63,7 @@ internal object EquipmentReferenceToolsData {
 		other(
 			"Gaming Set",
 			"Wisdom",
-			"â€”",
+			"—",
 			"Varies",
 			listOf("Win at a game of skill or chance (DC 15)"),
 			variants = listOf("Dice", "Dragonchess", "Playing Cards", "Three-Dragon Ante"),
@@ -90,16 +90,16 @@ internal object EquipmentReferenceToolsData {
 	val ALL_TOOLS = ARTISANS_TOOLS + OTHER_TOOLS
 
 	val ARTISANS_TOOLS_TABLE = ReferenceTable(
-		title = "Artisanâ€™s Tools",
+		title = "Artisan’s Tools",
 		columns = listOf("Name", "Ability", "Weight", "Cost", "Utilize", "Craft"),
 		rows = ARTISANS_TOOLS.map { tool ->
 			listOf(
-				tool.name.replace("'", "â€™"),
+				tool.name.replace("'", "’"),
 				tool.ability,
 				tool.weight,
 				tool.cost,
 				tool.utilize.joinToString(", or "),
-				tool.craft.joinToString().ifBlank { "â€”" }
+				tool.craft.joinToString().ifBlank { "—" }
 			)
 		}
 	)
@@ -109,7 +109,7 @@ internal object EquipmentReferenceToolsData {
 		columns = listOf("Name", "Ability", "Weight", "Cost / Variants", "Utilize", "Craft / Variants"),
 		rows = OTHER_TOOLS.map { tool ->
 			listOf(
-				tool.name.replace("'", "â€™"),
+				tool.name.replace("'", "’"),
 				tool.ability,
 				tool.weight,
 				if (tool.variants.isNotEmpty()) tool.variants.joinToString() else tool.cost,
@@ -117,7 +117,7 @@ internal object EquipmentReferenceToolsData {
 				when {
 					tool.craft.isNotEmpty() -> tool.craft.joinToString()
 					tool.notes.isNotEmpty() -> tool.notes.joinToString()
-					else -> "â€”"
+					else -> "—"
 				}
 			)
 		}

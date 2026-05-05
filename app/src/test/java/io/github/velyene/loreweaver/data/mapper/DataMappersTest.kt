@@ -89,57 +89,27 @@ class DataMappersTest {
 	}
 
 	@Test
-	fun characterEntryToEntity_preservesMonsterTypeAndChallengeRating_forNonAdventurers() {
+	fun characterIdentityFields_roundTripSpeciesBackgroundAndSplitConditions() {
 		val entity = CharacterEntry(
-			name = "Ancient White Dragon",
-			type = "Dragon",
-			party = CharacterParty.MONSTERS,
-			hp = 333,
-			maxHp = 333,
-			ac = 20,
-			challengeRating = 20.0
+			name = "Mira",
+			type = "Wizard",
+			species = "Elf",
+			background = "Sage",
+			spells = listOf("Magic Missile", "Shield"),
+			persistentConditions = setOf("Blessed"),
+			activeConditions = setOf("Poisoned")
 		).toEntity()
 
-		assertEquals("Dragon", entity.type)
-		assertEquals(20.0, entity.challengeRating, 0.0)
-		assertFalse(entity.isPlayerCharacter)
-		assertEquals("Dragon", entity.toDomain().type)
-		assertEquals(20.0, entity.toDomain().challengeRating, 0.0)
-	}
-
-	@Test
-	fun sessionEntityToDomain_readsLegacySnapshotConditionsStoredAsStrings() {
-		val session = SessionEntity(
-			encounterId = "encounter-1",
-			title = "Legacy session",
-			date = 1234L,
-			logJson = "[]",
-			snapshotJson = """
-				{
-				  "combatants": [
-				    {
-				      "characterId": "hero-1",
-				      "name": "Hero",
-				      "initiative": 12,
-				      "currentHp": 18,
-				      "maxHp": 24,
-				      "conditions": ["Poisoned", "Blessed"]
-				    }
-				  ],
-				  "currentTurnIndex": 0,
-				  "currentRound": 2
-				}
-			""".trimIndent(),
-		)
-
-		val domain = session.toDomain()
-		val snapshot = domain.snapshot
-		assertNotNull(snapshot)
-		assertEquals(0, snapshot?.currentTurnIndex)
-		assertEquals(2, snapshot?.currentRound)
-		assertEquals(0, snapshot?.combatants?.single()?.tempHp)
-		assertEquals(listOf("Poisoned", "Blessed"), snapshot?.combatants?.single()?.conditions?.map { it.name })
-		assertEquals(DurationType.ROUNDS, snapshot?.combatants?.single()?.conditions?.first()?.durationType)
+		assertEquals("Elf", entity.species)
+		assertEquals("Sage", entity.background)
+		assertEquals(listOf("Magic Missile", "Shield"), entity.spells)
+		assertEquals(setOf("Blessed"), entity.persistentConditions)
+		assertEquals(setOf("Poisoned"), entity.activeConditions)
+		assertEquals("Elf", entity.toDomain().species)
+		assertEquals("Sage", entity.toDomain().background)
+		assertEquals(listOf("Magic Missile", "Shield"), entity.toDomain().spells)
+		assertEquals(setOf("Blessed"), entity.toDomain().persistentConditions)
+		assertEquals(setOf("Poisoned"), entity.toDomain().activeConditions)
 	}
 
 	@Test

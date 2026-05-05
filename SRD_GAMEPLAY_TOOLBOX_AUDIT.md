@@ -2,28 +2,7 @@
 
 Snapshot date: 2026-04-20
 
-
 ## Contents
-
-- [Table of contents](#table-of-contents)
-- [Summary](#summary)
-- [Hard release overlay](#hard-release-overlay)
-- [Scope reviewed](#scope-reviewed)
-  - [Directly matched structured datasets](#directly-matched-structured-datasets)
-  - [Related adjacent datasets or systems](#related-adjacent-datasets-or-systems)
-- [Findings by category](#findings-by-category)
-  - [Travel Pace](#travel-pace)
-  - [Creating a Background](#creating-a-background)
-  - [Curses and Magical Contagions](#curses-and-magical-contagions)
-  - [Environmental Effects](#environmental-effects)
-  - [Fear and Mental Stress](#fear-and-mental-stress)
-  - [Poison](#poison)
-  - [Traps](#traps)
-  - [Combat Encounters / Combat Encounter Difficulty](#combat-encounters-combat-encounter-difficulty)
-- [Verification anchors](#verification-anchors)
-- [Notes for future updates](#notes-for-future-updates)
-
-## Table of contents
 
 - [Summary](#summary)
 - [Hard release overlay](#hard-release-overlay)
@@ -52,7 +31,7 @@ content in:
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/PoisonReference.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/TrapReference.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/DiseaseReference.kt`
-- `app/src/main/java/io/github/velyene/loreweaver/domain/util/MadnessReference.kt`
+- `app/src/main/java/io/github/velyene/loreweaver/domain/util/HysteriaReference.kt`
 - `app/src/main/java/io/github/velyene/loreweaver/domain/util/EncounterDifficulty.kt`
 
 The audit baseline is the user-provided SRD 5.2.1 Gameplay Toolbox excerpt covering:
@@ -94,7 +73,7 @@ Use this file with the repo's hard ship rule, not as a soft reference note:
 
 - `CoreRulesReference.SECTIONS` travel and hazard summaries
 - `CoreRulesReference.GLOSSARY_ENTRIES` hazard / condition / travel-adjacent definitions
-- `MadnessReference.*`
+- `HysteriaReference.*`
 - `EncounterDifficulty.*`
 
 ## Findings by category
@@ -122,10 +101,10 @@ Use this file with the repo's hard ship rule, not as a soft reference note:
 **Related but outside the provided excerpt**
 
 - `CharacterCreationReference.BACKGROUNDS` currently stores named sample backgrounds:
-	- `Acolyte`
-	- `Criminal`
-	- `Sage`
-	- `Soldier`
+    - `Acolyte`
+    - `Criminal`
+    - `Sage`
+    - `Soldier`
 - These named backgrounds are related to the excerpt's background-creation rules, but they are
   **outside the provided excerpt**, which only describes a creation procedure and does not provide
   a named background allowlist.
@@ -150,11 +129,11 @@ Use this file with the repo's hard ship rule, not as a soft reference note:
 
 - `DiseaseReference` uses compact app-authored summaries rather than exact excerpt text.
 - No dedicated structured curse dataset currently models:
-	- Bestow Curse benchmarks
-	- Cursed creatures
-	- Cursed magic items
-	- Narrative curses
-	- Environmental curses / Demonic Possession
+    - Bestow Curse benchmarks
+    - Cursed creatures
+    - Cursed magic items
+    - Narrative curses
+    - Environmental curses / Demonic Possession
 
 ### Environmental Effects
 
@@ -180,13 +159,13 @@ adjacent/original reference material rather than excerpt-backed structured conte
 
 **Related but outside the provided excerpt**
 
-- `MadnessReference` is adjacent to this SRD topic, but it goes beyond the excerpt's sample fear
+- `HysteriaReference` is adjacent to this SRD topic, but it goes beyond the excerpt's sample fear
   DCs, sample mental stress effects, and prolonged-effects guidance.
-- The following `MadnessReference` content should be treated as **outside the provided excerpt**:
-	- `SHORT_TERM_EFFECTS`
-	- `LONG_TERM_EFFECTS`
-	- `INDEFINITE_FLAWS`
-	- trigger guidance and DM usage guidance
+- The following `HysteriaReference` content should be treated as **outside the provided excerpt**:
+    - `SHORT_TERM_EFFECTS`
+    - `LONG_TERM_EFFECTS`
+    - `INDEFINITE_FLAWS`
+    - trigger guidance and DM usage guidance
 
 ### Poison
 
@@ -231,11 +210,11 @@ adjacent/original reference material rather than excerpt-backed structured conte
 - `EncounterDifficulty.kt` implements the older Easy / Medium / Hard / Deadly
   threshold-and-multiplier model, plus `TRIVIAL` and `BEYOND_DEADLY` extensions.
 - The excerpt instead defines:
-	- `Low Difficulty`
-	- `Moderate Difficulty`
-	- `High Difficulty`
-	- `XP Budget per Character`
-	- a spend-your-budget encounter-building flow
+    - `Low Difficulty`
+    - `Moderate Difficulty`
+    - `High Difficulty`
+    - `XP Budget per Character`
+    - a spend-your-budget encounter-building flow
 - Therefore `EncounterDifficulty.kt` should be treated as **related but outside this provided
   excerpt**.
 
@@ -252,9 +231,9 @@ adjacent/original reference material rather than excerpt-backed structured conte
   unless a later re-audited SRD excerpt expands it.
 - If a poison, trap, contagion, environmental effect, or encounter-building rule is added to
   app-owned content, explicitly classify it as either:
-	- in the audited excerpt,
-	- related but outside the excerpt, or
-	- app-authored guidance.
+    - in the audited excerpt,
+    - related but outside the excerpt, or
+    - app-authored guidance.
 - Prefer exact canonical names when the goal is SRD alignment; if a variant label is kept for UX
   reasons, document it as outside the excerpt rather than silently treating it as canonical.
 - If source provenance is unknown, default to `QUARANTINE`, not `KEEP`.

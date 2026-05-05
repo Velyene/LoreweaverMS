@@ -24,6 +24,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -65,8 +69,29 @@ fun ReferenceScreen(
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val contentState = rememberReferenceContentState(uiState)
 	val categoryListStates = rememberReferenceCategoryListStates()
+	val snackbarHostState = remember { SnackbarHostState() }
+	val retryActionLabel = stringResource(R.string.retry_action)
+
+	LaunchedEffect(uiState.error) {
+		uiState.error?.let { errorMessage ->
+			val retryAction = uiState.onRetry
+			val result = snackbarHostState.showSnackbar(
+				message = errorMessage,
+				actionLabel = if (retryAction != null) retryActionLabel else null,
+				duration = SnackbarDuration.Long
+			)
+			if (result == SnackbarResult.ActionPerformed) {
+				viewModel.clearError(errorMessage)
+				retryAction?.invoke()
+			} else {
+				viewModel.clearError(errorMessage)
+			}
+		}
+	}
 
 	uiState.selectedReferenceDetail?.let { detail ->
+		// Detail views temporarily take over the screen instead of nesting inside the tab scaffold so
+		// deep links and in-app detail opens share one consistent back path.
 		GenericReferenceDetailView(
 			detail = detail,
 			onBack = viewModel::clearReferenceDetail
@@ -75,6 +100,7 @@ fun ReferenceScreen(
 	}
 
 	Scaffold(
+		snackbarHost = { SnackbarHost(snackbarHostState) },
 		topBar = {
 			TopAppBar(
 				title = { Text(stringResource(R.string.reference_screen_title)) },
@@ -144,7 +170,7 @@ private fun rememberReferenceCategoryListStates(): Map<ReferenceCategory, LazyLi
 	val diseasesListState = rememberLazyListState()
 	val spellcastingListState = rememberLazyListState()
 	val objectsListState = rememberLazyListState()
-	val madnessListState = rememberLazyListState()
+	val hysteriaListState = rememberLazyListState()
 	val monstersListState = rememberLazyListState()
 	val coreRulesListState = rememberLazyListState()
 	val characterCreationListState = rememberLazyListState()
@@ -155,18 +181,20 @@ private fun rememberReferenceCategoryListStates(): Map<ReferenceCategory, LazyLi
 		diseasesListState,
 		spellcastingListState,
 		objectsListState,
-		madnessListState,
+		hysteriaListState,
 		monstersListState,
 		coreRulesListState,
 		characterCreationListState
 	) {
+		// Keep a dedicated list state per category so switching tabs preserves each section's scroll
+		// position instead of snapping every category back to the top.
 		mapOf(
 			ReferenceCategory.TRAPS to trapsListState,
 			ReferenceCategory.POISONS to poisonsListState,
 			ReferenceCategory.DISEASES to diseasesListState,
 			ReferenceCategory.SPELLCASTING to spellcastingListState,
 			ReferenceCategory.OBJECTS to objectsListState,
-			ReferenceCategory.MADNESS to madnessListState,
+			ReferenceCategory.HYSTERIA to hysteriaListState,
 			ReferenceCategory.MONSTERS to monstersListState,
 			ReferenceCategory.CORE_RULES to coreRulesListState,
 			ReferenceCategory.CHARACTER_CREATION to characterCreationListState
@@ -276,13 +304,13 @@ private fun ReferenceCategoryContent(
 		)
 
 		ReferenceCategory.OBJECTS -> ObjectsContent(listState = categoryListState)
-		ReferenceCategory.MADNESS -> MadnessContent(
-			selectedDuration = uiState.selectedMadnessDuration,
-			lastRoll = uiState.madnessLastRoll,
-			lastResult = uiState.madnessLastResult,
+		ReferenceCategory.HYSTERIA -> HysteriaContent(
+			selectedDuration = uiState.selectedHysteriaDuration,
+			lastRoll = uiState.hysteriaLastRoll,
+			lastResult = uiState.hysteriaLastResult,
 			listState = categoryListState,
-			onDurationSelected = viewModel::selectMadnessDuration,
-			onRoll = viewModel::rollMadness
+			onDurationSelected = viewModel::selectHysteriaDuration,
+			onRoll = viewModel::rollHysteria
 		)
 
 		ReferenceCategory.MONSTERS -> MonstersContent(
@@ -313,6 +341,6 @@ private fun ReferenceCategoryContent(
 
 // Objects content extracted to ReferenceScreenObjects.kt.
 
-// Madness content extracted to ReferenceScreenMadness.kt.
+// Hysteria content extracted to ReferenceScreenHysteria.kt.
 // Spellcasting content extracted to ReferenceScreenSpellcasting.kt.
 

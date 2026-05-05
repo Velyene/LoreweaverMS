@@ -45,6 +45,15 @@ The audit baseline is the user-provided SRD 5.2.1 excerpt covering:
 Goal: treat the pasted excerpt as the current SRD-backed allowlist for magic-item-related
 categories and keep the local reference aligned to that excerpt.
 
+## Contents
+
+- [Summary](#summary)
+- [Hard release overlay](#hard-release-overlay)
+- [Scope reviewed](#scope-reviewed)
+- [Current alignment status](#current-alignment-status)
+- [Verification anchors](#verification-anchors)
+- [Notes for future updates](#notes-for-future-updates)
+
 ## Hard release overlay
 
 For ship decisions, apply this stricter rule on top of the excerpt audit:
@@ -163,10 +172,10 @@ condensed local reference cards, including item-specific embedded tables for ent
 - `Magic Item Rarities and Values`
 - `Magic Item Tools`
 - `Magic Item Crafting Time and Cost`
-- `Sentient Itemâ€™s Alignment`
-- `Sentient Itemâ€™s Communication`
-- `Sentient Itemâ€™s Senses`
-- `Sentient Itemâ€™s Special Purpose`
+- `Sentient Item’s Alignment`
+- `Sentient Item’s Communication`
+- `Sentient Item’s Senses`
+- `Sentient Item’s Special Purpose`
 
 The prior adjacent tables outside the excerpt are no longer surfaced through `ALL_TABLES`:
 
@@ -195,9 +204,7 @@ the provided Magic Items excerpt itself.
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/`
   `ReferenceScreenAdventuringGearSearchTest.kt`
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenMagicItemSearchTest.kt`
--
-
-`app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
+- `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenSpellEconomySearchTest.kt`
 
 - `app/src/test/java/io/github/velyene/loreweaver/ui/screens/ReferenceScreenToolSearchTest.kt`
 

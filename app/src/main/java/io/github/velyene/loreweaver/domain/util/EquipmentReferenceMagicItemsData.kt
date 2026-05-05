@@ -34,7 +34,7 @@ internal object EquipmentReferenceMagicItemsData {
 		detailedMagicItem(
 			name = "Adamantine Armor",
 			subtitle = "Armor (Any Medium or Heavy, Except Hide Armor), Uncommon",
-			body = "This suit of armor is reinforced with adamantine. While youâ€™re wearing it, any Critical Hit against you becomes a normal hit."
+			body = "This suit of armor is reinforced with adamantine. While you’re wearing it, any Critical Hit against you becomes a normal hit."
 		),
 		detailedMagicItem(
 			name = "Amulet of the Planes",
@@ -60,7 +60,7 @@ internal object EquipmentReferenceMagicItemsData {
 			ReferenceTable(
 				title = "Apparatus of the Crab Levers",
 				columns = listOf("Lever", "Effect"),
-				rows = listOf(listOf("1", "Extend and retract the apparatusâ€™s legs"))
+				rows = listOf(listOf("1", "Extend and retract the apparatus’s legs"))
 			)
 		),
 		detailedMagicItem(
@@ -70,7 +70,7 @@ internal object EquipmentReferenceMagicItemsData {
 			ReferenceTable(
 				title = "Bag of Beans Effects",
 				columns = listOf("d100", "Effect"),
-				rows = listOf(listOf("91â€“99", "A cloud giantâ€™s castle rises into the air on the spot."))
+				rows = listOf(listOf("91–99", "A cloud giant’s castle rises into the air on the spot."))
 			)
 		),
 		detailedMagicItem(
@@ -134,7 +134,7 @@ internal object EquipmentReferenceMagicItemsData {
 		detailedMagicItem(
 			name = "Ioun Stone",
 			subtitle = "Wondrous Item, Varies (Requires Attunement)",
-			body = "Different stones orbit your head and grant distinct benefits. One stoneâ€™s mastery effect states: Your Proficiency Bonus increases by 1.",
+			body = "Different stones orbit your head and grant distinct benefits. One stone’s mastery effect states: Your Proficiency Bonus increases by 1.",
 			ReferenceTable(
 				title = "Ioun Stone Properties",
 				columns = listOf("Property", "Benefit"),
@@ -213,7 +213,7 @@ internal object EquipmentReferenceMagicItemsData {
 			ReferenceTable(
 				title = "Wand of Wonder Effects",
 				columns = listOf("d100", "Effect"),
-				rows = listOf(listOf("98â€“00", "The target is Petrified or otherwise transformed in dramatic fashion."))
+				rows = listOf(listOf("98–00", "The target is Petrified or otherwise transformed in dramatic fashion."))
 			)
 		)
 	)

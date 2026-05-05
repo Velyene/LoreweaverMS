@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Loreweaver</string>
-    <string name="home_title">HOME</string>
     <string name="recent_campaigns">Recent campaigns</string>
     <string name="quick_actions">Quick actions</string>
     <string name="start_new_session">Start New Session</string>
@@ -21,6 +20,7 @@
     <string name="home_active_encounter_ready">Ready to resume from the latest tracker state.</string>
     <string name="no_campaigns">No campaigns yet.</string>
     <string name="search_characters_placeholder">Search characters…</string>
+    <string name="search_characters_label">Search characters</string>
     <string name="characters_title">Characters</string>
     <string name="initiative_order_title">Initiative Order</string>
     <string name="round_counter">Round %1$d</string>
@@ -47,7 +47,7 @@
     <string name="initiative_hp_summary">HP: %1$d/%2$d</string>
     <string name="character_list_item_summary">%1$s • HP: %2$d/%3$d • AC: %4$d</string>
     <string name="initiative_accessibility_desc">%1$s, Initiative %2$d, HP %3$d of %4$d%5$s</string>
-    <string name="character_accessibility_desc">%1$s, %2$s. HP %3$d of %4$d. AC %5$d%6$s</string>
+    <string name="character_accessibility_desc">%1$s, %2$s%3$s. HP %4$d of %5$d. AC %6$d%7$s</string>
     <string name="decrease_hp_desc">Decrease HP for %1$s</string>
     <string name="increase_hp_desc">Increase HP for %1$s</string>
     <string name="back_button">Back</string>
@@ -66,13 +66,6 @@
     <string name="tab_combat">Combat</string>
     <string name="tab_stats">Stats</string>
     <string name="tab_journal">Journal</string>
-    <string name="character_status_overview_title">Status Overview</string>
-    <string name="character_status_encounter_conditions_title">Encounter Conditions</string>
-    <string name="character_status_encounter_conditions_empty">No active encounter conditions.</string>
-    <string name="character_status_ongoing_afflictions_title">Ongoing Afflictions</string>
-    <string name="character_status_ongoing_afflictions_empty">No ongoing afflictions.</string>
-    <string name="character_status_persistent_effects_title">Persistent Effects</string>
-    <string name="character_status_persistent_effects_empty">No persistent effects.</string>
     <string name="roll_result_desc">Roll result: %1$s is %2$d</string>
     <string name="clear_button">Clear</string>
     <string name="cancel_button">Cancel</string>
@@ -89,20 +82,41 @@
     <string name="speed_label">Speed</string>
     <string name="insp_label">Insp.</string>
     <string name="inspiration_desc">Inspiration</string>
+    <string name="inspiration_state_on">Inspiration active</string>
+    <string name="inspiration_state_off">Inspiration inactive</string>
     <string name="hp_label">HP</string>
     <string name="temp_hp_label">Temp HP</string>
     <string name="death_saves_label">Death Saves</string>
     <string name="successes_label">Successes: </string>
     <string name="failures_label">Failures: </string>
     <string name="survival_resting_label">Survival &amp; Resting</string>
+    <string name="action_view_title">Action View</string>
+    <string name="action_view_level_label">Level %1$d</string>
+    <string name="action_view_resource_value">%1$d / %2$d</string>
+    <string name="action_view_no_conditions">No active conditions</string>
+    <string name="action_view_tab_actions">Actions</string>
+    <string name="action_view_tab_spells">Spells</string>
+    <string name="action_view_tab_items">Items</string>
+    <string name="action_view_empty_actions">No actions or tracked resources yet.</string>
+    <string name="action_view_empty_spells">No spell slots available for this character.</string>
+    <string name="action_view_empty_items">No inventory items available for quick selection.</string>
+    <string name="action_view_notes_badge">Notes</string>
+    <string name="action_view_spell_level_label">Level %1$d Magic</string>
+    <string name="action_view_use_slot_button">Use Slot</string>
+    <string name="action_view_recover_slot_button">Recover Slot</string>
+    <string name="action_view_detail_panel_title">Detail Panel</string>
+    <string name="action_view_detail_empty">Tap an action, spell slot, or item to inspect it here.</string>
+    <string name="action_view_type_label">Type</string>
+    <string name="action_view_cost_label">Cost</string>
+    <string name="action_view_use_notes_label">Use Notes</string>
     <string name="hit_dice_label">Hit Dice (d%1$d): %2$d / %3$d</string>
     <string name="roll_hd_button">Roll HD</string>
     <string name="short_rest_button">Short Rest</string>
     <string name="long_rest_button">Long Rest</string>
     <string name="spell_slots_label">Spell Slots</string>
     <string name="spell_slot_level">Level %1$d: %2$d / %3$d</string>
-    <string name="use_spell_slot">Use Level %1$d Slot</string>
-    <string name="recover_spell_slot">Recover Level %1$d Slot</string>
+    <string name="use_spell_slot" tools:ignore="PluralsCandidate">Use Level %1$d Slot</string>
+    <string name="recover_spell_slot" tools:ignore="PluralsCandidate">Recover Level %1$d Slot</string>
     <string name="actions_attacks_label">Actions &amp; Attacks</string>
     <string name="dmg_label">Dmg: %1$s</string>
     <string name="atk_button">Atk: %1$s%2$d</string>
@@ -159,17 +173,41 @@
     <string name="dmg_dice_label" tools:keep="@string/dmg_dice_label">Damage (e.g. 1d8+3)</string>
     <string name="add_action_button">Add Action</string>
     <string name="standard_conditions_title" tools:keep="@string/standard_conditions_title">Standard Conditions</string>
+    <string name="action_view_custom_conditions_title">Custom Conditions</string>
     <string name="status_label">Status</string>
     <string name="save_character_button">Save Character</string>
     <string name="mana_stat_label" tools:keep="@string/mana_stat_label">Mana</string>
     <string name="stamina_stat_label" tools:keep="@string/stamina_stat_label">Stamina</string>
     <string name="character_form_quick_build">Quick Build</string>
     <string name="character_form_random_name">Random Name</string>
+    <string name="character_builder_step_counter">Step %1$d of %2$d</string>
+    <string name="character_builder_identity_title">Identity</string>
+    <string name="character_builder_identity_description">Set who this character is before you fine-tune the sheet.</string>
+    <string name="character_builder_core_stats_title">Core Stats</string>
+    <string name="character_builder_core_stats_description">Define level, survivability, ability scores, and key combat math.</string>
+    <string name="character_builder_build_suggestions_title">Build Suggestions</string>
+    <string name="character_builder_build_suggestions_description">Review class-driven recommendations, then shape equipment, resources, and actions.</string>
+    <string name="character_builder_status_notes_title">Status &amp; Notes</string>
+    <string name="character_builder_status_notes_description">Capture current situation, lasting conditions, and anything worth remembering.</string>
+    <string name="character_builder_review_save_title">Review &amp; Save</string>
+    <string name="character_builder_review_save_description">Check the completed builder summary, confirm validation, and save.</string>
+    <string name="character_builder_exit_button">Exit Builder</string>
+    <string name="character_builder_previous_button">Previous</string>
+    <string name="character_builder_continue_button">Continue</string>
+    <string name="species_label">Species</string>
+    <string name="background_label">Background</string>
     <string name="challenge_rating_input_label">Challenge Rating (CR)</string>
     <string name="challenge_rating_supporting_text">e.g., 0.125, 0.25, 0.5, 1, 2, 3…</string>
-    <string name="class_info_hit_die_summary">%1$s — d%2$d hit die</string>
+    <string name="class_info_hit_die_summary" tools:ignore="PluralsCandidate">%1$s — d%2$d hit die</string>
     <string name="class_info_recommended_stats">Recommended: %1$s</string>
     <string name="class_info_spellcaster_summary">Spellcaster ✦ slots scale with level</string>
+    <string name="ability_increase_label">Ability Increase:</string>
+    <string name="languages_label">Languages:</string>
+    <string name="species_traits_label">Traits:</string>
+    <string name="background_feat_label">Feat:</string>
+    <string name="background_skills_label">Skills:</string>
+    <string name="tool_proficiency_label">Tool:</string>
+    <string name="equipment_options_label">Equipment:</string>
     <string name="randomize_button">Randomize</string>
     <string name="save_chip_label">Save</string>
     <string name="hit_points_section_title">Hit Points</string>
@@ -288,6 +326,38 @@ Currency share: %2$s</string>
     <string name="reward_review_party_stash_action">Party Stash</string>
     <string name="reward_review_unclaimed_action">Unclaimed</string>
     <string name="reward_review_assigned_to_character">Assigned to %1$s</string>
+    <string name="current_conditions_label">Current Conditions</string>
+    <string name="current_conditions_supporting_text">Use this for short-lived status notes, concentration, wounds, or encounter-only effects.</string>
+    <string name="encounter_conditions_title">Encounter Conditions</string>
+    <string name="encounter_conditions_supporting_text">Track short-lived SRD conditions and custom effects that matter right now.</string>
+    <string name="encounter_conditions_empty">No encounter conditions selected.</string>
+    <string name="persistent_conditions_title">Persistent Conditions</string>
+    <string name="persistent_conditions_supporting_text">Select ongoing conditions that should stay with the character when saved.</string>
+    <string name="persistent_conditions_empty">No persistent conditions selected.</string>
+    <string name="condition_persistent_chip_suffix">Persistent</string>
+    <string name="encounter_status_notes_label">Encounter Status Notes</string>
+    <string name="encounter_status_notes_supporting_text">Use this for quick reminders like concentration, wounds, tactical state, or scene notes.</string>
+    <string name="srd_conditions_title">SRD Conditions</string>
+    <string name="custom_condition_label">Custom Condition / Effect</string>
+    <string name="character_build_recommended_abilities_title">Recommended Abilities</string>
+    <string name="character_build_generalist_abilities">Balanced, general-purpose spread</string>
+    <string name="character_build_suggested_spells_title">Suggested Spells</string>
+    <string name="character_build_no_spells_suggestion">No class spell suggestions for this build.</string>
+    <string name="character_build_selected_spells_title">Selected Spells</string>
+    <string name="character_build_selected_spells_placeholder">One spell per line…</string>
+    <string name="character_build_apply_spells_button">Use Suggested Spells as Starter Spell List</string>
+    <string name="character_build_suggested_equipment_title">Suggested Equipment</string>
+    <string name="character_build_no_equipment_suggestion">No starter equipment suggestions available.</string>
+    <string name="character_build_apply_equipment_button">Use Suggested Equipment as Starter Inventory</string>
+    <string name="character_build_guidance_title">Build Guidance</string>
+    <string name="character_builder_review_intro">Review the full summary below before saving. Recommended identity fields can still be left blank, but required validation must pass.</string>
+    <string name="character_builder_validation_title">Validation Pass</string>
+    <string name="character_builder_validation_name">Name provided</string>
+    <string name="character_builder_validation_hp">HP is numeric</string>
+    <string name="character_builder_validation_species">Species chosen (recommended)</string>
+    <string name="character_builder_validation_background">Background chosen (recommended)</string>
+    <string name="character_builder_validation_ready">Ready</string>
+    <string name="character_builder_validation_attention">Needs attention</string>
 
     <!-- Classes/Types -->
     <string name="class_rogue" tools:keep="@string/class_rogue">Rogue</string>
@@ -342,6 +412,26 @@ Currency share: %2$s</string>
     <string name="cond_restrained" tools:keep="@string/cond_restrained">Restrained</string>
     <string name="cond_stunned" tools:keep="@string/cond_stunned">Stunned</string>
     <string name="cond_unconscious" tools:keep="@string/cond_unconscious">Unconscious</string>
+    <string name="cond_bleeding">Bleeding</string>
+    <string name="cond_blessed">Blessed</string>
+    <string name="cond_burning">Burning</string>
+    <string name="cond_concentrating">Concentrating</string>
+    <string name="cond_cursed">Cursed</string>
+    <string name="cond_dodging">Dodging</string>
+    <string name="cond_hasted">Hasted</string>
+    <string name="cond_hexed">Hexed</string>
+    <string name="cond_hidden">Hidden</string>
+    <string name="cond_inspired">Inspired</string>
+    <string name="cond_marked">Marked</string>
+    <string name="cond_raging">Raging</string>
+    <string name="cond_slowed">Slowed</string>
+
+    <!-- Add Condition Dialog -->
+    <string name="add_condition_dialog_title">Add Condition</string>
+    <string name="add_condition_dialog_condition_label">Condition</string>
+    <string name="add_condition_dialog_has_duration_label">Has duration (in rounds)</string>
+    <string name="add_condition_dialog_duration_label">Duration (rounds)</string>
+    <string name="add_condition_dialog_duration_placeholder">e.g., 3</string>
 
     <!-- Prompt Library -->
     <string name="prompt_library_title">Prompt Library</string>
@@ -388,9 +478,13 @@ Currency share: %2$s</string>
     <string name="clear_log_confirm_title">Clear adventure log?</string>
     <string name="clear_log_confirm_message">This will remove all saved log entries.</string>
     <string name="adventure_log_empty_message">The chronicles are empty…</string>
+    <string name="adventure_log_error_load">Failed to load adventure log</string>
+    <string name="adventure_log_error_clear">Failed to clear adventure log</string>
 
     <!-- Campaigns -->
     <string name="campaigns_title">Campaigns</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="message_with_detail">%1$s: %2$s</string>
     <string name="create_campaign_desc">Create new campaign</string>
     <string name="new_campaign_button">New Campaign</string>
     <string name="campaigns_empty_message">No campaigns found.
@@ -411,12 +505,23 @@ Create one to begin your journey!</string>
     <string name="campaign_loading_title">Loading…</string>
     <string name="campaign_load_failed_message">Campaign couldn’t be loaded right now.</string>
     <string name="campaign_not_found_message">Campaign not found.</string>
+    <string name="campaign_error_critical">Critical error</string>
+    <string name="campaign_error_load_campaigns">Failed to load campaigns</string>
+    <string name="campaign_error_load_sessions">Failed to load sessions</string>
+    <string name="campaign_error_load_encounters">Failed to load encounters</string>
+    <string name="campaign_error_load_notes">Failed to load notes</string>
+    <string name="campaign_error_add_campaign">Failed to add campaign</string>
+    <string name="campaign_error_add_encounter">Failed to add encounter</string>
+    <string name="campaign_error_add_note">Failed to add note</string>
+    <string name="campaign_error_update_note">Failed to update note</string>
+    <string name="campaign_error_delete_note">Failed to delete note</string>
     <string name="campaign_tab_lore_notes">Lore &amp; Notes</string>
     <string name="campaign_tab_sessions">Sessions</string>
     <string name="campaign_tab_encounters">Encounters</string>
     <string name="notes_list_header">Notes list</string>
     <string name="notes_quick_actions_title">Quick Actions</string>
     <string name="new_note_button">New Note</string>
+    <string name="generate_random_calendar_button">Random Calendar</string>
     <string name="campaign_notes_empty_message">No notes for this campaign.</string>
     <string name="edit_note_desc">Edit note</string>
     <string name="delete_note_desc">Delete note</string>
@@ -439,7 +544,10 @@ Create one to begin your journey!</string>
     <string name="note_extra_historical_era_label">Historical Era</string>
     <string name="note_extra_region_label">Region</string>
     <string name="sessions_empty_message">No sessions recorded yet.</string>
-    <string name="session_entries_count">%1$d entries</string>
+    <plurals name="session_entries_count">
+        <item quantity="one">%d entry</item>
+        <item quantity="other">%d entries</item>
+    </plurals>
     <string name="encounters_section_title">Encounters</string>
     <string name="add_encounter_button">Add Encounter</string>
     <string name="encounters_empty_message">No encounters yet. Tap "Add Encounter" to create
@@ -461,10 +569,13 @@ Create one to begin your journey!</string>
     <string name="encounter_creation_setup_message">Create the encounter shell now, then choose saved party members, add enemies, and add notes from the setup screen.</string>
     <string name="monster_import_removed_message">Monster library import has been removed from
         this build.</string>
+    <string name="encounter_not_found_message">Encounter not found.</string>
+    <string name="encounter_error_load">Failed to load encounter</string>
+    <string name="encounter_error_start">Failed to start encounter</string>
+    <string name="encounter_error_save">Failed to save encounter</string>
     <string name="encounter_monster_picker_helper">Add monsters from the local library below. Selected creatures will be imported into the encounter with their reference stats.</string>
     <string name="encounter_monster_picker_empty">No monsters match the current search and filters.</string>
-    <string name="encounter_selected_monsters_count">%1$d monsters selected</string>
-    <string name="encounter_selected_monsters_more">+%1$d more</string>
+    <string name="encounter_selected_monsters_more" tools:ignore="PluralsCandidate">+%1$d more</string>
     <string name="encounter_no_monsters_selected">No monsters selected yet.</string>
     <string name="encounter_add_monster_button">Add</string>
     <string name="encounter_remove_all_button">Remove</string>
@@ -489,6 +600,10 @@ Create one to begin your journey!</string>
         <item quantity="one">%d matching monster</item>
         <item quantity="other">%d matching monsters</item>
     </plurals>
+    <plurals name="encounter_created_with_monsters_message">
+        <item quantity="one">Encounter created with %d monster!</item>
+        <item quantity="other">Encounter created with %d monsters!</item>
+    </plurals>
     <string name="confirm_delete_note_title">Delete note?</string>
     <string name="confirm_delete_note_message">This note will be permanently removed from the
         campaign.</string>
@@ -512,6 +627,14 @@ Create one to begin your journey!</string>
     <string name="session_summary_offline_subtitle">Your progress stays available offline</string>
     <string name="session_summary_persist_state_message">Your encounter is saved
 and ready when you return</string>
+
+    <!-- Character errors -->
+    <string name="character_error_load">Failed to load characters</string>
+    <string name="character_error_not_found">Character not found</string>
+    <string name="character_error_add">Failed to add character</string>
+    <string name="character_error_update">Failed to update character</string>
+    <string name="character_error_delete">Failed to delete character</string>
+    <string name="session_summary_badge">ENCOUNTER SAVED</string>
     <string name="session_summary_done_button">Return Home</string>
     <string name="session_summary_open_adventure_log">Open Adventure Log</string>
     <string name="encounter_summary_log_title">Combat Log Snippet</string>
@@ -525,6 +648,8 @@ and ready when you return</string>
     <string name="session_combat_log_title">Combat Log</string>
     <string name="session_summary_empty_message">No recent encounter summary is available.</string>
     <string name="session_summary_load_failed_message">Encounter summary couldn’t be loaded right now.</string>
+    <string name="session_summary_error_no_recent">No recent encounter summary is available.</string>
+    <string name="session_summary_error_load">Failed to load encounter summary.</string>
     <string name="session_summary_rounds_title">Total Rounds</string>
     <string name="encounter_summary_rounds_title">Rounds Completed</string>
     <string name="session_summary_survivors_count_title">Survivors</string>
@@ -532,9 +657,7 @@ and ready when you return</string>
     <string name="session_summary_saved_title">Outcome</string>
     <string name="session_summary_saved_subtitle">Saved</string>
     <string name="session_summary_surviving_players_title">Surviving Players</string>
-    <string name="session_summary_no_survivors_message">No players survived this encounter.</string>
     <string name="session_summary_defeated_enemies_title">Defeated Enemies</string>
-    <string name="session_summary_no_defeated_enemies_message">No enemies were defeated before the encounter ended.</string>
     <string name="session_summary_persistent_statuses_title">Persistent Statuses Remaining</string>
     <string name="session_summary_rewards_title">Encounter Rewards</string>
     <string name="session_summary_no_persistent_statuses_message">No persistent statuses remain on the party.</string>
@@ -704,6 +827,10 @@ and ready when you return</string>
     <string name="encounter_compact_mode_off">Compact mode off</string>
     <string name="encounter_compact_mode_enable_action">Use compact mode</string>
     <string name="encounter_compact_mode_disable_action">Use standard mode</string>
+    <string name="encounter_resource_temp_hp">Temp HP %1$d</string>
+    <string name="encounter_resource_mana">Mana %1$d/%2$d</string>
+    <string name="encounter_resource_stamina">Stamina %1$d/%2$d</string>
+    <string name="encounter_resource_named">%1$s %2$d/%3$d</string>
     <string name="encounter_active_panel_title">Active Turn</string>
     <string name="encounter_active_panel_empty_message">No active participant is available. Start the encounter or advance the turn order to continue.</string>
     <string name="encounter_active_panel_shared_tracker_supporting_text">One-device shared control: players call their move, and the DM records the action, target, outcome, HP, and statuses here.</string>
@@ -815,10 +942,11 @@ and ready when you return</string>
     <string name="encounter_move_later_button">Later</string>
     <string name="encounter_roster_empty_message">No combatants added yet.
 Add your party or individual enemies above.</string>
-    <string name="combatant_setup_summary">HP: %1$d  Init: %2$d</string>
+    <string name="combatant_setup_summary" tools:ignore="PluralsCandidate">HP: %1$d  Init: %2$d</string>
     <string name="remove_combatant_desc">Remove %1$s from encounter</string>
     <string name="remove_combatant_confirm_title">Remove combatant?</string>
     <string name="remove_combatant_confirm_message">Remove %1$s from the encounter roster?</string>
+    <string name="combatant_setup_content_description">%1$s. %2$s</string>
     <string name="encounter_notes_title">Encounter notes</string>
     <string name="encounter_notes_section_title">Encounter Notes</string>
     <string name="encounter_notes_collapsed_empty">No notes yet. Expand to add setup details.</string>
@@ -850,10 +978,6 @@ Add your party or individual enemies above.</string>
     <string name="damage_combatant_desc">Deal 1 damage to %1$s</string>
     <string name="heal_combatant_desc">Heal %1$s by 1</string>
     <string name="add_condition_desc">Add condition</string>
-    <string name="add_condition_dialog_title">Add Condition</string>
-    <string name="condition_label">Condition</string>
-    <string name="condition_has_duration_label">Has duration (in rounds)</string>
-    <string name="condition_persistent_label">Persistent across encounters</string>
     <string name="condition_persistent_chip_suffix">(Persistent)</string>
     <string name="condition_duration_rounds_label">Duration (rounds)</string>
     <string name="condition_duration_placeholder">e.g., 3</string>
@@ -863,12 +987,15 @@ Add your party or individual enemies above.</string>
     <string name="character_status_manage_persistent_supporting_text">Choose a status to record as a long-term effect so this character\'s ongoing state stays current between encounters.</string>
     <string name="character_status_current_persistent_effects_title">Current Persistent Effects</string>
     <string name="remove_condition_desc">Remove condition</string>
+    <string name="remove_condition_desc_with_name">Remove condition %1$s</string>
+    <string name="conditions_state_description">Conditions: %1$s</string>
     <string name="status_chip_reference_available">Reference details available</string>
     <string name="status_chip_status_only">Status only</string>
     <string name="combatant_initiative_summary">Init: %1$d</string>
-    <string name="combatant_turn">Turn: %1$s</string>
     <string name="combatant_hp_label">HP: %1$d/%2$d</string>
     <string name="combatant_hp_label_with_temp">HP: %1$d/%2$d +%3$d</string>
+    <string name="combatant_header_state_description">%1$s, %2$s</string>
+    <string name="encounter_difficulty_accessibility_desc">Encounter Difficulty: %1$s. Adjusted XP: %2$d</string>
     <string name="combat_log_bullet">• %1$s</string>
     <string name="encounter_log_feed_supporting_text">Rolling feed for the DM-managed shared tracker: damage, healing, conditions, turn changes, round changes, and quick encounter notes.</string>
     <string name="combat_log_collapsed_empty">No combat log entries yet.</string>
@@ -883,7 +1010,7 @@ Add your party or individual enemies above.</string>
     <string name="reference_tab_diseases" tools:keep="@string/reference_tab_diseases">Diseases</string>
     <string name="reference_tab_spellcasting">Spellcasting</string>
     <string name="reference_tab_objects" tools:keep="@string/reference_tab_objects">Objects</string>
-    <string name="reference_tab_madness">Madness</string>
+    <string name="reference_tab_hysteria">Hysteria</string>
     <string name="reference_tab_monsters">Monsters</string>
     <string name="reference_monster_filter_all">All</string>
     <string name="reference_monster_filter_shortcuts">Shortcuts</string>
@@ -904,6 +1031,11 @@ Add your party or individual enemies above.</string>
     <string name="reference_core_rules_adventuring">Adventuring</string>
     <string name="reference_core_rules_combat">Combat</string>
     <string name="reference_tab_with_favorites_count">%1$s, %2$d favorites</string>
+    <plurals name="reference_tab_with_favorites_count">
+        <item quantity="one">%1$s, %2$d favorite</item>
+        <item quantity="other">%1$s, %2$d favorites</item>
+    </plurals>
+    <string name="reference_search_label">Search reference</string>
     <string name="reference_search_hint">Search…</string>
     <string name="reference_back_to_list">Back to list</string>
     <string name="reference_roll_d100">Roll d100</string>
@@ -995,8 +1127,13 @@ Add your party or individual enemies above.</string>
     <string name="reference_detail_section_ability_scores">Ability Scores</string>
     <string name="reference_detail_section_profile">Profile</string>
     <string name="reference_search_updating">Updating search results…</string>
-    <string name="reference_search_results_count">%1$d results for “%2$s”</string>
+    <plurals name="reference_search_results_count">
+        <item quantity="one">%1$d result for “%2$s”</item>
+        <item quantity="other">%1$d results for “%2$s”</item>
+    </plurals>
     <string name="reference_search_results_ready">Showing filtered results for “%1$s”</string>
+    <string name="reference_preferences_load_error">Failed to load reference favorites.</string>
+    <string name="reference_preferences_update_error">Failed to update reference favorites.</string>
     <string name="reference_no_favorite_traps">No favorite traps yet. Star a trap to keep it
         handy.</string>
     <string name="reference_no_favorite_poisons">No favorite poisons yet. Star a poison to keep
@@ -1012,10 +1149,6 @@ Add your party or individual enemies above.</string>
     <string name="reference_copy_to_clipboard">Copy to clipboard</string>
     <string name="reference_share">Share</string>
     <string name="reference_share_chooser_title">Share reference</string>
-    <string name="reference_monster_unavailable">Monster reference content has been removed from
-        this build pending provenance review.</string>
-    <string name="reference_monster_search_unavailable">Monster search is unavailable in this build
-        because the bundled monster corpus has been removed pending provenance review.</string>
     <string name="reference_class_unavailable_title">Class reference unavailable</string>
     <string name="reference_class_unavailable_body">Bundled class reference content has been
         removed from this build pending provenance review.</string>
@@ -1111,7 +1244,7 @@ Add your party or individual enemies above.</string>
     <string name="spellcasting_proficiency_bonus_label">Prof. Bonus</string>
     <string name="spellcasting_misc_bonus_label">Misc. Bonus</string>
     <string name="spellcasting_caster_level_label">Caster Level</string>
-    <string name="spellcasting_selected_level_summary" tools:keep="@string/spellcasting_selected_level_summary">Using level %1$d full-caster progression</string>
+    <string name="spellcasting_selected_level_summary" tools:keep="@string/spellcasting_selected_level_summary" tools:ignore="PluralsCandidate">Using level %1$d full-caster progression</string>
     <string name="spellcasting_selected_progression_summary">Using %1$s progression at level
         %2$d</string>
     <string name="spellcasting_rules_section_title">Core Rules</string>
@@ -1122,18 +1255,24 @@ Add your party or individual enemies above.</string>
     <string name="spellcasting_areas_section_title">Areas of Effect</string>
     <string name="spellcasting_spell_lists_section_title" tools:keep="@string/spellcasting_spell_lists_section_title">Class Spell Lists</string>
     <string name="spellcasting_spell_list_summary_title" tools:keep="@string/spellcasting_spell_list_summary_title">%1$s Spell List</string>
-    <string name="spellcasting_spell_list_summary_body" tools:keep="@string/spellcasting_spell_list_summary_body">Showing %1$d spells from the selected class list.</string>
+    <plurals name="spellcasting_spell_list_summary_body" tools:keep="@plurals/spellcasting_spell_list_summary_body">
+        <item quantity="one">Showing %1$d spell from the selected class list.</item>
+        <item quantity="other">Showing %1$d spells from the selected class list.</item>
+    </plurals>
     <string name="spellcasting_spell_list_unavailable_title" tools:keep="@string/spellcasting_spell_list_unavailable_title">Class Spell List Unavailable</string>
-    <string name="spellcasting_spell_count" tools:keep="@string/spellcasting_spell_count">%1$d spells</string>
+    <plurals name="spellcasting_spell_count" tools:keep="@plurals/spellcasting_spell_count">
+        <item quantity="one">%d spell</item>
+        <item quantity="other">%d spells</item>
+    </plurals>
     <string name="spellcasting_slots_section_title">Spell Slot Progression</string>
     <string name="spellcasting_tips_section_title">Quick Tips</string>
     <string name="spellcasting_weave_section_title">Magic Theory</string>
     <string name="spellcasting_weave_card_title">Setting-Neutral Primer</string>
     <string name="spellcasting_level_row">Level %1$d</string>
     <string name="spellcasting_cantrips_row">Cantrips %1$d</string>
-    <string name="madness_roll_result_title">Roll Result: %1$d</string>
+    <string name="hysteria_roll_result_title">Roll Result: %1$d</string>
     <string name="reference_rolling_d100">Rolling…</string>
-    <string name="madness_rolling_preview_title">Rolling: %1$d</string>
-    <string name="madness_rolling_preview_body">The result is still tumbling through the
+    <string name="hysteria_rolling_preview_title">Rolling: %1$d</string>
+    <string name="hysteria_rolling_preview_body">The result is still tumbling through the
         table…</string>
 </resources>

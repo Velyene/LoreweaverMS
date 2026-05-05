@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. Reference detail models (ReferenceDetailSection, ReferenceDetailContent)
- * 2. ReferenceDetailResolver singleton â€” category constants, slug helpers, and detail resolution
+ * 2. ReferenceDetailResolver singleton — category constants, slug helpers, and detail resolution
  */
 
 package io.github.velyene.loreweaver.domain.util
@@ -50,7 +50,7 @@ object ReferenceDetailResolver {
 
 	private val whitespaceRegex = Regex("\\s+")
 	private val punctuationRegex = Regex("[^a-z0-9]+")
-	private val apostropheVariantRegex = Regex("â€™|â€˜|`|Â´")
+	private val apostropheVariantRegex = Regex("’|‘|\u00e2\u20ac\u2122|\u00e2\u20ac\u02dc|`|´|\u00c2\u00b4")
 
 	fun slugFor(name: String): String = normalizeKey(name).replace(' ', '-')
 
@@ -58,6 +58,9 @@ object ReferenceDetailResolver {
 		if (category.isBlank() || slug.isBlank()) return null
 
 		return when {
+			// Deep links can arrive from bottom-nav routes, in-screen chips, or older saved links that
+			// use slightly different section names. Resolve through aliases so those entry points keep
+			// landing on the same canonical detail content.
 			matchesCategory(category, CATEGORY_CONDITIONS, "Condition") -> resolveCondition(slug)
 			matchesCategory(category, CATEGORY_ACTIONS, "Action") -> resolveGlossary(
 				slug = slug,
@@ -82,7 +85,7 @@ object ReferenceDetailResolver {
 			matchesCategory(category, CATEGORY_ARMOR, "Armour") -> resolveArmor(slug)
 			matchesCategory(category, CATEGORY_TOOLS, "Tool", "Tool Reference") -> resolveTool(slug)
 			matchesCategory(category, CATEGORY_ADVENTURING_GEAR) -> resolveAdventuringGear(slug)
-			matchesCategory(category, CATEGORY_MAGIC_ITEMS, "Magic Item", "Magic Items A-Z", "Magic Items Aâ€“Z") -> resolveMagicItem(
+			matchesCategory(category, CATEGORY_MAGIC_ITEMS, "Magic Item", "Magic Items A-Z", "Magic Items A–Z") -> resolveMagicItem(
 				slug
 			)
 
@@ -164,7 +167,7 @@ object ReferenceDetailResolver {
 			title = feat.name,
 			subtitle = buildString {
 				append(CATEGORY_FEATS)
-				append(" â€¢ ")
+				append(" • ")
 				append(feat.category)
 			},
 			statRows = buildList {
@@ -395,7 +398,7 @@ object ReferenceDetailResolver {
 			title = row.firstOrNull().orEmpty(),
 			subtitle = table.title,
 			statRows = columns.zip(values)
-				.filter { (_, value) -> value.isNotBlank() && value != "â€”" }
+				.filter { (_, value) -> value.isNotBlank() && value != "—" }
 		)
 	}
 
@@ -412,6 +415,8 @@ object ReferenceDetailResolver {
 	private fun normalizeKey(value: String): String {
 		return value
 			.trim()
+			// Normalize smart quotes and mojibake apostrophe variants before punctuation stripping so
+			// copied text, saved slugs, and manually typed lookups collapse to one comparable key.
 			.replace(apostropheVariantRegex, "'")
 			.replace("&", " and ")
 			.lowercase()

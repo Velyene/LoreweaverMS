@@ -482,7 +482,7 @@ private fun DiseaseCard(
 			}
 			Spacer(modifier = Modifier.height(4.dp))
 			Text(
-				"DC ${disease.saveDC} â€¢ Incubation: ${disease.incubationTime}",
+				"DC ${disease.saveDC} • Incubation: ${disease.incubationTime}",
 				style = MaterialTheme.typography.bodySmall,
 				color = MaterialTheme.colorScheme.onSurfaceVariant
 			)
@@ -592,7 +592,7 @@ private fun DiseaseStatsCard(disease: DiseaseTemplate) {
 
 private fun buildTrapClipboardText(trap: TrapTemplate): String = buildString {
 	appendLine(trap.name)
-	appendLine("${trap.type} â€¢ ${trap.danger.name}")
+	appendLine("${trap.type} • ${trap.danger.name}")
 	appendLine("Detection DC: ${trap.detectionDC}")
 	appendLine("Disarm DC: ${trap.disarmDC}")
 	appendLine("Save DC: ${trap.saveDC}")

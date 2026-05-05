@@ -5,22 +5,10 @@ Snapshot date: 2026-04-20
 This note translates the project's current repo state into the user's **"If I cannot prove this came
 from SRD 5.2.1, it does not go in the shipped app"** rule.
 
-
 ## Contents
 
 - [Release-blocking do-not-ship checklist](#release-blocking-do-not-ship-checklist)
-  - [One-line decision rule](#one-line-decision-rule)
 - [Loreweaver hard do-not-ship check](#loreweaver-hard-do-not-ship-check)
-  - [1. Source check](#1-source-check)
-  - [2. Spells](#2-spells)
-  - [3. Feats](#3-feats)
-  - [4. Weapons](#4-weapons)
-  - [5. Armor](#5-armor)
-  - [6. Tools](#6-tools)
-  - [7. Adventuring gear](#7-adventuring-gear)
-  - [8. Text blocks](#8-text-blocks)
-  - [9. Branding / presentation](#9-branding-presentation)
-  - [10. Unknown or messy content](#10-unknown-or-messy-content)
 - [Safe replacement rule](#safe-replacement-rule)
 - [File-by-file one-line rule](#file-by-file-one-line-rule)
 - [Audit basis used for this snapshot](#audit-basis-used-for-this-snapshot)
@@ -28,14 +16,9 @@ from SRD 5.2.1, it does not go in the shipped app"** rule.
 - [High-level result](#high-level-result)
 - [Existing checks that already pass](#existing-checks-that-already-pass)
 - [Historical hard do-not-ship findings](#historical-hard-do-not-ship-findings)
-  - [1. Quarantine now — bundled reference corpora with explicit risk signals](#1-quarantine-now-bundled-reference-corpora-with-explicit-risk-signals)
-  - [2. Re-verify before ship — specific structured entries that conflict with the hard checklist](#2-re-verify-before-ship-specific-structured-entries-that-conflict-with-the-hard-checklist)
-  - [3. Search-surface warning — current UI still exposes high-risk corpora](#3-search-surface-warning-current-ui-still-exposes-high-risk-corpora)
 - [Items that currently look comparatively safer](#items-that-currently-look-comparatively-safer)
-- [Branding / presentation check](#branding-presentation-check)
+- [Branding / presentation check](#branding--presentation-check)
 - [Recommended ship gate](#recommended-ship-gate)
-  - [KEEP in shipped build only after proof](#keep-in-shipped-build-only-after-proof)
-  - [QUARANTINE before ship](#quarantine-before-ship)
 - [Minimal next-step checklist](#minimal-next-step-checklist)
 - [Fast Android Studio search terms](#fast-android-studio-search-terms)
 
@@ -233,20 +216,22 @@ This file now serves as both:
 
 At the current repo snapshot:
 
-- the previously flagged bundled monster/class/spell corpora are no longer present under
-  `app/src/main`
-- `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` reports **0** discovered excluded-corpus files
-- the Reference screen includes reviewed SRD-derived monster reference content
-- concise monster-running guidance still ships through reviewed `CoreRulesReference` content
+- bundled local monster reference data is present under `app/src/main` and exposed through the
+  `Monsters` tab in `ReferenceScreen.kt`
+- that monster corpus must stay aligned with the repo-owned monster audit documents rather than be
+  treated as an excluded-corpus false positive
+- the local `ContentSafetyAuditTest` audit path still concerns separately inventoried excluded
+  corpus files, not every reviewed SRD-backed dataset that intentionally ships in the app
+- concise monster-running guidance also ships through reviewed `CoreRulesReference` content
 
 ## High-level result
 
 **Treat this note as the strict shipping policy, not as evidence that the previously flagged corpora
 still ship today.**
 
-The current workspace still requires SRD-only proof discipline, but the specific bundled corpora
-called out below were historical findings that have since been removed from `app/src/main` during
-the quarantine/alignment work.
+The current workspace still requires SRD-only proof discipline. Some bundled corpora were removed
+during quarantine/alignment work, but the reviewed local monster reference corpus is present again
+in the current repo state and must continue to satisfy the SRD-only gate.
 
 ## Existing checks that already pass
 

@@ -24,7 +24,10 @@ import io.github.velyene.loreweaver.ui.theme.MutedText
 import io.github.velyene.loreweaver.ui.theme.PanelSurface
 
 @Composable
-internal fun NotesQuickActions(onAddNoteClick: () -> Unit) {
+internal fun NotesQuickActions(
+	onAddNoteClick: () -> Unit,
+	onGenerateCalendarClick: () -> Unit,
+) {
 	SectionHeader(stringResource(R.string.notes_quick_actions_title))
 	Row(
 		modifier = Modifier
@@ -34,6 +37,7 @@ internal fun NotesQuickActions(onAddNoteClick: () -> Unit) {
 	) {
 		Button(
 			onClick = onAddNoteClick,
+			modifier = Modifier.weight(1f),
 			colors = ButtonDefaults.buttonColors(containerColor = PanelSurface),
 			border = BorderStroke(1.dp, ArcaneTeal)
 		) {
@@ -46,6 +50,25 @@ internal fun NotesQuickActions(onAddNoteClick: () -> Unit) {
 			Spacer(modifier = Modifier.size(8.dp))
 			Text(
 				text = stringResource(R.string.new_note_button),
+				color = ArcaneTeal,
+				fontSize = 12.sp
+			)
+		}
+		Button(
+			onClick = onGenerateCalendarClick,
+			modifier = Modifier.weight(1f),
+			colors = ButtonDefaults.buttonColors(containerColor = PanelSurface),
+			border = BorderStroke(1.dp, ArcaneTeal)
+		) {
+			Icon(
+				imageVector = Icons.Default.Add,
+				contentDescription = null,
+				tint = ArcaneTeal,
+				modifier = Modifier.size(16.dp)
+			)
+			Spacer(modifier = Modifier.size(8.dp))
+			Text(
+				text = stringResource(R.string.generate_random_calendar_button),
 				color = ArcaneTeal,
 				fontSize = 12.sp
 			)

@@ -8,7 +8,7 @@ import org.junit.Assert.assertTrue
 
 internal fun createViewModel(
 	repository: TestReferencePreferencesRepository = TestReferencePreferencesRepository()
-): ReferenceViewModel = ReferenceViewModel(repository)
+): ReferenceViewModel = ReferenceViewModel(repository, fakeAppText)
 
 internal fun <T> assertFilteredLabels(
 	expected: List<String>,
@@ -41,20 +41,26 @@ internal class TestReferencePreferencesRepository : ReferencePreferencesReposito
 	private val _favoriteTrapNames = MutableStateFlow(emptySet<String>())
 	private val _favoritePoisonNames = MutableStateFlow(emptySet<String>())
 	private val _favoriteDiseaseNames = MutableStateFlow(emptySet<String>())
+	var toggleTrapFavoriteException: Exception? = null
+	var togglePoisonFavoriteException: Exception? = null
+	var toggleDiseaseFavoriteException: Exception? = null
 
 	override val favoriteTrapNames: StateFlow<Set<String>> = _favoriteTrapNames
 	override val favoritePoisonNames: StateFlow<Set<String>> = _favoritePoisonNames
 	override val favoriteDiseaseNames: StateFlow<Set<String>> = _favoriteDiseaseNames
 
 	override suspend fun toggleTrapFavorite(name: String) {
+		toggleTrapFavoriteException?.let { throw it }
 		_favoriteTrapNames.value = _favoriteTrapNames.value.toggle(name)
 	}
 
 	override suspend fun togglePoisonFavorite(name: String) {
+		togglePoisonFavoriteException?.let { throw it }
 		_favoritePoisonNames.value = _favoritePoisonNames.value.toggle(name)
 	}
 
 	override suspend fun toggleDiseaseFavorite(name: String) {
+		toggleDiseaseFavoriteException?.let { throw it }
 		_favoriteDiseaseNames.value = _favoriteDiseaseNames.value.toggle(name)
 	}
 

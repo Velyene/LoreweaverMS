@@ -2,9 +2,8 @@
  * FILE: MonsterReferenceDataOtoR.kt
  *
  * TABLE OF CONTENTS:
- * 1. Object: MonsterReferenceDataOtoR
- * 2. Value: ENTRIES
- * 3. Function: monster
+ * 1. Public monster dataset object and entry list
+ * 2. Monster entries O-R
  */
 
 package io.github.velyene.loreweaver.domain.util

@@ -33,12 +33,17 @@ internal fun CombatantHeaderRow(
 ) {
 	val initiativeSummary = stringResource(R.string.combatant_initiative_summary, combatant.initiative)
 	val hpSummary = formatCombatantHpLabel(combatant)
+	val stateSummary = stringResource(
+		R.string.combatant_header_state_description,
+		initiativeSummary,
+		hpSummary
+	)
 
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
 			.semantics {
-				stateDescription = "$initiativeSummary, $hpSummary"
+				stateDescription = stateSummary
 			},
 		verticalAlignment = Alignment.CenterVertically
 	) {

@@ -1,9 +1,17 @@
+/*
+ * FILE: ReferenceModels.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. ReferenceCategory model enum
+ * 2. ReferenceUiState model
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import androidx.annotation.Keep
 import io.github.velyene.loreweaver.domain.util.DiseaseReference
 import io.github.velyene.loreweaver.domain.util.DiseaseTemplate
-import io.github.velyene.loreweaver.domain.util.MadnessDuration
+import io.github.velyene.loreweaver.domain.util.HysteriaDuration
 import io.github.velyene.loreweaver.domain.util.MonsterReferenceCatalog
 import io.github.velyene.loreweaver.domain.util.MonsterReferenceEntry
 import io.github.velyene.loreweaver.domain.util.PoisonReference
@@ -14,9 +22,6 @@ import io.github.velyene.loreweaver.domain.util.TrapReference
 import io.github.velyene.loreweaver.domain.util.TrapTemplate
 import kotlinx.serialization.Serializable
 
-/**
- * Reference categories
- */
 @Keep
 @Serializable
 enum class ReferenceCategory {
@@ -25,16 +30,16 @@ enum class ReferenceCategory {
 	DISEASES,
 	SPELLCASTING,
 	OBJECTS,
-	MADNESS,
+	HYSTERIA,
 	MONSTERS,
 	CORE_RULES,
 	CHARACTER_CREATION
 }
 
-/**
- * UI state for reference screen
- */
 data class ReferenceUiState(
+	val isLoading: Boolean = true,
+	val error: String? = null,
+	val onRetry: (() -> Unit)? = null,
 	val selectedCategory: ReferenceCategory = ReferenceCategory.TRAPS,
 	val searchQuery: String = "",
 	val appliedSearchQuery: String = "",
@@ -59,8 +64,8 @@ data class ReferenceUiState(
 	val selectedPoison: PoisonTemplate? = null,
 	val selectedDisease: DiseaseTemplate? = null,
 	val selectedReferenceDetail: ReferenceDetailContent? = null,
-	val selectedMadnessDuration: MadnessDuration = MadnessDuration.SHORT_TERM,
-	val madnessLastRoll: Int? = null,
-	val madnessLastResult: String? = null
+	val selectedHysteriaDuration: HysteriaDuration = HysteriaDuration.SHORT_TERM,
+	val hysteriaLastRoll: Int? = null,
+	val hysteriaLastResult: String? = null
 )
 

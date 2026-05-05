@@ -2,11 +2,11 @@
  * FILE: ReferenceScreenCoreRules.kt
  *
  * TABLE OF CONTENTS:
- * 1. Core Rules content entry point and derived state
- * 2. Glossary and table filtering helpers
+ * 1. Core rules content entry point and derived state
+ * 2. Glossary and table filtering
  * 3. Lazy-list renderers for rules, glossary, and quick tables
- * 4. Core Rules glossary and subtab UI components
- * 5. Search helpers
+ * 4. Core rules glossary and subtab UI components
+ * 5. Search support
  */
 
 package io.github.velyene.loreweaver.ui.screens

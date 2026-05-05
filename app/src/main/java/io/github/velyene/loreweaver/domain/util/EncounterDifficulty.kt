@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. DifficultyRating enum and EncounterDifficultyResult model
- * 2. EncounterDifficulty singleton â€” XP thresholds, multiplier tables, and calculation logic
+ * 2. EncounterDifficulty singleton — XP thresholds, multiplier tables, and calculation logic
  */
 
 package io.github.velyene.loreweaver.domain.util

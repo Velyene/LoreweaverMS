@@ -2,14 +2,11 @@
  * FILE: MonsterReferenceDataAnimals.kt
  *
  * TABLE OF CONTENTS:
- * 1. Value: ANIMAL_MOD_SAVE_PREFIX
- * 2. Value: ANIMAL_AC_PREFIX
- * 3. Value: ANIMAL_HP_PREFIX
- * 4. Value: ANIMAL_SPEED_PREFIX
- * 5. Value: ANIMAL_CR_PREFIX
- * 6. Value: animalSectionHeaders
- * 7. Value: animalProfileLabels
- * 8. Value: animalAbilityRegex
+ * 1. Animal parser constants, section metadata, and regex helpers
+ * 2. Public animals dataset entry point
+ * 3. Intermediate parsed-entry models
+ * 4. Animal monster parsing pipeline
+ * 5. Raw imported animal reference text
  */
 
 package io.github.velyene.loreweaver.domain.util

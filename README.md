@@ -4,6 +4,17 @@ Loreweaver is an Android companion app for tabletop RPG groups. It helps Game Ma
 players manage campaigns, characters, encounters, and quick rules lookups from one local-first
 app.
 
+## Contents
+
+- [App Description](#app-description)
+- [Key Features](#key-features)
+- [Architecture Overview](#architecture-overview)
+- [Project Structure](#project-structure)
+- [Developer Workflow & Repository Hygiene](#developer-workflow--repository-hygiene)
+  - [Security / Hardening](#security--hardening)
+- [Notes on data and networking](#notes-on-data-and-networking)
+- [SRD Notice](#srd-notice)
+
 ## App Description
 
 The app is built around encounter flow. It reduces session bookkeeping by keeping combat state,
@@ -22,7 +33,7 @@ Compose with a fixed dark-fantasy theme for a consistent in-game presentation.
 - **Adventure logs**: Persist important session events in a Room-backed log capped to the most
   recent 100 entries.
 - **Reference**: Browse local rules content for traps, poisons, diseases, spellcasting,
-  objects, madness, core rules, and character creation.
+  objects, hysteria, core rules, and character creation.
 - **Favorites, copy, and share**: Star reference entries, copy prompt/reference text, and share
   selected reference content with other apps.
 - **Prompt library**: Access a small set of narrative prompts and copy them to the clipboard while
@@ -63,6 +74,9 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 
 ## Developer Workflow & Repository Hygiene
 
+See `ENGINEERING_STANDARDS.md` for the repo-wide expectations around Kotlin/Compose structure,
+ViewModel state conventions, accessibility, localization, testing, audits, and release readiness.
+
 - Gradle tasks are the source of truth for build health. JetBrains inspections can still raise
   false positives around manifest-owned Android components, Hilt providers/constructors, Room
   converters, and JUnit entry points.
@@ -73,6 +87,18 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 - Local-only IDE state stays ignored: `.idea/workspace.xml`, caches, shelves, HTTP requests,
   device/emulator selectors, preview state, `local.properties`, keystores, and all `build/`
   directories.
+
+### Security / Hardening
+
+- `app/build.gradle.kts` suppresses AGP dependency metadata in APKs and bundles, and release
+  builds skip `extractReleaseVersionControlInfo` so shipped artifacts do not embed
+  `META-INF/version-control-info.textproto` git provenance metadata.
+- `gradle/verification-metadata.xml` pins trusted SHA-256 checksums for dependency and plugin
+  resolution.
+- `app/src/main/AndroidManifest.xml` removes Room's unused
+  `androidx.room.MultiInstanceInvalidationService` because Loreweaver does not enable
+  multi-instance invalidation.
+
 - Root-level JetBrains inspection-export XML files created from `Problems` / `Inspect Code` runs
   are treated as disposable local artifacts and should not be committed.
 - Prefer fixing shared inspection entry points in `.idea/inspectionProfiles/` before adding
@@ -100,10 +126,13 @@ The full Creative Commons Attribution 4.0 license text is mirrored locally in
 
 Running the content-audit test suite can also regenerate the ignored local file
 `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`, which summarizes separately inventoried reference/SRD corpus
-files for developer review. In the current audited repo state, the audit suite reports no
-excluded corpus files under `app/src/main`.
+files for developer review. That excluded-corpus inventory is separate from the repo-owned audit
+artifacts such as `SRD_MONSTERS_A_TO_Z_AUDIT.md`, which track bundled reviewed datasets that do
+ship from `app/src/main`.
 
-The Reference screen includes reviewed SRD-derived monster reference content.
+The Reference screen includes a local `Monsters` tab backed by bundled monster datasets plus
+filtering and deep-link detail support. Monster content and provenance expectations are tracked by
+the SRD audit documents in the repo, especially `SRD_MONSTERS_A_TO_Z_AUDIT.md`.
 
 ---
 

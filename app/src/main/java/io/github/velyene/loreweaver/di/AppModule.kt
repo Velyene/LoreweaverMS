@@ -24,6 +24,8 @@ import io.github.velyene.loreweaver.domain.repository.LogsRepository
 import io.github.velyene.loreweaver.domain.repository.NotesRepository
 import io.github.velyene.loreweaver.domain.repository.ReferencePreferencesRepository
 import io.github.velyene.loreweaver.domain.repository.SessionsRepository
+import io.github.velyene.loreweaver.ui.util.AndroidAppText
+import io.github.velyene.loreweaver.ui.util.AppText
 import io.github.velyene.loreweaver.ui.viewmodels.AndroidCombatTextProvider
 import io.github.velyene.loreweaver.ui.viewmodels.CombatTextProvider
 import javax.inject.Singleton
@@ -76,6 +78,12 @@ object AppModule {
 	@Singleton
 	fun provideCombatTextProvider(@ApplicationContext context: Context): CombatTextProvider {
 		return AndroidCombatTextProvider(context)
+	}
+
+	@Provides
+	@Singleton
+	fun provideAppText(@ApplicationContext context: Context): AppText {
+		return AndroidAppText(context)
 	}
 
 	@Provides

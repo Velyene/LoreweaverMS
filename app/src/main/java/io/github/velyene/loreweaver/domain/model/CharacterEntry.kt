@@ -65,14 +65,20 @@ data class CharacterEntry(
 	var hitDieType: Int = 8, // e.g., 8 for d8
 	var hitDiceCurrent: Int = 1,
 	var hasInspiration: Boolean = false, // NEW: Inspiration toggle
+	var persistentConditions: Set<String> = emptySet(),
 	var activeConditions: Set<String> = emptySet(),
-	var actions: List<CharacterAction> = emptyList()
+	var actions: List<CharacterAction> = emptyList(),
+	var species: String = "",
+	var background: String = "",
+	var spells: List<String> = emptyList()
 ) {
 	// ==========================================================
 	// 2. Mechanical Logic
 	// ==========================================================
 
 	val hitDiceMax: Int get() = level
+	val allConditions: Set<String>
+		get() = persistentConditions + activeConditions
 
 	/**
 	 * Passive Perception is 10 + Wisdom Modifier + Proficiency (if applicable)
@@ -85,11 +91,11 @@ data class CharacterEntry(
 	 */
 	val effectiveSpeed: Int
 		get() {
-			if (activeConditions.contains("Paralyzed") || activeConditions.contains("Petrified") ||
-				activeConditions.contains("Restrained") || activeConditions.contains("Unconscious") || hp == 0
+			if (allConditions.contains("Paralyzed") || allConditions.contains("Petrified") ||
+				allConditions.contains("Restrained") || allConditions.contains("Unconscious") || hp == 0
 			) return 0
 			var base = speed
-			if (activeConditions.contains("Prone")) base /= 2
+			if (allConditions.contains("Prone")) base /= 2
 			return base
 		}
 
@@ -143,9 +149,9 @@ data class CharacterEntry(
 	fun getSaveBonus(attrName: String, attributeScore: Int): Int {
 		if ((attrName == "DEX" || attrName == "STR") &&
 			(
-				activeConditions.contains("Paralyzed") ||
-					activeConditions.contains("Unconscious") ||
-					activeConditions.contains("Petrified")
+				allConditions.contains("Paralyzed") ||
+					allConditions.contains("Unconscious") ||
+					allConditions.contains("Petrified")
 				)
 		) {
 			return -10 // Represents automatic failure or severe penalty
@@ -165,6 +171,7 @@ data class CharacterEntry(
 			hp = maxHp,
 			mana = maxMana,
 			stamina = maxStamina,
+			activeConditions = emptySet(),
 			deathSaveSuccesses = 0,
 			deathSaveFailures = 0,
 			hitDiceCurrent = (hitDiceCurrent + (hitDiceMax / 2)).coerceAtMost(hitDiceMax),

@@ -3,7 +3,7 @@
  *
  * TABLE OF CONTENTS:
  * 1. ObjectSize enum and ObjectStatBlock model
- * 2. ObjectStats singleton â€” AC, HP, and substance threshold tables
+ * 2. ObjectStats singleton — AC, HP, and substance threshold tables
  */
 
 package io.github.velyene.loreweaver.domain.util
@@ -166,24 +166,24 @@ object ObjectStatsReference {
 			appendLine("Handling Massive Objects:")
 			appendLine()
 			appendLine(
-				"â€¢ For extremely large targets, it is often easier to break the object into sections than to " +
+				"• For extremely large targets, it is often easier to break the object into sections than to " +
 					"treat it as one pool of hit points."
 			)
 			appendLine(
-				"â€¢ Each section can have its own AC, hit points, and threshold if the scene needs that level " +
+				"• Each section can have its own AC, hit points, and threshold if the scene needs that level " +
 					"of detail."
 			)
 			appendLine(
-				"â€¢ Ruining one critical section can be enough to topple or disable the whole structure."
+				"• Ruining one critical section can be enough to topple or disable the whole structure."
 			)
 			appendLine()
 			appendLine("Loose Adjudication Option:")
 			appendLine(
-				"â€¢ If tracking damage would slow the scene down, decide narratively how much punishment the " +
+				"• If tracking damage would slow the scene down, decide narratively how much punishment the " +
 					"object can take."
 			)
 			append(
-				"â€¢ Fragile oversized objects may fail quickly, while reinforced structures might require siege " +
+				"• Fragile oversized objects may fail quickly, while reinforced structures might require siege " +
 					"tools, repeated attacks, or magic."
 			)
 		}
@@ -196,14 +196,14 @@ object ObjectStatsReference {
 		return buildString {
 			appendLine("Damage Thresholds:")
 			appendLine()
-			appendLine("â€¢ Some sturdy objects ignore small hits entirely.")
+			appendLine("• Some sturdy objects ignore small hits entirely.")
 			appendLine(
-				"â€¢ If a single attack or effect does not meet the threshold, treat the impact as cosmetic " +
+				"• If a single attack or effect does not meet the threshold, treat the impact as cosmetic " +
 					"rather than structural."
 			)
-			appendLine("â€¢ Once an attack clears the threshold, apply damage normally.")
+			appendLine("• Once an attack clears the threshold, apply damage normally.")
 			append(
-				"â€¢ Thresholds around 5 to 10 fit sturdy gear and doors, while truly massive structures can " +
+				"• Thresholds around 5 to 10 fit sturdy gear and doors, while truly massive structures can " +
 					"justify higher numbers."
 			)
 		}

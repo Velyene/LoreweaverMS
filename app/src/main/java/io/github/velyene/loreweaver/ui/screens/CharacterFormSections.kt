@@ -19,6 +19,7 @@ package io.github.velyene.loreweaver.ui.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -46,9 +47,11 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -74,29 +77,37 @@ import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CharacterAction
 import io.github.velyene.loreweaver.domain.model.CharacterResource
 import io.github.velyene.loreweaver.domain.model.ClassInfo
+import io.github.velyene.loreweaver.domain.util.CharacterCreationReference
 import io.github.velyene.loreweaver.ui.theme.AntiqueGold
 import io.github.velyene.loreweaver.ui.theme.ArcaneTeal
 import io.github.velyene.loreweaver.ui.theme.MutedText
 import io.github.velyene.loreweaver.ui.theme.PanelSurface
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun CharacterFormContent(
 	screenTitle: String,
 	classes: List<String>,
+	speciesOptions: List<String>,
+	backgroundOptions: List<String>,
 	formState: CharacterFormState,
 	classInfo: ClassInfo?,
 	callbacks: CharacterFormCallbacks,
-	onBack: () -> Unit
+	currentSection: CharacterBuilderSection,
+	onSectionSelected: (CharacterBuilderSection) -> Unit,
+	onStepBack: () -> Unit,
+	onStepNext: () -> Unit
 ) {
 	val scrollState = rememberScrollState()
+	val sections = CharacterBuilderSection.entries
+	val currentStep = currentSection.ordinal + 1
 
 	Scaffold(
 		topBar = {
 			TopAppBar(
 				title = { Text(screenTitle) },
 				navigationIcon = {
-					IconButton(onClick = onBack) {
+					IconButton(onClick = onStepBack) {
 						Icon(
 							Icons.AutoMirrored.Filled.ArrowBack,
 							stringResource(R.string.back_button)
@@ -115,109 +126,101 @@ internal fun CharacterFormContent(
 				.visibleVerticalScrollbar(scrollState),
 			verticalArrangement = Arrangement.spacedBy(12.dp)
 		) {
-			CharacterBasicsSection(
-				classes = classes,
-				formState = formState,
-				onFormStateChange = callbacks.onFormStateChange,
-				onClassSelected = callbacks.onClassSelected,
-				classInfo = classInfo,
-				onRandomName = callbacks.onRandomName,
-				onQuickBuild = callbacks.onQuickBuild
+			BuilderProgressHeader(
+				sections = sections,
+				currentSection = currentSection,
+				currentStep = currentStep,
+				onSectionSelected = onSectionSelected
 			)
 
-			HorizontalDivider()
+			when (currentSection) {
+				CharacterBuilderSection.IDENTITY -> CharacterBasicsSection(
+					classes = classes,
+					speciesOptions = speciesOptions,
+					backgroundOptions = backgroundOptions,
+					formState = formState,
+					onFormStateChange = callbacks.onFormStateChange,
+					onClassSelected = callbacks.onClassSelected,
+					classInfo = classInfo,
+					onRandomName = callbacks.onRandomName,
+					onQuickBuild = callbacks.onQuickBuild
+				)
 
-			AttributeSection(
-				formState = formState,
-				onFormStateChange = callbacks.onFormStateChange,
-				onRandomizeAttributes = callbacks.onRandomizeAttributes
-			)
+				CharacterBuilderSection.CORE_STATS -> CoreStatsBuilderSection(
+					formState = formState,
+					classInfo = classInfo,
+					onFormStateChange = callbacks.onFormStateChange,
+					onRandomizeAttributes = callbacks.onRandomizeAttributes,
+					onRecalcHp = callbacks.onRecalcHp,
+					onRecalcMana = callbacks.onRecalcMana,
+					onRecalcStamina = callbacks.onRecalcStamina,
+					onToggleSkill = callbacks.onToggleSkill,
+					onHitDieChange = callbacks.onHitDieChange
+				)
 
-			HorizontalDivider()
+				CharacterBuilderSection.BUILD_SUGGESTIONS -> BuildSuggestionsSection(
+					formState = formState,
+					classInfo = classInfo,
+					onFormStateChange = callbacks.onFormStateChange,
+					onSpellsChange = { callbacks.onFormStateChange(formState.copy(spellsText = it)) },
+					onResourceNameChange = callbacks.onResourceNameChange,
+					onResourceMaxChange = callbacks.onResourceMaxChange,
+					onRemoveResource = callbacks.onRemoveResource,
+					onAddResource = callbacks.onAddResource,
+					onInventoryChange = callbacks.onInventoryChange,
+					onActionNameChange = callbacks.onActionNameChange,
+					onActionAttackBonusChange = callbacks.onActionAttackBonusChange,
+					onActionDamageChange = callbacks.onActionDamageChange,
+					onRemoveAction = callbacks.onRemoveAction,
+					onAddAction = callbacks.onAddAction
+				)
 
-			VitalSection(
-				formState = formState,
-				onFormStateChange = callbacks.onFormStateChange,
-				hitDieLabel = classInfo?.hitDie?.toString() ?: formState.hitDieType,
-				onRecalcHp = callbacks.onRecalcHp,
-				showManaSection = classInfo == null || classInfo.defaultSpellSlotsL1.isNotEmpty(),
-				onRecalcMana = callbacks.onRecalcMana,
-				onRecalcStamina = callbacks.onRecalcStamina
-			)
+				CharacterBuilderSection.STATUS_AND_NOTES -> StatusNotesSection(
+					formState = formState,
+					onFormStateChange = callbacks.onFormStateChange
+				)
 
-			HorizontalDivider()
-
-			CombatStatsSection(
-				formState = formState,
-				onFormStateChange = callbacks.onFormStateChange
-			)
-
-			HorizontalDivider()
-
-			SkillProficienciesSection(
-				skills = CharacterFormConstants.SKILL_LIST,
-				selectedProficiencies = formState.selectedProficiencies,
-				onToggleSkill = callbacks.onToggleSkill
-			)
-
-			HorizontalDivider()
-
-			ResourcesSection(
-				resources = formState.resources,
-				onResourceNameChange = callbacks.onResourceNameChange,
-				onResourceMaxChange = callbacks.onResourceMaxChange,
-				onRemoveResource = callbacks.onRemoveResource,
-				onAddResource = callbacks.onAddResource
-			)
-
-			HorizontalDivider()
-
-			InventorySection(
-				inventoryText = formState.inventoryText,
-				equippedItemsText = formState.equippedItemsText,
-				walletCp = formState.walletCp,
-				carryingNotes = formState.carryingNotes,
-				onInventoryChange = callbacks.onInventoryChange,
-				onEquippedItemsChange = { callbacks.onFormStateChange(formState.copy(equippedItemsText = it)) },
-				onWalletCpChange = { callbacks.onFormStateChange(formState.copy(walletCp = it)) },
-				onCarryingNotesChange = { callbacks.onFormStateChange(formState.copy(carryingNotes = it)) }
-			)
-
-			HorizontalDivider()
-
-			HitDieSection(
-				hitDieType = formState.hitDieType,
-				onHitDieChange = callbacks.onHitDieChange
-			)
-
-			HorizontalDivider()
-
-			ActionsSection(
-				actions = formState.actions,
-				onActionNameChange = callbacks.onActionNameChange,
-				onActionAttackBonusChange = callbacks.onActionAttackBonusChange,
-				onActionDamageChange = callbacks.onActionDamageChange,
-				onActionManaCostChange = callbacks.onActionManaCostChange,
-				onActionStaminaCostChange = callbacks.onActionStaminaCostChange,
-				onActionSpellSlotLevelChange = callbacks.onActionSpellSlotLevelChange,
-				onActionResourceNameChange = callbacks.onActionResourceNameChange,
-				onActionResourceCostChange = callbacks.onActionResourceCostChange,
-				onActionItemNameChange = callbacks.onActionItemNameChange,
-				onRemoveAction = callbacks.onRemoveAction,
-				onAddAction = callbacks.onAddAction
-			)
-
-			HorizontalDivider()
-
-			StatusNotesSection(
-				formState = formState,
-				onFormStateChange = callbacks.onFormStateChange
-			)
+				CharacterBuilderSection.REVIEW_AND_SAVE -> ReviewAndSaveSection(
+					formState = formState,
+					classInfo = classInfo
+				)
+			}
 
 			Spacer(modifier = Modifier.height(16.dp))
 
-			Button(onClick = callbacks.onSaveCharacter, modifier = Modifier.fillMaxWidth()) {
-				Text(stringResource(R.string.save_character_button))
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(12.dp)
+			) {
+				OutlinedButton(onClick = onStepBack, modifier = Modifier.weight(1f)) {
+					Text(
+						stringResource(
+							if (currentSection == CharacterBuilderSection.IDENTITY) {
+								R.string.character_builder_exit_button
+							} else {
+								R.string.character_builder_previous_button
+							}
+						)
+					)
+				}
+				Button(
+					onClick = if (currentSection == CharacterBuilderSection.REVIEW_AND_SAVE) {
+						callbacks.onSaveCharacter
+					} else {
+						onStepNext
+					},
+					modifier = Modifier.weight(1f)
+				) {
+					Text(
+						stringResource(
+							if (currentSection == CharacterBuilderSection.REVIEW_AND_SAVE) {
+								R.string.save_character_button
+							} else {
+								R.string.character_builder_continue_button
+							}
+						)
+					)
+				}
 			}
 
 			Spacer(modifier = Modifier.height(32.dp))
@@ -230,10 +233,63 @@ private fun CharacterFormSectionTitle(textResId: Int) {
 	Text(stringResource(textResId), style = MaterialTheme.typography.titleMedium)
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun BuilderProgressHeader(
+	sections: List<CharacterBuilderSection>,
+	currentSection: CharacterBuilderSection,
+	currentStep: Int,
+	onSectionSelected: (CharacterBuilderSection) -> Unit
+) {
+	Card(
+		colors = CardDefaults.cardColors(containerColor = PanelSurface),
+		modifier = Modifier.fillMaxWidth()
+	) {
+		Column(
+			modifier = Modifier.padding(16.dp),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			Text(
+				text = stringResource(R.string.character_builder_step_counter, currentStep, sections.size),
+				style = MaterialTheme.typography.labelLarge,
+				color = AntiqueGold,
+				fontWeight = FontWeight.Bold
+			)
+			Text(
+				text = stringResource(currentSection.titleResId),
+				style = MaterialTheme.typography.headlineSmall
+			)
+			Text(
+				text = stringResource(currentSection.descriptionResId),
+				style = MaterialTheme.typography.bodyMedium,
+				color = MutedText
+			)
+			LinearProgressIndicator(
+				progress = { currentStep / sections.size.toFloat() },
+				modifier = Modifier.fillMaxWidth()
+			)
+			FlowRow(
+				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				verticalArrangement = Arrangement.spacedBy(8.dp)
+			) {
+				sections.forEach { section ->
+					FilterChip(
+						selected = section == currentSection,
+						onClick = { onSectionSelected(section) },
+						label = { Text(stringResource(section.titleResId)) }
+					)
+				}
+			}
+		}
+	}
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CharacterBasicsSection(
 	classes: List<String>,
+	speciesOptions: List<String>,
+	backgroundOptions: List<String>,
 	formState: CharacterFormState,
 	onFormStateChange: (CharacterFormState) -> Unit,
 	onClassSelected: (String) -> Unit,
@@ -241,8 +297,20 @@ private fun CharacterBasicsSection(
 	onRandomName: () -> Unit,
 	onQuickBuild: () -> Unit
 ) {
-	var classExpanded by remember { mutableStateOf(false) }
 	val nameRequiredError = stringResource(R.string.name_required_error)
+	val suggestions = remember(classInfo, formState.background) {
+		buildCharacterSuggestions(classInfo = classInfo, backgroundName = formState.background)
+	}
+	val speciesReference = remember(formState.species) {
+		CharacterCreationReference.RACES.firstOrNull { race ->
+			race.name.equals(formState.species.trim(), ignoreCase = true)
+		}
+	}
+	val backgroundReference = remember(formState.background) {
+		CharacterCreationReference.BACKGROUNDS.firstOrNull { background ->
+			background.name.equals(formState.background.trim(), ignoreCase = true)
+		}
+	}
 
 	Row(
 		modifier = Modifier.fillMaxWidth(),
@@ -273,72 +341,150 @@ private fun CharacterBasicsSection(
 		singleLine = true
 	)
 
+	SelectionDropdownField(
+		labelResId = R.string.class_type_label,
+		value = formState.type,
+		options = classes,
+		onOptionSelected = onClassSelected
+	)
+
+	SelectionDropdownField(
+		labelResId = R.string.species_label,
+		value = formState.species,
+		options = speciesOptions,
+		onOptionSelected = { selectedSpecies ->
+			onFormStateChange(formState.copy(species = selectedSpecies))
+		}
+	)
+
+	SelectionDropdownField(
+		labelResId = R.string.background_label,
+		value = formState.background,
+		options = backgroundOptions,
+		onOptionSelected = { selectedBackground ->
+			onFormStateChange(formState.copy(background = selectedBackground))
+		}
+	)
+
+	OutlinedTextField(
+		value = formState.party,
+		onValueChange = { onFormStateChange(formState.copy(party = it)) },
+		label = { Text(stringResource(R.string.party_label)) },
+		modifier = Modifier.fillMaxWidth(),
+		singleLine = true
+	)
+
+	if (classInfo != null) {
+		ClassInfoCard(classInfo = classInfo)
+		SuggestionHighlightsSection(suggestions = suggestions)
+	}
+
+	speciesReference?.let { selectedSpecies ->
+		OriginReferenceCard(
+			title = selectedSpecies.name,
+			lines = listOf(
+				"${stringResource(R.string.ability_increase_label)} ${selectedSpecies.abilityScoreIncrease}",
+				"${stringResource(R.string.speed_label)} ${selectedSpecies.speed}",
+				"${stringResource(R.string.languages_label)} ${selectedSpecies.languages}",
+				selectedSpecies.traits.take(2).joinToString(prefix = "${stringResource(R.string.species_traits_label)} ") { it.name }
+			)
+		)
+	}
+
+	backgroundReference?.let { selectedBackground ->
+		OriginReferenceCard(
+			title = selectedBackground.name,
+			lines = listOf(
+				"${stringResource(R.string.background_feat_label)} ${selectedBackground.feat}",
+				"${stringResource(R.string.background_skills_label)} ${selectedBackground.skillProficiencies.joinToString()}",
+				"${stringResource(R.string.tool_proficiency_label)} ${selectedBackground.toolProficiency}",
+				"${stringResource(R.string.equipment_options_label)} ${selectedBackground.equipmentOptions.joinToString(" / ")}"
+			)
+		)
+	}
+}
+
+@Composable
+private fun SuggestionHighlightsSection(suggestions: CharacterBuildSuggestions) {
+	val suggestedItems = remember(suggestions) {
+		(suggestions.suggestedEquipment + suggestions.backgroundEquipment).distinct()
+	}
+
+	SuggestionCard(
+		title = stringResource(R.string.character_build_recommended_abilities_title),
+		lines = suggestions.recommendedAbilities.ifEmpty {
+			listOf(stringResource(R.string.character_build_generalist_abilities))
+		}
+	)
+	SuggestionCard(
+		title = stringResource(R.string.character_build_suggested_spells_title),
+		lines = suggestions.suggestedSpells.ifEmpty {
+			listOf(stringResource(R.string.character_build_no_spells_suggestion))
+		}
+	)
+	SuggestionCard(
+		title = stringResource(R.string.character_build_suggested_equipment_title),
+		lines = suggestedItems.ifEmpty {
+			listOf(stringResource(R.string.character_build_no_equipment_suggestion))
+		}
+	)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectionDropdownField(
+	labelResId: Int,
+	value: String,
+	options: List<String>,
+	onOptionSelected: (String) -> Unit
+) {
+	var expanded by remember { mutableStateOf(false) }
+
 	ExposedDropdownMenuBox(
-		expanded = classExpanded,
-		onExpandedChange = { classExpanded = !classExpanded },
+		expanded = expanded,
+		onExpandedChange = { expanded = !expanded },
 		modifier = Modifier.fillMaxWidth()
 	) {
 		OutlinedTextField(
-			value = formState.type,
+			value = value,
 			onValueChange = {},
 			readOnly = true,
-			label = { Text(stringResource(R.string.class_type_label)) },
-			trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = classExpanded) },
+			label = { Text(stringResource(labelResId)) },
+			trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
 			modifier = Modifier
 				.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
 				.fillMaxWidth()
 		)
-		ExposedDropdownMenu(
-			expanded = classExpanded,
-			onDismissRequest = { classExpanded = false }
-		) {
-			classes.forEach { className ->
+		ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+			options.forEach { option ->
 				DropdownMenuItem(
-					text = { Text(className) },
+					text = { Text(option) },
 					onClick = {
-						classExpanded = false
-						onClassSelected(className)
+						expanded = false
+						onOptionSelected(option)
 					}
 				)
 			}
 		}
 	}
+}
 
-	if (classInfo != null) {
-		ClassInfoCard(classInfo = classInfo)
-	}
-
-	OutlinedTextField(
-		value = formState.level,
-		onValueChange = {
-			if (it.isDigitsOnlyInput()) {
-				onFormStateChange(formState.copy(level = it))
+@Composable
+private fun OriginReferenceCard(title: String, lines: List<String>) {
+	Card(
+		colors = CardDefaults.cardColors(containerColor = PanelSurface),
+		shape = RoundedCornerShape(8.dp),
+		modifier = Modifier.fillMaxWidth()
+	) {
+		Column(
+			modifier = Modifier.padding(12.dp),
+			verticalArrangement = Arrangement.spacedBy(4.dp)
+		) {
+			Text(title, style = MaterialTheme.typography.titleSmall, color = AntiqueGold)
+			lines.filter { it.isNotBlank() }.forEach { line ->
+				Text(line, style = MaterialTheme.typography.bodySmall, color = MutedText)
 			}
-		},
-		label = { Text(stringResource(R.string.level_label)) },
-		modifier = Modifier.fillMaxWidth(),
-		keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-		singleLine = true
-	)
-
-	if (formState.party != CharacterFormConstants.ADVENTURERS_PARTY) {
-		OutlinedTextField(
-			value = formState.challengeRating,
-			onValueChange = {
-				onFormStateChange(formState.copy(challengeRating = it))
-			},
-			label = { Text(stringResource(R.string.challenge_rating_input_label)) },
-			modifier = Modifier.fillMaxWidth(),
-			keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-			singleLine = true,
-			supportingText = {
-				Text(
-					stringResource(R.string.challenge_rating_supporting_text),
-					style = MaterialTheme.typography.labelSmall,
-					color = MutedText
-				)
-			}
-		)
+		}
 	}
 }
 
@@ -363,7 +509,7 @@ private fun ClassInfoCard(classInfo: ClassInfo) {
 			Text(
 				stringResource(
 					R.string.class_info_recommended_stats,
-					classInfo.primaryStats.joinToString(" â€º ")
+					classInfo.primaryStats.joinToString(" › ")
 				),
 				color = MutedText,
 				style = MaterialTheme.typography.bodySmall
@@ -377,6 +523,92 @@ private fun ClassInfoCard(classInfo: ClassInfo) {
 			}
 		}
 	}
+}
+
+@Composable
+private fun CoreStatsBuilderSection(
+	formState: CharacterFormState,
+	classInfo: ClassInfo?,
+	onFormStateChange: (CharacterFormState) -> Unit,
+	onRandomizeAttributes: () -> Unit,
+	onRecalcHp: () -> Unit,
+	onRecalcMana: () -> Unit,
+	onRecalcStamina: () -> Unit,
+	onToggleSkill: (String) -> Unit,
+	onHitDieChange: (String) -> Unit
+) {
+	OutlinedTextField(
+		value = formState.level,
+		onValueChange = {
+			if (it.isDigitsOnlyInput()) {
+				onFormStateChange(formState.copy(level = it))
+			}
+		},
+		label = { Text(stringResource(R.string.level_label)) },
+		modifier = Modifier.fillMaxWidth(),
+		keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+		singleLine = true
+	)
+
+	if (formState.party != CharacterFormConstants.ADVENTURERS_PARTY) {
+		OutlinedTextField(
+			value = formState.challengeRating,
+			onValueChange = { onFormStateChange(formState.copy(challengeRating = it)) },
+			label = { Text(stringResource(R.string.challenge_rating_input_label)) },
+			modifier = Modifier.fillMaxWidth(),
+			keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+			singleLine = true,
+			supportingText = {
+				Text(
+					stringResource(R.string.challenge_rating_supporting_text),
+					style = MaterialTheme.typography.labelSmall,
+					color = MutedText
+				)
+			}
+		)
+	}
+
+	HorizontalDivider()
+
+	VitalSection(
+		formState = formState,
+		onFormStateChange = onFormStateChange,
+		hitDieLabel = classInfo?.hitDie?.toString() ?: formState.hitDieType,
+		onRecalcHp = onRecalcHp,
+		showManaSection = classInfo == null || classInfo.defaultSpellSlotsL1.isNotEmpty(),
+		onRecalcMana = onRecalcMana,
+		onRecalcStamina = onRecalcStamina
+	)
+
+	HorizontalDivider()
+
+	CombatStatsSection(
+		formState = formState,
+		onFormStateChange = onFormStateChange
+	)
+
+	HorizontalDivider()
+
+	AttributeSection(
+		formState = formState,
+		onFormStateChange = onFormStateChange,
+		onRandomizeAttributes = onRandomizeAttributes
+	)
+
+	HorizontalDivider()
+
+	SkillProficienciesSection(
+		skills = CharacterFormConstants.SKILL_LIST,
+		selectedProficiencies = formState.selectedProficiencies,
+		onToggleSkill = onToggleSkill
+	)
+
+	HorizontalDivider()
+
+	HitDieSection(
+		hitDieType = formState.hitDieType,
+		onHitDieChange = onHitDieChange
+	)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -438,7 +670,7 @@ private fun AttributeSection(
 						singleLine = true,
 						supportingText = {
 							Text(
-								"${CharacterFormConstants.MIN_ATTRIBUTE}â€“${CharacterFormConstants.MAX_ATTRIBUTE}",
+								"${CharacterFormConstants.MIN_ATTRIBUTE}–${CharacterFormConstants.MAX_ATTRIBUTE}",
 								style = MaterialTheme.typography.labelSmall,
 								color = MutedText
 							)
@@ -648,16 +880,6 @@ private fun CombatStatsSection(
 			singleLine = true
 		)
 	}
-
-	OutlinedTextField(
-		value = formState.party,
-		onValueChange = {
-			onFormStateChange(formState.copy(party = it))
-		},
-		label = { Text(stringResource(R.string.party_label)) },
-		modifier = Modifier.fillMaxWidth(),
-		singleLine = true
-	)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -726,13 +948,7 @@ private fun ResourcesSection(
 @Composable
 private fun InventorySection(
 	inventoryText: String,
-	equippedItemsText: String,
-	walletCp: String,
-	carryingNotes: String,
-	onInventoryChange: (String) -> Unit,
-	onEquippedItemsChange: (String) -> Unit,
-	onWalletCpChange: (String) -> Unit,
-	onCarryingNotesChange: (String) -> Unit
+	onInventoryChange: (String) -> Unit
 ) {
 	CharacterFormSectionTitle(R.string.inventory_section_title)
 	OutlinedTextField(
@@ -743,34 +959,6 @@ private fun InventorySection(
 		placeholder = {
 			Text(stringResource(R.string.inventory_placeholder_one_per_line), color = MutedText)
 		}
-	)
-	Spacer(modifier = Modifier.height(8.dp))
-	OutlinedTextField(
-		value = equippedItemsText,
-		onValueChange = onEquippedItemsChange,
-		modifier = Modifier.fillMaxWidth(),
-		minLines = 2,
-		label = { Text(stringResource(R.string.equipped_items_label)) },
-		placeholder = {
-			Text(stringResource(R.string.inventory_placeholder_one_per_line), color = MutedText)
-		}
-	)
-	Spacer(modifier = Modifier.height(8.dp))
-	OutlinedTextField(
-		value = walletCp,
-		onValueChange = onWalletCpChange,
-		label = { Text(stringResource(R.string.character_wallet_cp_label)) },
-		modifier = Modifier.fillMaxWidth(),
-		keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-		singleLine = true
-	)
-	Spacer(modifier = Modifier.height(8.dp))
-	OutlinedTextField(
-		value = carryingNotes,
-		onValueChange = onCarryingNotesChange,
-		label = { Text(stringResource(R.string.carrying_notes_label)) },
-		modifier = Modifier.fillMaxWidth(),
-		minLines = 2
 	)
 }
 
@@ -796,12 +984,6 @@ private fun ActionsSection(
 	onActionNameChange: (Int, String) -> Unit,
 	onActionAttackBonusChange: (Int, String) -> Unit,
 	onActionDamageChange: (Int, String) -> Unit,
-	onActionManaCostChange: (Int, String) -> Unit,
-	onActionStaminaCostChange: (Int, String) -> Unit,
-	onActionSpellSlotLevelChange: (Int, String) -> Unit,
-	onActionResourceNameChange: (Int, String) -> Unit,
-	onActionResourceCostChange: (Int, String) -> Unit,
-	onActionItemNameChange: (Int, String) -> Unit,
 	onRemoveAction: (Int) -> Unit,
 	onAddAction: () -> Unit
 ) {
@@ -845,60 +1027,6 @@ private fun ActionsSection(
 						singleLine = true
 					)
 				}
-				Text(
-					text = stringResource(R.string.action_costs_section_label),
-					style = MaterialTheme.typography.labelMedium
-				)
-				Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-					OutlinedTextField(
-						value = action.manaCost.toString(),
-						onValueChange = { onActionManaCostChange(index, it) },
-						label = { Text(stringResource(R.string.action_mana_cost_label)) },
-						modifier = Modifier.weight(1f),
-						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						singleLine = true
-					)
-					OutlinedTextField(
-						value = action.staminaCost.toString(),
-						onValueChange = { onActionStaminaCostChange(index, it) },
-						label = { Text(stringResource(R.string.action_stamina_cost_label)) },
-						modifier = Modifier.weight(1f),
-						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						singleLine = true
-					)
-					OutlinedTextField(
-						value = action.spellSlotLevel?.toString().orEmpty(),
-						onValueChange = { onActionSpellSlotLevelChange(index, it) },
-						label = { Text(stringResource(R.string.action_spell_slot_label)) },
-						modifier = Modifier.weight(1f),
-						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						singleLine = true
-					)
-				}
-				Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-					OutlinedTextField(
-						value = action.resourceName.orEmpty(),
-						onValueChange = { onActionResourceNameChange(index, it) },
-						label = { Text(stringResource(R.string.action_resource_name_label)) },
-						modifier = Modifier.weight(1f),
-						singleLine = true
-					)
-					OutlinedTextField(
-						value = action.resourceCost.toString(),
-						onValueChange = { onActionResourceCostChange(index, it) },
-						label = { Text(stringResource(R.string.action_resource_cost_label)) },
-						modifier = Modifier.weight(1f),
-						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						singleLine = true
-					)
-				}
-				OutlinedTextField(
-					value = action.itemName.orEmpty(),
-					onValueChange = { onActionItemNameChange(index, it) },
-					label = { Text(stringResource(R.string.action_item_name_label)) },
-					modifier = Modifier.fillMaxWidth(),
-					singleLine = true
-				)
 			}
 		}
 	}
@@ -908,18 +1036,181 @@ private fun ActionsSection(
 }
 
 @Composable
+private fun BuildSuggestionsSection(
+	formState: CharacterFormState,
+	classInfo: ClassInfo?,
+	onFormStateChange: (CharacterFormState) -> Unit,
+	onSpellsChange: (String) -> Unit,
+	onResourceNameChange: (Int, String) -> Unit,
+	onResourceMaxChange: (Int, String) -> Unit,
+	onRemoveResource: (Int) -> Unit,
+	onAddResource: () -> Unit,
+	onInventoryChange: (String) -> Unit,
+	onActionNameChange: (Int, String) -> Unit,
+	onActionAttackBonusChange: (Int, String) -> Unit,
+	onActionDamageChange: (Int, String) -> Unit,
+	onRemoveAction: (Int) -> Unit,
+	onAddAction: () -> Unit
+) {
+	val suggestions = remember(classInfo, formState.background) {
+		buildCharacterSuggestions(classInfo = classInfo, backgroundName = formState.background)
+	}
+	val starterEquipment = remember(suggestions) {
+		(suggestions.suggestedEquipment + suggestions.backgroundEquipment).distinct()
+	}
+
+	SuggestionCard(
+		title = stringResource(R.string.character_build_recommended_abilities_title),
+		lines = suggestions.recommendedAbilities.ifEmpty {
+			listOf(stringResource(R.string.character_build_generalist_abilities))
+		}
+	)
+
+	SuggestionCard(
+		title = stringResource(R.string.character_build_suggested_spells_title),
+		lines = suggestions.suggestedSpells.ifEmpty {
+			listOf(stringResource(R.string.character_build_no_spells_suggestion))
+		}
+	)
+
+	SuggestionCard(
+		title = stringResource(R.string.character_build_suggested_equipment_title),
+		lines = starterEquipment.ifEmpty {
+			listOf(stringResource(R.string.character_build_no_equipment_suggestion))
+		}
+	)
+
+	if (starterEquipment.isNotEmpty()) {
+		OutlinedButton(
+			onClick = {
+				onFormStateChange(formState.copy(inventoryText = starterEquipment.joinToString("\n")))
+			},
+			modifier = Modifier.fillMaxWidth()
+		) {
+			Text(stringResource(R.string.character_build_apply_equipment_button))
+		}
+	}
+
+	if (suggestions.guidance.isNotEmpty()) {
+		SuggestionCard(
+			title = stringResource(R.string.character_build_guidance_title),
+			lines = suggestions.guidance
+		)
+	}
+
+	CharacterFormSectionTitle(R.string.character_build_selected_spells_title)
+	OutlinedTextField(
+		value = formState.spellsText,
+		onValueChange = onSpellsChange,
+		modifier = Modifier.fillMaxWidth(),
+		minLines = 4,
+		placeholder = {
+			Text(
+				stringResource(R.string.character_build_selected_spells_placeholder),
+				color = MutedText
+			)
+		}
+	)
+	if (suggestions.suggestedSpells.isNotEmpty()) {
+		OutlinedButton(
+			onClick = {
+				onSpellsChange(suggestions.suggestedSpells.joinToString("\n"))
+			},
+			modifier = Modifier.fillMaxWidth()
+		) {
+			Text(stringResource(R.string.character_build_apply_spells_button))
+		}
+	}
+
+	HorizontalDivider()
+
+	ResourcesSection(
+		resources = formState.resources,
+		onResourceNameChange = onResourceNameChange,
+		onResourceMaxChange = onResourceMaxChange,
+		onRemoveResource = onRemoveResource,
+		onAddResource = onAddResource
+	)
+
+	HorizontalDivider()
+
+	InventorySection(
+		inventoryText = formState.inventoryText,
+		onInventoryChange = onInventoryChange
+	)
+
+	HorizontalDivider()
+
+	ActionsSection(
+		actions = formState.actions,
+		onActionNameChange = onActionNameChange,
+		onActionAttackBonusChange = onActionAttackBonusChange,
+		onActionDamageChange = onActionDamageChange,
+		onRemoveAction = onRemoveAction,
+		onAddAction = onAddAction
+	)
+}
+
+@Composable
+private fun SuggestionCard(title: String, lines: List<String>) {
+	Card(
+		colors = CardDefaults.cardColors(containerColor = PanelSurface),
+		modifier = Modifier.fillMaxWidth()
+	) {
+		Column(
+			modifier = Modifier.padding(12.dp),
+			verticalArrangement = Arrangement.spacedBy(4.dp)
+		) {
+			Text(title, style = MaterialTheme.typography.titleSmall, color = AntiqueGold)
+			lines.filter { it.isNotBlank() }.forEach { line ->
+				Text("• $line", style = MaterialTheme.typography.bodyMedium)
+			}
+		}
+	}
+}
+
+@Composable
 private fun StatusNotesSection(
 	formState: CharacterFormState,
 	onFormStateChange: (CharacterFormState) -> Unit
 ) {
+	ConditionSelectionSection(
+		title = stringResource(R.string.encounter_conditions_title),
+		supportingText = stringResource(R.string.encounter_conditions_supporting_text),
+		emptyText = stringResource(R.string.encounter_conditions_empty),
+		selectedConditions = formState.encounterConditions,
+		isPersistent = false,
+		onConditionsChange = { updatedConditions ->
+			onFormStateChange(formState.copy(encounterConditions = updatedConditions))
+		}
+	)
+
+	ConditionSelectionSection(
+		title = stringResource(R.string.persistent_conditions_title),
+		supportingText = stringResource(R.string.persistent_conditions_supporting_text),
+		emptyText = stringResource(R.string.persistent_conditions_empty),
+		selectedConditions = formState.persistentConditions,
+		isPersistent = true,
+		onConditionsChange = { updatedConditions ->
+			onFormStateChange(formState.copy(persistentConditions = updatedConditions))
+		}
+	)
+
+	CharacterFormSectionTitle(R.string.encounter_status_notes_label)
 	OutlinedTextField(
 		value = formState.status,
 		onValueChange = {
 			onFormStateChange(formState.copy(status = it))
 		},
-		label = { Text(stringResource(R.string.status_label)) },
+		label = { Text(stringResource(R.string.encounter_status_notes_label)) },
 		modifier = Modifier.fillMaxWidth(),
-		singleLine = true
+		supportingText = {
+			Text(
+				stringResource(R.string.encounter_status_notes_supporting_text),
+				style = MaterialTheme.typography.labelSmall,
+				color = MutedText
+			)
+		}
 	)
 	OutlinedTextField(
 		value = formState.notes,
@@ -931,3 +1222,259 @@ private fun StatusNotesSection(
 		minLines = 3
 	)
 }
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ConditionSelectionSection(
+	title: String,
+	supportingText: String,
+	emptyText: String,
+	selectedConditions: Set<String>,
+	isPersistent: Boolean,
+	onConditionsChange: (Set<String>) -> Unit,
+) {
+	var customCondition by remember(title) { mutableStateOf("") }
+	val normalizedSelection = remember(selectedConditions, isPersistent) {
+		buildStatusChipModels(selectedConditions, isPersistent)
+	}
+	val selectedLabels = remember(selectedConditions) { normalizedStatusLabels(selectedConditions).toSet() }
+
+	CharacterFormSectionTitle(title = title)
+	Text(
+		text = supportingText,
+		style = MaterialTheme.typography.bodySmall,
+		color = MutedText
+	)
+	if (normalizedSelection.isEmpty()) {
+		Text(
+			text = emptyText,
+			style = MaterialTheme.typography.bodySmall,
+			color = MutedText
+		)
+	} else {
+		StatusChipFlowRow(
+			statuses = normalizedSelection,
+			onStatusRemove = { status ->
+				onConditionsChange(selectedLabels - status.name)
+			}
+		)
+	}
+
+	Text(
+		text = stringResource(R.string.srd_conditions_title),
+		style = MaterialTheme.typography.labelLarge,
+		color = AntiqueGold,
+		fontWeight = FontWeight.Bold
+	)
+	FlowRow(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalArrangement = Arrangement.spacedBy(8.dp),
+		verticalArrangement = Arrangement.spacedBy(8.dp)
+	) {
+		ConditionConstants.STANDARD_CONDITIONS.forEach { condition ->
+			val metadata = ConditionConstants.metadataFor(condition)
+			val isSelected = condition in selectedLabels
+			FilterChip(
+				selected = isSelected,
+				onClick = {
+					onConditionsChange(selectedLabels.withToggledCondition(condition))
+				},
+				label = { Text(condition) },
+				border = BorderStroke(1.dp, metadata.borderColor),
+				colors = FilterChipDefaults.filterChipColors(
+					selectedContainerColor = metadata.color.copy(alpha = 0.24f),
+					selectedLabelColor = MaterialTheme.colorScheme.onSurface,
+				)
+			)
+		}
+	}
+
+	Row(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalArrangement = Arrangement.spacedBy(8.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		OutlinedTextField(
+			value = customCondition,
+			onValueChange = { customCondition = it },
+			label = { Text(stringResource(R.string.custom_condition_label)) },
+			modifier = Modifier.weight(1f),
+			singleLine = true
+		)
+		Button(
+			onClick = {
+				onConditionsChange(selectedLabels.withAddedCondition(customCondition))
+				customCondition = ""
+			},
+			enabled = customCondition.isNotBlank()
+		) {
+			Text(stringResource(R.string.add_button))
+		}
+	}
+}
+
+@Composable
+private fun ReviewAndSaveSection(
+	formState: CharacterFormState,
+	classInfo: ClassInfo?
+) {
+	val validation = remember(formState.name, formState.hp) {
+		validateCharacterForm(name = formState.name, hp = formState.hp)
+	}
+	val buildSuggestions = remember(classInfo, formState.background) {
+		buildCharacterSuggestions(classInfo = classInfo, backgroundName = formState.background)
+	}
+
+	Text(
+		text = stringResource(R.string.character_builder_review_intro),
+		style = MaterialTheme.typography.bodyMedium,
+		color = MutedText
+	)
+
+	ReviewCard(title = stringResource(R.string.character_builder_identity_title)) {
+		ReviewRow(stringResource(R.string.name_label), formState.name)
+		ReviewRow(stringResource(R.string.class_type_label), formState.type)
+		ReviewRow(stringResource(R.string.species_label), formState.species)
+		ReviewRow(stringResource(R.string.background_label), formState.background)
+		ReviewRow(stringResource(R.string.party_label), formState.party)
+	}
+
+	ReviewCard(title = stringResource(R.string.character_builder_core_stats_title)) {
+		ReviewRow(stringResource(R.string.level_label), formState.level)
+		ReviewRow(stringResource(R.string.hit_points_section_title), "${formState.hp} / ${formState.maxHp}")
+		ReviewRow(stringResource(R.string.ac_label), formState.ac)
+		ReviewRow(stringResource(R.string.initiative_short_label), formState.initiative)
+		ReviewRow(stringResource(R.string.speed_label), formState.speed)
+		ReviewRow(
+			stringResource(R.string.attributes_title),
+			listOf(
+				"STR ${formState.str}",
+				"DEX ${formState.dex}",
+				"CON ${formState.con}",
+				"INT ${formState.intell}",
+				"WIS ${formState.wis}",
+				"CHA ${formState.cha}"
+			).joinToString(" • ")
+		)
+	}
+
+	ReviewCard(title = stringResource(R.string.character_builder_build_suggestions_title)) {
+		ReviewRow(
+			stringResource(R.string.character_build_recommended_abilities_title),
+			buildSuggestions.recommendedAbilities.joinToString().ifBlank {
+				stringResource(R.string.character_build_generalist_abilities)
+			}
+		)
+		ReviewRow(
+			stringResource(R.string.character_build_selected_spells_title),
+			formState.spellsText.lineSequence().filter { it.isNotBlank() }.joinToString().ifBlank {
+				stringResource(R.string.none_label)
+			}
+		)
+		ReviewRow(
+			stringResource(R.string.inventory_section_title),
+			formState.inventoryText.lineSequence().filter { it.isNotBlank() }.count().toString()
+		)
+		ReviewRow(
+			stringResource(R.string.resources_section_title),
+			formState.resources.size.toString()
+		)
+		ReviewRow(
+			stringResource(R.string.custom_actions_section_title),
+			formState.actions.size.toString()
+		)
+	}
+
+	ReviewCard(title = stringResource(R.string.character_builder_status_notes_title)) {
+		ReviewRow(
+			stringResource(R.string.encounter_conditions_title),
+			formState.encounterConditions.joinToString().ifBlank { stringResource(R.string.none_label) }
+		)
+		ReviewRow(
+			stringResource(R.string.persistent_conditions_title),
+			formState.persistentConditions.joinToString().ifBlank { stringResource(R.string.none_label) }
+		)
+		ReviewRow(stringResource(R.string.encounter_status_notes_label), formState.status)
+		ReviewRow(stringResource(R.string.notes_label), formState.notes)
+	}
+
+	ReviewCard(title = stringResource(R.string.character_builder_validation_title)) {
+		ValidationRow(
+			label = stringResource(R.string.character_builder_validation_name),
+			isValid = !validation.nameError
+		)
+		ValidationRow(
+			label = stringResource(R.string.character_builder_validation_hp),
+			isValid = !validation.hpError
+		)
+		ValidationRow(
+			label = stringResource(R.string.character_builder_validation_species),
+			isValid = formState.species.isNotBlank()
+		)
+		ValidationRow(
+			label = stringResource(R.string.character_builder_validation_background),
+			isValid = formState.background.isNotBlank()
+		)
+	}
+}
+
+@Composable
+private fun ReviewCard(title: String, content: @Composable ColumnScope.() -> Unit) {
+	Card(
+		colors = CardDefaults.cardColors(containerColor = PanelSurface),
+		modifier = Modifier.fillMaxWidth()
+	) {
+		Column(
+			modifier = Modifier.padding(12.dp),
+			verticalArrangement = Arrangement.spacedBy(8.dp)
+		) {
+			Text(title, style = MaterialTheme.typography.titleSmall, color = AntiqueGold)
+			content()
+		}
+	}
+}
+
+@Composable
+private fun ReviewRow(label: String, value: String) {
+	Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+		Text(label, style = MaterialTheme.typography.labelMedium, color = AntiqueGold)
+		Text(value.ifBlank { stringResource(R.string.none_label) }, style = MaterialTheme.typography.bodyMedium)
+	}
+}
+
+@Composable
+private fun CharacterFormSectionTitle(title: String) {
+	Text(title, style = MaterialTheme.typography.titleMedium)
+}
+
+private fun Set<String>.withToggledCondition(condition: String): Set<String> {
+	val canonicalCondition = canonicalStatusLabel(condition)
+	return normalizeConditionSet(toggleSelection(this, canonicalCondition))
+}
+
+private fun Set<String>.withAddedCondition(condition: String): Set<String> {
+	return normalizeConditionSet(this + condition)
+}
+
+private fun normalizeConditionSet(conditions: Iterable<String>): Set<String> {
+	return normalizedStatusLabels(conditions).toSet()
+}
+
+@Composable
+private fun ValidationRow(label: String, isValid: Boolean) {
+	Row(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalArrangement = Arrangement.SpaceBetween,
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Text(label, style = MaterialTheme.typography.bodyMedium)
+		Text(
+			text = stringResource(
+				if (isValid) R.string.character_builder_validation_ready else R.string.character_builder_validation_attention
+			),
+			style = MaterialTheme.typography.labelLarge,
+			color = if (isValid) ArcaneTeal else AntiqueGold
+		)
+	}
+}
+

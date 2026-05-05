@@ -2,8 +2,8 @@
  * FILE: SessionHistoryScreen.kt
  *
  * TABLE OF CONTENTS:
- * 1. Session History Screen (SessionHistoryScreen)
- * 2. Expandable Session Item (SessionExpandableItem)
+ * 1. Session history screen entry point
+ * 2. Expandable session item composable
  */
 
 package io.github.velyene.loreweaver.ui.screens

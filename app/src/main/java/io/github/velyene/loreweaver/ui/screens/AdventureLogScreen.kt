@@ -1,5 +1,10 @@
 /*
  * FILE: AdventureLogScreen.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Adventure log screen shell and snackbar handling
+ * 2. Loading, empty, and populated log states
+ * 3. Clear-log confirmation flow
  */
 
 package io.github.velyene.loreweaver.ui.screens
@@ -18,9 +23,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,12 +54,31 @@ fun AdventureLogScreen(
 	onBack: () -> Unit,
 	viewModel: AdventureLogViewModel = hiltViewModel()
 ) {
-	val logs by viewModel.logs.collectAsStateWithLifecycle(initialValue = emptyList())
+	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val dateFormat = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
 	var showClearConfirmation by remember { mutableStateOf(false) }
 	val listState = rememberLazyListState()
+	val snackbarHostState = remember { SnackbarHostState() }
+	val retryActionLabel = stringResource(R.string.retry_action)
+
+	LaunchedEffect(uiState.error) {
+		val error = uiState.error ?: return@LaunchedEffect
+		val retryAction = uiState.onRetry
+		val result = snackbarHostState.showSnackbar(
+			message = error,
+			actionLabel = if (retryAction != null) retryActionLabel else null,
+			duration = SnackbarDuration.Long,
+		)
+		if (result == SnackbarResult.ActionPerformed) {
+			viewModel.clearError(error)
+			retryAction?.invoke()
+		} else {
+			viewModel.clearError(error)
+		}
+	}
 
 	Scaffold(
+		snackbarHost = { SnackbarHost(snackbarHostState) },
 		topBar = {
 			TopAppBar(
 				title = { Text(stringResource(R.string.adventure_log_title)) },
@@ -72,7 +101,13 @@ fun AdventureLogScreen(
 			)
 		}
 	) { padding ->
-		if (logs.isEmpty()) {
+		if (uiState.isLoading && uiState.logs.isEmpty()) {
+			CenteredLoadingState(
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(padding)
+			)
+		} else if (uiState.logs.isEmpty()) {
 			CenteredEmptyState(
 				message = stringResource(R.string.adventure_log_empty_message),
 				modifier = Modifier
@@ -87,7 +122,7 @@ fun AdventureLogScreen(
 					.padding(padding)
 					.visibleVerticalScrollbar(listState)
 			) {
-				items(logs, key = { it.id }) { entry ->
+				items(uiState.logs, key = { it.id }) { entry ->
 					ListItem(
 						overlineContent = {
 							Text(

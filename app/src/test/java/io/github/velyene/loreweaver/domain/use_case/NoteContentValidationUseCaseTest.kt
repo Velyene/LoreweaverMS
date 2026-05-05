@@ -2,14 +2,9 @@
  * FILE: NoteContentValidationUseCaseTest.kt
  *
  * TABLE OF CONTENTS:
- * 1. Class: NoteContentValidationUseCaseTest
- * 2. Function: addNoteUseCase_rejectsBlankContent_whenContentIsBlank
- * 3. Value: repository
- * 4. Value: useCase
- * 5. Function: updateNoteUseCase_rejectsBlankContent_whenContentIsBlank
- * 6. Function: addNoteUseCase_rejectsLoreWithoutHistoricalEra_whenHistoricalEraIsBlank
- * 7. Function: addNoteUseCase_rejectsNpcWithoutFaction_whenFactionIsBlank
- * 8. Function: addNoteUseCase_rejectsLocationWithoutRegion_whenRegionIsBlank
+ * 1. Add-note validation tests
+ * 2. Update-note validation tests
+ * 3. Fake notes repository
  */
 
 package io.github.velyene.loreweaver.domain.use_case

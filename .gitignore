@@ -77,13 +77,13 @@ long_kotlin_lines.txt
 *.log
 /out/
 EXCLUDED_REFERENCE_CORPUS_AUDIT.md
+toc-audit.txt
 
 # ============================================================
 # Local JetBrains inspection / formatting exports
 # ============================================================
 /AI_INTERACTION_LOG.md
 /.descriptions.xml
-/.xml
 /AndroidLint*.xml
 /EditorConfig*.xml
 /*Inspection*.xml

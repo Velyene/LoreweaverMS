@@ -2,19 +2,15 @@
  * FILE: AppDatabase.kt
  *
  * TABLE OF CONTENTS:
- * 1. Value: DATABASE_NAME
- * 2. Value: INSTANCE
- * 3. Value: MIGRATION_10_11
- * 4. Value: MIGRATION_9_10
- * 5. Value: MIGRATION_8_9
- * 6. Value: MIGRATION_7_8
- * 7. Value: MIGRATION_6_7
- * 8. Value: MIGRATION_5_6
+ * 1. Room database declaration
+ * 2. DAO accessors
+ * 3. Singleton, migrations, and builder helpers
  */
 
 package io.github.velyene.loreweaver.data
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -177,27 +173,59 @@ abstract class AppDatabase : RoomDatabase() {
 			}
 		}
 
+		internal fun isDebuggableBuild(context: Context): Boolean {
+			return (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+		}
+
+		internal fun createDatabaseBuilder(
+			context: Context,
+			databaseName: String = DATABASE_NAME,
+			isDebuggableBuild: Boolean = isDebuggableBuild(context)
+		): RoomDatabase.Builder<AppDatabase> {
+			val builder = Room.databaseBuilder(
+				context.applicationContext,
+				AppDatabase::class.java,
+				databaseName
+			)
+				.addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+
+			// Local/dev installs can legitimately open a newer on-device database after switching
+			// branches or testing older builds. Allow destructive downgrade fallback only in debug
+			// so development does not get stuck on missing downgrade paths, while release builds
+			// still fail fast unless an explicit production-safe migration policy is added.
+			if (isDebuggableBuild) {
+				builder.fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
+			}
+
+			return builder
+		}
+
+		internal fun resetInstanceForTesting() {
+			INSTANCE?.close()
+			INSTANCE = null
+		}
+
 		fun getDatabase(context: Context): AppDatabase {
 			return INSTANCE ?: synchronized(this) {
-				val instance = Room.databaseBuilder(
-					context.applicationContext,
-					AppDatabase::class.java,
-					DATABASE_NAME
+			val instance = Room.databaseBuilder(
+				context.applicationContext,
+				AppDatabase::class.java,
+				DATABASE_NAME
+			)
+				.addMigrations(
+					MIGRATION_4_5,
+					MIGRATION_5_6,
+					MIGRATION_6_7,
+					MIGRATION_7_8,
+					MIGRATION_8_9,
+					MIGRATION_9_10,
+					MIGRATION_10_11,
+								MIGRATION_11_12,
+								MIGRATION_12_13,
+														MIGRATION_13_14,
+														MIGRATION_14_15
 				)
-					.addMigrations(
-						MIGRATION_4_5,
-						MIGRATION_5_6,
-						MIGRATION_6_7,
-						MIGRATION_7_8,
-						MIGRATION_8_9,
-						MIGRATION_9_10,
-						MIGRATION_10_11,
-									MIGRATION_11_12,
-									MIGRATION_12_13,
-															MIGRATION_13_14,
-															MIGRATION_14_15
-					)
-					.build()
+				.build()
 				INSTANCE = instance
 				instance
 			}

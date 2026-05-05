@@ -23,7 +23,7 @@ class ReferenceScreenMagicItemSearchTest {
 		) { it.name }
 		assertQueryResults(
 			listOf("Bag of Beans"),
-			"cloud giantâ€™s castle",
+			"cloud giant’s castle",
 			::filterEquipmentMagicItems
 		) { it.name }
 		assertQueryResults(

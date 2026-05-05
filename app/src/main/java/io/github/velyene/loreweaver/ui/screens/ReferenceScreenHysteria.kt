@@ -1,11 +1,11 @@
 /*
- * FILE: ReferenceScreenMadness.kt
+ * FILE: ReferenceScreenHysteria.kt
  *
  * TABLE OF CONTENTS:
- * 1. Madness content entry point and remembered section state
+ * 1. Hysteria content entry point and remembered section state
  * 2. Header, roll, result, and table sections
  * 3. Roll-preview and table-entry mappers
- * 4. Share-text helpers
+ * 4. Share-text support
  */
 
 package io.github.velyene.loreweaver.ui.screens
@@ -45,8 +45,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
-import io.github.velyene.loreweaver.domain.util.MadnessDuration
-import io.github.velyene.loreweaver.domain.util.MadnessReference
+import io.github.velyene.loreweaver.domain.util.HysteriaDuration
+import io.github.velyene.loreweaver.domain.util.HysteriaReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,15 +54,15 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-internal fun MadnessContent(
-	selectedDuration: MadnessDuration,
+internal fun HysteriaContent(
+	selectedDuration: HysteriaDuration,
 	lastRoll: Int?,
 	lastResult: String?,
 	listState: LazyListState,
-	onDurationSelected: (MadnessDuration) -> Unit,
+	onDurationSelected: (HysteriaDuration) -> Unit,
 	onRoll: () -> Unit
 ) {
-	val madnessSectionState = rememberMadnessSectionState(
+	val hysteriaSectionState = rememberHysteriaSectionState(
 		listState = listState,
 		selectedDuration = selectedDuration,
 		lastRoll = lastRoll,
@@ -72,39 +72,39 @@ internal fun MadnessContent(
 	val shareChooserTitle = stringResource(R.string.reference_share_chooser_title)
 	val resultBringIntoViewRequester = remember { BringIntoViewRequester() }
 
-	LaunchedEffect(madnessSectionState.resultScrollToken, lastRoll, lastResult) {
-		if (madnessSectionState.resultScrollToken == 0 || lastRoll == null || lastResult.isNullOrBlank()) return@LaunchedEffect
+	LaunchedEffect(hysteriaSectionState.resultScrollToken, lastRoll, lastResult) {
+		if (hysteriaSectionState.resultScrollToken == 0 || lastRoll == null || lastResult.isNullOrBlank()) return@LaunchedEffect
 
 		delay(150.milliseconds)
 		resultBringIntoViewRequester.bringIntoView()
-		madnessSectionState.onResultShown()
+		hysteriaSectionState.onResultShown()
 	}
 
-	MadnessContentLayout(
+	HysteriaContentLayout(
 		selectedDuration = selectedDuration,
 		lastRoll = lastRoll,
 		lastResult = lastResult,
 		shareChooserTitle = shareChooserTitle,
 		context = context,
 		onDurationSelected = onDurationSelected,
-		state = madnessSectionState,
+		state = hysteriaSectionState,
 		resultBringIntoViewRequester = resultBringIntoViewRequester
 	)
 }
 
 @Composable
-private fun MadnessContentLayout(
-	selectedDuration: MadnessDuration,
+private fun HysteriaContentLayout(
+	selectedDuration: HysteriaDuration,
 	lastRoll: Int?,
 	lastResult: String?,
 	shareChooserTitle: String,
 	context: Context,
-	onDurationSelected: (MadnessDuration) -> Unit,
-	state: MadnessSectionState,
+	onDurationSelected: (HysteriaDuration) -> Unit,
+	state: HysteriaSectionState,
 	resultBringIntoViewRequester: BringIntoViewRequester
 ) {
 	Column(modifier = Modifier.fillMaxSize()) {
-		MadnessDurationTabs(
+		HysteriaDurationTabs(
 			selectedDuration = selectedDuration,
 			onDurationSelected = onDurationSelected
 		)
@@ -119,7 +119,7 @@ private fun MadnessContentLayout(
 			verticalArrangement = Arrangement.spacedBy(12.dp)
 		) {
 			item {
-				MadnessHeaderSection(
+				HysteriaHeaderSection(
 					selectedDuration = selectedDuration,
 					lastRoll = lastRoll,
 					lastResult = lastResult,
@@ -129,7 +129,7 @@ private fun MadnessContentLayout(
 			}
 
 			item {
-				MadnessRollSection(
+				HysteriaRollSection(
 					isRolling = state.isRolling,
 					animatedRoll = state.animatedRoll,
 					lastRoll = lastRoll,
@@ -140,7 +140,7 @@ private fun MadnessContentLayout(
 			}
 
 			item {
-				MadnessTableSection(
+				HysteriaTableSection(
 					tableEntries = state.tableEntries,
 					highlightedRoll = state.highlightedRoll
 				)
@@ -149,9 +149,9 @@ private fun MadnessContentLayout(
 	}
 }
 
-private data class MadnessSectionState(
+private data class HysteriaSectionState(
 	val listState: LazyListState,
-	val tableEntries: List<MadnessTableDisplayEntry>,
+	val tableEntries: List<HysteriaTableDisplayEntry>,
 	val highlightedRoll: Int?,
 	val animatedRoll: Int?,
 	val isRolling: Boolean,
@@ -161,20 +161,20 @@ private data class MadnessSectionState(
 )
 
 @Composable
-private fun rememberMadnessSectionState(
+private fun rememberHysteriaSectionState(
 	listState: LazyListState,
-	selectedDuration: MadnessDuration,
+	selectedDuration: HysteriaDuration,
 	lastRoll: Int?,
 	onRoll: () -> Unit
-): MadnessSectionState {
+): HysteriaSectionState {
 	val coroutineScope = rememberCoroutineScope()
-	val tableEntries = remember(selectedDuration) { createMadnessTableEntries(selectedDuration) }
+	val tableEntries = remember(selectedDuration) { createHysteriaTableEntries(selectedDuration) }
 	var animatedRoll by remember(selectedDuration) { mutableStateOf<Int?>(null) }
 	var isRolling by remember(selectedDuration) { mutableStateOf(false) }
 	var resultScrollToken by remember(selectedDuration) { mutableIntStateOf(0) }
 	val highlightedRoll = animatedRoll ?: lastRoll
 
-	return MadnessSectionState(
+	return HysteriaSectionState(
 		listState = listState,
 		tableEntries = tableEntries,
 		highlightedRoll = highlightedRoll,
@@ -182,7 +182,7 @@ private fun rememberMadnessSectionState(
 		isRolling = isRolling,
 		resultScrollToken = resultScrollToken,
 		onRollRequested = {
-			startMadnessRollPreview(
+			startHysteriaRollPreview(
 				coroutineScope = coroutineScope,
 				isRolling = isRolling,
 				onRollingChange = {
@@ -208,8 +208,8 @@ private fun rememberMadnessSectionState(
 }
 
 @Composable
-private fun MadnessTableEntryCard(
-	entry: MadnessTableDisplayEntry,
+private fun HysteriaTableEntryCard(
+	entry: HysteriaTableDisplayEntry,
 	isHighlighted: Boolean = false
 ) {
 	Card(
@@ -233,7 +233,7 @@ private fun MadnessTableEntryCard(
 	}
 }
 
-private fun startMadnessRollPreview(
+private fun startHysteriaRollPreview(
 	coroutineScope: CoroutineScope,
 	isRolling: Boolean,
 	onRollingChange: (Boolean) -> Unit,
@@ -256,15 +256,15 @@ private fun startMadnessRollPreview(
 }
 
 @Composable
-private fun MadnessDurationTabs(
-	selectedDuration: MadnessDuration,
-	onDurationSelected: (MadnessDuration) -> Unit
+private fun HysteriaDurationTabs(
+	selectedDuration: HysteriaDuration,
+	onDurationSelected: (HysteriaDuration) -> Unit
 ) {
 	PrimaryScrollableTabRow(
 		selectedTabIndex = selectedDuration.ordinal,
 		containerColor = MaterialTheme.colorScheme.surface
 	) {
-		MadnessDuration.entries.forEach { duration ->
+		HysteriaDuration.entries.forEach { duration ->
 			Tab(
 				selected = selectedDuration == duration,
 				onClick = { onDurationSelected(duration) },
@@ -280,16 +280,16 @@ private fun MadnessDurationTabs(
 }
 
 @Composable
-private fun MadnessDurationInfoCard(selectedDuration: MadnessDuration) {
+private fun HysteriaDurationInfoCard(selectedDuration: HysteriaDuration) {
 	Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
 		Column(modifier = Modifier.padding(12.dp)) {
 			Text(
-				text = "Duration: ${MadnessReference.getDurationDescription(selectedDuration)}",
+				text = "Duration: ${HysteriaReference.getDurationDescription(selectedDuration)}",
 				fontWeight = FontWeight.Bold
 			)
 			Spacer(modifier = Modifier.height(4.dp))
 			Text(
-				text = MadnessReference.getCureInfo()[selectedDuration].orEmpty(),
+				text = HysteriaReference.getCureInfo()[selectedDuration].orEmpty(),
 				fontSize = 12.sp
 			)
 		}
@@ -297,8 +297,8 @@ private fun MadnessDurationInfoCard(selectedDuration: MadnessDuration) {
 }
 
 @Composable
-private fun MadnessHeaderSection(
-	selectedDuration: MadnessDuration,
+private fun HysteriaHeaderSection(
+	selectedDuration: HysteriaDuration,
 	lastRoll: Int?,
 	lastResult: String?,
 	shareChooserTitle: String,
@@ -306,22 +306,22 @@ private fun MadnessHeaderSection(
 ) {
 	Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 		ReferenceTitleWithShare(
-			title = stringResource(R.string.reference_tab_madness),
+			title = stringResource(R.string.reference_tab_hysteria),
 			onShare = {
 				shareReferenceText(
 					context = context,
 					chooserTitle = shareChooserTitle,
-					text = buildMadnessReferenceShareText(selectedDuration, lastRoll, lastResult)
+					text = buildHysteriaReferenceShareText(selectedDuration, lastRoll, lastResult)
 				)
 			}
 		)
 
-		MadnessDurationInfoCard(selectedDuration)
+		HysteriaDurationInfoCard(selectedDuration)
 	}
 }
 
 @Composable
-private fun MadnessRollSection(
+private fun HysteriaRollSection(
 	isRolling: Boolean,
 	animatedRoll: Int?,
 	lastRoll: Int?,
@@ -330,20 +330,20 @@ private fun MadnessRollSection(
 	resultBringIntoViewRequester: BringIntoViewRequester
 ) {
 	Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-		MadnessRollButton(
+		HysteriaRollButton(
 			isRolling = isRolling,
 			onRoll = onRollRequested
 		)
 
 		animatedRoll?.let { previewRoll ->
 			InfoCard(
-				title = stringResource(R.string.madness_rolling_preview_title, previewRoll),
-				body = stringResource(R.string.madness_rolling_preview_body)
+				title = stringResource(R.string.hysteria_rolling_preview_title, previewRoll),
+				body = stringResource(R.string.hysteria_rolling_preview_body)
 			)
 		}
 
 		if (lastRoll != null && !lastResult.isNullOrBlank()) {
-			MadnessResultCard(
+			HysteriaResultCard(
 				roll = lastRoll,
 				result = lastResult,
 				modifier = Modifier.bringIntoViewRequester(resultBringIntoViewRequester)
@@ -353,7 +353,7 @@ private fun MadnessRollSection(
 }
 
 @Composable
-private fun MadnessResultCard(
+private fun HysteriaResultCard(
 	roll: Int,
 	result: String,
 	modifier: Modifier = Modifier
@@ -367,7 +367,7 @@ private fun MadnessResultCard(
 			verticalArrangement = Arrangement.spacedBy(6.dp)
 		) {
 			Text(
-				text = stringResource(R.string.madness_roll_result_title, roll),
+				text = stringResource(R.string.hysteria_roll_result_title, roll),
 				style = MaterialTheme.typography.titleSmall,
 				fontWeight = FontWeight.Bold,
 				color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -382,13 +382,13 @@ private fun MadnessResultCard(
 }
 
 @Composable
-private fun MadnessTableSection(
-	tableEntries: List<MadnessTableDisplayEntry>,
+private fun HysteriaTableSection(
+	tableEntries: List<HysteriaTableDisplayEntry>,
 	highlightedRoll: Int?
 ) {
 	Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 		tableEntries.forEach { entry ->
-			MadnessTableEntryCard(
+			HysteriaTableEntryCard(
 				entry = entry,
 				isHighlighted = highlightedRoll != null && highlightedRoll in entry.range
 			)
@@ -397,7 +397,7 @@ private fun MadnessTableSection(
 }
 
 @Composable
-private fun MadnessRollButton(
+private fun HysteriaRollButton(
 	isRolling: Boolean,
 	onRoll: () -> Unit
 ) {
@@ -414,32 +414,32 @@ private fun MadnessRollButton(
 	}
 }
 
-private data class MadnessTableDisplayEntry(
+private data class HysteriaTableDisplayEntry(
 	val key: String,
 	val range: IntRange,
 	val text: String
 )
 
-private fun createMadnessTableEntries(duration: MadnessDuration): List<MadnessTableDisplayEntry> =
+private fun createHysteriaTableEntries(duration: HysteriaDuration): List<HysteriaTableDisplayEntry> =
 	when (duration) {
-		MadnessDuration.SHORT_TERM -> MadnessReference.SHORT_TERM_EFFECTS.map { effect ->
-			MadnessTableDisplayEntry(
+		HysteriaDuration.SHORT_TERM -> HysteriaReference.SHORT_TERM_EFFECTS.map { effect ->
+			HysteriaTableDisplayEntry(
 				key = "${duration.name}-${effect.diceRange.first}",
 				range = effect.diceRange,
 				text = effect.effect
 			)
 		}
 
-		MadnessDuration.LONG_TERM -> MadnessReference.LONG_TERM_EFFECTS.map { effect ->
-			MadnessTableDisplayEntry(
+		HysteriaDuration.LONG_TERM -> HysteriaReference.LONG_TERM_EFFECTS.map { effect ->
+			HysteriaTableDisplayEntry(
 				key = "${duration.name}-${effect.diceRange.first}",
 				range = effect.diceRange,
 				text = effect.effect
 			)
 		}
 
-		MadnessDuration.INDEFINITE -> MadnessReference.INDEFINITE_FLAWS.map { (flaw, range) ->
-			MadnessTableDisplayEntry(
+		HysteriaDuration.INDEFINITE -> HysteriaReference.INDEFINITE_FLAWS.map { (flaw, range) ->
+			HysteriaTableDisplayEntry(
 				key = "${duration.name}-${range.first}",
 				range = range,
 				text = flaw
@@ -447,19 +447,21 @@ private fun createMadnessTableEntries(duration: MadnessDuration): List<MadnessTa
 		}
 	}
 
-private fun buildMadnessReferenceShareText(
-	duration: MadnessDuration,
+private fun buildHysteriaReferenceShareText(
+	duration: HysteriaDuration,
 	lastRoll: Int?,
 	lastResult: String?
 ): String = buildString {
-	appendLine("Madness Reference")
-	appendLine("Duration: ${MadnessReference.getDurationDescription(duration)}")
-	appendLine("Cure: ${MadnessReference.getCureInfo()[duration].orEmpty()}")
+	appendLine("Hysteria Reference")
+	appendLine("Duration: ${HysteriaReference.getDurationDescription(duration)}")
+	appendLine("Cure: ${HysteriaReference.getCureInfo()[duration].orEmpty()}")
 	appendLine()
 	if (lastRoll != null && !lastResult.isNullOrBlank()) {
 		appendLine("Latest Roll: $lastRoll")
 		appendLine(lastResult)
 	} else {
-		appendLine("No roll yet. Use the d100 roller to generate a madness result.")
+		appendLine("No roll yet. Use the d100 roller to generate a hysteria result.")
 	}
 }.trim()
+
+

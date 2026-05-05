@@ -2,14 +2,11 @@
  * FILE: CampaignRepositoryImpl.kt
  *
  * TABLE OF CONTENTS:
- * 1. Class: CampaignRepositoryImpl
- * 2. Value: campaignDao
- * 3. Value: encounterDao
- * 4. Value: characterDao
- * 5. Value: sessionDao
- * 6. Value: noteDao
- * 7. Value: logDao
- * 8. Value: encounterIds
+ * 1. Campaign queries and writes
+ * 2. Encounter persistence and combatant snapshots
+ * 3. Character persistence
+ * 4. Session and note persistence
+ * 5. Log persistence and retention
  */
 
 package io.github.velyene.loreweaver.data.repository
@@ -47,9 +44,6 @@ class CampaignRepositoryImpl(
 	override fun getAllCampaigns(): Flow<List<Campaign>> =
 		campaignDao.getAllCampaigns().map { entities -> entities.map { it.toDomain() } }
 
-	override fun getAllEncounters(): Flow<List<Encounter>> =
-		encounterDao.getAllEncounters().map { entities -> entities.map { it.toDomain() } }
-
 	override suspend fun getCampaignById(id: String): Campaign? =
 		campaignDao.getCampaignById(id)?.toDomain()
 
@@ -57,44 +51,12 @@ class CampaignRepositoryImpl(
 		campaignDao.insertCampaign(campaign.toEntity())
 	}
 
-	override suspend fun updateCampaign(campaign: Campaign) {
-		val existingEntity = campaignDao.getCampaignById(campaign.id)
-		campaignDao.insertCampaign(
-			campaign.toEntity().let { entity ->
-				if (existingEntity != null) {
-					entity.copy(createdAt = existingEntity.createdAt)
-				} else {
-					entity
-				}
-			}
-		)
-	}
-
-	override suspend fun deleteCampaign(campaign: Campaign) {
-		val encounterIds = encounterDao.getEncounterIdsForCampaign(campaign.id)
-		if (encounterIds.isNotEmpty()) {
-			sessionDao.clearEncounterReferences(encounterIds)
-		}
-		campaignDao.deleteCampaignById(campaign.id)
-	}
-
 	override fun getEncountersForCampaign(campaignId: String): Flow<List<Encounter>> =
 		encounterDao.getEncountersForCampaign(campaignId)
 			.map { entities -> entities.map { it.toDomain() } }
 
 	override suspend fun insertEncounter(encounter: Encounter) {
-		upsertEncounter(encounter)
-	}
-
-	override suspend fun updateEncounter(encounter: Encounter) {
-		upsertEncounter(encounter)
-	}
-
-	override suspend fun deleteEncounter(encounter: Encounter) {
-		sessionDao.clearEncounterReferences(listOf(encounter.id))
-		encounterDao.getEncounterById(encounter.id)?.let { entity ->
-			encounterDao.deleteEncounter(entity)
-		}
+		encounterDao.insertEncounter(encounter.toEntity())
 	}
 
 	override suspend fun getEncounterById(encounterId: String): Encounter? =
@@ -137,9 +99,6 @@ class CampaignRepositoryImpl(
 		sessionDao.insertSession(session.toEntity())
 	}
 
-	override suspend fun getSessionById(sessionId: String): SessionRecord? =
-		sessionDao.getSessionById(sessionId)?.toDomain()
-
 	override fun getNotesForCampaign(campaignId: String): Flow<List<Note>> =
 		noteDao.getNotesForCampaign(campaignId).map { entities -> entities.map { it.toDomain() } }
 
@@ -178,7 +137,6 @@ class CampaignRepositoryImpl(
 
 	override suspend fun setActiveEncounter(encounterId: String) {
 		encounterDao.clearActiveEncounters()
-		if (encounterId.isBlank()) return
 		val encounter = encounterDao.getEncounterById(encounterId)
 		encounter?.let {
 			encounterDao.updateEncounter(it.copy(isActive = true))
@@ -187,9 +145,6 @@ class CampaignRepositoryImpl(
 
 	override suspend fun getRecentSession(): SessionRecord? =
 		sessionDao.getRecentSession()?.toDomain()
-
-	override suspend fun getRecentSessionForEncounter(encounterId: String): SessionRecord? =
-		sessionDao.getRecentSessionForEncounter(encounterId)?.toDomain()
 
 	override fun getAllLogs(): Flow<List<LogEntry>> =
 		logDao.getAllLogs().map { entities -> entities.map { it.toDomain() } }
@@ -204,22 +159,5 @@ class CampaignRepositoryImpl(
 
 	override suspend fun clearLogs() {
 		logDao.clearLogs()
-	}
-
-	private suspend fun upsertEncounter(encounter: Encounter) {
-		val existingEntity = encounterDao.getEncounterById(encounter.id)
-		val targetEntity = encounter.toEntity().let { candidate ->
-			if (existingEntity != null) {
-				candidate.copy(createdAt = existingEntity.createdAt)
-			} else {
-				candidate
-			}
-		}
-
-		if (existingEntity == null) {
-			encounterDao.insertEncounter(targetEntity)
-		} else {
-			encounterDao.updateEncounter(targetEntity)
-		}
 	}
 }

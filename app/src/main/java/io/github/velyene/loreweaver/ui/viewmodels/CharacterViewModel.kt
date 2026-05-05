@@ -12,7 +12,8 @@ import io.github.velyene.loreweaver.domain.use_case.GetCharacterByIdUseCase
 import io.github.velyene.loreweaver.domain.use_case.GetCharactersUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertLogUseCase
 import io.github.velyene.loreweaver.domain.use_case.UpdateCharacterUseCase
-import io.github.velyene.loreweaver.ui.util.UiText
+import io.github.velyene.loreweaver.ui.util.AppText
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +25,7 @@ data class CharacterUiState(
 	val characters: List<CharacterEntry> = emptyList(),
 	val selectedCharacter: CharacterEntry? = null,
 	val isLoading: Boolean = false,
-	val error: UiText? = null
+	val error: String? = null
 )
 
 @HiltViewModel
@@ -34,11 +35,14 @@ class CharacterViewModel @Inject constructor(
 	private val addCharacterUseCase: AddCharacterUseCase,
 	private val updateCharacterUseCase: UpdateCharacterUseCase,
 	private val deleteCharacterUseCase: DeleteCharacterUseCase,
-	private val insertLogUseCase: InsertLogUseCase
+	private val insertLogUseCase: InsertLogUseCase,
+	private val appText: AppText
 ) : ViewModel() {
 	private companion object {
 		const val DEFAULT_LOG_TYPE = "Roll"
 	}
+
+	private var selectedCharacterId: String? = null
 
 	private val _uiState = MutableStateFlow(CharacterUiState())
 	val uiState: StateFlow<CharacterUiState> = _uiState.asStateFlow()
@@ -52,76 +56,98 @@ class CharacterViewModel @Inject constructor(
 			beginLoading()
 			try {
 				getCharactersUseCase().collect { characters ->
-					_uiState.update { it.copy(characters = characters, isLoading = false) }
+					_uiState.update { currentState ->
+						currentState.copy(
+							characters = characters,
+							selectedCharacter = selectedCharacterId?.let { id ->
+								characters.find { it.id == id }
+							},
+							isLoading = false
+						)
+					}
 				}
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
-				reportError(formatError(UiText.StringResource(R.string.error_load_characters), e))
+				reportError(formatCampaignError(appText, R.string.character_error_load, e))
 			}
 		}
 	}
 
 	fun selectCharacter(id: String) {
+		selectedCharacterId = id
 		viewModelScope.launch {
 			beginLoading()
 			try {
 				val character = getCharacterByIdUseCase(id)
 				_uiState.update { it.copy(selectedCharacter = character, isLoading = false) }
+			} catch (e: CancellationException) {
+				throw e
 			} catch (e: Exception) {
-				reportError(formatError(UiText.StringResource(R.string.error_character_not_found), e))
+				reportError(formatCampaignError(appText, R.string.character_error_not_found, e))
 			}
 		}
 	}
 
-	fun addCharacter(character: CharacterEntry) {
-		launchActionWithError(UiText.StringResource(R.string.error_add_character)) { addCharacterUseCase(character) }
+	fun addCharacter(character: CharacterEntry, onSuccess: () -> Unit = {}) {
+		launchActionWithError(
+			errorPrefix = "Failed to add character",
+			action = { addCharacterUseCase(character) },
+			onSuccess = onSuccess
+		)
 	}
 
-	fun updateCharacter(character: CharacterEntry) {
-		_uiState.update { state ->
-			if (state.selectedCharacter?.id == character.id) {
-				state.copy(selectedCharacter = character)
-			} else {
-				state
-			}
-		}
-		launchActionWithError(UiText.StringResource(R.string.error_update_character)) { updateCharacterUseCase(character) }
+	fun updateCharacter(character: CharacterEntry, onSuccess: () -> Unit = {}) {
+		launchActionWithError(
+			errorPrefix = "Failed to update character",
+			action = { updateCharacterUseCase(character) },
+			onSuccess = onSuccess
+		)
 	}
 
-	fun deleteCharacter(character: CharacterEntry) {
-		_uiState.update { state ->
-			if (state.selectedCharacter?.id == character.id) {
-				state.copy(selectedCharacter = null)
-			} else {
-				state
+	fun deleteCharacter(character: CharacterEntry, onSuccess: () -> Unit = {}) {
+		launchActionWithError(
+			errorPrefix = "Failed to delete character",
+			action = { deleteCharacterUseCase(character) },
+			onSuccess = {
+				if (selectedCharacterId == character.id) {
+					selectedCharacterId = null
+					_uiState.update { it.copy(selectedCharacter = null) }
+				}
+				onSuccess()
 			}
-		}
-		launchActionWithError(UiText.StringResource(R.string.error_delete_character)) { deleteCharacterUseCase(character) }
+		)
 	}
 
 	private fun beginLoading() {
-		_uiState.update { it.copy(isLoading = true, error = null) }
+		_uiState.update { it.beginLoading() }
 	}
 
-	private fun reportError(message: UiText) {
-		_uiState.update { it.copy(isLoading = false, error = message) }
+	private fun reportError(message: String) {
+		_uiState.update { it.withError(message) }
 	}
 
-	private fun formatError(prefix: UiText, exception: Exception): UiText {
-		return UiText.StringResource(R.string.error_with_detail, listOf(prefix, exceptionDetail(exception)))
+	private fun formatError(prefix: String, exception: Exception): String {
+		return "$prefix: ${exceptionDetail(exception)}"
 	}
 
-	private fun launchActionWithError(errorPrefix: UiText, action: suspend () -> Unit) {
+	private fun launchActionWithError(
+		errorPrefix: String,
+		action: suspend () -> Unit,
+		onSuccess: () -> Unit = {}
+	) {
 		viewModelScope.launch {
 			try {
 				action()
+				onSuccess()
 			} catch (e: Exception) {
-				reportError(formatError(errorPrefix, e))
+				reportError(formatCampaignError(appText, errorPrefixResId, e))
 			}
 		}
 	}
 
 	fun clearError() {
-		_uiState.update { it.copy(error = null) }
+		_uiState.update { it.clearErrorState() }
 	}
 
 	fun logAction(message: String, type: String = DEFAULT_LOG_TYPE) {

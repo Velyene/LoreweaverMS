@@ -2,14 +2,9 @@
  * FILE: MonsterReferenceSupport.kt
  *
  * TABLE OF CONTENTS:
- * 1. Value: MONSTER_GROUP_ANIMALS
- * 2. Value: MONSTER_STAT_AC
- * 3. Value: MONSTER_STAT_INITIATIVE
- * 4. Value: MONSTER_STAT_HP
- * 5. Value: MONSTER_STAT_SPEED
- * 6. Value: MONSTER_STAT_CR
- * 7. Value: MONSTER_SECTION_TRAIT
- * 8. Value: MONSTER_SECTION_TRAITS
+ * 1. Shared monster labels, section names, and preview metadata
+ * 2. Monster entry construction and stat-row parsing
+ * 3. Body-section extraction and profile helpers
  */
 
 package io.github.velyene.loreweaver.domain.util

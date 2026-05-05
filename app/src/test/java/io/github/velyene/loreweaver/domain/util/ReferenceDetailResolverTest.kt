@@ -2,14 +2,9 @@
  * FILE: ReferenceDetailResolverTest.kt
  *
  * TABLE OF CONTENTS:
- * 1. Class: ReferenceDetailResolverTest
- * 2. Value: ALLOSAURUS
- * 3. Value: SWARM_OF_BATS
- * 4. Function: resolve_returnsFeatDetailsForSrdFeatSlug
- * 5. Value: detail
- * 6. Function: resolve_returnsWeaponDetailsForSrdEquipmentSlug
- * 7. Function: resolve_returnsSafeSpellIndexEntryForCanonicalSpellSlug
- * 8. Function: resolve_returnsMonsterDetailsForRestoredMonsterCorpus
+ * 1. Feat, equipment, and spell detail resolution tests
+ * 2. Monster detail and grouped-entry resolution tests
+ * 3. Fallback and missing-detail behavior tests
  */
 
 package io.github.velyene.loreweaver.domain.util
@@ -215,12 +210,12 @@ class ReferenceDetailResolverTest {
 	fun resolve_acceptsSingularCategoryAliasesAndTypographicSlugs() {
 		val spellDetail = ReferenceDetailResolver.resolve(
 			"Spell",
-			ReferenceDetailResolver.slugFor("Heroesâ€™ Feast")
+			ReferenceDetailResolver.slugFor("Heroes’ Feast")
 		)
 		val conditionDetail = ReferenceDetailResolver.resolve("Condition", "blinded")
 
 		assertNotNull(spellDetail)
-		assertEquals("Heroesâ€™ Feast", spellDetail?.title)
+		assertEquals("Heroes’ Feast", spellDetail?.title)
 		assertNotNull(conditionDetail)
 		assertEquals("Blinded", conditionDetail?.title)
 	}
