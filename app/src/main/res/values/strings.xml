@@ -232,7 +232,6 @@
     <string name="hit_die_section_title">Hit Die</string>
     <string name="custom_actions_section_title">Custom Actions</string>
     <string name="damage_label_short">Damage</string>
-    <string name="action_costs_section_label">Action costs &amp; requirements</string>
     <string name="action_mana_cost_label">Mana Cost</string>
     <string name="action_stamina_cost_label">Stamina Cost</string>
     <string name="action_spell_slot_label">Spell Slot</string>
@@ -327,7 +326,6 @@ Currency share: %2$s</string>
     <string name="reward_review_unclaimed_action">Unclaimed</string>
     <string name="reward_review_assigned_to_character">Assigned to %1$s</string>
     <string name="current_conditions_label">Current Conditions</string>
-    <string name="current_conditions_supporting_text">Use this for short-lived status notes, concentration, wounds, or encounter-only effects.</string>
     <string name="encounter_conditions_title">Encounter Conditions</string>
     <string name="encounter_conditions_supporting_text">Track short-lived SRD conditions and custom effects that matter right now.</string>
     <string name="encounter_conditions_empty">No encounter conditions selected.</string>
@@ -360,7 +358,6 @@ Currency share: %2$s</string>
     <string name="character_builder_validation_attention">Needs attention</string>
 
     <!-- Classes/Types -->
-    <string name="class_rogue" tools:keep="@string/class_rogue">Rogue</string>
     <string name="class_paladin" tools:keep="@string/class_paladin">Paladin</string>
     <string name="class_ranger" tools:keep="@string/class_ranger">Ranger</string>
 
@@ -560,7 +557,6 @@ Create one to begin your journey!</string>
     <string name="edit_encounter">Edit %1$s</string>
     <string name="delete_encounter">Delete %1$s</string>
     <string name="confirm_delete_encounter_title">Delete encounter?</string>
-    <string name="confirm_delete_encounter_message">%1$s will be permanently removed.</string>
     <string name="encounter_updated_message">Encounter updated.</string>
     <string name="encounter_deleted_message">Encounter deleted.</string>
     <string name="view_encounter_details_desc">View encounter details</string>
@@ -569,16 +565,11 @@ Create one to begin your journey!</string>
     <string name="encounter_creation_setup_message">Create the encounter shell now, then choose saved party members, add enemies, and add notes from the setup screen.</string>
     <string name="monster_import_removed_message">Monster library import has been removed from
         this build.</string>
-    <string name="encounter_not_found_message">Encounter not found.</string>
     <string name="encounter_error_load">Failed to load encounter</string>
-    <string name="encounter_error_start">Failed to start encounter</string>
     <string name="encounter_error_save">Failed to save encounter</string>
-    <string name="encounter_monster_picker_helper">Add monsters from the local library below. Selected creatures will be imported into the encounter with their reference stats.</string>
-    <string name="encounter_monster_picker_empty">No monsters match the current search and filters.</string>
     <string name="encounter_selected_monsters_more" tools:ignore="PluralsCandidate">+%1$d more</string>
     <string name="encounter_no_monsters_selected">No monsters selected yet.</string>
     <string name="encounter_add_monster_button">Add</string>
-    <string name="encounter_remove_all_button">Remove</string>
     <string name="encounter_monster_sort_label">Sort monsters</string>
     <string name="encounter_monster_sort_name">Name</string>
     <string name="encounter_monster_sort_cr">CR</string>
@@ -616,7 +607,6 @@ Create one to begin your journey!</string>
     <string name="session_detail_saved_at_label">Saved: %1$s</string>
     <string name="session_detail_open_campaign_button">Open Campaign</string>
     <string name="session_detail_open_button">View Session Detail</string>
-    <string name="session_detail_snapshot_unavailable">No end-state snapshot was saved for this session.</string>
     <string name="session_summary_badge">SAVED SESSION</string>
     <string name="encounter_summary_badge">ENCOUNTER SUMMARY</string>
     <string name="session_summary_snapshot_title">Encounter snapshot</string>
@@ -634,7 +624,6 @@ and ready when you return</string>
     <string name="character_error_add">Failed to add character</string>
     <string name="character_error_update">Failed to update character</string>
     <string name="character_error_delete">Failed to delete character</string>
-    <string name="session_summary_badge">ENCOUNTER SAVED</string>
     <string name="session_summary_done_button">Return Home</string>
     <string name="session_summary_open_adventure_log">Open Adventure Log</string>
     <string name="encounter_summary_log_title">Combat Log Snippet</string>
@@ -643,7 +632,6 @@ and ready when you return</string>
     <string name="open_session_action">Open session %1$s</string>
     <string name="search_sessions_label">Search sessions</string>
     <string name="search_sessions_placeholder">Search sessions…</string>
-    <string name="session_history_empty_message">No sessions found.</string>
     <string name="session_history_load_failed_message">Session history couldn’t be loaded right now.</string>
     <string name="session_combat_log_title">Combat Log</string>
     <string name="session_summary_empty_message">No recent encounter summary is available.</string>
@@ -656,12 +644,9 @@ and ready when you return</string>
     <string name="encounter_summary_surviving_party_title">Surviving Party</string>
     <string name="session_summary_saved_title">Outcome</string>
     <string name="session_summary_saved_subtitle">Saved</string>
-    <string name="session_summary_surviving_players_title">Surviving Players</string>
     <string name="session_summary_defeated_enemies_title">Defeated Enemies</string>
-    <string name="session_summary_persistent_statuses_title">Persistent Statuses Remaining</string>
     <string name="session_summary_rewards_title">Encounter Rewards</string>
     <string name="session_summary_no_persistent_statuses_message">No persistent statuses remain on the party.</string>
-    <string name="session_summary_reward_xp">Experience: %1$d XP</string>
     <string name="session_summary_reward_currency">Currency: %1$s</string>
     <string name="session_summary_reward_xp_share">XP share: %1$d participants • %2$d XP each</string>
     <string name="session_summary_reward_xp_surplus">XP rounding surplus: %1$d XP</string>
@@ -671,7 +656,6 @@ and ready when you return</string>
     <string name="session_summary_reward_participants_title">Participant shares</string>
     <string name="session_summary_reward_participant_line">%1$s — %2$d XP • %3$s</string>
     <string name="session_summary_reward_unassigned_loot_title">Unassigned loot</string>
-    <string name="session_summary_reward_special_items_title">Special items</string>
     <string name="session_summary_reward_log_title">Reward history log</string>
     <string name="session_summary_log_empty_message">No combat log entries were recorded.</string>
     <string name="session_summary_continue_campaign_button">Open Campaign</string>
@@ -686,8 +670,6 @@ and ready when you return</string>
     <string name="session_end_state_title">End State</string>
     <string name="session_final_round">Final Round: %1$d</string>
     <string name="session_combatant_hp_summary">%1$s: %2$d/%3$d HP</string>
-    <string name="session_expand_action">Expand session details for %1$s</string>
-    <string name="session_collapse_action">Collapse session details for %1$s</string>
     <string name="accessibility_state_expanded">Expanded</string>
     <string name="accessibility_state_collapsed">Collapsed</string>
 
@@ -719,7 +701,7 @@ and ready when you return</string>
     <string name="error_load_session_detail">Failed to load session detail.</string>
     <string name="error_load_encounter">Failed to load encounter</string>
     <string name="error_start_encounter">Failed to start encounter</string>
-    <string name="encounter_created_with_monsters_message">Encounter created with %1$d monsters!</string>
+
     <string name="combat_setup_badge_label">SETUP</string>
     <string name="combat_tracker_badge_label">TRACKER</string>
     <string name="combat_round_begins_status">Round %1$d begins</string>
@@ -826,7 +808,6 @@ and ready when you return</string>
     <string name="encounter_compact_mode_on">Compact mode on</string>
     <string name="encounter_compact_mode_off">Compact mode off</string>
     <string name="encounter_compact_mode_enable_action">Use compact mode</string>
-    <string name="encounter_compact_mode_disable_action">Use standard mode</string>
     <string name="encounter_resource_temp_hp">Temp HP %1$d</string>
     <string name="encounter_resource_mana">Mana %1$d/%2$d</string>
     <string name="encounter_resource_stamina">Stamina %1$d/%2$d</string>
@@ -843,12 +824,10 @@ and ready when you return</string>
     <string name="encounter_turn_step_select_target">2. Choose the target that action affects on the shared battlefield roster.</string>
     <string name="encounter_turn_step_apply_result">3. Apply the outcome, update HP or status as needed, and let the log capture the event.</string>
     <string name="encounter_turn_step_ready_to_end">4. The turn is recorded. End it here to advance to the next unit.</string>
-    <string name="encounter_available_actions_title">Available Actions</string>
     <string name="encounter_dm_priority_title">Turn Priority</string>
     <string name="encounter_dm_priority_supporting_text">Keep the active unit, next turn, and urgent status changes visible before you move into the deeper control rows.</string>
     <string name="encounter_dm_priority_active_now">Now: %1$s</string>
     <string name="encounter_dm_priority_next_up">Next: %1$s</string>
-    <string name="encounter_dm_priority_next_up_none">Next: none</string>
     <string name="encounter_danger_signals_title">Danger Signals</string>
     <string name="encounter_danger_signal_stable">Stable — no urgent HP or status warnings on the active participant.</string>
     <string name="encounter_danger_signal_low_hp">Low HP: %1$s at %2$d/%3$d.</string>
@@ -937,7 +916,6 @@ and ready when you return</string>
     <string name="encounter_lifecycle_completed">Completed</string>
     <string name="encounter_lifecycle_archived">Archived</string>
     <string name="encounter_roster_title">Encounter Roster (%1$d)</string>
-    <string name="encounter_order_label">Order</string>
     <string name="encounter_move_earlier_button">Earlier</string>
     <string name="encounter_move_later_button">Later</string>
     <string name="encounter_roster_empty_message">No combatants added yet.
@@ -950,8 +928,6 @@ Add your party or individual enemies above.</string>
     <string name="encounter_notes_title">Encounter notes</string>
     <string name="encounter_notes_section_title">Encounter Notes</string>
     <string name="encounter_notes_collapsed_empty">No notes yet. Expand to add setup details.</string>
-    <string name="encounter_notes_collapsed_preview">%1$s</string>
-    <string name="encounter_notes_expand_action">Expand notes</string>
     <string name="encounter_notes_collapse_action">Collapse notes</string>
     <string name="add_enemy_dialog_title">Add Enemy</string>
     <string name="encounter_enemy_batch_helper">Use quantity to add a wave at once. Names are auto-numbered for faster turn tracking.</string>
@@ -978,7 +954,7 @@ Add your party or individual enemies above.</string>
     <string name="damage_combatant_desc">Deal 1 damage to %1$s</string>
     <string name="heal_combatant_desc">Heal %1$s by 1</string>
     <string name="add_condition_desc">Add condition</string>
-    <string name="condition_persistent_chip_suffix">(Persistent)</string>
+
     <string name="condition_duration_rounds_label">Duration (rounds)</string>
     <string name="condition_duration_placeholder">e.g., 3</string>
     <string name="character_status_add_persistent_button">Add Persistent Status</string>
@@ -1000,7 +976,6 @@ Add your party or individual enemies above.</string>
     <string name="encounter_log_feed_supporting_text">Rolling feed for the DM-managed shared tracker: damage, healing, conditions, turn changes, round changes, and quick encounter notes.</string>
     <string name="combat_log_collapsed_empty">No combat log entries yet.</string>
     <string name="combat_log_collapsed_summary">%1$d entries • Latest: %2$s</string>
-    <string name="combat_log_expand_action">Expand combat log</string>
     <string name="combat_log_collapse_action">Collapse combat log</string>
 
     <!-- Reference Screen -->
@@ -1008,8 +983,6 @@ Add your party or individual enemies above.</string>
     <string name="reference_tab_traps" tools:keep="@string/reference_tab_traps">Traps</string>
     <string name="reference_tab_poisons" tools:keep="@string/reference_tab_poisons">Poisons</string>
     <string name="reference_tab_diseases" tools:keep="@string/reference_tab_diseases">Diseases</string>
-    <string name="reference_tab_spellcasting">Spellcasting</string>
-    <string name="reference_tab_objects" tools:keep="@string/reference_tab_objects">Objects</string>
     <string name="reference_tab_hysteria">Hysteria</string>
     <string name="reference_tab_monsters">Monsters</string>
     <string name="reference_monster_filter_all">All</string>
@@ -1030,7 +1003,7 @@ Add your party or individual enemies above.</string>
     <string name="reference_core_rules_fundamentals">Fundamentals</string>
     <string name="reference_core_rules_adventuring">Adventuring</string>
     <string name="reference_core_rules_combat">Combat</string>
-    <string name="reference_tab_with_favorites_count">%1$s, %2$d favorites</string>
+
     <plurals name="reference_tab_with_favorites_count">
         <item quantity="one">%1$s, %2$d favorite</item>
         <item quantity="other">%1$s, %2$d favorites</item>
@@ -1043,7 +1016,6 @@ Add your party or individual enemies above.</string>
     <string name="reference_overview_title">Overview</string>
     <string name="reference_description_title">Description</string>
     <string name="reference_effect_title">Effect</string>
-    <string name="reference_effects_title">Effects</string>
     <string name="reference_duration_title">Duration</string>
     <string name="reference_symptoms_title">Symptoms</string>
     <string name="reference_progression_title">Progression</string>
@@ -1056,13 +1028,11 @@ Add your party or individual enemies above.</string>
     <string name="reference_objects_damage_thresholds_title">Damage Thresholds</string>
     <string name="reference_objects_fragile_resilient">Fragile / Resilient</string>
     <string name="reference_objects_ac_value">AC %1$d</string>
-    <string name="reference_objects_hp_value">HP %1$d</string>
     <string name="reference_objects_threshold_value">Threshold %1$d</string>
     <string name="reference_trap_card_summary">%1$s • Detection DC %2$d • Save DC %3$d</string>
     <string name="reference_trap_danger_guide_title">Trap Stats by Danger Level</string>
     <string name="reference_trap_danger_save_attack_summary">Save DC %1$d–%2$d  •  Attack +%3$d–+%4$d</string>
     <string name="reference_trap_danger_damage_summary">Damage (Lv 1–4) %1$s  •  (Lv 11–16) %2$s</string>
-    <string name="reference_disarm_method_title">Disarm Method</string>
     <string name="reference_trap_detection_dc">Detection DC</string>
     <string name="reference_trap_disarm_dc">Disarm DC</string>
     <string name="reference_trap_attack_bonus">Attack Bonus</string>
