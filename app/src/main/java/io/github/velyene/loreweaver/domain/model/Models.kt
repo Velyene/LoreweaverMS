@@ -24,7 +24,8 @@ data class Campaign(
 	val characterIds: List<String> = emptyList(),
 	val noteIds: List<String> = emptyList(),
 	val encounterIds: List<String> = emptyList(),
-	val settings: Map<String, String> = emptyMap() // Campaign Settings
+	val settings: Map<String, String> = emptyMap(), // Campaign Settings
+	val inventoryState: CampaignInventoryState = CampaignInventoryState()
 )
 
 /**
@@ -39,7 +40,11 @@ data class Encounter(
 	val currentRound: Int = 1,
 	val currentTurnIndex: Int = 0,
 	val participants: List<CombatantState> = emptyList(),
-	val activeTrackers: List<TrackerEntity> = emptyList()
+	val activeTrackers: List<TrackerEntity> = emptyList(),
+	val activeLog: List<String> = emptyList(),
+	val rewardTemplate: EncounterRewardTemplate = EncounterRewardTemplate(),
+	val generationSettings: EncounterGenerationSettings = EncounterGenerationSettings(),
+	val generationDetails: EncounterGenerationDetails? = null
 )
 
 enum class EncounterStatus { PENDING, ACTIVE }
@@ -67,7 +72,11 @@ data class SessionRecord(
 	val date: Long = System.currentTimeMillis(),
 	val log: List<String> = emptyList(),
 	val snapshot: EncounterSnapshot? = null,
-	val reuseFlag: Boolean = false // Tracker Reuse
+	val reuseFlag: Boolean = false, // Tracker Reuse
+	val isCompleted: Boolean = false,
+	val encounterResult: String? = null,
+	val rewards: EncounterRewardSummary? = null,
+	val rewardReview: RewardReviewState? = null
 )
 
 /**
@@ -153,6 +162,12 @@ data class CharacterAction(
 	val attackBonus: Int = 0,
 	val damageDice: String = "",
 	val isAttack: Boolean = true,
-	val notes: String = ""
+	val notes: String = "",
+	val staminaCost: Int = 0,
+	val resourceName: String? = null,
+	val resourceCost: Int = 0,
+	val spellSlotLevel: Int? = null,
+	val manaCost: Int = 0,
+	val itemName: String? = null
 )
 

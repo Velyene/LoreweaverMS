@@ -11,38 +11,41 @@ internal enum class CoreRulesSubtab(val label: String) {
 	QUICK_TABLES("Quick Tables")
 }
 
+private val CORE_RULES_FUNDAMENTALS_SECTION_TITLES = setOf(
+	"General Principles",
+	"Rhythm of Play",
+	"D20 Tests",
+	"Ability Checks",
+	"Saving Throws",
+	"Attack Rolls and Armor Class",
+	"Advantage, Disadvantage, and Heroic Inspiration",
+	"Proficiency",
+	"Actions, Bonus Actions, and Reactions"
+)
+
+private val CORE_RULES_ADVENTURING_SECTION_TITLES = setOf(
+	"Social Interaction",
+	"Exploration Basics",
+	"Travel and Marching Order"
+)
+
+private val CORE_RULES_COMBAT_SECTION_TITLES = setOf(
+	"Combat Sequence",
+	"Movement and Position",
+	"Making Attacks",
+	"Special Combat Cases",
+	"Monster Stat Blocks",
+	"Running a Monster",
+	"Monster Attack and Usage Notation",
+	"Damage, Healing, and Dying",
+	"Temporary Hit Points"
+)
+
 internal fun CoreRulesSubtab.matches(section: CoreRuleSection): Boolean = when (this) {
 	CoreRulesSubtab.ALL -> true
-	CoreRulesSubtab.FUNDAMENTALS -> section.title in setOf(
-		"General Principles",
-		"Rhythm of Play",
-		"D20 Tests",
-		"Ability Checks",
-		"Saving Throws",
-		"Attack Rolls and Armor Class",
-		"Advantage, Disadvantage, and Heroic Inspiration",
-		"Proficiency",
-		"Actions, Bonus Actions, and Reactions"
-	)
-
-	CoreRulesSubtab.ADVENTURING -> section.title in setOf(
-		"Social Interaction",
-		"Exploration Basics",
-		"Travel and Marching Order"
-	)
-
-	CoreRulesSubtab.COMBAT -> section.title in setOf(
-		"Combat Sequence",
-		"Movement and Position",
-		"Making Attacks",
-		"Special Combat Cases",
-		"Monster Stat Blocks",
-		"Running a Monster",
-		"Monster Attack and Usage Notation",
-		"Damage, Healing, and Dying",
-		"Temporary Hit Points"
-	)
-
+	CoreRulesSubtab.FUNDAMENTALS -> section.title in CORE_RULES_FUNDAMENTALS_SECTION_TITLES
+	CoreRulesSubtab.ADVENTURING -> section.title in CORE_RULES_ADVENTURING_SECTION_TITLES
+	CoreRulesSubtab.COMBAT -> section.title in CORE_RULES_COMBAT_SECTION_TITLES
 	CoreRulesSubtab.GLOSSARY -> false
 	CoreRulesSubtab.QUICK_TABLES -> false
 }

@@ -2,6 +2,24 @@
 
 Snapshot date: 2026-04-20
 
+
+## Contents
+
+- [Summary](#summary)
+- [Hard release overlay](#hard-release-overlay)
+- [Scope reviewed](#scope-reviewed)
+- [Canonical label normalization completed](#canonical-label-normalization-completed)
+  - [Focus types](#focus-types)
+  - [Tack and vehicle labels](#tack-and-vehicle-labels)
+  - [Food, drink, and lodging labels](#food-drink-and-lodging-labels)
+  - [Spellcasting service categories](#spellcasting-service-categories)
+  - [Tool variant normalization](#tool-variant-normalization)
+  - [Supporting alias cleanup](#supporting-alias-cleanup)
+- [Already aligned](#already-aligned)
+- [Release-blocking interpretation by dataset](#release-blocking-interpretation-by-dataset)
+- [Verification anchors](#verification-anchors)
+- [Notes for future updates](#notes-for-future-updates)
+
 ## Summary
 
 This note records the equipment and feat allowlist audit completed against the current

@@ -1,12 +1,27 @@
+/*
+ * FILE: CampaignDetailNotesSection.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Composable: LoreAndNotesSection
+ * 2. Dialog and delete-confirmation state handling
+ * 3. Composable: CampaignInventoryOverview
+ * 4. Composable: InventoryLineList
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,12 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.velyene.loreweaver.R
+import io.github.velyene.loreweaver.domain.model.Campaign
+import io.github.velyene.loreweaver.domain.model.InventoryItem
 import io.github.velyene.loreweaver.domain.model.Note
-import io.github.velyene.loreweaver.domain.util.generateRandomCampaignCalendarNote
-import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_GENERAL
+import io.github.velyene.loreweaver.domain.util.formatCurrencyCp
 
 @Composable
 internal fun LoreAndNotesSection(
+	campaign: Campaign,
 	notes: List<Note>,
 	onAddNote: (String, String, String) -> Unit,
 	onDeleteNote: (Note) -> Unit,
@@ -41,11 +58,14 @@ internal fun LoreAndNotesSection(
 			.visibleVerticalScrollbar(listState)
 	) {
 		item {
+			CampaignInventoryOverview(campaign = campaign)
+			Spacer(modifier = Modifier.size(16.dp))
+		}
+
+		item {
 			NotesQuickActions(
-				{ dialogMode = NoteDialogMode.Adding },
-				{
-					onAddNote(generateRandomCampaignCalendarNote(), NOTE_TYPE_GENERAL, "")
-				}
+				onAddNoteClick = { dialogMode = NoteDialogMode.Adding },
+				onGenerateCalendarClick = {}
 			)
 			Spacer(modifier = Modifier.size(16.dp))
 		}
@@ -93,3 +113,57 @@ internal fun LoreAndNotesSection(
 		)
 	}
 }
+
+@Composable
+private fun CampaignInventoryOverview(campaign: Campaign) {
+	val inventoryState = campaign.inventoryState
+	Card(
+		modifier = Modifier.fillMaxWidth(),
+		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+	) {
+		LazyColumn(modifier = Modifier.padding(16.dp), userScrollEnabled = false) {
+			item { SectionHeader(stringResource(R.string.campaign_inventory_section_title)) }
+			item {
+				Text(
+					text = stringResource(
+						R.string.campaign_shared_currency_label,
+						formatCurrencyCp(inventoryState.sharedCurrencyCp)
+					)
+				)
+			}
+			item {
+				Text(
+					text = stringResource(R.string.campaign_party_stash_label),
+					style = MaterialTheme.typography.labelLarge
+				)
+				InventoryLineList(items = inventoryState.partyStash)
+			}
+			item {
+				Text(
+					text = stringResource(R.string.campaign_unclaimed_loot_label),
+					style = MaterialTheme.typography.labelLarge
+				)
+				InventoryLineList(items = inventoryState.unclaimedLoot)
+			}
+			item {
+				Text(
+					text = stringResource(R.string.campaign_reward_pool_label),
+					style = MaterialTheme.typography.labelLarge
+				)
+				InventoryLineList(items = inventoryState.encounterRewardPool)
+			}
+		}
+	}
+}
+
+@Composable
+private fun InventoryLineList(items: List<InventoryItem>) {
+	if (items.isEmpty()) {
+		Text(stringResource(R.string.empty_label))
+	} else {
+		items.forEach { item ->
+			Text(stringResource(R.string.inventory_bullet, if (item.quantity > 1) "${item.name} ×${item.quantity}" else item.name))
+		}
+	}
+}
+

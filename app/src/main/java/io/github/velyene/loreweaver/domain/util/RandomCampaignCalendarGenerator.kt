@@ -1,3 +1,13 @@
+/*
+ * FILE: RandomCampaignCalendarGenerator.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Constants and random-name pools
+ * 2. Data classes: CampaignCalendarMonth and CampaignCalendar
+ * 3. Generators: calendar, note, and note rendering
+ * 4. Private helpers: calendar, weekday, month, and festival naming
+ */
+
 package io.github.velyene.loreweaver.domain.util
 
 import kotlin.random.Random

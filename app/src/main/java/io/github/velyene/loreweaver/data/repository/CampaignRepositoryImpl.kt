@@ -51,12 +51,33 @@ class CampaignRepositoryImpl(
 		campaignDao.insertCampaign(campaign.toEntity())
 	}
 
+	override suspend fun updateCampaign(campaign: Campaign) {
+		campaignDao.insertCampaign(campaign.toEntity())
+	}
+
+	override suspend fun deleteCampaign(campaign: Campaign) {
+		campaignDao.deleteCampaignById(campaign.id)
+	}
+
 	override fun getEncountersForCampaign(campaignId: String): Flow<List<Encounter>> =
 		encounterDao.getEncountersForCampaign(campaignId)
 			.map { entities -> entities.map { it.toDomain() } }
 
+	override fun getAllEncounters(): Flow<List<Encounter>> =
+		encounterDao.getAllEncounters().map { entities -> entities.map { it.toDomain() } }
+
 	override suspend fun insertEncounter(encounter: Encounter) {
 		encounterDao.insertEncounter(encounter.toEntity())
+	}
+
+	override suspend fun updateEncounter(encounter: Encounter) {
+		encounterDao.updateEncounter(encounter.toEntity())
+	}
+
+	override suspend fun deleteEncounter(encounter: Encounter) {
+		val ids = listOf(encounter.id)
+		sessionDao.clearEncounterReferences(ids)
+		encounterDao.deleteEncounter(encounter.toEntity())
 	}
 
 	override suspend fun getEncounterById(encounterId: String): Encounter? =
@@ -145,6 +166,12 @@ class CampaignRepositoryImpl(
 
 	override suspend fun getRecentSession(): SessionRecord? =
 		sessionDao.getRecentSession()?.toDomain()
+
+	override suspend fun getSessionById(sessionId: String): SessionRecord? =
+		sessionDao.getSessionById(sessionId)?.toDomain()
+
+	override suspend fun getRecentSessionForEncounter(encounterId: String): SessionRecord? =
+		sessionDao.getRecentSessionForEncounter(encounterId)?.toDomain()
 
 	override fun getAllLogs(): Flow<List<LogEntry>> =
 		logDao.getAllLogs().map { entities -> entities.map { it.toDomain() } }

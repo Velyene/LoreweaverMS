@@ -2,33 +2,29 @@
  * FILE: ConditionConstants.kt
  *
  * TABLE OF CONTENTS:
- * 1. Condition option model
- * 2. Shared condition/status metadata
- * 3. Lookup and routing support
+ * 1. Object: ConditionConstants
+ * 2. Class: StatusPolicyBucket
+ * 3. Class: StatusCategory
+ * 4. Class: StatusMetadata
+ * 5. Value: label
+ * 6. Value: category
+ * 7. Value: color
+ * 8. Value: borderColor
  */
 
 package io.github.velyene.loreweaver.ui.screens
 
-import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
-import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.util.ReferenceDetailResolver
+import io.github.velyene.loreweaver.domain.util.SrdSpellIndexReference
+import io.github.velyene.loreweaver.ui.theme.MutedText
+import io.github.velyene.loreweaver.ui.theme.PrimaryText
 import io.github.velyene.loreweaver.ui.viewmodels.ReferenceCategory
 
-data class ConditionOption(
-	val name: String,
-	@field:StringRes val labelRes: Int
-)
-
+/**
+ * Standard fifth-edition conditions and common status effects.
+ */
 object ConditionConstants {
-	enum class StatusCategory {
-		BUFF,
-		DEBUFF,
-		DAMAGE_OVER_TIME,
-		PERSISTENT,
-		UTILITY
-	}
-
 	enum class StatusPolicyBucket {
 		OFFICIAL_CONDITION,
 		BUILT_IN_STATUS,
@@ -36,205 +32,421 @@ object ConditionConstants {
 		CUSTOM_HOMEBREW
 	}
 
+	enum class StatusCategory {
+		DAMAGE_OVER_TIME,
+		SENSORY,
+		CONTROL,
+		MOBILITY,
+		PERSISTENT,
+		BUFF,
+		DEBUFF,
+		DEFENSIVE
+	}
+
 	data class StatusMetadata(
 		val label: String,
 		val category: StatusCategory,
 		val color: Color,
 		val borderColor: Color,
-		val iconGlyph: String,
-		val persistsAcrossEncounters: Boolean = false
+		val persistsAcrossEncounters: Boolean = false,
+		val iconGlyph: String? = null
 	)
 
-	data class ReferenceTarget(
+	data class StatusLookupTarget(
 		val category: ReferenceCategory,
 		val query: String = "",
 		val detailCategory: String? = null,
 		val detailSlug: String? = null
 	)
 
-	private val officialConditionOptions = listOf(
-		ConditionOption("Blinded", R.string.cond_blinded),
-		ConditionOption("Charmed", R.string.cond_charmed),
-		ConditionOption("Deafened", R.string.cond_deafened),
-		ConditionOption("Frightened", R.string.cond_frightened),
-		ConditionOption("Grappled", R.string.cond_grappled),
-		ConditionOption("Incapacitated", R.string.cond_incapacitated),
-		ConditionOption("Invisible", R.string.cond_invisible),
-		ConditionOption("Paralyzed", R.string.cond_paralyzed),
-		ConditionOption("Petrified", R.string.cond_petrified),
-		ConditionOption("Poisoned", R.string.cond_poisoned),
-		ConditionOption("Prone", R.string.cond_prone),
-		ConditionOption("Restrained", R.string.cond_restrained),
-		ConditionOption("Stunned", R.string.cond_stunned),
-		ConditionOption("Unconscious", R.string.cond_unconscious)
+	private val allMetadata = listOf(
+		StatusMetadata(
+			label = "Poisoned",
+			category = StatusCategory.DAMAGE_OVER_TIME,
+			color = Color(0xFF6BCB3D),
+			borderColor = Color(0xFF8CE85A),
+			iconGlyph = "☠"
+		),
+		StatusMetadata(
+			label = "Burning",
+			category = StatusCategory.DAMAGE_OVER_TIME,
+			color = Color(0xFFFF7A1A),
+			borderColor = Color(0xFFFFA45C),
+			iconGlyph = "✦"
+		),
+		StatusMetadata(
+			label = "Bleeding",
+			category = StatusCategory.DAMAGE_OVER_TIME,
+			color = Color(0xFFC93A3A),
+			borderColor = Color(0xFFE06060),
+			iconGlyph = "✹"
+		),
+		StatusMetadata(
+			label = "Blinded",
+			category = StatusCategory.SENSORY,
+			color = Color(0xFF9A92B1),
+			borderColor = Color(0xFFB7B0CC),
+			iconGlyph = "◌"
+		),
+		StatusMetadata(
+			label = "Deafened",
+			category = StatusCategory.SENSORY,
+			color = Color(0xFF6E7C91),
+			borderColor = Color(0xFF90A0B7),
+			iconGlyph = "◔"
+		),
+		StatusMetadata(
+			label = "Frightened",
+			category = StatusCategory.CONTROL,
+			color = Color(0xFF6C4A8B),
+			borderColor = Color(0xFF8D68AF),
+			iconGlyph = "!"
+		),
+		StatusMetadata(
+			label = "Charmed",
+			category = StatusCategory.CONTROL,
+			color = Color(0xFFC86DD7),
+			borderColor = Color(0xFFE29AF0),
+			iconGlyph = "♥"
+		),
+		StatusMetadata(
+			label = "Stunned",
+			category = StatusCategory.CONTROL,
+			color = Color(0xFFE2B93B),
+			borderColor = Color(0xFFF2D36F),
+			iconGlyph = "⚡"
+		),
+		StatusMetadata(
+			label = "Restrained",
+			category = StatusCategory.MOBILITY,
+			color = Color(0xFF4F6E73),
+			borderColor = Color(0xFF6E959B),
+			iconGlyph = "⛓"
+		),
+		StatusMetadata(
+			label = "Grappled",
+			category = StatusCategory.MOBILITY,
+			color = Color(0xFF7A5C3A),
+			borderColor = Color(0xFFA17A4E),
+			iconGlyph = "↯"
+		),
+		StatusMetadata(
+			label = "Prone",
+			category = StatusCategory.MOBILITY,
+			color = Color(0xFF8A6B4E),
+			borderColor = Color(0xFFB08A63),
+			iconGlyph = "↓"
+		),
+		StatusMetadata(
+			label = "Paralyzed",
+			category = StatusCategory.MOBILITY,
+			color = Color(0xFF708090),
+			borderColor = Color(0xFF93A6B8),
+			iconGlyph = "⟂"
+		),
+		StatusMetadata(
+			label = "Petrified",
+			category = StatusCategory.MOBILITY,
+			color = Color(0xFF7C7F86),
+			borderColor = Color(0xFFA0A4AC),
+			persistsAcrossEncounters = true,
+			iconGlyph = "◼"
+		),
+		StatusMetadata(
+			label = "Exhaustion",
+			category = StatusCategory.PERSISTENT,
+			color = Color(0xFF4B4E91),
+			borderColor = Color(0xFF7175C2),
+			persistsAcrossEncounters = true,
+			iconGlyph = "☾"
+		),
+		StatusMetadata(
+			label = "Cursed",
+			category = StatusCategory.PERSISTENT,
+			color = Color(0xFF5A3B6E),
+			borderColor = Color(0xFF82549F),
+			persistsAcrossEncounters = true,
+			iconGlyph = "✶"
+		),
+		StatusMetadata(
+			label = "Diseased",
+			category = StatusCategory.PERSISTENT,
+			color = Color(0xFF76853A),
+			borderColor = Color(0xFF98AC4B),
+			persistsAcrossEncounters = true,
+			iconGlyph = "☣"
+		),
+		StatusMetadata(
+			label = "Marked",
+			category = StatusCategory.PERSISTENT,
+			color = Color(0xFFB28A2E),
+			borderColor = Color(0xFFD4B24C),
+			persistsAcrossEncounters = true,
+			iconGlyph = "✧"
+		),
+		StatusMetadata(
+			label = "Blessed",
+			category = StatusCategory.BUFF,
+			color = Color(0xFFD4B24C),
+			borderColor = Color(0xFFE8CB73),
+			iconGlyph = "✦"
+		),
+		StatusMetadata(
+			label = "Invisible",
+			category = StatusCategory.BUFF,
+			color = Color(0xFF4AA3A1),
+			borderColor = Color(0xFF79C9C7),
+			iconGlyph = "◔"
+		),
+		StatusMetadata(
+			label = "Shielded",
+			category = StatusCategory.DEFENSIVE,
+			color = Color(0xFF3F7CAC),
+			borderColor = Color(0xFF68A6D8),
+			iconGlyph = "⬡"
+		),
+		StatusMetadata(
+			label = "Unconscious",
+			category = StatusCategory.CONTROL,
+			color = Color(0xFF606D78),
+			borderColor = Color(0xFF8B98A4),
+			iconGlyph = "☾"
+		),
+		StatusMetadata(
+			label = "Incapacitated",
+			category = StatusCategory.CONTROL,
+			color = Color(0xFF7A6E88),
+			borderColor = Color(0xFFA094B0),
+			iconGlyph = "⊘"
+		),
+		StatusMetadata(
+			label = "Hidden",
+			category = StatusCategory.BUFF,
+			color = Color(0xFF4F6E73),
+			borderColor = Color(0xFF79A0A6),
+			iconGlyph = "◐"
+		),
+		StatusMetadata(
+			label = "Inspired",
+			category = StatusCategory.BUFF,
+			color = Color(0xFF2DA8B0),
+			borderColor = Color(0xFF59E5EF),
+			iconGlyph = "✧"
+		),
+		StatusMetadata(
+			label = "Hasted",
+			category = StatusCategory.BUFF,
+			color = Color(0xFF00C2C7),
+			borderColor = Color(0xFF59E5EF),
+			iconGlyph = "➤"
+		),
+		StatusMetadata(
+			label = "Hexed",
+			category = StatusCategory.DEBUFF,
+			color = Color(0xFF7A2E57),
+			borderColor = Color(0xFF9D4671),
+			iconGlyph = "✶"
+		),
+		StatusMetadata(
+			label = "Dodging",
+			category = StatusCategory.DEFENSIVE,
+			color = Color(0xFF3F7CAC),
+			borderColor = Color(0xFF68A6D8),
+			iconGlyph = "⬒"
+		),
+		StatusMetadata(
+			label = "Raging",
+			category = StatusCategory.BUFF,
+			color = Color(0xFFC93A3A),
+			borderColor = Color(0xFFE06060),
+			iconGlyph = "✹"
+		),
+		StatusMetadata(
+			label = "Concentrating",
+			category = StatusCategory.DEFENSIVE,
+			color = Color(0xFF4B4E91),
+			borderColor = Color(0xFF7175C2),
+			iconGlyph = "◎"
+		),
+		StatusMetadata(
+			label = "Slowed",
+			category = StatusCategory.DEBUFF,
+			color = Color(0xFF6E7C91),
+			borderColor = Color(0xFF90A0B7),
+			iconGlyph = "⏷"
+		)
 	)
 
-	private val builtInStatusOptions = listOf(
-		ConditionOption("Blessed", R.string.cond_blessed),
-		ConditionOption("Concentrating", R.string.cond_concentrating),
-		ConditionOption("Cursed", R.string.cond_cursed),
-		ConditionOption("Dodging", R.string.cond_dodging),
-		ConditionOption("Hasted", R.string.cond_hasted),
-		ConditionOption("Hidden", R.string.cond_hidden),
-		ConditionOption("Inspired", R.string.cond_inspired),
-		ConditionOption("Marked", R.string.cond_marked),
-		ConditionOption("Slowed", R.string.cond_slowed)
+	private val metadataByLabel = allMetadata.associateBy { it.label.lowercase() }
+	val OFFICIAL_CONDITIONS = listOf(
+		"Blinded",
+		"Charmed",
+		"Deafened",
+		"Exhaustion",
+		"Frightened",
+		"Grappled",
+		"Incapacitated",
+		"Invisible",
+		"Paralyzed",
+		"Petrified",
+		"Poisoned",
+		"Prone",
+		"Restrained",
+		"Stunned",
+		"Unconscious"
 	)
 
-	private val customEffectOptions = listOf(
-		ConditionOption("Burning", R.string.cond_burning),
-		ConditionOption("Hexed", R.string.cond_hexed),
-		ConditionOption("Raging", R.string.cond_raging)
+	val BUILT_IN_STATUS_LABELS = listOf(
+		"Blessed",
+		"Concentrating",
+		"Dodging",
+		"Hasted",
+		"Hexed",
+		"Inspired",
+		"Marked",
+		"Raging"
 	)
 
-	private val customHomebrewOptions = listOf(
-		ConditionOption("Bleeding", R.string.cond_bleeding)
+	val CUSTOM_EFFECT_LABELS = listOf(
+		"Burning",
+		"Cursed",
+		"Diseased",
+		"Hidden",
+		"Shielded",
+		"Slowed"
 	)
 
-	val OFFICIAL_CONDITIONS: List<ConditionOption> = officialConditionOptions
-	val BUILT_IN_STATUS_LABELS: List<ConditionOption> = builtInStatusOptions
-	val CUSTOM_EFFECT_LABELS: List<ConditionOption> = customEffectOptions
-	val CUSTOM_HOMEBREW_ONLY_LABELS: List<ConditionOption> = customHomebrewOptions
-
-	val STANDARD_CONDITIONS: List<ConditionOption> = OFFICIAL_CONDITIONS
-	val COMMON_CONDITIONS: List<ConditionOption> = BUILT_IN_STATUS_LABELS + CUSTOM_EFFECT_LABELS + CUSTOM_HOMEBREW_ONLY_LABELS
-	val ALL_CONDITIONS: List<ConditionOption> =
-		(STANDARD_CONDITIONS + COMMON_CONDITIONS).sortedBy(ConditionOption::name)
-	val ALL_STATUS_LABELS: List<ConditionOption> = ALL_CONDITIONS
-
-	private val officialConditionNames =
-		OFFICIAL_CONDITIONS.map(ConditionOption::name).toSet() + setOf("Exhaustion")
-	private val builtInStatusNames = BUILT_IN_STATUS_LABELS.map(ConditionOption::name).toSet()
-	private val customEffectNames = CUSTOM_EFFECT_LABELS.map(ConditionOption::name).toSet()
-	private val customHomebrewNames = CUSTOM_HOMEBREW_ONLY_LABELS.map(ConditionOption::name).toSet()
-
-	private val canonicalLabels = ALL_CONDITIONS.associateBy { it.name.lowercase() }
-
-	private val metadataByLabel = mapOf(
-		"blinded" to statusMetadata("Blinded", StatusCategory.DEBUFF, 0xFF8E8E93, "◌"),
-		"charmed" to statusMetadata("Charmed", StatusCategory.DEBUFF, 0xFFE8A0BF, "♡"),
-		"deafened" to statusMetadata("Deafened", StatusCategory.DEBUFF, 0xFF9AA0A6, "◔"),
-		"diseased" to statusMetadata("Diseased", StatusCategory.DEBUFF, 0xFF7DA16F, "☣"),
-		"exhaustion" to statusMetadata("Exhaustion", StatusCategory.PERSISTENT, 0xFFB39DDB, "✧", persistsAcrossEncounters = true),
-		"frightened" to statusMetadata("Frightened", StatusCategory.DEBUFF, 0xFF6D6875, "⚑"),
-		"grappled" to statusMetadata("Grappled", StatusCategory.DEBUFF, 0xFFB08968, "⛓"),
-		"incapacitated" to statusMetadata("Incapacitated", StatusCategory.DEBUFF, 0xFF607D8B, "⏸"),
-		"invisible" to statusMetadata("Invisible", StatusCategory.BUFF, 0xFF80CBC4, "◌"),
-		"paralyzed" to statusMetadata("Paralyzed", StatusCategory.DEBUFF, 0xFF9575CD, "⚡"),
-		"petrified" to statusMetadata("Petrified", StatusCategory.DEBUFF, 0xFF9E9E9E, "⬢"),
-		"poisoned" to statusMetadata("Poisoned", StatusCategory.DAMAGE_OVER_TIME, 0xFF6BCB3D, "☠"),
-		"prone" to statusMetadata("Prone", StatusCategory.DEBUFF, 0xFFBC8F6F, "↧"),
-		"restrained" to statusMetadata("Restrained", StatusCategory.DEBUFF, 0xFFB07D62, "⛓"),
-		"stunned" to statusMetadata("Stunned", StatusCategory.DEBUFF, 0xFFFFC857, "✦"),
-		"unconscious" to statusMetadata("Unconscious", StatusCategory.DEBUFF, 0xFF5C6BC0, "☾"),
-		"bleeding" to statusMetadata("Bleeding", StatusCategory.DAMAGE_OVER_TIME, 0xFFE57373, "✹"),
-		"blessed" to statusMetadata("Blessed", StatusCategory.BUFF, 0xFFFFD54F, "✦"),
-		"burning" to statusMetadata("Burning", StatusCategory.DAMAGE_OVER_TIME, 0xFFFF7043, "🔥"),
-		"concentrating" to statusMetadata("Concentrating", StatusCategory.UTILITY, 0xFF4DB6AC, "◎"),
-		"cursed" to statusMetadata("Cursed", StatusCategory.DEBUFF, 0xFFBA68C8, "✢", persistsAcrossEncounters = true),
-		"dodging" to statusMetadata("Dodging", StatusCategory.UTILITY, 0xFF64B5F6, "⬒"),
-		"hasted" to statusMetadata("Hasted", StatusCategory.BUFF, 0xFF4FC3F7, "➜"),
-		"hexed" to statusMetadata("Hexed", StatusCategory.DEBUFF, 0xFFAB47BC, "✣", persistsAcrossEncounters = true),
-		"hidden" to statusMetadata("Hidden", StatusCategory.UTILITY, 0xFF90A4AE, "◔"),
-		"inspired" to statusMetadata("Inspired", StatusCategory.BUFF, 0xFF81C784, "✪"),
-		"marked" to statusMetadata("Marked", StatusCategory.DEBUFF, 0xFFFFB74D, "⌖"),
-		"raging" to statusMetadata("Raging", StatusCategory.BUFF, 0xFFE53935, "⚔"),
-		"slowed" to statusMetadata("Slowed", StatusCategory.DEBUFF, 0xFF7986CB, "↘")
+	val CUSTOM_HOMEBREW_ONLY_LABELS = listOf(
+		"Bleeding"
 	)
+
+	/**
+	 * Legacy aliases kept so older call sites still compile while the picker/UI shifts to the new
+	 * status-policy terminology.
+	 */
+	val STANDARD_CONDITIONS = OFFICIAL_CONDITIONS
+	val COMMON_CONDITIONS = BUILT_IN_STATUS_LABELS + CUSTOM_EFFECT_LABELS + CUSTOM_HOMEBREW_ONLY_LABELS
+
+	/**
+	 * Combined list of all built-in status labels for selection.
+	 */
+	val ALL_STATUS_LABELS = (OFFICIAL_CONDITIONS + COMMON_CONDITIONS).sorted()
+	val ALL_CONDITIONS = ALL_STATUS_LABELS
 
 	fun metadataFor(label: String): StatusMetadata {
-		val normalized = label.trim()
-		if (normalized.isBlank()) {
-			return fallbackMetadata(label = "")
-		}
-		val canonicalLabel = canonicalStatusLabel(normalized)
-		return metadataByLabel[canonicalLabel.lowercase()]
-			?: fallbackMetadata(label = canonicalLabel)
+		return metadataByLabel[label.lowercase()] ?: StatusMetadata(
+			label = label,
+			category = StatusCategory.DEBUFF,
+			color = MutedText,
+			borderColor = PrimaryText.copy(alpha = 0.55f),
+			persistsAcrossEncounters = false,
+			iconGlyph = "•"
+		)
 	}
 
 	fun defaultPersistsAcrossEncounters(label: String): Boolean =
 		metadataFor(label).persistsAcrossEncounters
 
 	fun bucketFor(label: String): StatusPolicyBucket {
-		val canonical = canonicalStatusLabel(label)
-		return when (canonical) {
-			in officialConditionNames -> StatusPolicyBucket.OFFICIAL_CONDITION
-			in builtInStatusNames -> StatusPolicyBucket.BUILT_IN_STATUS
-			in customEffectNames -> StatusPolicyBucket.CUSTOM_EFFECT
+		val canonicalLabel = metadataFor(label).label
+		return when (canonicalLabel) {
+			in OFFICIAL_CONDITIONS -> StatusPolicyBucket.OFFICIAL_CONDITION
+			in BUILT_IN_STATUS_LABELS -> StatusPolicyBucket.BUILT_IN_STATUS
+			in CUSTOM_EFFECT_LABELS -> StatusPolicyBucket.CUSTOM_EFFECT
 			else -> StatusPolicyBucket.CUSTOM_HOMEBREW
 		}
 	}
 
-	fun shouldAllowOfficialConditionLookup(label: String): Boolean =
+	fun isOfficialCondition(label: String): Boolean =
 		bucketFor(label) == StatusPolicyBucket.OFFICIAL_CONDITION
 
-	fun referenceTargetFor(label: String): ReferenceTarget? {
-		return when (canonicalStatusLabel(label)) {
-			in officialConditionNames -> ReferenceTarget(
-				category = ReferenceCategory.CORE_RULES,
-				query = canonicalStatusLabel(label),
-				detailCategory = ReferenceDetailResolver.CATEGORY_CONDITIONS,
-				detailSlug = slugify(canonicalStatusLabel(label))
+	fun shouldAllowOfficialConditionLookup(label: String): Boolean = isOfficialCondition(label)
+
+	fun referenceTargetFor(label: String): StatusLookupTarget? {
+		return when (val canonicalLabel = metadataFor(label).label) {
+			in OFFICIAL_CONDITIONS -> officialConditionTarget(canonicalLabel)
+			"Blessed" -> spellTarget("Bless")
+			"Concentrating" -> glossaryTarget(
+				term = "Concentration",
+				detailCategory = ReferenceDetailResolver.CATEGORY_GLOSSARY
 			)
-			"Blessed" -> ReferenceTarget(
-				category = ReferenceCategory.SPELLCASTING,
-				query = "Bless",
-				detailCategory = ReferenceDetailResolver.CATEGORY_SPELLS,
-				detailSlug = slugify("Bless")
+
+			"Dodging" -> glossaryTarget(
+				term = "Dodge",
+				detailCategory = ReferenceDetailResolver.CATEGORY_ACTIONS
 			)
-			"Dodging" -> ReferenceTarget(
-				category = ReferenceCategory.CORE_RULES,
-				query = "Dodge",
+
+			"Hexed" -> spellTarget("Hex")
+			"Hasted" -> spellTarget("Haste")
+			"Burning" -> glossaryTarget(
+				term = "Burning",
+				detailCategory = ReferenceDetailResolver.CATEGORY_HAZARDS
+			)
+
+			"Cursed" -> spellSearchTarget("Curse")
+			"Diseased" -> StatusLookupTarget(category = ReferenceCategory.DISEASES)
+			"Hidden" -> glossaryTarget(
+				term = "Hide",
 				detailCategory = ReferenceDetailResolver.CATEGORY_ACTIONS,
-				detailSlug = slugify("Dodge")
+				query = canonicalLabel
 			)
-			"Burning" -> ReferenceTarget(
-				category = ReferenceCategory.CORE_RULES,
-				query = "Burning",
-				detailCategory = ReferenceDetailResolver.CATEGORY_HAZARDS,
-				detailSlug = slugify("Burning")
-			)
-			"Diseased" -> ReferenceTarget(
-				category = ReferenceCategory.DISEASES,
-				query = "Diseased"
-			)
+
+			"Shielded" -> spellSearchTarget("Shield")
+			"Slowed" -> spellTarget("Slow")
 			else -> null
 		}
 	}
 
-	private fun canonicalStatusLabel(label: String): String {
-		val normalized = label.trim()
-		return canonicalLabels[normalized.lowercase()]?.name ?: normalized.replaceFirstChar(Char::titlecase)
-	}
+	fun persistentConditions(): List<String> =
+		ALL_STATUS_LABELS.filter(::defaultPersistsAcrossEncounters)
 
-	private fun statusMetadata(
-		label: String,
-		category: StatusCategory,
-		color: Long,
-		iconGlyph: String,
-		persistsAcrossEncounters: Boolean = false
-	): StatusMetadata {
-		val baseColor = Color(color)
-		return StatusMetadata(
-			label = label,
-			category = category,
-			color = baseColor,
-			borderColor = baseColor.copy(alpha = 0.85f),
-			iconGlyph = iconGlyph,
-			persistsAcrossEncounters = persistsAcrossEncounters
+	private fun officialConditionTarget(label: String): StatusLookupTarget {
+		val slug = ReferenceDetailResolver.slugFor(label)
+		val hasDetail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_CONDITIONS,
+			slug
+		) != null
+		return StatusLookupTarget(
+			category = ReferenceCategory.CORE_RULES,
+			query = label,
+			detailCategory = if (hasDetail) ReferenceDetailResolver.CATEGORY_CONDITIONS else null,
+			detailSlug = if (hasDetail) slug else null
 		)
 	}
 
-	private fun fallbackMetadata(label: String): StatusMetadata {
-		return StatusMetadata(
-			label = label,
-			category = StatusCategory.DEBUFF,
-			color = Color(0xFFB0BEC5),
-			borderColor = Color(0xFF90A4AE),
-			iconGlyph = "•"
+	private fun glossaryTarget(
+		term: String,
+		detailCategory: String,
+		query: String = term
+	): StatusLookupTarget {
+		val slug = ReferenceDetailResolver.slugFor(term)
+		val hasDetail = ReferenceDetailResolver.resolve(detailCategory, slug) != null
+		return StatusLookupTarget(
+			category = ReferenceCategory.CORE_RULES,
+			query = query,
+			detailCategory = if (hasDetail) detailCategory else null,
+			detailSlug = if (hasDetail) slug else null
 		)
 	}
 
-	private fun slugify(label: String): String =
-		label.trim().lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
+	private fun spellTarget(spellName: String): StatusLookupTarget {
+		val canonicalSpellName = SrdSpellIndexReference.canonicalNameFor(spellName)
+			?: return spellSearchTarget(spellName)
+		val slug = ReferenceDetailResolver.slugFor(canonicalSpellName)
+		val hasDetail = ReferenceDetailResolver.resolve(
+			ReferenceDetailResolver.CATEGORY_SPELLS,
+			slug
+		) != null
+		return StatusLookupTarget(
+			category = ReferenceCategory.SPELLCASTING,
+			query = canonicalSpellName,
+			detailCategory = if (hasDetail) ReferenceDetailResolver.CATEGORY_SPELLS else null,
+			detailSlug = if (hasDetail) slug else null
+		)
+	}
+
+	private fun spellSearchTarget(query: String): StatusLookupTarget = StatusLookupTarget(
+		category = ReferenceCategory.SPELLCASTING,
+		query = query
+	)
 }

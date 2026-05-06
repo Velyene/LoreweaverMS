@@ -10,6 +10,7 @@ package io.github.velyene.loreweaver.ui.screens.tracker.live
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,7 +38,9 @@ internal fun TurnTrackerStrip(
 	round: Int,
 	participants: List<LiveParticipantUiModel>,
 	turnIndex: Int,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	focusedCombatantId: String? = null,
+	onFocusCombatant: (String) -> Unit = {}
 ) {
 	Column(
 		modifier = modifier
@@ -77,7 +80,9 @@ internal fun TurnTrackerStrip(
 						1 -> androidx.compose.ui.res.stringResource(R.string.encounter_turn_label_next)
 						else -> androidx.compose.ui.res.stringResource(R.string.encounter_turn_label_upcoming)
 					},
-					isCurrent = index == 0
+					isCurrent = index == 0,
+					isFocused = participant.combatant.characterId == focusedCombatantId,
+					onFocusCombatant = onFocusCombatant
 				)
 			}
 		}
@@ -88,7 +93,9 @@ internal fun TurnTrackerStrip(
 private fun TurnOrderChip(
 	participant: LiveParticipantUiModel,
 	turnLabel: String,
-	isCurrent: Boolean
+	isCurrent: Boolean,
+	isFocused: Boolean,
+	onFocusCombatant: (String) -> Unit
 ) {
 	val accentColor = if (participant.isPlayer) ArcaneTeal else DangerRed
 	val containerColor = when {
@@ -101,9 +108,10 @@ private fun TurnOrderChip(
 	Card(
 		colors = CardDefaults.cardColors(containerColor = containerColor),
 		border = BorderStroke(
-			width = if (isCurrent) 2.dp else 1.dp,
-			color = if (isCurrent) AntiqueGold else accentColor.copy(alpha = 0.6f)
-		)
+			width = if (isCurrent || isFocused) 2.dp else 1.dp,
+			color = if (isCurrent || isFocused) AntiqueGold else accentColor.copy(alpha = 0.6f)
+		),
+		modifier = Modifier.clickable { onFocusCombatant(participant.combatant.characterId) }
 	) {
 		Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
 			Text(

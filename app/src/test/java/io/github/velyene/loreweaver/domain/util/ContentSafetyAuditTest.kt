@@ -218,6 +218,26 @@ class ContentSafetyAuditTest {
 			rationale = "Character-building guidance was rewritten into setting-neutral original prose.",
 			followUpNote = "Re-review if new example characters or campaign-setting references are added."
 		),
+		"java/io/github/velyene/loreweaver/domain/util/CharacterCreationReferenceSpecies.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "Species guidance and race summaries were moved out of CharacterCreationReference.kt without changing the reviewed content scope.",
+			followUpNote = "Keep future species additions concise, setting-neutral, and aligned with the existing reviewed character-creation corpus."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/CharacterCreationReferenceNarrativeData.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "Character-creation prose sections and advancement guidance were split from the already reviewed character-creation digest without expanding scope.",
+			followUpNote = "Keep future narrative additions short, setting-neutral, and aligned with the reviewed character-creation corpus."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/CharacterCreationReferenceCatalogData.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "Background, language, feat, and trinket catalog text was split from the already reviewed character-creation digest without changing the reviewed SRD-backed scope.",
+			followUpNote = "Keep future catalog additions concise, mechanical, and free of branded setting language."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/CharacterCreationReferenceTablesData.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "Derived character-creation table text was split from the already reviewed character-creation digest without expanding the reviewed prose scope.",
+			followUpNote = "Keep future table additions procedural and aligned with the reviewed character-creation reference data."
+		),
 		// Short guidance blocks and disease summaries were paraphrased and intentionally retained.
 		"java/io/github/velyene/loreweaver/domain/util/DiseaseReference.kt" to ReviewedProseFile(
 			reviewedOn = REVIEWED_ON_2026_04_18,
@@ -241,6 +261,21 @@ class ContentSafetyAuditTest {
 			reviewedOn = "2026-04-19",
 			rationale = "Contains reviewed condensed core-rules summaries and lookup tables for the reference UI.",
 			followUpNote = "Keep future additions procedural and compact rather than book-style prose."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceSectionsData.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "Core rules topic summaries were split out of the already reviewed core-rules digest without changing the reviewed prose scope.",
+			followUpNote = "Keep future section additions short, procedural, and consistent with the existing reviewed digest."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceGlossaryData.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "Glossary summaries were extracted from the already reviewed CoreRulesReference corpus to reduce file size while preserving the reviewed content.",
+			followUpNote = "Keep future glossary entries concise, mechanical, and aligned with the reviewed core-rules corpus."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/CoreRulesReferenceTablesData.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "Quick-table labels and table cell prose were moved into a dedicated file during the hotspot split without expanding the reviewed reference corpus.",
+			followUpNote = "Prefer terse lookup-oriented table text and re-review if future cells become paragraph-like."
 		),
 		// Large item/rules reference file contains many reviewed explanatory blocks that are still useful UI content.
 		"java/io/github/velyene/loreweaver/domain/util/EquipmentReference.kt" to ReviewedProseFile(
@@ -283,10 +318,20 @@ class ContentSafetyAuditTest {
 			rationale = "Restored local monster-reference entries for the shipped D-G slice were reviewed in this chat as mechanical SRD-backed content.",
 			followUpNote = "Keep future imports sectioned, searchable, and limited to reviewed SRD-backed monster data."
 		),
+		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataG.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "The G-only monster slice was split out of the already reviewed D-G corpus without changing the reviewed SRD-backed content scope.",
+			followUpNote = "Keep future G-series additions limited to reviewed SRD-backed monster data and preserve the alphabetical split for searchability."
+		),
 		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataHtoN.kt" to ReviewedProseFile(
 			reviewedOn = "2026-04-27",
 			rationale = "Restored local monster-reference entries for the shipped H-N slice were reviewed in this chat as mechanical SRD-backed content.",
 			followUpNote = "Keep future imports sectioned, searchable, and limited to reviewed SRD-backed monster data."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataLtoN.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "The L-N monster slice was split out of the already reviewed H-N monster reference corpus without changing the reviewed SRD-backed content scope.",
+			followUpNote = "Keep future L-N additions limited to reviewed SRD-backed monster data and preserve the search-friendly section split."
 		),
 		"java/io/github/velyene/loreweaver/domain/util/MonsterReferenceDataOtoR.kt" to ReviewedProseFile(
 			reviewedOn = "2026-04-27",
@@ -320,6 +365,16 @@ class ContentSafetyAuditTest {
 			reviewedOn = REVIEWED_ON_2026_04_18,
 			rationale = "Contains reviewed setting-neutral magic theory and spellcasting help text.",
 			followUpNote = "Avoid reintroducing branded lore or long lore-forward explanations."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/SpellcastingReferenceRules.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "Spellcasting rules, guidance, and setting-neutral magic theory were split from the already reviewed spellcasting reference without changing scope.",
+			followUpNote = "Avoid adding branded lore or expanding the prose beyond concise rules help text."
+		),
+		"java/io/github/velyene/loreweaver/domain/util/SpellcastingReferenceData.kt" to ReviewedProseFile(
+			reviewedOn = "2026-05-02",
+			rationale = "Spell-preparation labels and slot-table metadata were split from the already reviewed spellcasting reference without changing the reviewed SRD-backed scope.",
+			followUpNote = "Keep future additions mechanical, tabular, and consistent with the existing reviewed spellcasting reference data."
 		)
 	)
 

@@ -16,9 +16,9 @@ class ReferenceScreenAmmunitionSearchTest {
 		val firearmBullets = EquipmentReference.AMMUNITION.first { it.type == "Bullets, Firearm" }
 		val needles = EquipmentReference.AMMUNITION.first { it.type == NEEDLES }
 
-		assertMatchesAll(arrows::matchesSearchQuery, QUIVER, "20")
-		assertMatchesAll(firearmBullets::matchesSearchQuery, "Pouch", "3 GP")
-		assertMatchesAll(needles::matchesSearchQuery, "50")
+		assertMatchesAll(arrows::matchesQuery, QUIVER, "20")
+		assertMatchesAll(firearmBullets::matchesQuery, "Pouch", "3 GP")
+		assertMatchesAll(needles::matchesQuery, "50")
 	}
 
 	@Test

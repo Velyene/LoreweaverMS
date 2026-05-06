@@ -23,8 +23,7 @@ class GetActiveEncounterUseCase @Inject constructor(
 		return try {
 			val encounter = encountersRepository.getActiveEncounter()
 			if (encounter != null) {
-				val session = sessionsRepository.getRecentSession()
-					?.takeIf { it.encounterId == encounter.id }
+				val session = sessionsRepository.getRecentSessionForEncounter(encounter.id)
 				Resource.Success(Pair(encounter, session))
 			} else {
 				Resource.Error(NO_ACTIVE_ENCOUNTER_MESSAGE)

@@ -242,8 +242,7 @@ private fun TrapDetailView(
 				title = trap.name,
 				isFavorite = isFavorite,
 				onToggleFavorite = onToggleFavorite,
-				onCopy = referenceTextActions.onCopy,
-				onShare = referenceTextActions.onShare
+				actions = referenceTextActions
 			)
 		}
 
@@ -371,8 +370,7 @@ private fun PoisonDetailView(
 				title = poison.name,
 				isFavorite = isFavorite,
 				onToggleFavorite = onToggleFavorite,
-				onCopy = referenceTextActions.onCopy,
-				onShare = referenceTextActions.onShare,
+				actions = referenceTextActions,
 				leadingActions = {
 					Text(
 						text = poison.pricePerDose,
@@ -482,7 +480,7 @@ private fun DiseaseCard(
 			}
 			Spacer(modifier = Modifier.height(4.dp))
 			Text(
-				"DC ${disease.saveDC} • Incubation: ${disease.incubationTime}",
+				stringResource(R.string.reference_disease_card_summary, disease.saveDC, disease.incubationTime),
 				style = MaterialTheme.typography.bodySmall,
 				color = MaterialTheme.colorScheme.onSurfaceVariant
 			)
@@ -513,8 +511,7 @@ private fun DiseaseDetailView(
 				title = disease.name,
 				isFavorite = isFavorite,
 				onToggleFavorite = onToggleFavorite,
-				onCopy = referenceTextActions.onCopy,
-				onShare = referenceTextActions.onShare
+				actions = referenceTextActions
 			)
 		}
 

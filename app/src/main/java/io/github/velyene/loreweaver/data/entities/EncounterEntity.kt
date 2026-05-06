@@ -26,5 +26,10 @@ data class EncounterEntity(
 	val isActive: Boolean = false,
 	val currentRound: Int = 1,
 	val currentTurnIndex: Int = 0,
+	val participantsJson: String = "[]",
+	val activeLogJson: String = "[]",
+	val rewardTemplateJson: String = "{}",
+	val generationSettingsJson: String = "{}",
+	val generationDetailsJson: String? = null,
 	val createdAt: Long = System.currentTimeMillis()
 )

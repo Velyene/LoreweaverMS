@@ -44,6 +44,7 @@ internal data class CampaignDetailContentState(
 	val campaign: Campaign?,
 	val selectedTab: Int,
 	val isLoading: Boolean,
+	val onRetry: (() -> Unit)? = null,
 	val notes: List<Note>,
 	val sessions: List<SessionRecord>,
 	val encounters: List<Encounter>
@@ -51,11 +52,14 @@ internal data class CampaignDetailContentState(
 
 internal data class CampaignDetailActions(
 	val onEncounterClick: (String) -> Unit,
+	val onSessionClick: (String) -> Unit,
 	val onAddNote: (String, String, String) -> Unit,
 	val onDeleteNote: (Note) -> Unit,
 	val onUpdateNote: (Note) -> Unit,
 	val onAddEncounter: (String) -> Unit,
-	val onAddEncounterWithMonsters: (String, List<RemoteItem>) -> Unit
+	val onAddEncounterWithMonsters: (String, List<RemoteItem>) -> Unit,
+	val onUpdateEncounter: (Encounter, String) -> Unit,
+	val onDeleteEncounter: (Encounter) -> Unit,
 )
 
 @Composable
@@ -80,7 +84,10 @@ internal fun CampaignDetailContent(
 			if (state.isLoading) {
 				CenteredLoadingState()
 			} else {
-				CampaignNotFoundState()
+				CampaignNotFoundState(
+					isRetryable = state.onRetry != null,
+					onRetry = state.onRetry,
+				)
 			}
 			return@Column
 		}
@@ -104,8 +111,21 @@ internal fun CampaignDetailContent(
 }
 
 @Composable
-private fun CampaignNotFoundState() {
-	CenteredEmptyState(message = stringResource(R.string.campaign_not_found_message))
+private fun CampaignNotFoundState(
+	isRetryable: Boolean,
+	onRetry: (() -> Unit)? = null,
+) {
+	CenteredEmptyState(
+		message = stringResource(
+			if (isRetryable) {
+				R.string.campaign_load_failed_message
+			} else {
+				R.string.campaign_not_found_message
+			}
+		),
+		actionLabel = if (isRetryable) stringResource(R.string.retry_action) else null,
+		onAction = onRetry,
+	)
 }
 
 @Composable
@@ -170,18 +190,24 @@ private fun CampaignDetailTabContent(
 	// and navigation while this file owns the campaign-detail presentation split.
 	when (state.selectedTab) {
 		0 -> LoreAndNotesSection(
+			campaign = requireNotNull(state.campaign),
 			notes = state.notes,
 			onAddNote = actions.onAddNote,
 			onDeleteNote = actions.onDeleteNote,
 			onUpdateNote = actions.onUpdateNote
 		)
 
-		1 -> SessionHistoryList(state.sessions)
+		1 -> SessionHistoryList(
+			sessions = state.sessions,
+			onSessionClick = actions.onSessionClick,
+		)
 		2 -> LinkedEncounterList(
 			encounters = state.encounters,
 			onEncounterClick = actions.onEncounterClick,
 			onAddEncounter = actions.onAddEncounter,
-			onAddEncounterWithMonsters = actions.onAddEncounterWithMonsters
+			onAddEncounterWithMonsters = actions.onAddEncounterWithMonsters,
+			onUpdateEncounter = actions.onUpdateEncounter,
+			onDeleteEncounter = actions.onDeleteEncounter,
 		)
 	}
 }

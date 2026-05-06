@@ -19,9 +19,9 @@ class ReferenceScreenTransportSearchTest {
 		val saddle = EquipmentReference.TACK_AND_DRAWN_ITEMS.first { it.item == SADDLE_MILITARY }
 		val airship = EquipmentReference.LARGE_VEHICLES.first { it.ship == AIRSHIP }
 
-		assertMatchesAll(warhorse::matchesSearchQuery, "540 lb.", WARHORSE_QUERY)
-		assertMatchesAll(saddle::matchesSearchQuery, SADDLE_QUERY, "20 GP")
-		assertMatchesAll(airship::matchesSearchQuery, AIRSHIP_QUERY, "40,000 GP")
+		assertMatchesAll(warhorse::matchesQuery, "540 lb.", WARHORSE_QUERY)
+		assertMatchesAll(saddle::matchesQuery, SADDLE_QUERY, "20 GP")
+		assertMatchesAll(airship::matchesQuery, AIRSHIP_QUERY, "40,000 GP")
 	}
 
 	@Test

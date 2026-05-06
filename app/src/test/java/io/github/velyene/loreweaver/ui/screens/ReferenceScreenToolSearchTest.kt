@@ -16,9 +16,9 @@ class ReferenceScreenToolSearchTest {
 		val gamingSet = EquipmentReference.OTHER_TOOLS.first { it.name == GAMING_SET }
 		val herbalismKit = EquipmentReference.OTHER_TOOLS.first { it.name == "Herbalism Kit" }
 
-		assertMatchesAll(calligrapher::matchesSearchQuery, "Dexterity", "Ink")
-		assertMatchesAll(gamingSet::matchesSearchQuery, DRAGONCHESS, "Variants require separate proficiency")
-		assertMatchesAll(herbalismKit::matchesSearchQuery, "Antitoxin")
+		assertMatchesAll(calligrapher::matchesQuery, "Dexterity", "Ink")
+		assertMatchesAll(gamingSet::matchesQuery, DRAGONCHESS, "Variants require separate proficiency")
+		assertMatchesAll(herbalismKit::matchesQuery, "Antitoxin")
 	}
 
 	@Test

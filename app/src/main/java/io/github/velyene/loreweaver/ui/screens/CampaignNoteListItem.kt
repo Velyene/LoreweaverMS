@@ -24,6 +24,11 @@ import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.Note
 import io.github.velyene.loreweaver.ui.theme.PanelSurface
+import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_GENERAL
+import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LOCATION
+import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_LORE
+import io.github.velyene.loreweaver.ui.util.NOTE_TYPE_NPC
+import io.github.velyene.loreweaver.ui.util.noteTypeMetadata
 
 @Composable
 internal fun NoteListItem(
@@ -82,21 +87,21 @@ internal fun NoteListItem(
 
 @Composable
 private fun noteMetadata(note: Note): Pair<String, String?> = when (note) {
-	is Note.General -> stringResource(R.string.note_label_general) to null
+	is Note.General -> stringResource(noteTypeMetadata(NOTE_TYPE_GENERAL).badgeLabelResId) to null
 	is Note.Lore -> {
-		stringResource(R.string.note_label_lore) to note.historicalEra
+		stringResource(noteTypeMetadata(NOTE_TYPE_LORE).badgeLabelResId) to note.historicalEra
 			.takeIf { it.isNotBlank() }
 			?.let { stringResource(R.string.note_era_detail, it) }
 	}
 
-	is Note.NPC -> stringResource(R.string.note_label_npc) to stringResource(
+	is Note.NPC -> stringResource(noteTypeMetadata(NOTE_TYPE_NPC).badgeLabelResId) to stringResource(
 		R.string.note_npc_detail,
 		note.faction,
 		note.attitude
 	)
 
 	is Note.Location -> {
-		stringResource(R.string.note_label_location) to note.region
+		stringResource(noteTypeMetadata(NOTE_TYPE_LOCATION).badgeLabelResId) to note.region
 			.takeIf { it.isNotBlank() }
 			?.let { stringResource(R.string.note_region_detail, it) }
 	}

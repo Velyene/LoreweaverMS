@@ -39,7 +39,7 @@ import io.github.velyene.loreweaver.data.entities.SessionEntity
 		NoteEntity::class,
 		LogEntryEntity::class
 	],
-	version = 11,
+	version = 15,
 	exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -52,10 +52,63 @@ abstract class AppDatabase : RoomDatabase() {
 	abstract fun logDao(): LogDao
 
 	companion object {
+		const val DATABASE_NAME = "loreweaver_database"
+
 		@Volatile
 		private var INSTANCE: AppDatabase? = null
 
-		internal const val DATABASE_NAME = "loreweaver_database"
+		val MIGRATION_14_15 = object : Migration(14, 15) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL("ALTER TABLE characters ADD COLUMN experiencePoints INTEGER NOT NULL DEFAULT 0")
+				db.execSQL("ALTER TABLE characters ADD COLUMN inventoryStateJson TEXT NOT NULL DEFAULT '{}'")
+				db.execSQL("ALTER TABLE campaigns ADD COLUMN inventoryStateJson TEXT NOT NULL DEFAULT '{}'")
+				db.execSQL("ALTER TABLE session_records ADD COLUMN rewardReviewJson TEXT")
+			}
+		}
+
+		val MIGRATION_13_14 = object : Migration(13, 14) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL("ALTER TABLE encounters ADD COLUMN generationSettingsJson TEXT NOT NULL DEFAULT '{}'")
+				db.execSQL("ALTER TABLE encounters ADD COLUMN generationDetailsJson TEXT")
+			}
+		}
+
+		val MIGRATION_12_13 = object : Migration(12, 13) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL("ALTER TABLE encounters ADD COLUMN rewardTemplateJson TEXT NOT NULL DEFAULT '{}'")
+			}
+		}
+
+		val MIGRATION_11_12 = object : Migration(11, 12) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL("ALTER TABLE session_records ADD COLUMN rewardsJson TEXT")
+			}
+		}
+
+		val MIGRATION_10_11 = object : Migration(10, 11) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL("ALTER TABLE encounters ADD COLUMN participantsJson TEXT NOT NULL DEFAULT '[]'")
+				db.execSQL("ALTER TABLE encounters ADD COLUMN activeLogJson TEXT NOT NULL DEFAULT '[]'")
+			}
+		}
+
+		private val MIGRATION_9_10 = object : Migration(9, 10) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL(
+					"CREATE INDEX IF NOT EXISTS `index_session_records_date` ON `session_records` (`date`)"
+				)
+				db.execSQL(
+					"CREATE INDEX IF NOT EXISTS `index_session_records_encounterId_date` ON `session_records` (`encounterId`, `date`)"
+				)
+			}
+		}
+
+		private val MIGRATION_8_9 = object : Migration(8, 9) {
+			override fun migrate(db: SupportSQLiteDatabase) {
+				db.execSQL("ALTER TABLE session_records ADD COLUMN isCompleted INTEGER NOT NULL DEFAULT 0")
+				db.execSQL("ALTER TABLE session_records ADD COLUMN encounterResult TEXT")
+			}
+		}
 
 		private val MIGRATION_7_8 = object : Migration(7, 8) {
 			override fun migrate(db: SupportSQLiteDatabase) {
@@ -154,7 +207,25 @@ abstract class AppDatabase : RoomDatabase() {
 
 		fun getDatabase(context: Context): AppDatabase {
 			return INSTANCE ?: synchronized(this) {
-				val instance = createDatabaseBuilder(context).build()
+			val instance = Room.databaseBuilder(
+				context.applicationContext,
+				AppDatabase::class.java,
+				DATABASE_NAME
+			)
+				.addMigrations(
+					MIGRATION_4_5,
+					MIGRATION_5_6,
+					MIGRATION_6_7,
+					MIGRATION_7_8,
+					MIGRATION_8_9,
+					MIGRATION_9_10,
+					MIGRATION_10_11,
+								MIGRATION_11_12,
+								MIGRATION_12_13,
+														MIGRATION_13_14,
+														MIGRATION_14_15
+				)
+				.build()
 				INSTANCE = instance
 				instance
 			}

@@ -57,7 +57,7 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 
 - **Kotlin + Jetpack Compose** for the app UI.
 - **Hilt** for dependency injection.
-- **Room** for local persistence. The current `AppDatabase` version is `8`.
+- **Room** for local persistence. The current `AppDatabase` version is `15`.
 - **Gson** for JSON-backed Room columns and type conversion helpers.
 - **Navigation Compose + Kotlin Serialization** for type-safe navigation.
 - **Material 3** with a custom dark fantasy palette. Dynamic color is disabled by default.
@@ -76,6 +76,18 @@ The project follows an MVVM + Clean Architecture structure with a local-first da
 
 See `ENGINEERING_STANDARDS.md` for the repo-wide expectations around Kotlin/Compose structure,
 ViewModel state conventions, accessibility, localization, testing, audits, and release readiness.
+
+Useful local audit commands:
+
+```powershell
+.\scripts\audit_utf8_mojibake.ps1
+.\gradlew.bat auditUtf8Mojibake --console=plain
+.\gradlew.bat :app:assembleDebug --console=plain
+```
+
+The canonical text-integrity gate is the Gradle task `auditUtf8Mojibake`. The underlying PowerShell
+script remains available as a direct local entrypoint, but `android-ci` now runs the Gradle task as
+an upstream CI gate before build/test work proceeds.
 
 - Gradle tasks are the source of truth for build health. JetBrains inspections can still raise
   false positives around manifest-owned Android components, Hilt providers/constructors, Room

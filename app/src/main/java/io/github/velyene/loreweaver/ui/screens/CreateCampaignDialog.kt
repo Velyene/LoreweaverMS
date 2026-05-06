@@ -14,41 +14,52 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.velyene.loreweaver.R
 
+internal const val CREATE_CAMPAIGN_NAME_FIELD_TAG = "create_campaign_name_field"
+internal const val CREATE_CAMPAIGN_DESCRIPTION_FIELD_TAG = "create_campaign_description_field"
+
 @Composable
 internal fun CreateCampaignDialog(
+	title: String = stringResource(R.string.create_campaign_title),
+	confirmLabel: String = stringResource(R.string.create_button),
+	initialName: String = "",
+	initialDescription: String = "",
 	onDismiss: () -> Unit,
-	onCreate: (name: String, desc: String) -> Unit
+	onConfirm: (name: String, desc: String) -> Unit
 ) {
-	var name by remember { mutableStateOf("") }
-	var desc by remember { mutableStateOf("") }
+	var name by remember(initialName) { mutableStateOf(initialName) }
+	var desc by remember(initialDescription) { mutableStateOf(initialDescription) }
+	val trimmedName = name.trim()
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text(text = stringResource(R.string.create_campaign_title)) },
+		title = { Text(text = title) },
 		text = {
 			Column {
 				OutlinedTextField(
 					value = name,
 					onValueChange = { name = it },
-					label = { Text(text = stringResource(R.string.campaign_name_label)) }
+					label = { Text(text = stringResource(R.string.campaign_name_label)) },
+					modifier = Modifier.testTag(CREATE_CAMPAIGN_NAME_FIELD_TAG)
 				)
 				Spacer(modifier = Modifier.height(8.dp))
 				OutlinedTextField(
 					value = desc,
 					onValueChange = { desc = it },
-					label = { Text(text = stringResource(R.string.description_label)) }
+					label = { Text(text = stringResource(R.string.description_label)) },
+					modifier = Modifier.testTag(CREATE_CAMPAIGN_DESCRIPTION_FIELD_TAG)
 				)
 			}
 		},
 		confirmButton = {
 			Button(
-				onClick = { if (name.isNotEmpty()) onCreate(name, desc) },
-				enabled = name.isNotEmpty()
-			) { Text(text = stringResource(R.string.create_button)) }
+				onClick = { if (trimmedName.isNotEmpty()) onConfirm(trimmedName, desc) },
+				enabled = trimmedName.isNotEmpty()
+			) { Text(text = confirmLabel) }
 		},
 		dismissButton = {
 			TextButton(onClick = onDismiss) {

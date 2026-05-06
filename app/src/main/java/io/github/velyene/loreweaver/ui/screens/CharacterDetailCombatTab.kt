@@ -2,16 +2,15 @@
  * FILE: CharacterDetailCombatTab.kt
  *
  * TABLE OF CONTENTS:
- * 1. Combat tab entry point
- * 2. Hit dice and resting section
- * 3. Spell slot section
- * 4. Actions section and action cards
- * 5. Dice tray section
- * 6. Dice parsing support
+ * 1. Combat Tab Layout
+ * 2. HP and Resource Controls
+ * 3. Actions and Spellcasting Sections
+ * 4. Combat Formatting Helpers
  */
 
 package io.github.velyene.loreweaver.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -21,17 +20,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -39,19 +44,23 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CharacterAction
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.util.CharacterParty
+import io.github.velyene.loreweaver.ui.theme.AntiqueGold
+import io.github.velyene.loreweaver.ui.theme.ArcaneTeal
 import io.github.velyene.loreweaver.ui.viewmodels.CharacterViewModel
 import kotlin.random.Random
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CombatTab(
 	character: CharacterEntry,
@@ -61,16 +70,16 @@ fun CombatTab(
 	situationalBonus: String,
 	onRollResult: (Pair<String, Int>?) -> Unit
 ) {
-	CharacterDetailQuickStatsBar(character, viewModel)
+	QuickStatsBar(character, viewModel)
 	Spacer(modifier = Modifier.height(16.dp))
 
 	StatDisplayRow(
 		label = stringResource(R.string.hp_label),
 		value = character.hp,
 		max = character.maxHp,
-		onUpdate = {
+		onUpdate = { delta ->
 			haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-			onUpdateStat(it, STAT_TYPE_HP)
+			onUpdateStat(delta, STAT_TYPE_HP)
 		}
 	)
 
@@ -79,7 +88,7 @@ fun CombatTab(
 			label = stringResource(R.string.temp_hp_label),
 			value = character.tempHp,
 			max = character.maxHp,
-			onUpdate = { onUpdateStat(it, STAT_TYPE_TEMP_HP) }
+			onUpdate = { delta -> onUpdateStat(delta, STAT_TYPE_TEMP_HP) }
 		)
 	}
 
@@ -87,7 +96,7 @@ fun CombatTab(
 		DeathSaveRow(
 			successes = character.deathSaveSuccesses,
 			failures = character.deathSaveFailures,
-			onUpdate = { success, delta ->
+			onUpdate = { success: Boolean, delta: Int ->
 				haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 				val updated = if (success) {
 					character.copy(
@@ -110,6 +119,64 @@ fun CombatTab(
 	ActionsSection(character, viewModel, situationalBonus, onRollResult)
 	Spacer(modifier = Modifier.height(16.dp))
 	DiceTraySection(situationalBonus, onRollResult)
+}
+
+@Composable
+private fun QuickStatsBar(character: CharacterEntry, viewModel: CharacterViewModel) {
+	Row(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalArrangement = Arrangement.SpaceBetween
+	) {
+		StatCell(label = stringResource(R.string.ac_label), value = "${character.effectiveAc}")
+		StatCell(
+			label = stringResource(R.string.initiative_label),
+			value = "${if (character.initiative >= 0) "+" else ""}${character.initiative}"
+		)
+		StatCell(
+			label = stringResource(R.string.passive_perc_label),
+			value = "${character.passivePerception}"
+		)
+		StatCell(
+			label = stringResource(R.string.speed_label),
+			value = stringResource(R.string.speed_feet_value, character.effectiveSpeed),
+			valueColor = if (character.effectiveSpeed < character.speed) {
+				MaterialTheme.colorScheme.error
+			} else {
+				Color.Unspecified
+			}
+		)
+		Column(horizontalAlignment = Alignment.CenterHorizontally) {
+			Text(
+				stringResource(R.string.insp_label),
+				fontWeight = FontWeight.Bold,
+				color = AntiqueGold,
+				style = MaterialTheme.typography.labelSmall
+			)
+			Icon(
+				imageVector = if (character.hasInspiration) Icons.Default.Star else Icons.Default.StarBorder,
+				contentDescription = stringResource(R.string.inspiration_desc),
+				tint = if (character.hasInspiration) ArcaneTeal else MaterialTheme.colorScheme.outline,
+				modifier = Modifier
+					.size(24.dp)
+					.clickable {
+						viewModel.updateCharacter(character.copy(hasInspiration = !character.hasInspiration))
+					}
+			)
+		}
+	}
+}
+
+@Composable
+private fun StatCell(label: String, value: String, valueColor: Color = Color.Unspecified) {
+	Column(horizontalAlignment = Alignment.CenterHorizontally) {
+		Text(
+			label,
+			fontWeight = FontWeight.Bold,
+			color = AntiqueGold,
+			style = MaterialTheme.typography.labelSmall
+		)
+		Text(value, fontSize = 20.sp, color = valueColor)
+	}
 }
 
 @Composable
@@ -281,7 +348,9 @@ private fun ActionCard(
 				Spacer(modifier = Modifier.width(8.dp))
 				OutlinedButton(onClick = {
 					onRollResult(damageRollLabel to parseAndRoll(action.damageDice))
-				}) { Text(stringResource(R.string.dmg_button)) }
+				}) {
+					Text(stringResource(R.string.dmg_button))
+				}
 			}
 		}
 	}
@@ -303,53 +372,113 @@ private fun DiceTraySection(
 			ElevatedButton(onClick = {
 				val bonus = situationalBonus.toIntOrNull() ?: 0
 				onRollResult(diceLabel to (Random.nextInt(1, sides + 1) + bonus))
-			}) { Text(diceLabel) }
+			}) {
+				Text(diceLabel)
+			}
 		}
 	}
 }
 
-private fun rollDicePool(num: Int, sides: Int): Int =
-	(1..num).sumOf { Random.nextInt(1, sides + 1) }
-
-private fun rollWithAdvDis(num: Int, sides: Int, advantage: Boolean): Int {
-	val a = rollDicePool(num, sides)
-	val b = rollDicePool(num, sides)
-	return if (advantage) maxOf(a, b) else minOf(a, b)
+@Composable
+fun StatDisplayRow(label: String, value: Int, max: Int, onUpdate: (Int) -> Unit) {
+	Column(modifier = Modifier.padding(vertical = 4.dp)) {
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			horizontalArrangement = Arrangement.spacedBy(16.dp)
+		) {
+			Text(
+				text = stringResource(R.string.stat_value_with_max, label, value, max),
+				fontSize = 18.sp,
+				modifier = Modifier.weight(1f)
+			)
+			Row(verticalAlignment = Alignment.CenterVertically) {
+				TextButton(onClick = { onUpdate(-5) }) {
+					Text("-5", color = MaterialTheme.colorScheme.error)
+				}
+				IconButton(onClick = { onUpdate(-1) }) {
+					Icon(
+						Icons.Default.Remove,
+						contentDescription = stringResource(R.string.decrease_stat_desc, label),
+						tint = MaterialTheme.colorScheme.error
+					)
+				}
+				IconButton(onClick = { onUpdate(1) }) {
+					Icon(
+						Icons.Default.Add,
+						contentDescription = stringResource(R.string.increase_stat_desc, label),
+						tint = MaterialTheme.colorScheme.primary
+					)
+				}
+				TextButton(onClick = { onUpdate(5) }) {
+					Text("+5", color = MaterialTheme.colorScheme.primary)
+				}
+			}
+		}
+		val barColor = when (label) {
+			stringResource(R.string.hp_label) -> MaterialTheme.colorScheme.error
+			stringResource(R.string.mana_label) -> MaterialTheme.colorScheme.primary
+			stringResource(R.string.stamina_label) -> MaterialTheme.colorScheme.secondary
+			else -> MaterialTheme.colorScheme.primary
+		}
+		LinearProgressIndicator(
+			progress = { if (max > 0) value.toFloat() / max.toFloat() else 0f },
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(8.dp),
+			strokeCap = StrokeCap.Round,
+			color = barColor,
+			trackColor = barColor.copy(alpha = 0.2f)
+		)
+	}
 }
 
-private fun evaluateDicePart(
-	part: String,
-	advantage: Boolean,
-	disadvantage: Boolean
-): Int {
-	val sign = if (part.startsWith("-")) -1 else 1
-	val cleanPart = part.removePrefix("+").removePrefix("-")
-	return if (cleanPart.contains("d", ignoreCase = true)) {
-		val (n, s) = cleanPart.lowercase().split("d", limit = 2)
-		val num = n.toIntOrNull() ?: 1
-		val sides = s.toIntOrNull() ?: 0
-		if (sides <= 0) 0
-		else {
-			val rolled = if (advantage || disadvantage) rollWithAdvDis(num, sides, advantage)
-			else rollDicePool(num, sides)
-			sign * rolled
+@Composable
+fun DeathSaveRow(successes: Int, failures: Int, onUpdate: (Boolean, Int) -> Unit) {
+	Card(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(vertical = 8.dp),
+		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+	) {
+		Column(modifier = Modifier.padding(16.dp)) {
+			Text(
+				stringResource(R.string.death_saves_label),
+				fontWeight = FontWeight.Bold,
+				color = MaterialTheme.colorScheme.onErrorContainer
+			)
+			Spacer(modifier = Modifier.height(8.dp))
+			DeathSaveCheckboxRow(
+				label = stringResource(R.string.successes_label),
+				count = successes,
+				checkedColor = MaterialTheme.colorScheme.primary,
+				onUpdate = { checked -> if (checked) onUpdate(true, 1) else onUpdate(true, -1) }
+			)
+			DeathSaveCheckboxRow(
+				label = stringResource(R.string.failures_label),
+				count = failures,
+				checkedColor = MaterialTheme.colorScheme.error,
+				onUpdate = { checked -> if (checked) onUpdate(false, 1) else onUpdate(false, -1) }
+			)
 		}
-	} else sign * (cleanPart.toIntOrNull() ?: 0)
+	}
 }
 
-internal fun parseAndRoll(diceExpr: String): Int = try {
-	val cleanExpr = diceExpr.trim().lowercase()
-	val advantage = cleanExpr.startsWith("adv")
-	val disadvantage = cleanExpr.startsWith("dis")
-	val expr = cleanExpr.removePrefix("adv").removePrefix("dis").replace(" ", "")
-	Regex("(?=[+-])", RegexOption.MULTILINE)
-		.split(expr.replace("-", "+-"))
-		.filter { it.isNotBlank() }
-		.sumOf { part ->
-			val cleanPart = part.removePrefix("+").removePrefix("-")
-			if (cleanPart.isBlank()) 0 else evaluateDicePart(part, advantage, disadvantage)
+@Composable
+private fun DeathSaveCheckboxRow(
+	label: String,
+	count: Int,
+	checkedColor: Color,
+	onUpdate: (Boolean) -> Unit
+) {
+	Row(verticalAlignment = Alignment.CenterVertically) {
+		Text(label, modifier = Modifier.weight(1f))
+		repeat(3) { index ->
+			Checkbox(
+				checked = index < count,
+				onCheckedChange = onUpdate,
+				colors = CheckboxDefaults.colors(checkedColor = checkedColor)
+			)
 		}
-} catch (_: Exception) {
-	0
+	}
 }
 

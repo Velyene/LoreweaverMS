@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
@@ -44,11 +45,19 @@ import io.github.velyene.loreweaver.ui.screens.CharacterFormScreen
 import io.github.velyene.loreweaver.ui.screens.CharacterListScreen
 import io.github.velyene.loreweaver.ui.screens.CombatTrackerScreen
 import io.github.velyene.loreweaver.ui.screens.ConditionConstants
+import io.github.velyene.loreweaver.ui.screens.DmSessionHubScreen
+import io.github.velyene.loreweaver.ui.screens.EnemyLibraryScreen
 import io.github.velyene.loreweaver.ui.screens.HomeScreen
 import io.github.velyene.loreweaver.ui.screens.PromptLibraryScreen
 import io.github.velyene.loreweaver.ui.screens.ReferenceScreen
+import io.github.velyene.loreweaver.ui.screens.SavedEncounterPickerScreen
+import io.github.velyene.loreweaver.ui.screens.SessionDetailScreen
 import io.github.velyene.loreweaver.ui.screens.SessionHistoryScreen
 import io.github.velyene.loreweaver.ui.screens.SessionSummaryScreen
+import io.github.velyene.loreweaver.ui.screens.SessionSummaryMode
+import io.github.velyene.loreweaver.ui.viewmodels.EnemyLibraryEncounterSetupDraft
+import io.github.velyene.loreweaver.ui.viewmodels.consumeEnemyLibraryEncounterSetupDraft
+import io.github.velyene.loreweaver.ui.viewmodels.stashEnemyLibraryEncounterSetupDraft
 import kotlin.reflect.KClass
 
 @Composable
@@ -119,11 +128,42 @@ private fun LoreweaverNavGraph(
 	) {
 		composable<HomeRoute> {
 			HomeScreen(
-				onNewEncounter = { navController.navigate(CombatTrackerRoute()) },
+				onNewEncounter = { navController.navigate(DmSessionHubRoute) },
 				onCampaigns = { navController.navigate(CampaignListRoute) },
 				onResumeEncounter = { navController.navigate(CombatTrackerRoute()) },
+				onLatestSessionClick = { sessionId -> navController.navigate(SessionDetailRoute(sessionId)) },
 				onCampaignClick = { id -> navController.navigate(CampaignDetailRoute(id)) },
 			) { navController.navigate(ReferenceRoute()) }
+		}
+		composable<DmSessionHubRoute> {
+			DmSessionHubScreen(
+				onBack = { navController.popBackStack() },
+				onNewEncounter = { navController.navigate(CombatTrackerRoute(startFresh = true)) },
+				onResumeActiveEncounter = { navController.navigate(CombatTrackerRoute()) },
+				onOpenSavedEncounters = { navController.navigate(SavedEncounterPickerRoute) },
+				onManageCharacters = { navController.navigate(CharacterListRoute) },
+				onEnemyLibrary = { navController.navigate(EnemyLibraryRoute) },
+				onSessionLogNotes = { navController.navigate(AdventureLogRoute) },
+				onCampaigns = { navController.navigate(CampaignListRoute) },
+				onAboutHelp = { navController.navigate(ReferenceRoute()) },
+			)
+		}
+		composable<SavedEncounterPickerRoute> {
+			SavedEncounterPickerScreen(
+				onBack = { navController.popBackStack() },
+				onOpenEncounter = { encounterId -> navController.navigate(CombatTrackerRoute(encounterId = encounterId)) },
+			)
+		}
+		composable<EnemyLibraryRoute> {
+			EnemyLibraryScreen(
+				onBack = { navController.popBackStack() },
+				onOpenEncounterSetup = { stagedEnemies ->
+					navController.currentBackStackEntry?.savedStateHandle?.let { savedStateHandle ->
+						stashEnemyLibraryEncounterSetupDraft(savedStateHandle, stagedEnemies)
+					}
+					navController.navigate(CombatTrackerRoute(startFresh = true))
+				},
+			)
 		}
 		composable<CampaignListRoute> {
 			CampaignListScreen(
@@ -136,6 +176,7 @@ private fun LoreweaverNavGraph(
 			CampaignDetailScreen(
 				campaignId = dest.id,
 				onBack = { navController.popBackStack() },
+				onSessionClick = { sessionId -> navController.navigate(SessionDetailRoute(sessionId)) },
 				onEncounterClick = { encounterId ->
 					navController.navigate(CombatTrackerRoute(encounterId))
 				},
@@ -143,10 +184,66 @@ private fun LoreweaverNavGraph(
 		}
 		composable<CombatTrackerRoute> { backStackEntry: NavBackStackEntry ->
 			val dest = backStackEntry.toRoute<CombatTrackerRoute>()
+			val stagedLibraryDraft = remember(backStackEntry, dest.startFresh) {
+				if (dest.startFresh) {
+					consumeEnemyLibraryEncounterSetupDraft(navController.previousBackStackEntry?.savedStateHandle)
+				} else {
+					EnemyLibraryEncounterSetupDraft()
+				}
+			}
 			CombatTrackerScreen(
 				encounterId = dest.encounterId,
+				startFresh = dest.startFresh,
+				stagedLibraryDraft = stagedLibraryDraft,
 				onBack = { navController.popBackStack() },
-				onEndEncounter = { navController.navigate(SessionSummaryRoute) },
+				onExitHome = {
+					navController.navigate(HomeRoute) {
+						popUpTo<HomeRoute> { inclusive = true }
+					}
+				},
+				onEndEncounter = { sessionId ->
+					navController.navigate(EncounterSummaryRoute(sessionId = sessionId)) {
+						popUpTo<CombatTrackerRoute> { inclusive = true }
+					}
+				},
+			)
+		}
+		composable<RewardReviewRoute> {
+			SessionSummaryScreen(
+				summaryMode = SessionSummaryMode.ENCOUNTER_COMPLETION,
+				onSaveEncounter = { sessionId ->
+					navController.navigate(SessionDetailRoute(sessionId))
+				},
+				onDone = {
+					navController.navigate(HomeRoute) {
+						popUpTo<HomeRoute> { inclusive = true }
+					}
+				},
+				onStartAnotherEncounter = {
+					navController.navigate(CombatTrackerRoute(startFresh = true)) {
+						popUpTo<RewardReviewRoute> { inclusive = true }
+					}
+				},
+			)
+		}
+		composable<EncounterSummaryRoute> { backStackEntry: NavBackStackEntry ->
+			val dest = backStackEntry.toRoute<EncounterSummaryRoute>()
+			SessionSummaryScreen(
+				sessionId = dest.sessionId,
+				summaryMode = SessionSummaryMode.ENCOUNTER_COMPLETION,
+				onSaveEncounter = { sessionId ->
+					navController.navigate(SessionDetailRoute(sessionId))
+				},
+				onDone = {
+					navController.navigate(HomeRoute) {
+						popUpTo<HomeRoute> { inclusive = true }
+					}
+				},
+				onStartAnotherEncounter = {
+					navController.navigate(CombatTrackerRoute(startFresh = true)) {
+						popUpTo<EncounterSummaryRoute> { inclusive = true }
+					}
+				},
 			)
 		}
 		composable<SessionSummaryRoute> {
@@ -160,6 +257,9 @@ private fun LoreweaverNavGraph(
 					navController.navigate(CampaignDetailRoute(campaignId)) {
 						popUpTo<SessionSummaryRoute> { inclusive = true }
 					}
+				},
+				onOpenSessionDetail = { sessionId ->
+					navController.navigate(SessionDetailRoute(sessionId))
 				},
 				onStartAnotherEncounter = {
 					navController.navigate(CombatTrackerRoute()) {
@@ -180,7 +280,18 @@ private fun LoreweaverNavGraph(
 			)
 		}
 		composable<SessionHistoryRoute> {
-			SessionHistoryScreen(onBack = { navController.popBackStack() })
+			SessionHistoryScreen(
+				onBack = { navController.popBackStack() },
+				onSessionClick = { sessionId -> navController.navigate(SessionDetailRoute(sessionId)) },
+			)
+		}
+		composable<SessionDetailRoute> { backStackEntry: NavBackStackEntry ->
+			val dest = backStackEntry.toRoute<SessionDetailRoute>()
+			SessionDetailScreen(
+				sessionId = dest.id,
+				onBack = { navController.popBackStack() },
+				onOpenCampaign = { campaignId -> navController.navigate(CampaignDetailRoute(campaignId)) },
+			)
 		}
 		composable<AdventureLogRoute> {
 			AdventureLogScreen(onBack = { navController.popBackStack() })
@@ -235,8 +346,14 @@ private fun NavDestination?.isBottomBarSelected(screen: BottomBarScreen): Boolea
 
 	return when (screen) {
 		is BottomBarScreen.Home -> hasAnyRoute(
+			DmSessionHubRoute::class,
+			SavedEncounterPickerRoute::class,
+			EnemyLibraryRoute::class,
 			CombatTrackerRoute::class,
+			RewardReviewRoute::class,
+			EncounterSummaryRoute::class,
 			SessionSummaryRoute::class,
+			SessionDetailRoute::class,
 			AdventureLogRoute::class,
 			SessionHistoryRoute::class,
 		)

@@ -2,46 +2,10 @@
  * FILE: CoreRulesReference.kt
  *
  * TABLE OF CONTENTS:
- * 1. Reference data models (CoreRuleSection, CoreGlossaryEntry)
  * 2. CoreRulesReference singleton — section and glossary datasets
  */
 
 package io.github.velyene.loreweaver.domain.util
-
-/**
- * Summary card for a Core Rules topic.
- */
-data class CoreRuleSection(
-	val title: String,
-	val summary: String,
-	val bullets: List<String> = emptyList(),
-	val keywords: List<String> = emptyList()
-)
-
-/**
- * Compact glossary entry used by the Core Rules reference UI.
- */
-data class CoreGlossaryEntry(
-	val term: String,
-	val tag: String? = null,
-	val summary: String,
-	val bullets: List<String> = emptyList(),
-	val seeAlso: List<String> = emptyList(),
-	val keywords: List<String> = emptyList()
-) {
-	val title: String
-		get() = if (tag.isNullOrBlank()) term else "$term [$tag]"
-
-	fun matchesQuery(query: String): Boolean {
-		if (query.isBlank()) return true
-
-		return sequenceOf(title, summary)
-			.plus(bullets.asSequence())
-			.plus(seeAlso.asSequence())
-			.plus(keywords.asSequence())
-			.any { it.contains(query, ignoreCase = true) }
-	}
-}
 
 /**
  * Utility object for Core Rules reference content.
@@ -1428,11 +1392,6 @@ object CoreRulesReference {
 			term = WEAPON_ATTACK,
 			summary = "A weapon attack is an attack roll made with a weapon.",
 			seeAlso = listOf(ATTACK_ROLL, "Weapon")
-		),
-		CoreGlossaryEntry(
-			term = "Weapon",
-			summary = "A weapon is an item in the simple or martial weapon categories.",
-			seeAlso = listOf(WEAPON_ATTACK, ATTACK_ACTION)
 		)
 	)
 

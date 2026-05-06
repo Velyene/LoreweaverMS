@@ -39,6 +39,7 @@ data class CharacterEntry(
 	var notes: String = "",
 	var deathSaveSuccesses: Int = 0,
 	var deathSaveFailures: Int = 0,
+	var experiencePoints: Int = 0,
 
 	// --- Attributes & Progression ---
 	var level: Int = 1,
@@ -56,6 +57,7 @@ data class CharacterEntry(
 
 	// --- Equipment & Resources ---
 	var inventory: List<String> = emptyList(),
+	var inventoryState: CharacterInventoryState = CharacterInventoryState(),
 	var resources: List<CharacterResource> = emptyList(),
 	var spellSlots: Map<Int, Pair<Int, Int>> = emptyMap(), // Level -> (Current, Max)
 
@@ -214,5 +216,101 @@ data class CharacterEntry(
 		}
 
 		return this.copy(spellSlots = newSpellSlots, resources = newResources)
+	}
+
+	fun canAffordAction(
+		manaCost: Int = 0,
+		staminaCost: Int = 0,
+		spellSlotLevel: Int? = null,
+		resourceName: String? = null,
+		resourceCost: Int = 0,
+		itemName: String? = null
+	): Boolean {
+		if (mana < manaCost.coerceAtLeast(0)) return false
+		if (stamina < staminaCost.coerceAtLeast(0)) return false
+		if (spellSlotLevel != null) {
+			val currentSlots = spellSlots[spellSlotLevel]?.first ?: 0
+			if (currentSlots <= 0) return false
+		}
+		if (!resourceName.isNullOrBlank()) {
+			val resource = resources.firstOrNull { it.name.equals(resourceName, ignoreCase = true) }
+			if (resource == null || resource.current < resourceCost.coerceAtLeast(0)) return false
+		}
+		if (!itemName.isNullOrBlank() && availableInventoryNames().none { it.equals(itemName, ignoreCase = true) }) return false
+		return true
+	}
+
+	fun spendActionCosts(
+		manaCost: Int = 0,
+		staminaCost: Int = 0,
+		spellSlotLevel: Int? = null,
+		resourceName: String? = null,
+		resourceCost: Int = 0,
+		itemName: String? = null
+	): CharacterEntry {
+		var updated = copy(
+			mana = (mana - manaCost.coerceAtLeast(0)).coerceAtLeast(0),
+			stamina = (stamina - staminaCost.coerceAtLeast(0)).coerceAtLeast(0)
+		)
+
+		if (spellSlotLevel != null) {
+			val currentSlots = updated.spellSlots[spellSlotLevel]?.first ?: 0
+			val maxSlots = updated.spellSlots[spellSlotLevel]?.second ?: 0
+			updated = updated.copy(
+				spellSlots = updated.spellSlots.toMutableMap().apply {
+					this[spellSlotLevel] = currentSlots.coerceAtLeast(1) - 1 to maxSlots
+				}
+			)
+		}
+
+		if (!resourceName.isNullOrBlank()) {
+			updated = updated.copy(
+				resources = updated.resources.map { resource ->
+					if (resource.name.equals(resourceName, ignoreCase = true)) {
+						resource.copy(current = (resource.current - resourceCost.coerceAtLeast(0)).coerceAtLeast(0))
+					} else {
+						resource
+					}
+				}
+			)
+		}
+
+		if (!itemName.isNullOrBlank()) {
+			var removedStructuredItem = false
+			var removedLegacyItem = false
+			val updatedPersonalInventory = updated.personalInventoryItems().filter { item ->
+				if (!removedStructuredItem && item.name.equals(itemName, ignoreCase = true)) {
+					removedStructuredItem = true
+					false
+				} else {
+					true
+				}
+			}
+			updated = updated.copy(
+				inventory = updated.inventory.filter { item ->
+					if (!removedLegacyItem && item.equals(itemName, ignoreCase = true)) {
+						removedLegacyItem = true
+						false
+					} else {
+						true
+					}
+				},
+				inventoryState = updated.inventoryState.copy(personalInventory = updatedPersonalInventory)
+			)
+		}
+
+		return updated
+	}
+
+	fun personalInventoryItems(): List<InventoryItem> {
+		return inventoryState.personalInventory.ifEmpty {
+			inventory.map { itemName ->
+				InventoryItem(name = itemName)
+			}
+		}
+	}
+
+	fun availableInventoryNames(): List<String> {
+		return (personalInventoryItems() + inventoryState.equippedItems).map(InventoryItem::name)
 	}
 }

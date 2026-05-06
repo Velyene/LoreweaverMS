@@ -87,10 +87,11 @@ Key route notes:
 
 ## Data Layer Conventions
 
-- **Room DB**: `AppDatabase` uses version **11**, database name `loreweaver_database`, and
+- **Room DB**: `AppDatabase` uses version **15**, database name `loreweaver_database`, and
   `exportSchema = false`.
 - **Migrations**: `MIGRATION_4_5`, `MIGRATION_5_6`, `MIGRATION_6_7`, `MIGRATION_7_8`,
-  `MIGRATION_8_9`, `MIGRATION_9_10`, and `MIGRATION_10_11` are all
+  `MIGRATION_8_9`, `MIGRATION_9_10`, `MIGRATION_10_11`, `MIGRATION_11_12`, `MIGRATION_12_13`,
+  `MIGRATION_13_14`, and `MIGRATION_14_15` are all
   registered in `Room.databaseBuilder()`.
 - **JSON columns**: Complex character fields such as `resources`, `actions`, `proficiencies`,
   `inventory`, and `spellSlotsJson` are stored as raw JSON strings and mapped with Gson in
@@ -111,8 +112,15 @@ Key route notes:
   `MIGRATION_8_9` and now round-trip through the guided character builder.
 - **Character spells**: `spells` was added to `CharacterEntity` in `MIGRATION_9_10` and now
   round-trips through the guided builder and action/detail character views.
-- **Condition split**: `MIGRATION_10_11` adds `persistentConditions`, copies legacy saved
-  `activeConditions` into that new column, and clears encounter-only condition state.
+- **Encounter checkpointing**: `MIGRATION_10_11` adds persisted `participantsJson` and
+  `activeLogJson` columns so active encounter state can survive app restarts.
+- **Session rewards**: `MIGRATION_11_12` adds `rewardsJson` to `SessionEntity`.
+- **Reward templates**: `MIGRATION_12_13` adds `rewardTemplateJson` to `EncounterEntity`.
+- **Encounter generation state**: `MIGRATION_13_14` adds `generationSettingsJson` and
+  `generationDetailsJson` to `EncounterEntity`.
+- **Inventory/reward review state**: `MIGRATION_14_15` adds `experiencePoints`,
+  `inventoryStateJson`, and `rewardReviewJson` persistence support across characters, campaigns,
+  and session records.
 - **Character conditions**: Domain `CharacterEntry` now stores longer-lived
   `persistentConditions` separately from encounter `activeConditions`; the builder, detail views,
   and live tracker all use that split, and live combat can optionally promote a condition into the
@@ -202,6 +210,9 @@ Reference behavior notes:
 ## Build & Run Commands
 
 ```bash
+# UTF-8 / mojibake audit
+./gradlew auditUtf8Mojibake
+
 # Debug build
 ./gradlew assembleDebug
 
@@ -214,6 +225,10 @@ Reference behavior notes:
 # Instrumented tests (requires device/emulator)
 ./gradlew connectedAndroidTest
 ```
+
+On Windows PowerShell, the underlying script remains available as
+`./scripts/audit_utf8_mojibake.ps1`,
+but the Gradle task is the canonical local and CI entrypoint.
 
 `ContentSafetyAuditTest`, `GameplayToolboxSrdAuditTest`, and `MagicItemsSrdAuditTest` all run as
 part of `:app:testDebugUnitTest`; the audit suite can rewrite `EXCLUDED_REFERENCE_CORPUS_AUDIT.md`
@@ -244,7 +259,7 @@ Key versions from `gradle/libs.versions.toml`:
   artifacts.
 - Room 2.8.x DAO methods return `Long` and `Int`; `CampaignRepositoryImpl` uses block bodies so
   those return values do not leak through `Unit`-typed repository methods.
-- All six migrations are wired into `Room.databaseBuilder()`.
+- All registered schema migrations are wired into `Room.databaseBuilder()`.
 - Some IDE `ComposableFunction0/1/2` errors around Compose lambdas in files such as
   `MainActivity.kt` and `navigation/LoreweaverNavGraph.kt` may be JetBrains IDE analysis false
   positives even when Gradle builds successfully.
@@ -278,6 +293,8 @@ focused on Loreweaver-specific repo hygiene facts and exceptions.
   `.idea/codeStyles/`, `.idea/compiler.xml`, `.idea/gradle.xml`, `.idea/misc.xml`,
   `.idea/runConfigurations.xml`, `.idea/dictionaries/`, `.idea/.name`,
   `.idea/AndroidProjectSystem.xml`, `.idea/jsonCatalog.xml`, and `.idea/.gitignore`.
+- Repo-owned text files should remain valid UTF-8 and free of mojibake; use `auditUtf8Mojibake`
+  after editing docs, resources, datasets, scripts, or build logic that affects tracked text.
 - Machine-specific IDE state such as `.idea/workspace.xml`, caches, shelves, HTTP requests,
   device/emulator selectors, preview state, and similar local files should remain ignored.
 - `EXCLUDED_REFERENCE_CORPUS_AUDIT.md` is a locally regenerated audit artifact used for developer
@@ -294,11 +311,20 @@ focused on Loreweaver-specific repo hygiene facts and exceptions.
 - Prefer adjusting shared inspection entry points for Android/Hilt/Room/JUnit before adding
   `@Suppress("unused")` in source. If suppression is still required, keep it narrowly scoped to a
   verified framework-owned declaration.
+- `.github/workflows/android-ci.yml` runs the UTF-8/mojibake audit job before the debug build/unit
+  test job so text-integrity regressions fail fast in CI.
 
 ## Key Files Reference
 
 - `MainActivity.kt` — Android entry activity; applies `LoreweaverTheme(darkTheme = true)` and
   hosts `LoreweaverApp()`.
+- `build.gradle.kts` — root Gradle configuration; registers `auditUtf8Mojibake`.
+- `buildSrc/src/main/kotlin/Utf8MojibakeAuditTask.kt` — typed Gradle task implementation for the
+  UTF-8/mojibake audit.
+- `scripts/audit_utf8_mojibake.ps1` — tracked-text UTF-8 and mojibake audit script used by the
+  Gradle task.
+- `.github/workflows/android-ci.yml` — primary CI workflow; runs UTF-8/mojibake audit before
+  assemble/unit-test gates.
 - `LoreweaverApplication.kt` — `@HiltAndroidApp` application entry point declared in the manifest.
 - `navigation/Routes.kt` — type-safe `@Serializable` route declarations.
 - `navigation/LoreweaverNavGraph.kt` — `LoreweaverApp`, `NavHost`, animated transitions, and

@@ -15,9 +15,9 @@ class ReferenceScreenAdventuringGearSearchTest {
 		val healerKit = EquipmentReference.ADVENTURING_GEAR.first { it.name == "Healer’s Kit" }
 		val spellScroll = EquipmentReference.ADVENTURING_GEAR.first { it.name == "Spell Scroll" }
 
-		assertMatchesAll(backpack::matchesSearchQuery, "2 GP", SADDLEBAG)
-		assertMatchesAll(healerKit::matchesSearchQuery, "stabilize an Unconscious creature")
-		assertMatchesAll(spellScroll::matchesSearchQuery, "magic item", "written language")
+		assertMatchesAll(backpack::matchesQuery, "2 GP", SADDLEBAG)
+		assertMatchesAll(healerKit::matchesQuery, "stabilize an Unconscious creature")
+		assertMatchesAll(spellScroll::matchesQuery, "magic item", "written language")
 	}
 
 	@Test

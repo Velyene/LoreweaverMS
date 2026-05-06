@@ -14,9 +14,9 @@ class ReferenceScreenLanguageSearchTest {
 		val dwarvish = CharacterCreationReference.STANDARD_LANGUAGES.first { it.name == "Dwarvish" }
 		val primordial = CharacterCreationReference.RARE_LANGUAGES.first { it.name == PRIMORDIAL }
 
-		assertMatchesAll(common::matchesSearchQuery, "Common")
-		assertMatchesAll(dwarvish::matchesSearchQuery, "3–4", "Standard")
-		assertMatchesAll(primordial::matchesSearchQuery, PRIMORDIAL, "Rare")
+		assertMatchesAll(common::matchesQuery, "Common")
+		assertMatchesAll(dwarvish::matchesQuery, "3–4", "Standard")
+		assertMatchesAll(primordial::matchesQuery, PRIMORDIAL, "Rare")
 	}
 
 	@Test

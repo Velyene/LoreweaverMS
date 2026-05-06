@@ -1,5 +1,16 @@
+/*
+ * FILE: CharacterFormCallbacksTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: CharacterFormCallbacksTest
+ * 2. Validation tests for form and builder sections
+ * 3. Character construction fallback and preservation tests
+ * 4. Action-cost preservation tests
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
+import io.github.velyene.loreweaver.domain.model.CharacterAction
 import io.github.velyene.loreweaver.domain.model.ClassInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -151,5 +162,43 @@ class CharacterFormCallbacksTest {
 		assertEquals("Elf", builtCharacter.species)
 		assertEquals("Sage", builtCharacter.background)
 		assertEquals(listOf("Bless", "Shield of Faith"), builtCharacter.spells)
+	}
+
+	@Test
+	fun buildCharacterEntry_preservesCustomActionCostsFromFormState() {
+		val formState = CharacterFormState(
+			name = "Sister Vale",
+			actions = listOf(
+				CharacterAction(
+					name = "Radiant Burst",
+					attackBonus = 5,
+					damageDice = "2d8",
+					isAttack = true,
+					manaCost = 3,
+					staminaCost = 1,
+					spellSlotLevel = 2,
+					resourceName = "Channel Divinity",
+					resourceCost = 1,
+					itemName = "Holy Symbol"
+				)
+			)
+		)
+
+		val builtCharacter = buildCharacterEntry(
+			existingCharacter = null,
+			formState = formState,
+			classInfo = null,
+			hp = 18
+		)
+
+		with(builtCharacter.actions.single()) {
+			assertEquals("Radiant Burst", name)
+			assertEquals(3, manaCost)
+			assertEquals(1, staminaCost)
+			assertEquals(2, spellSlotLevel)
+			assertEquals("Channel Divinity", resourceName)
+			assertEquals(1, resourceCost)
+			assertEquals("Holy Symbol", itemName)
+		}
 	}
 }

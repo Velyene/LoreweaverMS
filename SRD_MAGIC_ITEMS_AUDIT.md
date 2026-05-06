@@ -2,6 +2,23 @@
 
 Snapshot date: 2026-04-20
 
+
+## Contents
+
+- [Summary](#summary)
+- [Hard release overlay](#hard-release-overlay)
+- [Scope reviewed](#scope-reviewed)
+  - [Directly related local datasets](#directly-related-local-datasets)
+  - [Adjacent supporting content](#adjacent-supporting-content)
+- [Current alignment status](#current-alignment-status)
+  - [Magic Items chapter guidance](#magic-items-chapter-guidance)
+  - [Magic item category coverage](#magic-item-category-coverage)
+  - [Structured excerpt-backed tables now modeled locally](#structured-excerpt-backed-tables-now-modeled-locally)
+  - [Magic-item crafting references embedded in tool data](#magic-item-crafting-references-embedded-in-tool-data)
+  - [Adjacent spellcasting references](#adjacent-spellcasting-references)
+- [Verification anchors](#verification-anchors)
+- [Notes for future updates](#notes-for-future-updates)
+
 ## Summary
 
 This note records the magic-item audit completed against the current local reference content in:

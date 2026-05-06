@@ -26,7 +26,7 @@ internal fun CombatantListItem(
 	isActive: Boolean,
 	onHpChange: (characterId: String, delta: Int) -> Unit,
 	onAddCondition: (characterId: String, condition: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
-	onRemoveCondition: (characterId: String, conditionName: String, removePersistentCondition: Boolean) -> Unit
+	onRemoveCondition: (characterId: String, conditionName: String) -> Unit
 ) {
 	var showAddConditionDialog by remember { mutableStateOf(false) }
 	fun dismissConditionDialog() {
@@ -48,11 +48,11 @@ internal fun CombatantListItem(
 
 		if (combatant.conditions.isNotEmpty() || persistentConditions.isNotEmpty() || isActive) {
 			Spacer(modifier = Modifier.height(4.dp))
-			CombatantStatusRow(
-				combatant,
-				persistentConditions,
-				onRemoveCondition,
-				{ showAddConditionDialog = true }
+			CombatantConditionsRow(
+				combatant = combatant,
+				persistentConditions = persistentConditions,
+				onRemoveCondition = { characterId, conditionName, _ -> onRemoveCondition(characterId, conditionName) },
+				onAddConditionClick = { showAddConditionDialog = true }
 			)
 		}
 	}

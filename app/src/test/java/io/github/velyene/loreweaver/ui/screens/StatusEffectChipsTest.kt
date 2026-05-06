@@ -53,8 +53,9 @@ class StatusEffectChipsTest {
 		val metadata = ConditionConstants.metadataFor("Battle Focus")
 
 		assertEquals("Battle Focus", metadata.label)
-		assertEquals(ConditionConstants.StatusCategory.CUSTOM, metadata.category)
-		assertFalse(metadata.isSrdCondition)
+		assertEquals(ConditionConstants.StatusCategory.DEBUFF, metadata.category)
+		assertEquals(ConditionConstants.StatusPolicyBucket.CUSTOM_HOMEBREW, ConditionConstants.bucketFor("Battle Focus"))
+		assertFalse(ConditionConstants.isOfficialCondition(metadata.label))
 	}
 }
 

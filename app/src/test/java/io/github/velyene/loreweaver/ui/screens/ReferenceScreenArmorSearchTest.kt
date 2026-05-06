@@ -17,9 +17,9 @@ class ReferenceScreenArmorSearchTest {
 		val chainMail = EquipmentReference.ARMOR.first { it.name == CHAIN_MAIL }
 		val shield = EquipmentReference.ARMOR.first { it.name == SHIELD }
 
-		assertMatchesAll(leatherArmor::matchesSearchQuery, LIGHT, "11 + Dex modifier")
-		assertMatchesAll(chainMail::matchesSearchQuery, "Str 13", "Disadvantage")
-		assertMatchesAll(shield::matchesSearchQuery, UTILIZE_ACTION)
+		assertMatchesAll(leatherArmor::matchesQuery, LIGHT, "11 + Dex modifier")
+		assertMatchesAll(chainMail::matchesQuery, "Str 13", "Disadvantage")
+		assertMatchesAll(shield::matchesQuery, UTILIZE_ACTION)
 	}
 
 	@Test

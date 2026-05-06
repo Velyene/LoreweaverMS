@@ -1,6 +1,7 @@
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,16 +21,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.SessionRecord
 import io.github.velyene.loreweaver.ui.theme.ArcaneTeal
 
+internal fun sessionHistoryListItemTag(sessionId: String): String = "session_history_item_$sessionId"
+
 @Composable
-internal fun SessionHistoryList(sessions: List<SessionRecord>) {
+internal fun SessionHistoryList(
+	sessions: List<SessionRecord>,
+	onSessionClick: (String) -> Unit = {},
+) {
 	if (sessions.isEmpty()) {
 		CenteredEmptyState(stringResource(R.string.sessions_empty_message))
 	} else {
@@ -47,6 +55,11 @@ internal fun SessionHistoryList(sessions: List<SessionRecord>) {
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(vertical = 4.dp)
+						.testTag(sessionHistoryListItemTag(session.id))
+						.clickable(
+							role = Role.Button,
+							onClickLabel = stringResource(R.string.open_session_action, session.title)
+						) { onSessionClick(session.id) }
 						.background(
 							MaterialTheme.colorScheme.surfaceVariant,
 							RoundedCornerShape(8.dp)
@@ -63,11 +76,7 @@ internal fun SessionHistoryList(sessions: List<SessionRecord>) {
 								fontSize = 14.sp
 							)
 							Text(
-								text = pluralStringResource(
-									R.plurals.session_entries_count,
-									session.log.size,
-									session.log.size
-								),
+								text = pluralStringResource(R.plurals.session_entries_count, session.log.size, session.log.size),
 								color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
 								fontSize = 11.sp
 							)

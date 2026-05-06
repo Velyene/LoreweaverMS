@@ -26,12 +26,15 @@ import io.github.velyene.loreweaver.domain.repository.ReferencePreferencesReposi
 import io.github.velyene.loreweaver.domain.repository.SessionsRepository
 import io.github.velyene.loreweaver.ui.util.AndroidAppText
 import io.github.velyene.loreweaver.ui.util.AppText
+import io.github.velyene.loreweaver.ui.viewmodels.AndroidCombatTextProvider
+import io.github.velyene.loreweaver.ui.viewmodels.CombatTextProvider
 import javax.inject.Singleton
 
 @Suppress("unused")
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+	const val REFERENCE_PREFERENCES_NAME = "reference_preferences"
 
 	@Provides
 	@Singleton
@@ -60,7 +63,7 @@ object AppModule {
 	@Provides
 	@Singleton
 	fun provideReferenceSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-		return context.getSharedPreferences("reference_preferences", Context.MODE_PRIVATE)
+		return context.getSharedPreferences(REFERENCE_PREFERENCES_NAME, Context.MODE_PRIVATE)
 	}
 
 	@Provides
@@ -69,6 +72,12 @@ object AppModule {
 		sharedPreferences: SharedPreferences
 	): ReferencePreferencesRepository {
 		return ReferencePreferencesRepositoryImpl(sharedPreferences)
+	}
+
+	@Provides
+	@Singleton
+	fun provideCombatTextProvider(@ApplicationContext context: Context): CombatTextProvider {
+		return AndroidCombatTextProvider(context)
 	}
 
 	@Provides

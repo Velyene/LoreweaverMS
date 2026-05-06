@@ -17,10 +17,10 @@ class ReferenceScreenBackgroundSearchTest {
 		val sage = CharacterCreationReference.BACKGROUNDS.first { it.name == "Sage" }
 		val soldier = CharacterCreationReference.BACKGROUNDS.first { it.name == "Soldier" }
 
-		assertMatchesAll(acolyte::matchesSearchQuery, ACOLYTE, "Religion")
-		assertMatchesAll(criminal::matchesSearchQuery, CROWBAR, "Thieves' Tools")
-		assertMatchesAll(sage::matchesSearchQuery, "Magic Initiate")
-		assertMatchesAll(soldier::matchesSearchQuery, "Gaming Set")
+		assertMatchesAll(acolyte::matchesQuery, ACOLYTE, "Religion")
+		assertMatchesAll(criminal::matchesQuery, CROWBAR, "Thieves' Tools")
+		assertMatchesAll(sage::matchesQuery, "Magic Initiate")
+		assertMatchesAll(soldier::matchesQuery, "Gaming Set")
 	}
 
 	@Test
