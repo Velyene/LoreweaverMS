@@ -71,6 +71,7 @@ signing.properties
 # Misc build artefacts & logs
 # ============================================================
 *.hprof
+build_errors.txt
 build_log.txt
 build_output.txt
 long_kotlin_lines.txt

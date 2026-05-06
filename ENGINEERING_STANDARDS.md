@@ -33,6 +33,8 @@ be handled.
 - Prefer **clear, maintainable code** over clever or compact code.
 - Keep changes **small, focused, and reviewable**.
 - Treat **Gradle builds and tests** as the source of truth for project health.
+- Treat **text integrity** as part of build health: repo-owned text should remain valid UTF-8 and
+  free of mojibake.
 - Keep **docs aligned with shipped behavior**, not planned behavior.
 - Treat **accessibility, localization, and audit safety** as normal engineering work, not polish.
 - Comments should explain **why**, constraints, or tradeoffs—not restate what the code already says.
@@ -192,6 +194,8 @@ All user-facing text should be localization-ready.
 - avoid inline button labels, placeholders, titles, and accessibility summaries
 - use formatted resources rather than concatenating sentence fragments in code
 - keep canonical internal values separate from display labels where those concepts differ
+- preserve UTF-8 cleanliness in repo-owned text resources, datasets, docs, and build/config files
+  when editing them
 
 ### Examples that should be resource-backed
 
@@ -227,6 +231,7 @@ When behavior changes, update the relevant repo-owned docs:
 - `README.md`
 - `AGENTS.md` when architecture or key conventions change
 - SRD/audit markdown when shipped content expectations change
+- engineering/review policy docs when quality gates or repo-wide expectations change
 
 Docs must describe current shipped behavior.
 
@@ -286,6 +291,8 @@ engineering work.
 - keep provenance and scope aligned with the repo-owned audit docs
 - do not reintroduce unreviewed long-form content casually
 - keep rules summaries concise and mechanically useful
+- keep repo-owned text files valid UTF-8 and correct mojibake or replacement-character corruption
+  before considering the change complete
 
 ### When editing large reference datasets
 
@@ -375,10 +382,19 @@ The exact CI workflow can evolve, but these are the expected quality gates.
 
 ### Baseline gates
 
+- `auditUtf8Mojibake`
 - `:app:testDebugUnitTest`
 - `:app:assembleDebug`
 - lint/static analysis when configured
 - relevant audit tests when content changes
+
+### Text integrity gate
+
+Changes that touch repo-owned text, docs, resources, datasets, scripts, or build logic must pass the
+UTF-8/
+mojibake audit gate before they are considered ready. Local verification may use the repository's
+documented
+audit entrypoint, but the policy requirement is that the canonical audit gate remains green in CI.
 
 ### Content-sensitive changes
 
@@ -397,6 +413,7 @@ A change is not complete if the governing audits are left broken or stale.
 
 Before shipping or cutting a release candidate:
 
+- UTF-8/mojibake audit passes
 - build passes
 - unit tests pass
 - relevant audit tests pass
@@ -417,6 +434,7 @@ A change is done when:
 - localization/accessibility were considered
 - relevant docs are updated
 - relevant audits remain accurate
+- repo-owned text touched by the change remains UTF-8 clean and audit-clean
 - unrelated churn is avoided
 
 ---
