@@ -1,3 +1,13 @@
+/*
+ * FILE: CampaignListViewModel.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: CampaignListViewModel
+ * 2. Loading: campaigns and session history
+ * 3. Loading: active encounter summary
+ * 4. Error and state update helpers
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import androidx.lifecycle.ViewModel

@@ -1,3 +1,13 @@
+/*
+ * FILE: CampaignViewModelSupport.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Campaign editor error-prefix constants
+ * 2. Error formatting helpers
+ * 3. Campaign and character UiState helpers
+ * 4. Combat and session summary UiState helpers
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import androidx.annotation.StringRes

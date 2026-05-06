@@ -72,7 +72,8 @@ private fun createCharacterViewModel(repository: FakeCharactersRepository): Char
 		addCharacterUseCase = AddCharacterUseCase(repository),
 		updateCharacterUseCase = UpdateCharacterUseCase(repository),
 		deleteCharacterUseCase = DeleteCharacterUseCase(repository),
-		insertLogUseCase = InsertLogUseCase(FakeLogsRepository())
+		insertLogUseCase = InsertLogUseCase(FakeLogsRepository()),
+		appText = fakeAppText
 	)
 }
 

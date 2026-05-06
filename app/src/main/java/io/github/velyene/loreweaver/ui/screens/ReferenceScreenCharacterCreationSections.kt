@@ -1,8 +1,17 @@
+/*
+ * FILE: ReferenceScreenCharacterCreationSections.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. LazyListScope renderer: foundation items
+ * 2. LazyListScope renderer: guidance items
+ * 3. LazyListScope renderer: tail items
+ * 4. Detail navigation helper: openFeatReferenceDetail
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.util.CharacterCreationReference

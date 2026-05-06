@@ -62,12 +62,17 @@ internal fun CharacterEntry.toFormState(): CharacterFormState {
 		.copy(
 			selectedProficiencies = proficiencies,
 			selectedSaveProficiencies = saveProficiencies,
+			species = species,
+			background = background,
+			spellsText = spells.joinToString("\n"),
 			inventoryText = personalInventoryItems().joinToString("\n") { it.name },
 			equippedItemsText = inventoryState.equippedItems.joinToString("\n") { it.name },
 			walletCp = inventoryState.currencyCp.toString(),
 			carryingNotes = inventoryState.carryingNotes,
 			resources = resources,
 			actions = actions,
+			encounterConditions = activeConditions,
+			persistentConditions = persistentConditions,
 			status = status,
 			notes = notes
 		)

@@ -1,7 +1,17 @@
+/*
+ * FILE: CharacterFormCallbacksTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: CharacterFormCallbacksTest
+ * 2. Validation tests for form and builder sections
+ * 3. Character construction fallback and preservation tests
+ * 4. Action-cost preservation tests
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
-import io.github.velyene.loreweaver.domain.model.ClassInfo
 import io.github.velyene.loreweaver.domain.model.CharacterAction
+import io.github.velyene.loreweaver.domain.model.ClassInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

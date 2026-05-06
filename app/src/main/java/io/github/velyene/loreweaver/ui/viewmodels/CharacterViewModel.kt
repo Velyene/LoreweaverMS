@@ -1,3 +1,13 @@
+/*
+ * FILE: CharacterViewModel.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Data class: CharacterUiState
+ * 2. Class: CharacterViewModel initialization and selection
+ * 3. Character CRUD actions
+ * 4. Error formatting, logging, and state helpers
+ */
+
 package io.github.velyene.loreweaver.ui.viewmodels
 
 import androidx.lifecycle.ViewModel

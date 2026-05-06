@@ -61,7 +61,8 @@ internal fun createCampaignDetailViewModel(repository: SplitFakeCampaignReposito
 		getCampaignByIdUseCase = GetCampaignByIdUseCase(repository),
 		getEncountersForCampaignUseCase = GetEncountersForCampaignUseCase(repository),
 		getNotesForCampaignUseCase = GetNotesForCampaignUseCase(repository),
-		getSessionsForEncounterUseCase = GetSessionsForEncounterUseCase(repository)
+		getSessionsForEncounterUseCase = GetSessionsForEncounterUseCase(repository),
+		appText = fakeAppText
 	)
 }
 
@@ -103,6 +104,7 @@ internal class SplitFakeCampaignRepository : CampaignRepository {
 	private val campaignsFlow = MutableStateFlow<List<Campaign>>(emptyList())
 	private val charactersFlow = MutableStateFlow<List<CharacterEntry>>(emptyList())
 	private val allSessionsFlow = MutableStateFlow<List<SessionRecord>>(emptyList())
+	private val logsFlow = MutableStateFlow<List<LogEntry>>(emptyList())
 	private val encountersByCampaign = mutableMapOf<String, MutableStateFlow<List<Encounter>>>()
 	private val notesByCampaign = mutableMapOf<String, MutableStateFlow<List<Note>>>()
 	private val sessionsByEncounter = mutableMapOf<String, MutableStateFlow<List<SessionRecord>>>()
@@ -110,6 +112,7 @@ internal class SplitFakeCampaignRepository : CampaignRepository {
 	private var recentSession: SessionRecord? = null
 	var allSessionsFailure: Exception? = null
 	var recentSessionFailure: Exception? = null
+	var clearLogsFailure: Exception? = null
 
 	val insertedCharacters = mutableListOf<CharacterEntry>()
 	val insertedNotes = mutableListOf<Note>()
@@ -285,11 +288,16 @@ internal class SplitFakeCampaignRepository : CampaignRepository {
 			?: sessionsByEncounter[encounterId]?.value?.maxByOrNull(SessionRecord::date)
 	}
 
-	override fun getAllLogs(): Flow<List<LogEntry>> = flowOf(emptyList())
+	override fun getAllLogs(): Flow<List<LogEntry>> = logsFlow
 
-	override suspend fun insertLog(log: LogEntry) = Unit
+	override suspend fun insertLog(log: LogEntry) {
+		logsFlow.value += log
+	}
 
-	override suspend fun clearLogs() = Unit
+	override suspend fun clearLogs() {
+		clearLogsFailure?.let { throw it }
+		logsFlow.value = emptyList()
+	}
 
 	fun setCampaigns(campaigns: List<Campaign>) {
 		campaignsFlow.value = campaigns
@@ -301,6 +309,14 @@ internal class SplitFakeCampaignRepository : CampaignRepository {
 
 	fun setAllSessions(sessions: List<SessionRecord>) {
 		allSessionsFlow.value = sessions
+	}
+
+	fun setLogs(logs: List<LogEntry>) {
+		logsFlow.value = logs
+	}
+
+	fun setClearLogsException(exception: Exception?) {
+		clearLogsFailure = exception
 	}
 
 	fun setCharacters(characters: List<CharacterEntry>) {

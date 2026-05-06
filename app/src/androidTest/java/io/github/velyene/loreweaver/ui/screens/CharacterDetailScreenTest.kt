@@ -1,3 +1,13 @@
+/*
+ * FILE: CharacterDetailScreenTest.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Class: CharacterDetailScreenTest
+ * 2. Test coverage: Journal tab content
+ * 3. Test coverage: Combat tab content
+ * 4. Test support: CharacterViewModel and fake repositories
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -16,6 +26,7 @@ import io.github.velyene.loreweaver.domain.use_case.GetCharactersUseCase
 import io.github.velyene.loreweaver.domain.use_case.InsertLogUseCase
 import io.github.velyene.loreweaver.domain.use_case.UpdateCharacterUseCase
 import io.github.velyene.loreweaver.ui.theme.LoreweaverTheme
+import io.github.velyene.loreweaver.ui.util.AppText
 import io.github.velyene.loreweaver.ui.viewmodels.CharacterViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -119,8 +130,21 @@ private fun createTestCharacterViewModel(): CharacterViewModel {
 		addCharacterUseCase = AddCharacterUseCase(charactersRepository),
 		updateCharacterUseCase = UpdateCharacterUseCase(charactersRepository),
 		deleteCharacterUseCase = DeleteCharacterUseCase(charactersRepository),
-		insertLogUseCase = InsertLogUseCase(AndroidTestLogsRepository())
+		insertLogUseCase = InsertLogUseCase(AndroidTestLogsRepository()),
+		appText = androidTestAppText
 	)
+}
+
+private val androidTestAppText: AppText = object : AppText {
+	override fun getString(resId: Int, vararg formatArgs: Any): String =
+		buildString {
+			append("resId=")
+			append(resId)
+			if (formatArgs.isNotEmpty()) {
+				append(" args=")
+				append(formatArgs.toList())
+			}
+		}
 }
 
 private class AndroidTestCharactersRepository : CharactersRepository {

@@ -1,3 +1,13 @@
+/*
+ * FILE: CharacterActionHubSupport.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Enum and model: ActionHubSection and ActionHubEntry
+ * 2. Builder: buildActionHubEntries
+ * 3. Entry mappers: actions, resources, spells, and items
+ * 4. Inventory inference and formatting helpers
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.model.CharacterAction

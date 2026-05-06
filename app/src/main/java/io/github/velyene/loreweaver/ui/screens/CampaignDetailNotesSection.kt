@@ -1,3 +1,13 @@
+/*
+ * FILE: CampaignDetailNotesSection.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Composable: LoreAndNotesSection
+ * 2. Dialog and delete-confirmation state handling
+ * 3. Composable: CampaignInventoryOverview
+ * 4. Composable: InventoryLineList
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import androidx.compose.foundation.layout.Spacer

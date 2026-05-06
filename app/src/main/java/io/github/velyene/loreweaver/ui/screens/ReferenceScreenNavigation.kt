@@ -1,3 +1,13 @@
+/*
+ * FILE: ReferenceScreenNavigation.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Enum: CharacterCreationSubsection
+ * 2. Title, table, and feat category groupings
+ * 3. Matching helpers for sections, steps, feats, and tables
+ * 4. Subsection visibility helpers for reference rendering
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.CharacterCreationStep

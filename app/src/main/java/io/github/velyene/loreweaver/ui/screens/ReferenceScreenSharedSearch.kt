@@ -1,3 +1,13 @@
+/*
+ * FILE: ReferenceScreenSharedSearch.kt
+ *
+ * TABLE OF CONTENTS:
+ * 1. Shared query helpers and display-label formatting
+ * 2. Character creation search extensions
+ * 3. Core rules search extensions
+ * 4. Equipment and item search extensions
+ */
+
 package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.AbilityScoreSummary
