@@ -2,21 +2,19 @@
  * FILE: CombatEncounterSupport.kt
  *
  * TABLE OF CONTENTS:
- * 1. Encounter difficulty calculation
- * 2. Encounter presentation models
- * 3. Encounter/session persistence builders
+ * 1. Encounter presentation models
+ * 2. Encounter/session persistence builders
+ *
+ * Note: calculateEncounterDifficulty moved to CombatRosterSupport.kt
  */
 
 package io.github.velyene.loreweaver.ui.viewmodels
 
-import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.domain.model.Encounter
 import io.github.velyene.loreweaver.domain.model.EncounterSnapshot
 import io.github.velyene.loreweaver.domain.model.EncounterStatus
 import io.github.velyene.loreweaver.domain.model.SessionRecord
-import io.github.velyene.loreweaver.domain.util.EncounterDifficulty
-import io.github.velyene.loreweaver.domain.util.EncounterDifficultyResult
 import java.util.UUID
 
 internal data class EncounterPresentation(
@@ -29,24 +27,6 @@ internal data class EncounterPresentation(
 	val isCombatActive: Boolean
 )
 
-internal fun calculateEncounterDifficulty(state: CombatUiState): EncounterDifficultyResult? {
-	val charactersById = state.availableCharacters.associateBy(CharacterEntry::id)
-	val selectedCharacters = state.combatants.mapNotNull { combatant ->
-		charactersById[combatant.characterId]
-	}
-	val partyMembers = selectedCharacters.filter(CharacterEntry::isAdventurer)
-	val enemies = state.combatants.filter { combatant ->
-		charactersById[combatant.characterId]?.isAdventurer() != true
-	}
-	val enemyCRMap = enemies.associate { combatant ->
-		combatant.characterId to (charactersById[combatant.characterId]?.challengeRating ?: 0.0)
-	}
-	return EncounterDifficulty.calculateDifficulty(
-		partyMembers = partyMembers,
-		enemies = enemies,
-		enemyCRMap = enemyCRMap
-	)
-}
 
 internal fun buildActiveEncounterPresentation(
 	encounter: Encounter,

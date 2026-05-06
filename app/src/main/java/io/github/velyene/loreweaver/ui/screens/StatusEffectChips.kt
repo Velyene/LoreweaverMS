@@ -68,6 +68,12 @@ internal fun persistentStatusChipModels(labels: Iterable<String>): List<StatusCh
 	}
 }
 
+internal fun buildStatusChipModels(labels: Iterable<String>, isPersistent: Boolean): List<StatusChipModel> {
+	return normalizedStatusLabels(labels).map { label ->
+		statusChipModel(name = label, isPersistent = isPersistent)
+	}
+}
+
 internal fun normalizedStatusLabels(labels: Iterable<String>): List<String> {
 	return labels
 		.asSequence()

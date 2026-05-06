@@ -9,8 +9,6 @@ package io.github.velyene.loreweaver.ui.screens.tracker.live
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.res.stringResource
-import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
 import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.ui.viewmodels.PendingTurnAction
@@ -23,26 +21,12 @@ internal fun rememberLiveTrackerUiState(
 	pendingAction: PendingTurnAction?,
 	selectedTargetId: String?
 ): LiveTrackerUiState {
-	val labels = LiveTrackerFormattingLabels(
-		enemyTypeLabel = stringResource(R.string.encounter_turn_chip_enemy),
-		defaultActionLabels = listOf(
-			stringResource(R.string.combat_action_strike),
-			stringResource(R.string.combat_action_cast),
-			stringResource(R.string.combat_action_sneak),
-			stringResource(R.string.combat_action_dodge)
-		),
-		tempHpFormat = stringResource(R.string.encounter_resource_temp_hp),
-		manaFormat = stringResource(R.string.encounter_resource_mana),
-		staminaFormat = stringResource(R.string.encounter_resource_stamina),
-		namedResourceFormat = stringResource(R.string.encounter_resource_named)
+	val labels = rememberLiveTrackerLabels()
+	val participants = rememberLiveParticipants(
+		combatants = combatants,
+		availableCharacters = availableCharacters,
+		labels = labels
 	)
-	val participants = remember(combatants, availableCharacters, labels) {
-		buildLiveParticipants(
-			combatants = combatants,
-			availableCharacters = availableCharacters,
-			labels = labels
-		)
-	}
 	return remember(participants, turnIndex, pendingAction, selectedTargetId) {
 		val currentParticipant = participants.getOrNull(turnIndex)
 		val targetableParticipants = participants.filter { participant ->
@@ -69,4 +53,3 @@ internal fun rememberLiveTrackerUiState(
 		)
 	}
 }
-

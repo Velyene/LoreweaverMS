@@ -98,9 +98,16 @@ private fun CharacterStatusOverview(
 
 	if (showPersistentStatusPicker) {
 		AddConditionDialog(
-			titleOverride = stringResource(R.string.character_status_manage_persistent_title),
-			supportingTextOverride = stringResource(R.string.character_status_manage_persistent_supporting_text),
-			availableConditions = ConditionConstants.persistentConditions().toSet(),
+			config = AddConditionDialogConfig(
+				titleOverride = stringResource(R.string.character_status_manage_persistent_title),
+				supportingTextOverride = stringResource(R.string.character_status_manage_persistent_supporting_text),
+				availableConditions = ConditionConstants.persistentConditions().toSet(),
+				initialHasDuration = false,
+				initialPersistsAcrossEncounters = true,
+				showDurationControls = false,
+				showPersistenceToggle = false,
+				sheetTag = PERSISTENT_STATUS_PICKER_SHEET_TAG,
+			),
 			summaryContent = {
 				PersistentStatusManagerSummary(
 					statuses = currentPersistentEffects,
@@ -109,11 +116,6 @@ private fun CharacterStatusOverview(
 					}
 				)
 			},
-			initialHasDuration = false,
-			initialPersistsAcrossEncounters = true,
-			showDurationControls = false,
-			showPersistenceToggle = false,
-			sheetTag = PERSISTENT_STATUS_PICKER_SHEET_TAG,
 			onDismiss = {
 				@Suppress("UNUSED_VALUE")
 				showPersistentStatusPicker = false

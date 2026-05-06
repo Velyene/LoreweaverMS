@@ -147,8 +147,11 @@ internal fun applyPendingActionResult(
 	}
 }
 
-internal fun advanceCombatTurn(uiState: MutableStateFlow<CombatUiState>) {
-	uiState.update { it.clearPendingTurnState().advanceTurn() }
+internal fun advanceCombatTurn(
+	uiState: MutableStateFlow<CombatUiState>,
+	combatTextProvider: CombatTextProvider
+) {
+	uiState.update { it.clearPendingTurnState().advanceTurn(combatTextProvider) }
 }
 
 internal fun addCombatantCondition(

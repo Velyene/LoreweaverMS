@@ -1,4 +1,4 @@
-/*
+﻿/*
  * FILE: EncounterSetupSections.kt
  *
  * TABLE OF CONTENTS:
@@ -18,7 +18,6 @@
 package io.github.velyene.loreweaver.ui.screens.tracker.setup
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -255,65 +254,6 @@ private fun SnapshotMetricCard(label: String, value: String) {
 	}
 }
 
-@Composable
-internal fun PartyMembersSection(
-	savedPartyMembers: List<CharacterEntry>,
-	selectedPartyIds: Set<String>,
-	partyActions: EncounterSetupPartyActions
-) {
-	EncounterSetupSectionShell(
-		title = stringResource(R.string.encounter_party_members_title),
-		supportingText = stringResource(R.string.encounter_party_members_supporting_text),
-	) {
-		Row(
-			modifier = Modifier.fillMaxWidth(),
-			horizontalArrangement = Arrangement.spacedBy(8.dp)
-		) {
-			TextButton(
-				onClick = partyActions.onAddEntireParty,
-				enabled = selectedPartyIds.size < savedPartyMembers.size,
-				modifier = Modifier.weight(1f)
-			) {
-				Text(
-					text = stringResource(
-						R.string.add_party_button_with_count,
-						(savedPartyMembers.size - selectedPartyIds.size).coerceAtLeast(0)
-					)
-				)
-			}
-			TextButton(
-				onClick = partyActions.onClearPartyMembers,
-				enabled = selectedPartyIds.isNotEmpty(),
-				modifier = Modifier.weight(1f)
-			) {
-				Text(text = stringResource(R.string.clear_button))
-			}
-		}
-		Text(
-			text = "${selectedPartyIds.size} of ${savedPartyMembers.size} Adventurers are staged for this encounter.",
-			style = MaterialTheme.typography.bodySmall,
-			color = MaterialTheme.colorScheme.onSurfaceVariant
-		)
-		Spacer(modifier = Modifier.height(8.dp))
-
-		if (savedPartyMembers.isEmpty()) {
-			EncounterSetupEmptyState(stringResource(R.string.encounter_party_members_empty_message))
-		} else {
-			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-				savedPartyMembers.forEach { character ->
-					androidx.compose.runtime.key(character.id) {
-						val isSelected = selectedPartyIds.contains(character.id)
-						SavedPartyMemberCard(
-							character = character,
-							isSelected = isSelected,
-							onTogglePartyMember = { partyActions.onTogglePartyMember(character) }
-						)
-					}
-				}
-			}
-		}
-	}
-}
 
 @Composable
 internal fun EncounterRosterSection(
@@ -464,101 +404,6 @@ private fun EncounterRosterCard(
 				)
 				TextButton(onClick = { onUpdateInitiative(combatant.characterId, combatant.initiative + 1) }) {
 					Text(text = "+1", color = contentColor)
-				}
-			}
-		}
-	}
-}
-
-@Composable
-private fun SavedPartyMemberCard(
-	character: CharacterEntry,
-	isSelected: Boolean,
-	onTogglePartyMember: () -> Unit
-) {
-	Card(
-		modifier = Modifier
-			.fillMaxWidth()
-			.clickable(onClick = onTogglePartyMember),
-		colors = CardDefaults.cardColors(
-			containerColor = if (isSelected) {
-				MaterialTheme.colorScheme.primaryContainer
-			} else {
-				MaterialTheme.colorScheme.surfaceVariant
-			}
-		)
-	) {
-		Row(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 12.dp, vertical = 10.dp),
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.SpaceBetween
-		) {
-			Column(modifier = Modifier.weight(1f)) {
-				Text(
-					text = character.name,
-					style = MaterialTheme.typography.titleSmall,
-					fontWeight = FontWeight.SemiBold,
-					color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-				)
-				Text(
-					text = stringResource(
-						R.string.encounter_party_member_summary,
-						character.level,
-						character.hp,
-						character.maxHp,
-						character.initiative
-					),
-					style = MaterialTheme.typography.bodySmall,
-					color = if (isSelected) {
-						MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-					} else {
-						MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-					}
-				)
-			}
-			Text(
-				text = if (isSelected) {
-					stringResource(R.string.encounter_party_member_selected)
-				} else {
-					stringResource(R.string.encounter_party_member_add)
-				},
-				style = MaterialTheme.typography.labelMedium,
-				fontWeight = FontWeight.Bold,
-				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
-			)
-		}
-	}
-}
-
-@Composable
-internal fun EnemiesSection(
-	enemies: List<CombatantState>,
-	onAddEnemy: () -> Unit,
-	onRemoveEnemy: (CombatantState) -> Unit
-) {
-	EncounterSetupSectionShell(
-		title = stringResource(R.string.encounter_enemies_title),
-		supportingText = stringResource(R.string.encounter_enemies_supporting_text),
-		trailingContent = {
-			TextButton(onClick = onAddEnemy) {
-				Text(text = stringResource(R.string.add_enemy_button))
-			}
-		},
-	) {
-
-		if (enemies.isEmpty()) {
-			EncounterSetupEmptyState(stringResource(R.string.encounter_enemies_empty_message))
-		} else {
-			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-				enemies.forEach { enemy ->
-					androidx.compose.runtime.key(enemy.characterId) {
-						EnemyCombatantCard(
-							combatant = enemy,
-							onRemoveEnemy = { onRemoveEnemy(enemy) }
-						)
-					}
 				}
 			}
 		}
@@ -763,46 +608,6 @@ internal fun RandomEncounterGenerationSection(
 						)
 					}
 				}
-			}
-		}
-	}
-}
-
-@Composable
-private fun EnemyCombatantCard(
-	combatant: CombatantState,
-	onRemoveEnemy: () -> Unit
-) {
-	Card(
-		modifier = Modifier.fillMaxWidth(),
-		colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-	) {
-		Row(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 12.dp, vertical = 8.dp),
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.SpaceBetween
-		) {
-			Column(modifier = Modifier.weight(1f)) {
-				Text(
-					text = combatant.name,
-					style = MaterialTheme.typography.titleSmall,
-					fontWeight = FontWeight.Medium,
-					color = MaterialTheme.colorScheme.onSurfaceVariant
-				)
-				Text(
-					text = stringResource(
-						R.string.combatant_setup_summary,
-						combatant.maxHp,
-						combatant.initiative
-					),
-					style = MaterialTheme.typography.bodySmall,
-					color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-				)
-			}
-			TextButton(onClick = onRemoveEnemy) {
-				Text(text = stringResource(R.string.remove_button))
 			}
 		}
 	}

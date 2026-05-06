@@ -69,7 +69,7 @@ class CharacterViewModel @Inject constructor(
 			} catch (e: CancellationException) {
 				throw e
 			} catch (e: Exception) {
-				reportError(formatCampaignError(appText, R.string.character_error_load, e))
+				reportError(formatCharacterError(R.string.character_error_load, e))
 			}
 		}
 	}
@@ -84,14 +84,14 @@ class CharacterViewModel @Inject constructor(
 			} catch (e: CancellationException) {
 				throw e
 			} catch (e: Exception) {
-				reportError(formatCampaignError(appText, R.string.character_error_not_found, e))
+				reportError(formatCharacterError(R.string.character_error_not_found, e))
 			}
 		}
 	}
 
 	fun addCharacter(character: CharacterEntry, onSuccess: () -> Unit = {}) {
 		launchActionWithError(
-			errorPrefix = "Failed to add character",
+			errorPrefixResId = R.string.character_error_add,
 			action = { addCharacterUseCase(character) },
 			onSuccess = onSuccess
 		)
@@ -99,7 +99,7 @@ class CharacterViewModel @Inject constructor(
 
 	fun updateCharacter(character: CharacterEntry, onSuccess: () -> Unit = {}) {
 		launchActionWithError(
-			errorPrefix = "Failed to update character",
+			errorPrefixResId = R.string.character_error_update,
 			action = { updateCharacterUseCase(character) },
 			onSuccess = onSuccess
 		)
@@ -107,7 +107,7 @@ class CharacterViewModel @Inject constructor(
 
 	fun deleteCharacter(character: CharacterEntry, onSuccess: () -> Unit = {}) {
 		launchActionWithError(
-			errorPrefix = "Failed to delete character",
+			errorPrefixResId = R.string.character_error_delete,
 			action = { deleteCharacterUseCase(character) },
 			onSuccess = {
 				if (selectedCharacterId == character.id) {
@@ -124,15 +124,25 @@ class CharacterViewModel @Inject constructor(
 	}
 
 	private fun reportError(message: String) {
-		_uiState.update { it.withError(message) }
+		_uiState.update { it.copy(isLoading = false, error = message) }
 	}
 
-	private fun formatError(prefix: String, exception: Exception): String {
-		return "$prefix: ${exceptionDetail(exception)}"
+	private fun formatCharacterError(
+		@androidx.annotation.StringRes errorPrefixResId: Int,
+		exception: Exception
+	): String {
+		val prefix = appText.getString(errorPrefixResId)
+		val detail = exceptionDetail(exception)
+		return if (detail.isBlank()) prefix else appText.getString(R.string.error_with_detail, prefix, detail)
 	}
+
+	private fun exceptionDetail(exception: Exception): String =
+		exception.localizedMessage?.takeIf { it.isNotBlank() }
+			?: exception.message?.takeIf { it.isNotBlank() }
+			?: exception.javaClass.simpleName
 
 	private fun launchActionWithError(
-		errorPrefix: String,
+		@androidx.annotation.StringRes errorPrefixResId: Int,
 		action: suspend () -> Unit,
 		onSuccess: () -> Unit = {}
 	) {
@@ -141,7 +151,7 @@ class CharacterViewModel @Inject constructor(
 				action()
 				onSuccess()
 			} catch (e: Exception) {
-				reportError(formatCampaignError(appText, errorPrefixResId, e))
+				reportError(formatCharacterError(errorPrefixResId, e))
 			}
 		}
 	}

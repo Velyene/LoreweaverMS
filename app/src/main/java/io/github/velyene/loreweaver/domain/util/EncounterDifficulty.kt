@@ -243,6 +243,7 @@ object EncounterDifficulty {
 			EncounterDifficultyTarget.LOW -> DifficultyRating.EASY
 			EncounterDifficultyTarget.MODERATE -> DifficultyRating.MEDIUM
 			EncounterDifficultyTarget.HIGH -> DifficultyRating.HARD
+			else -> DifficultyRating.MEDIUM // CUSTOM is handled via early return above
 		}
 		return thresholds[rating] ?: 0
 	}

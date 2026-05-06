@@ -17,10 +17,10 @@ import io.github.velyene.loreweaver.domain.model.ATTRIBUTE_STRENGTH
 import io.github.velyene.loreweaver.domain.model.ATTRIBUTE_WISDOM
 import io.github.velyene.loreweaver.domain.model.CharacterAction
 import io.github.velyene.loreweaver.domain.model.CharacterEntry
-import io.github.velyene.loreweaver.domain.model.InventoryItem
-import io.github.velyene.loreweaver.domain.model.InventoryItemType
 import io.github.velyene.loreweaver.domain.model.CharacterResource
 import io.github.velyene.loreweaver.domain.model.ClassInfo
+import io.github.velyene.loreweaver.domain.model.InventoryItem
+import io.github.velyene.loreweaver.domain.model.InventoryItemType
 import io.github.velyene.loreweaver.domain.model.calcMaxHp
 import io.github.velyene.loreweaver.domain.model.calcMaxMana
 import io.github.velyene.loreweaver.domain.model.classInfoFor

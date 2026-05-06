@@ -196,7 +196,7 @@ internal fun SessionSummaryContent(
 
 		Spacer(modifier = Modifier.height(16.dp))
 
-		SummaryStatRow(summary = summary, mode = mode)
+		SummaryStatRow(summary = summary)
 
 		Spacer(modifier = Modifier.height(16.dp))
 

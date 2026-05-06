@@ -53,7 +53,10 @@ internal fun LoreAndNotesSection(
 		}
 
 		item {
-			NotesQuickActions(onAddNoteClick = { dialogMode = NoteDialogMode.Adding })
+			NotesQuickActions(
+				onAddNoteClick = { dialogMode = NoteDialogMode.Adding },
+				onGenerateCalendarClick = {}
+			)
 			Spacer(modifier = Modifier.size(16.dp))
 		}
 

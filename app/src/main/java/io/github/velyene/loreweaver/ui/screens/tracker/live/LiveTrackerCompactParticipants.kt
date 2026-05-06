@@ -1,4 +1,4 @@
-/*
+﻿/*
  * FILE: LiveTrackerCompactParticipants.kt
  *
  * TABLE OF CONTENTS:
@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.ui.screens.AddConditionDialog
+import io.github.velyene.loreweaver.ui.screens.AddConditionDialogConfig
 import io.github.velyene.loreweaver.ui.theme.AntiqueGold
 import io.github.velyene.loreweaver.ui.theme.ArcaneTeal
 import io.github.velyene.loreweaver.ui.theme.DangerRed
@@ -225,80 +226,6 @@ internal fun BattlefieldRosterPanel(
 }
 
 @Composable
-internal fun SecondaryPartyPanel(
-	partyMembers: List<LiveParticipantUiModel>,
-	currentParticipantId: String?,
-	selectedTargetId: String?,
-	focusedCombatantId: String?,
-	isCompactBattleMode: Boolean,
-	selectableTargetIds: Set<String>,
-	onSelectTarget: (String) -> Unit,
-	onFocusCombatant: (String) -> Unit,
-	onHpChange: (String, Int) -> Unit,
-) {
-	CompactParticipantSection(
-		state = CompactParticipantSectionState(
-			title = stringResource(R.string.encounter_secondary_party_title),
-			supportingText = stringResource(R.string.encounter_secondary_party_supporting_text),
-			emptyMessage = stringResource(R.string.encounter_secondary_party_empty_message),
-			participants = partyMembers,
-			currentParticipantId = currentParticipantId,
-			selectedTargetId = selectedTargetId,
-			focusedCombatantId = focusedCombatantId,
-			isCompactBattleMode = isCompactBattleMode,
-			selectableTargetIds = selectableTargetIds,
-		),
-		statusFor = { participant ->
-			when {
-				participant.combatant.characterId == currentParticipantId -> stringResource(R.string.encounter_status_active)
-				participant.isEliminated -> stringResource(R.string.encounter_status_downed)
-				else -> stringResource(R.string.encounter_status_ready)
-			}
-		},
-		onSelectTarget = onSelectTarget,
-		onFocusCombatant = onFocusCombatant,
-		onHpChange = onHpChange,
-	)
-}
-
-@Composable
-internal fun EnemyPanel(
-	enemies: List<LiveParticipantUiModel>,
-	currentParticipantId: String?,
-	selectedTargetId: String?,
-	focusedCombatantId: String?,
-	isCompactBattleMode: Boolean,
-	selectableTargetIds: Set<String>,
-	onSelectTarget: (String) -> Unit,
-	onFocusCombatant: (String) -> Unit,
-	onHpChange: (String, Int) -> Unit,
-) {
-	CompactParticipantSection(
-		state = CompactParticipantSectionState(
-			title = stringResource(R.string.encounter_enemy_panel_title),
-			supportingText = stringResource(R.string.encounter_enemy_panel_supporting_text),
-			emptyMessage = stringResource(R.string.encounter_enemy_panel_empty_message),
-			participants = enemies,
-			currentParticipantId = currentParticipantId,
-			selectedTargetId = selectedTargetId,
-			focusedCombatantId = focusedCombatantId,
-			isCompactBattleMode = isCompactBattleMode,
-			selectableTargetIds = selectableTargetIds,
-		),
-		statusFor = { participant ->
-			when {
-				participant.combatant.characterId == currentParticipantId -> stringResource(R.string.encounter_status_active)
-				participant.isEliminated -> stringResource(R.string.encounter_status_defeated)
-				else -> stringResource(R.string.encounter_status_alive)
-			}
-		},
-		onSelectTarget = onSelectTarget,
-		onFocusCombatant = onFocusCombatant,
-		onHpChange = onHpChange,
-	)
-}
-
-@Composable
 private fun CompactParticipantSection(
 	state: CompactParticipantSectionState,
 	statusFor: @Composable (LiveParticipantUiModel) -> String,
@@ -450,7 +377,9 @@ private fun CompactParticipantCardBody(
 				CombatantConditionsRow(
 					combatant = state.participant.combatant,
 					persistentConditions = state.participant.persistentConditions,
-					onRemoveCondition = callbacks.onRemoveCondition,
+					onRemoveCondition = { characterId, conditionName, _ ->
+						callbacks.onRemoveCondition(characterId, conditionName)
+					},
 					onAddConditionClick = { dialogState.showAddConditionDialog = true },
 				)
 			}
@@ -484,7 +413,7 @@ private fun CompactParticipantCardDialogHosts(
 ) {
 	if (dialogState.showAddConditionDialog && callbacks.onAddCondition != null) {
 		AddConditionDialog(
-			participantName = state.participant.combatant.name,
+			config = AddConditionDialogConfig(participantName = state.participant.combatant.name),
 			onConfirm = { condition: String, duration: Int?, persistsAcrossEncounters: Boolean ->
 				callbacks.onAddCondition(
 					state.participant.combatant.characterId,

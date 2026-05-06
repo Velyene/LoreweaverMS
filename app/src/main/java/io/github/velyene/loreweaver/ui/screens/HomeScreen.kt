@@ -79,7 +79,7 @@ internal fun ErrorSnackbarHandler(
 	error: UiText?,
 	onRetry: (() -> Unit)?,
 	snackbarHostState: SnackbarHostState,
-	onClear: (String) -> Unit,
+	onClear: () -> Unit,
 	retryActionLabel: String,
 ) {
 	val errorMessage = error?.asString()
@@ -94,10 +94,10 @@ internal fun ErrorSnackbarHandler(
 		)
 
 		if (result == SnackbarResult.ActionPerformed) {
-			onClear(error)
+			onClear()
 			onRetry?.invoke()
 		} else {
-			onClear(error)
+			onClear()
 		}
 	}
 }

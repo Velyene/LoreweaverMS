@@ -646,15 +646,6 @@ private fun TrackerContent(
 	)
 }
 
-private fun buildPartyCombatant(character: CharacterEntry): CombatantState {
-	return CombatantState(
-		character.id,
-		character.name,
-		character.initiative,
-		character.hp,
-		character.maxHp
-	)
-}
 
 private fun buildPartyCombatants(characters: List<CharacterEntry>): List<CombatantState> {
 	return characters.map(::buildPartyCombatant)

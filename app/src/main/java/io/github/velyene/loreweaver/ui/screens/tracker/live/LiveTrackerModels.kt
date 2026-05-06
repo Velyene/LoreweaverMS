@@ -68,12 +68,22 @@ internal data class LiveTrackerCallbacks(
 internal data class CurrentParticipantPanelState(
 	val encounterName: String,
 	val participant: LiveParticipantUiModel?,
-	val nextParticipant: LiveParticipantUiModel?,
-	val canGoToPreviousTurn: Boolean,
+	val nextParticipant: LiveParticipantUiModel? = null,
+	val canGoToPreviousTurn: Boolean = false,
 	val pendingAction: PendingTurnAction?,
 	val selectedTarget: LiveParticipantUiModel?,
 	val turnStep: CombatTurnStep,
 	val targetableParticipants: List<LiveParticipantUiModel>
+)
+
+internal data class LiveTrackerUiState(
+	val participants: List<LiveParticipantUiModel>,
+	val currentParticipant: LiveParticipantUiModel?,
+	val selectedTarget: LiveParticipantUiModel?,
+	val targetableParticipants: List<LiveParticipantUiModel>,
+	val selectableTargetIds: Set<String>,
+	val secondaryPartyMembers: List<LiveParticipantUiModel>,
+	val enemies: List<LiveParticipantUiModel>
 )
 
 internal data class LiveTrackerContentListState(

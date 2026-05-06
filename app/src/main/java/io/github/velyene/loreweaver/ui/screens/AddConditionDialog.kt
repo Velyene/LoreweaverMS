@@ -28,6 +28,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -50,51 +51,51 @@ import io.github.velyene.loreweaver.R
 const val ADD_CONDITION_SHEET_TAG = "add_condition_sheet"
 
 /**
+ * Configuration for [AddConditionDialog].
+ */
+data class AddConditionDialogConfig(
+	val participantName: String? = null,
+	val titleOverride: String? = null,
+	val supportingTextOverride: String? = null,
+	val availableConditions: Set<String>? = null,
+	val initialHasDuration: Boolean = true,
+	val initialPersistsAcrossEncounters: Boolean = false,
+	val showDurationControls: Boolean = true,
+	val showPersistenceToggle: Boolean = true,
+	val sheetTag: String = ADD_CONDITION_SHEET_TAG,
+)
+
+/**
  * Dialog for adding a condition to a combatant.
  */
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AddConditionDialog(
-	participantName: String? = null,
-	titleOverride: String? = null,
-	supportingTextOverride: String? = null,
-	availableConditions: Set<String>? = null,
+	config: AddConditionDialogConfig = AddConditionDialogConfig(),
 	summaryContent: (@Composable () -> Unit)? = null,
-	initialHasDuration: Boolean = true,
-	initialPersistsAcrossEncounters: Boolean = false,
-	showDurationControls: Boolean = true,
-	showPersistenceToggle: Boolean = true,
-	sheetTag: String = ADD_CONDITION_SHEET_TAG,
 	onConfirm: (conditionName: String, duration: Int?, persistsAcrossEncounters: Boolean) -> Unit,
 	onDismiss: () -> Unit
 ) {
 	var selectedCondition by remember { mutableStateOf("") }
 	var duration by remember { mutableStateOf("") }
-	var hasDuration by remember(initialHasDuration) { mutableStateOf(initialHasDuration) }
-	var persistsAcrossEncounters by remember(initialPersistsAcrossEncounters) {
-		mutableStateOf(initialPersistsAcrossEncounters)
+	var hasDuration by remember(config.initialHasDuration) { mutableStateOf(config.initialHasDuration) }
+	var persistsAcrossEncounters by remember(config.initialPersistsAcrossEncounters) {
+		mutableStateOf(config.initialPersistsAcrossEncounters)
 	}
-	val selectedMetadata = remember(selectedCondition) {
-		selectedCondition.takeIf(String::isNotBlank)?.let(ConditionConstants::metadataFor)
+	val allowedConditions = rememberAllowedConditions(config.availableConditions)
+	val dialogTitle = rememberConditionDialogTitle(config)
+
+	val onSelectCondition: (String) -> Unit = { condition ->
+		selectedCondition = condition
+		persistsAcrossEncounters = resolveDefaultPersistence(config, condition)
 	}
-	val officialConditionsLabel = stringResource(R.string.condition_picker_official_conditions)
-	val builtInStatusesLabel = stringResource(R.string.condition_picker_built_in_statuses)
-	val customEffectsLabel = stringResource(R.string.condition_picker_custom_effects)
-	val homebrewEffectsLabel = stringResource(R.string.condition_picker_homebrew_effects)
-	val allowedConditions = remember(availableConditions) {
-		availableConditions
-			?.map(::canonicalStatusLabel)
-			?.toSet()
-	}
-	val dialogTitle = titleOverride ?: participantName
-		?.takeIf(String::isNotBlank)
-		?.let { stringResource(R.string.encounter_apply_status_dialog_title, it) }
-		?: stringResource(R.string.add_condition_dialog_title)
-	val supportingText = supportingTextOverride
+	val onHasDurationChange: (Boolean) -> Unit = { hasDuration = it }
+	val onPersistsChange: (Boolean) -> Unit = { persistsAcrossEncounters = it }
+	val onDurationChange: (String) -> Unit = { duration = it }
 
 	ModalBottomSheet(
 		onDismissRequest = onDismiss,
-		modifier = Modifier.testTag(sheetTag),
+		modifier = Modifier.testTag(config.sheetTag),
 	) {
 		Column(
 			modifier = Modifier
@@ -102,151 +103,210 @@ fun AddConditionDialog(
 				.padding(horizontal = 20.dp, vertical = 8.dp),
 			verticalArrangement = Arrangement.spacedBy(12.dp),
 		) {
-			Text(
-				text = dialogTitle,
-				modifier = Modifier.semantics { heading() },
-			)
-			supportingText?.takeIf(String::isNotBlank)?.let { text ->
+			Text(text = dialogTitle, modifier = Modifier.semantics { heading() })
+			if (!config.supportingTextOverride.isNullOrBlank()) {
 				Text(
-					text = text,
-					color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+					text = config.supportingTextOverride,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 				)
 			}
 			HorizontalDivider()
-			Column(
-				modifier = Modifier
-					.fillMaxWidth()
-					.heightIn(max = 520.dp)
-					.verticalScroll(rememberScrollState()),
-				verticalArrangement = Arrangement.spacedBy(12.dp),
-			) {
-				summaryContent?.invoke()
-				selectedMetadata?.let { metadata ->
-					Text(
-						text = "${metadata.iconGlyph.orEmpty()} ${metadata.category.name.replace('_', ' ')}",
-						color = metadata.borderColor
-					)
-				}
-				OutlinedTextField(
-					value = selectedCondition,
-					onValueChange = {},
-					readOnly = true,
-					label = { Text(stringResource(R.string.condition_label)) },
-					modifier = Modifier.fillMaxWidth(),
-				)
-
-				ConditionChipSection(
-					title = officialConditionsLabel,
-					conditions = filterAllowedConditions(ConditionConstants.OFFICIAL_CONDITIONS, allowedConditions),
+			AddConditionScrollableContent(
+				config = config,
+				summaryContent = summaryContent,
+				state = AddConditionScrollState(
 					selectedCondition = selectedCondition,
-					onSelectCondition = { condition ->
-						selectedCondition = condition
-						persistsAcrossEncounters = if (showPersistenceToggle) {
-							ConditionConstants.defaultPersistsAcrossEncounters(condition)
-						} else {
-							initialPersistsAcrossEncounters
-						}
-					}
-				)
-				ConditionChipSection(
-					title = builtInStatusesLabel,
-					conditions = filterAllowedConditions(ConditionConstants.BUILT_IN_STATUS_LABELS, allowedConditions),
-					selectedCondition = selectedCondition,
-					onSelectCondition = { condition ->
-						selectedCondition = condition
-						persistsAcrossEncounters = if (showPersistenceToggle) {
-							ConditionConstants.defaultPersistsAcrossEncounters(condition)
-						} else {
-							initialPersistsAcrossEncounters
-						}
-					}
-				)
-				ConditionChipSection(
-					title = customEffectsLabel,
-					conditions = filterAllowedConditions(ConditionConstants.CUSTOM_EFFECT_LABELS, allowedConditions),
-					selectedCondition = selectedCondition,
-					onSelectCondition = { condition ->
-						selectedCondition = condition
-						persistsAcrossEncounters = if (showPersistenceToggle) {
-							ConditionConstants.defaultPersistsAcrossEncounters(condition)
-						} else {
-							initialPersistsAcrossEncounters
-						}
-					}
-				)
-				ConditionChipSection(
-					title = homebrewEffectsLabel,
-					conditions = filterAllowedConditions(ConditionConstants.CUSTOM_HOMEBREW_ONLY_LABELS, allowedConditions),
-					selectedCondition = selectedCondition,
-					onSelectCondition = { condition ->
-						selectedCondition = condition
-						persistsAcrossEncounters = if (showPersistenceToggle) {
-							ConditionConstants.defaultPersistsAcrossEncounters(condition)
-						} else {
-							initialPersistsAcrossEncounters
-						}
-					}
-				)
-
-				if (showDurationControls) {
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Checkbox(
-							checked = hasDuration,
-							onCheckedChange = { hasDuration = it }
-						)
-						Text(stringResource(R.string.condition_has_duration_label))
-					}
-				}
-
-				if (showPersistenceToggle) {
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Checkbox(
-							checked = persistsAcrossEncounters,
-							onCheckedChange = { persistsAcrossEncounters = it }
-						)
-						Text(stringResource(R.string.condition_persistent_label))
-					}
-				}
-
-				if (showDurationControls && hasDuration) {
-					OutlinedTextField(
-						value = duration,
-						onValueChange = { if (it.all { c -> c.isDigit() }) duration = it },
-						label = { Text(stringResource(R.string.condition_duration_rounds_label)) },
-						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						modifier = Modifier.fillMaxWidth(),
-						placeholder = { Text(stringResource(R.string.condition_duration_placeholder)) }
-					)
-				}
-			}
-			Row(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
-			) {
-				TextButton(onClick = onDismiss, modifier = Modifier.weight(1f)) {
-					Text(stringResource(R.string.cancel_button))
-				}
-				Button(
-					onClick = {
-						if (selectedCondition.isNotBlank()) {
-							val dur = if (hasDuration && duration.isNotBlank()) duration.toIntOrNull() else null
-							onConfirm(selectedCondition, dur, persistsAcrossEncounters)
-						}
-					},
-					enabled = selectedCondition.isNotBlank(),
-					modifier = Modifier.weight(1f),
-				) {
-					Text(stringResource(R.string.add_button))
-				}
-			}
+					hasDuration = hasDuration,
+					persistsAcrossEncounters = persistsAcrossEncounters,
+					duration = duration,
+				),
+				allowedConditions = allowedConditions,
+				onSelectCondition = onSelectCondition,
+				onHasDurationChange = onHasDurationChange,
+				onPersistsChange = onPersistsChange,
+				onDurationChange = onDurationChange,
+			)
+			AddConditionActionButtons(
+				selectedCondition = selectedCondition,
+				hasDuration = hasDuration,
+				duration = duration,
+				persistsAcrossEncounters = persistsAcrossEncounters,
+				onConfirm = onConfirm,
+				onDismiss = onDismiss,
+			)
 		}
 	}
+}
+
+@Composable
+private fun rememberConditionDialogTitle(config: AddConditionDialogConfig): String {
+	val applyStatusTitle = config.participantName
+		?.takeIf(String::isNotBlank)
+		?.let { stringResource(R.string.encounter_apply_status_dialog_title, it) }
+	return config.titleOverride
+		?: applyStatusTitle
+		?: stringResource(R.string.add_condition_dialog_title)
+}
+
+private fun resolveDefaultPersistence(config: AddConditionDialogConfig, condition: String): Boolean {
+	return if (config.showPersistenceToggle) {
+		ConditionConstants.defaultPersistsAcrossEncounters(condition)
+	} else {
+		config.initialPersistsAcrossEncounters
+	}
+}
+
+@Composable
+private fun rememberAllowedConditions(availableConditions: Set<String>?): Set<String>? {
+	return remember(availableConditions) {
+		availableConditions?.map(::canonicalStatusLabel)?.toSet()
+	}
+}
+
+private data class AddConditionScrollState(
+	val selectedCondition: String,
+	val hasDuration: Boolean,
+	val persistsAcrossEncounters: Boolean,
+	val duration: String,
+)
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun AddConditionScrollableContent(
+	config: AddConditionDialogConfig,
+	summaryContent: (@Composable () -> Unit)?,
+	state: AddConditionScrollState,
+	allowedConditions: Set<String>?,
+	onSelectCondition: (String) -> Unit,
+	onHasDurationChange: (Boolean) -> Unit,
+	onPersistsChange: (Boolean) -> Unit,
+	onDurationChange: (String) -> Unit,
+) {
+	val selectedCondition = state.selectedCondition
+	val selectedMetadata = remember(selectedCondition) {
+		selectedCondition.takeIf(String::isNotBlank)?.let(ConditionConstants::metadataFor)
+	}
+	val officialLabel = stringResource(R.string.condition_picker_official_conditions)
+	val builtInLabel = stringResource(R.string.condition_picker_built_in_statuses)
+	val customLabel = stringResource(R.string.condition_picker_custom_effects)
+	val homebrewLabel = stringResource(R.string.condition_picker_homebrew_effects)
+
+	Column(
+		modifier = Modifier
+			.fillMaxWidth()
+			.heightIn(max = 520.dp)
+			.verticalScroll(rememberScrollState()),
+		verticalArrangement = Arrangement.spacedBy(12.dp),
+	) {
+		summaryContent?.invoke()
+		selectedMetadata?.let { metadata ->
+			Text(
+				text = "${metadata.iconGlyph.orEmpty()} ${metadata.category.name.replace('_', ' ')}",
+				color = metadata.borderColor,
+			)
+		}
+		OutlinedTextField(
+			value = selectedCondition,
+			onValueChange = {},
+			readOnly = true,
+			label = { Text(stringResource(R.string.add_condition_dialog_condition_label)) },
+			modifier = Modifier.fillMaxWidth(),
+		)
+		ConditionChipSection(
+			title = officialLabel,
+			conditions = filterAllowedConditions(ConditionConstants.OFFICIAL_CONDITIONS, allowedConditions),
+			selectedCondition = selectedCondition,
+			onSelectCondition = onSelectCondition,
+		)
+		ConditionChipSection(
+			title = builtInLabel,
+			conditions = filterAllowedConditions(ConditionConstants.BUILT_IN_STATUS_LABELS, allowedConditions),
+			selectedCondition = selectedCondition,
+			onSelectCondition = onSelectCondition,
+		)
+		ConditionChipSection(
+			title = customLabel,
+			conditions = filterAllowedConditions(ConditionConstants.CUSTOM_EFFECT_LABELS, allowedConditions),
+			selectedCondition = selectedCondition,
+			onSelectCondition = onSelectCondition,
+		)
+		ConditionChipSection(
+			title = homebrewLabel,
+			conditions = filterAllowedConditions(ConditionConstants.CUSTOM_HOMEBREW_ONLY_LABELS, allowedConditions),
+			selectedCondition = selectedCondition,
+			onSelectCondition = onSelectCondition,
+		)
+		if (config.showDurationControls) {
+			LabeledCheckboxRow(
+				checked = state.hasDuration,
+				onCheckedChange = onHasDurationChange,
+				label = stringResource(R.string.add_condition_dialog_has_duration_label),
+			)
+		}
+		if (config.showPersistenceToggle) {
+			LabeledCheckboxRow(
+				checked = state.persistsAcrossEncounters,
+				onCheckedChange = onPersistsChange,
+				label = stringResource(R.string.add_condition_dialog_persistent_label),
+			)
+		}
+		if (config.showDurationControls && state.hasDuration) {
+			OutlinedTextField(
+				value = state.duration,
+				onValueChange = { if (it.all(Char::isDigit)) onDurationChange(it) },
+				label = { Text(stringResource(R.string.add_condition_dialog_duration_label)) },
+				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+				modifier = Modifier.fillMaxWidth(),
+				placeholder = { Text(stringResource(R.string.add_condition_dialog_duration_placeholder)) },
+			)
+		}
+	}
+}
+
+@Composable
+private fun LabeledCheckboxRow(
+	checked: Boolean,
+	onCheckedChange: (Boolean) -> Unit,
+	label: String,
+) {
+	Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+		Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+		Text(text = label)
+	}
+}
+
+@Composable
+private fun AddConditionActionButtons(
+	selectedCondition: String,
+	hasDuration: Boolean,
+	duration: String,
+	persistsAcrossEncounters: Boolean,
+	onConfirm: (String, Int?, Boolean) -> Unit,
+	onDismiss: () -> Unit,
+) {
+	Row(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalArrangement = Arrangement.spacedBy(8.dp),
+	) {
+		TextButton(onClick = onDismiss, modifier = Modifier.weight(1f)) {
+			Text(stringResource(R.string.cancel_button))
+		}
+		Button(
+			onClick = {
+				if (selectedCondition.isNotBlank()) {
+					onConfirm(selectedCondition, resolveDurationForConfirm(hasDuration, duration), persistsAcrossEncounters)
+				}
+			},
+			enabled = selectedCondition.isNotBlank(),
+			modifier = Modifier.weight(1f),
+		) {
+			Text(stringResource(R.string.add_button))
+		}
+	}
+}
+
+private fun resolveDurationForConfirm(hasDuration: Boolean, duration: String): Int? {
+	return if (hasDuration && duration.isNotBlank()) duration.toIntOrNull() else null
 }
 
 /**

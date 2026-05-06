@@ -413,7 +413,7 @@ private fun EncounterSetupStepsList(
 				PartyMembersSection(
 					savedPartyMembers = derivedState.savedPartyMembers,
 					selectedPartyIds = derivedState.selectedPartyIds,
-					partyActions = callbacks.partyActions,
+					onTogglePartyMember = callbacks.partyActions.onTogglePartyMember,
 				)
 			}
 		}
@@ -687,7 +687,9 @@ private fun EncounterNameSection(
 		OutlinedTextField(
 			value = encounterName,
 			onValueChange = onEncounterNameChange,
-			modifier = Modifier.fillMaxWidth().testTag(ENCOUNTER_SETUP_NAME_FIELD_TAG),
+			modifier = Modifier
+				.fillMaxWidth()
+				.testTag(ENCOUNTER_SETUP_NAME_FIELD_TAG),
 			label = { Text(text = stringResource(R.string.encounter_name_label)) },
 			placeholder = { Text(text = stringResource(R.string.encounter_setup_encounter_name_placeholder)) },
 			singleLine = true,

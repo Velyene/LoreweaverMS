@@ -1,4 +1,4 @@
-/*
+﻿/*
  * FILE: LiveTrackerCurrentParticipantPanel.kt
  *
  * TABLE OF CONTENTS:
@@ -15,7 +15,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,10 +38,9 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.github.velyene.loreweaver.R
 import io.github.velyene.loreweaver.ui.screens.AddConditionDialog
-import io.github.velyene.loreweaver.ui.screens.CombatTrackerConstants.QUICK_HP_BUTTON_HEIGHT_DP
+import io.github.velyene.loreweaver.ui.screens.AddConditionDialogConfig
 import io.github.velyene.loreweaver.ui.theme.AntiqueGold
 import kotlin.math.abs
 
@@ -190,7 +188,9 @@ internal fun CurrentParticipantPanel(
 			CombatantConditionsRow(
 				combatant = participant.combatant,
 				persistentConditions = participant.persistentConditions,
-				onRemoveCondition = callbacks.onRemoveCondition,
+				onRemoveCondition = { characterId, conditionName, _ ->
+					callbacks.onRemoveCondition(characterId, conditionName)
+				},
 				onAddConditionClick = { showAddConditionDialog = true }
 			)
 
@@ -278,7 +278,7 @@ internal fun CurrentParticipantPanel(
 
 	if (showAddConditionDialog) {
 		AddConditionDialog(
-			participantName = participant.combatant.name,
+			config = AddConditionDialogConfig(participantName = participant.combatant.name),
 			onConfirm = { condition, duration, persistsAcrossEncounters ->
 				callbacks.onAddCondition(
 					participant.combatant.characterId,
@@ -370,17 +370,6 @@ internal fun CurrentParticipantPanel(
 }
 
 @Composable
-internal fun SummaryStatRow(primaryLabel: String, secondaryLabel: String) {
-	Row(
-		modifier = Modifier.fillMaxWidth(),
-		horizontalArrangement = Arrangement.spacedBy(8.dp)
-	) {
-		MiniSummaryCard(label = primaryLabel, modifier = Modifier.weight(1f))
-		MiniSummaryCard(label = secondaryLabel, modifier = Modifier.weight(1f))
-	}
-}
-
-@Composable
 internal fun MiniSummaryCard(label: String, modifier: Modifier = Modifier) {
 	Box(
 		modifier = modifier
@@ -394,19 +383,6 @@ internal fun MiniSummaryCard(label: String, modifier: Modifier = Modifier) {
 			fontWeight = FontWeight.Medium,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
-	}
-}
-
-@Composable
-internal fun ResourceLinesSection(resourceLines: List<String>) {
-	Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-		resourceLines.forEach { line ->
-			Text(
-				text = line,
-				style = MaterialTheme.typography.bodySmall,
-				color = MaterialTheme.colorScheme.onPrimaryContainer
-			)
-		}
 	}
 }
 
@@ -488,35 +464,6 @@ private fun DmPriorityOverviewSection(
 					style = MaterialTheme.typography.bodySmall,
 					color = MaterialTheme.colorScheme.onPrimaryContainer,
 				)
-			}
-		}
-	}
-}
-
-@Composable
-internal fun QuickHpControls(
-	characterId: String,
-	onHpChange: (characterId: String, delta: Int) -> Unit
-) {
-	Row(
-		modifier = Modifier.fillMaxWidth(),
-		horizontalArrangement = Arrangement.spacedBy(4.dp),
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		Text(
-			text = stringResource(R.string.hp_label),
-			fontSize = 12.sp,
-			modifier = Modifier.padding(end = 4.dp)
-		)
-		listOf(-5, -1, 1, 5).forEach { delta ->
-			OutlinedButton(
-				onClick = { onHpChange(characterId, delta) },
-				modifier = Modifier
-					.weight(1f)
-					.height(QUICK_HP_BUTTON_HEIGHT_DP.dp),
-				contentPadding = PaddingValues(0.dp)
-			) {
-				Text(if (delta > 0) "+$delta" else delta.toString(), fontSize = 12.sp)
 			}
 		}
 	}

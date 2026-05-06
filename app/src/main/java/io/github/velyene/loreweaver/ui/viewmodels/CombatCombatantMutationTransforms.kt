@@ -3,7 +3,9 @@
  *
  * TABLE OF CONTENTS:
  * 1. Combatant list mutation transforms
- * 2. HP and temp-HP transforms
+ * 2. HP transforms
+ *
+ * Note: withRemovedCombatant, withUpdatedTempHp → CombatRosterSupport.kt
  */
 
 package io.github.velyene.loreweaver.ui.viewmodels
@@ -23,27 +25,6 @@ internal fun CombatUiState.withAddedCombatant(combatant: CombatantState): Combat
 	return copy(
 		combatants = updatedCombatants,
 		currentTurnIndex = normalizedTurnIndex(updatedCombatants, currentTurnIndex)
-	)
-}
-
-internal fun CombatUiState.withRemovedCombatant(characterId: String): CombatUiState {
-	val updatedCombatants = combatants.filter { combatant -> combatant.characterId != characterId }
-	val removedCurrentCombatant = currentCombatant()?.characterId == characterId
-	val shouldClearPendingTurn =
-		updatedCombatants.isEmpty() || removedCurrentCombatant || selectedTargetId == characterId
-	val requestedIndex = if (removedCurrentCombatant && currentTurnIndex > 0) {
-		currentTurnIndex - 1
-	} else {
-		currentTurnIndex
-	}
-	val baseState = if (shouldClearPendingTurn) {
-		clearPendingTurnState()
-	} else {
-		this
-	}
-	return baseState.copy(
-		combatants = updatedCombatants,
-		currentTurnIndex = normalizedTurnIndex(updatedCombatants, requestedIndex)
 	)
 }
 
@@ -74,18 +55,6 @@ internal fun CombatUiState.applyHpDelta(characterId: String, delta: Int): Pair<C
 		combatant = combatant,
 		oldHp = combatant.currentHp,
 		newHp = newHp
-	)
-}
-
-internal fun CombatUiState.withUpdatedTempHp(characterId: String, tempHp: Int): CombatUiState {
-	return copy(
-		combatants = combatants.map { combatant ->
-			if (combatant.characterId == characterId) {
-				combatant.copy(tempHp = tempHp.coerceAtLeast(0))
-			} else {
-				combatant
-			}
-		}
 	)
 }
 

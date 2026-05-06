@@ -280,7 +280,9 @@ internal fun ParticipantDetailDialog(
 					CombatantConditionsRow(
 						combatant = participant.combatant,
 						persistentConditions = participant.persistentConditions,
-						onRemoveCondition = actions.onRemoveCondition,
+						onRemoveCondition = { characterId, conditionName, _ ->
+							actions.onRemoveCondition(characterId, conditionName)
+						},
 						onAddConditionClick = actions.onOpenApplyStatus,
 					)
 				}

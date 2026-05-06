@@ -81,23 +81,31 @@ internal fun EncounterNotesSection(
 
 @Composable
 internal fun AddEnemyDialog(
-	onConfirm: (name: String, hp: Int, initiative: Int) -> Unit,
+	initialName: String = "",
+	initialHp: String = DEFAULT_ENEMY_HP.toString(),
+	initialInitiative: String = DEFAULT_ENEMY_INITIATIVE.toString(),
+	initialQuantity: String = "1",
+	titleOverride: String? = null,
+	helperTextOverride: String? = null,
+	onConfirm: (name: String, hp: Int, initiative: Int, quantity: Int) -> Unit,
 	onDismiss: () -> Unit
 ) {
-	var name by remember { mutableStateOf("") }
-	var hp by remember { mutableStateOf(DEFAULT_ENEMY_HP.toString()) }
-	var initiative by remember { mutableStateOf(DEFAULT_ENEMY_INITIATIVE.toString()) }
+	var name by remember { mutableStateOf(initialName) }
+	var hp by remember { mutableStateOf(initialHp) }
+	var initiative by remember { mutableStateOf(initialInitiative) }
+	var quantity by remember { mutableStateOf(initialQuantity) }
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
 		title = {
 			Text(
-				stringResource(R.string.add_enemy_dialog_title),
+				titleOverride ?: stringResource(R.string.add_enemy_dialog_title),
 				modifier = Modifier.semantics { heading() }
 			)
 		},
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+				helperTextOverride?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
 				OutlinedTextField(
 					value = name,
 					onValueChange = { name = it },
@@ -120,6 +128,13 @@ internal fun AddEnemyDialog(
 						modifier = Modifier.weight(1f)
 					)
 				}
+				OutlinedTextField(
+					value = quantity,
+					onValueChange = { quantity = it.filter { c -> c.isDigit() } },
+					label = { Text(stringResource(R.string.encounter_enemy_quantity_label)) },
+					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+					modifier = Modifier.fillMaxWidth()
+				)
 			}
 		},
 		confirmButton = {
@@ -129,7 +144,8 @@ internal fun AddEnemyDialog(
 						onConfirm(
 							name.trim(),
 							hp.toIntOrNull() ?: DEFAULT_ENEMY_HP,
-							initiative.toIntOrNull() ?: DEFAULT_ENEMY_INITIATIVE
+							initiative.toIntOrNull() ?: DEFAULT_ENEMY_INITIATIVE,
+							quantity.toIntOrNull()?.coerceAtLeast(1) ?: 1
 						)
 					}
 				}

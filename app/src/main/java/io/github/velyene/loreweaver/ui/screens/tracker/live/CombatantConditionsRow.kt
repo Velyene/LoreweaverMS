@@ -10,7 +10,6 @@
 package io.github.velyene.loreweaver.ui.screens.tracker.live
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -32,11 +31,10 @@ import io.github.velyene.loreweaver.domain.model.CombatantState
 import io.github.velyene.loreweaver.ui.screens.StatusChipFlowRow
 import io.github.velyene.loreweaver.ui.screens.StatusChipModel
 import io.github.velyene.loreweaver.ui.screens.canonicalStatusLabel
-import io.github.velyene.loreweaver.ui.screens.statusChipDisplayText
 import io.github.velyene.loreweaver.ui.screens.statusChipModel
 
 @Composable
-internal fun CombatantStatusRow(
+internal fun CombatantConditionsRow(
 	combatant: CombatantState,
 	persistentConditions: Set<String> = emptySet(),
 	onRemoveCondition: (String, String, Boolean) -> Unit,
@@ -45,7 +43,6 @@ internal fun CombatantStatusRow(
 	val statuses = buildCombatantStatusChips(combatant, persistentConditions)
 	val addConditionDescription = stringResource(R.string.add_condition_desc)
 	val persistentSuffix = stringResource(R.string.condition_persistent_chip_suffix)
-	val statuses = buildCombatantStatusChips(combatant, persistentConditions)
 	val conditionsStateValue = if (statuses.isEmpty()) {
 		stringResource(R.string.empty_label)
 	} else {
@@ -133,5 +130,3 @@ private fun buildCombatantStatusChips(
 	}
 	return mergedStatuses.values.sortedBy { status -> status.name.lowercase() }
 }
-
-
