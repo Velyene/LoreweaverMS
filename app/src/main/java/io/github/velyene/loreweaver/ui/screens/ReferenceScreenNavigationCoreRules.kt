@@ -2,6 +2,15 @@ package io.github.velyene.loreweaver.ui.screens
 
 import io.github.velyene.loreweaver.domain.util.CoreRuleSection
 
+internal enum class CoreRulesSubtab(val label: String) {
+	ALL("All"),
+	FUNDAMENTALS("Fundamentals"),
+	ADVENTURING("Adventuring"),
+	COMBAT("Combat"),
+	GLOSSARY("Glossary"),
+	QUICK_TABLES("Quick Tables")
+}
+
 private val CORE_RULES_FUNDAMENTALS_SECTION_TITLES = setOf(
 	"General Principles",
 	"Rhythm of Play",

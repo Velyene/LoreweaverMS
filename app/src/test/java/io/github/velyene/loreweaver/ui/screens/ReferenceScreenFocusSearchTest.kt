@@ -16,9 +16,9 @@ class ReferenceScreenFocusSearchTest {
 		val woodenStaff = EquipmentReference.FOCUSES.first { it.name == "Wooden Staff" }
 		val emblem = EquipmentReference.FOCUSES.first { it.name == "Emblem" }
 
-		assertMatchesAll(crystal::matchesSearchQuery, "Arcane Focus", "Wizard")
-		assertMatchesAll(woodenStaff::matchesSearchQuery, "Quarterstaff")
-		assertMatchesAll(emblem::matchesSearchQuery, HOLY_SYMBOL_RESULTS, "Cleric or Paladin")
+		assertMatchesAll(crystal::matchesQuery, "Arcane Focus", "Wizard")
+		assertMatchesAll(woodenStaff::matchesQuery, "Quarterstaff")
+		assertMatchesAll(emblem::matchesQuery, HOLY_SYMBOL_RESULTS, "Cleric or Paladin")
 	}
 
 	@Test

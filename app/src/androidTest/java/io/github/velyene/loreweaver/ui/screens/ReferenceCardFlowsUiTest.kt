@@ -42,8 +42,10 @@ class ReferenceCardFlowsUiTest {
 					title = "Poison Details",
 					isFavorite = false,
 					onToggleFavorite = { favoriteClicks++ },
-					onCopy = { copyClicks++ },
-					onShare = { shareClicks++ }
+					actions = ReferenceTextActions(
+						onCopy = { copyClicks++ },
+						onShare = { shareClicks++ }
+					)
 				)
 			}
 		}

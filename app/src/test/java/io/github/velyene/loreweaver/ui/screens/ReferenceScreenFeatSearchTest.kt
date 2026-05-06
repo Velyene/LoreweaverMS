@@ -12,10 +12,10 @@ class ReferenceScreenFeatSearchTest {
 		val archery = CharacterCreationReference.FEATS.first { it.name == "Archery" }
 		val truesight = CharacterCreationReference.FEATS.first { it.name == "Boon of Truesight" }
 
-		assertMatchesAll(magicInitiate::matchesSearchQuery, "Origin", "Two Cantrips", "Repeatable")
-		assertMatchesAll(grappler::matchesSearchQuery, "Strength or Dexterity 13+")
-		assertMatchesAll(archery::matchesSearchQuery, "Ranged weapons")
-		assertMatchesAll(truesight::matchesSearchQuery, "60 feet")
+		assertMatchesAll(magicInitiate::matchesQuery, "Origin", "Two Cantrips", "Repeatable")
+		assertMatchesAll(grappler::matchesQuery, "Strength or Dexterity 13+")
+		assertMatchesAll(archery::matchesQuery, "Ranged weapons")
+		assertMatchesAll(truesight::matchesQuery, "60 feet")
 	}
 
 	@Test

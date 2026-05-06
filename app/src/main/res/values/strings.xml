@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+﻿<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Loreweaver</string>
     <string name="recent_campaigns">Recent campaigns</string>
     <string name="quick_actions">Quick actions</string>
@@ -429,6 +429,7 @@ Currency share: %2$s</string>
     <string name="add_condition_dialog_has_duration_label">Has duration (in rounds)</string>
     <string name="add_condition_dialog_duration_label">Duration (rounds)</string>
     <string name="add_condition_dialog_duration_placeholder">e.g., 3</string>
+    <string name="add_condition_dialog_persistent_label">Persists across encounters</string>
 
     <!-- Prompt Library -->
     <string name="prompt_library_title">Prompt Library</string>
@@ -557,6 +558,7 @@ Create one to begin your journey!</string>
     <string name="edit_encounter">Edit %1$s</string>
     <string name="delete_encounter">Delete %1$s</string>
     <string name="confirm_delete_encounter_title">Delete encounter?</string>
+    <string name="confirm_delete_encounter_message">Delete "%1$s"? This cannot be undone.</string>
     <string name="encounter_updated_message">Encounter updated.</string>
     <string name="encounter_deleted_message">Encounter deleted.</string>
     <string name="view_encounter_details_desc">View encounter details</string>
@@ -565,6 +567,7 @@ Create one to begin your journey!</string>
     <string name="encounter_creation_setup_message">Create the encounter shell now, then choose saved party members, add enemies, and add notes from the setup screen.</string>
     <string name="monster_import_removed_message">Monster library import has been removed from
         this build.</string>
+    <string name="encounter_error_start">Failed to start encounter</string>
     <string name="encounter_error_load">Failed to load encounter</string>
     <string name="encounter_error_save">Failed to save encounter</string>
     <string name="encounter_selected_monsters_more" tools:ignore="PluralsCandidate">+%1$d more</string>
@@ -583,6 +586,9 @@ Create one to begin your journey!</string>
     <string name="encounter_increment_selected_monster">Add one %1$s to selection</string>
     <string name="encounter_decrement_selected_monster">Remove one %1$s from selection</string>
     <string name="encounter_remove_selected_monster">Remove all %1$s from selection</string>
+    <string name="encounter_remove_all_button">Remove</string>
+    <string name="encounter_monster_picker_empty">No monsters match your filters.</string>
+    <string name="encounter_monster_picker_helper">Tap Add to include a monster. Tap its count to remove one.</string>
     <plurals name="encounter_selected_monsters_quantity">
         <item quantity="one">%d monster selected</item>
         <item quantity="other">%d monsters selected</item>
@@ -962,6 +968,13 @@ Add your party or individual enemies above.</string>
     <string name="character_status_manage_persistent_button">Manage Persistent Statuses</string>
     <string name="character_status_manage_persistent_supporting_text">Choose a status to record as a long-term effect so this character\'s ongoing state stays current between encounters.</string>
     <string name="character_status_current_persistent_effects_title">Current Persistent Effects</string>
+    <string name="character_status_overview_title">Status Overview</string>
+    <string name="character_status_encounter_conditions_title">Encounter Conditions</string>
+    <string name="character_status_encounter_conditions_empty">No active encounter conditions.</string>
+    <string name="character_status_ongoing_afflictions_title">Ongoing Afflictions</string>
+    <string name="character_status_ongoing_afflictions_empty">No ongoing afflictions.</string>
+    <string name="character_status_persistent_effects_title">Persistent Effects</string>
+    <string name="character_status_persistent_effects_empty">No persistent effects recorded.</string>
     <string name="remove_condition_desc">Remove condition</string>
     <string name="remove_condition_desc_with_name">Remove condition %1$s</string>
     <string name="conditions_state_description">Conditions: %1$s</string>
@@ -1041,6 +1054,7 @@ Add your party or individual enemies above.</string>
     <string name="reference_poison_damage_summary">Damage: %1$s %2$s</string>
     <string name="reference_poison_failed_save_damage">Damage (Failed Save)</string>
     <string name="reference_poison_successful_save_damage">Damage (Success)</string>
+    <string name="reference_disease_card_summary">DC %1$d • Incubation: %2$s</string>
     <string name="reference_disease_incubation_time">Incubation Time</string>
     <string name="reference_disease_transmission">Transmission</string>
     <string name="reference_spellcasting_verified_srd_spell_names">Verified SRD Spell Names</string>
@@ -1098,10 +1112,10 @@ Add your party or individual enemies above.</string>
     <string name="reference_detail_section_profile">Profile</string>
     <string name="reference_search_updating">Updating search results…</string>
     <plurals name="reference_search_results_count">
-        <item quantity="one">%1$d result for “%2$s”</item>
-        <item quantity="other">%1$d results for “%2$s”</item>
+        <item quantity="one">%1$d result for \"%2$s\"</item>
+        <item quantity="other">%1$d results for \"%2$s\"</item>
     </plurals>
-    <string name="reference_search_results_ready">Showing filtered results for “%1$s”</string>
+    <string name="reference_search_results_ready">Showing filtered results for \"%1$s\"</string>
     <string name="reference_preferences_load_error">Failed to load reference favorites.</string>
     <string name="reference_preferences_update_error">Failed to update reference favorites.</string>
     <string name="reference_no_favorite_traps">No favorite traps yet. Star a trap to keep it
@@ -1244,5 +1258,28 @@ Add your party or individual enemies above.</string>
     <string name="reference_rolling_d100">Rolling…</string>
     <string name="hysteria_rolling_preview_title">Rolling: %1$d</string>
     <string name="hysteria_rolling_preview_body">The result is still tumbling through the
-        table…</string>
+        table…</string>    <!-- Reference tab labels -->
+    <string name="reference_tab_spellcasting">Spellcasting</string>
+    <string name="reference_tab_objects">Objects</string>
+    <!-- Reference section headers -->
+    <string name="reference_effects_title">Effects</string>
+    <string name="reference_disarm_method_title">Disarm Method</string>
+    <!-- Reference objects -->
+    <string name="reference_objects_hp_value">HP %1</string>
+    <!-- Session history -->
+    <string name="session_history_empty_message">No session history yet</string>
+    <string name="session_collapse_action">Collapse %1&#36;s</string>
+    <string name="session_expand_action">Expand %1&#36;s</string>
+    <!-- Session detail -->
+    <string name="session_detail_snapshot_unavailable">Session snapshot unavailable</string>
+    <!-- Session summary rewards -->
+    <string name="session_summary_reward_xp">%1 XP earned</string>
+    <string name="session_summary_reward_special_items_title">Special Equipment</string>    <!-- Encounter actions and order -->
+    <string name="encounter_available_actions_title">Actions</string>
+    <string name="encounter_order_label">Order:</string>
+    <string name="encounter_dm_priority_next_up_none">&#8212;</string>
+    <string name="encounter_created_with_monsters_message_count">Encounter created with %1 monsters</string>
+    <!-- Session summary sections -->
+    <string name="session_summary_surviving_players_title">Surviving Players</string>
+    <string name="session_summary_persistent_statuses_title">Persistent Effects</string>
 </resources>

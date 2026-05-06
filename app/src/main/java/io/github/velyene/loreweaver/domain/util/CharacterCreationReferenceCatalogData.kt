@@ -67,15 +67,15 @@ internal object CharacterCreationReferenceCatalogData {
 	)
 
 	val standardLanguages = listOf(
-		LanguageReference(name = "Common", group = "Standard", roll = "â€”"),
+		LanguageReference(name = "Common", group = "Standard", roll = "—"),
 		LanguageReference(name = "Common Sign Language", group = "Standard", roll = "1"),
 		LanguageReference(name = "Draconic", group = "Standard", roll = "2"),
-		LanguageReference(name = "Dwarvish", group = "Standard", roll = "3â€“4"),
-		LanguageReference(name = "Elvish", group = "Standard", roll = "5â€“6"),
+		LanguageReference(name = "Dwarvish", group = "Standard", roll = "3–4"),
+		LanguageReference(name = "Elvish", group = "Standard", roll = "5–6"),
 		LanguageReference(name = "Giant", group = "Standard", roll = "7"),
 		LanguageReference(name = "Gnomish", group = "Standard", roll = "8"),
 		LanguageReference(name = "Goblin", group = "Standard", roll = "9"),
-		LanguageReference(name = "Halfling", group = "Standard", roll = "10â€“11"),
+		LanguageReference(name = "Halfling", group = "Standard", roll = "10–11"),
 		LanguageReference(name = "Orc", group = "Standard", roll = "12")
 	)
 
@@ -239,7 +239,7 @@ internal object CharacterCreationReferenceCatalogData {
 			prerequisite = "Level 19+, Spellcasting Feature",
 			benefits = listOf(
 				"Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30.",
-				"Free Casting. Whenever you cast a spell with a level 1â€“4 spell slot, roll 1d4; if the " +
+				"Free Casting. Whenever you cast a spell with a level 1–4 spell slot, roll 1d4; if the " +
 					"result matches the slot's level, the slot isn't expended."
 			)
 		),

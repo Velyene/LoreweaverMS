@@ -11,9 +11,9 @@ class ReferenceScreenWeaponSearchTest {
 		val lance = EquipmentReference.WEAPONS.first { it.name == "Lance" }
 		val musket = EquipmentReference.WEAPONS.first { it.name == "Musket" }
 
-		assertMatchesAll(dagger::matchesSearchQuery, "Finesse", "Nick")
-		assertMatchesAll(lance::matchesSearchQuery, "unless mounted")
-		assertMatchesAll(musket::matchesSearchQuery, "500 GP", "Bullet")
+		assertMatchesAll(dagger::matchesQuery, "Finesse", "Nick")
+		assertMatchesAll(lance::matchesQuery, "unless mounted")
+		assertMatchesAll(musket::matchesQuery, "500 GP", "Bullet")
 	}
 
 	@Test

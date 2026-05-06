@@ -143,8 +143,7 @@ internal fun GenericReferenceDetailView(
 				title = detail.title,
 				isFavorite = false,
 				onToggleFavorite = {},
-				onCopy = referenceTextActions.onCopy,
-				onShare = referenceTextActions.onShare,
+				actions = referenceTextActions,
 				showFavoriteAction = false
 			)
 		}
@@ -271,9 +270,9 @@ private fun localizedReferenceDetailLabel(label: String): String {
 
 private fun normalizeReferenceDetailDisplayText(text: String): String {
 	return text
-		.replace("â€¢", "•")
-		.replace("Aâ€“Z", "A–Z")
-		.replace("â€”", "—")
+		.replace("\u00E2\u20AC\u00A2", "•")
+		.replace("A\u00E2\u20AC\u201CZ", "A–Z")
+		.replace("\u00E2\u20AC\u201D", "—")
 }
 
 private fun buildReferenceDetailClipboardText(detail: LocalizedReferenceDetailContent): String =

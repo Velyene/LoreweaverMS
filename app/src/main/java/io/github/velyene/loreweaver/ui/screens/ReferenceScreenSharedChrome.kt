@@ -107,8 +107,7 @@ internal fun ReferenceDetailHeader(
 	title: String,
 	isFavorite: Boolean,
 	onToggleFavorite: () -> Unit,
-	onCopy: () -> Unit,
-	onShare: () -> Unit,
+	actions: ReferenceTextActions,
 	showFavoriteAction: Boolean = true,
 	leadingActions: @Composable RowScope.() -> Unit = {}
 ) {
@@ -133,13 +132,13 @@ internal fun ReferenceDetailHeader(
 			if (showFavoriteAction) {
 				ReferenceFavoriteIconButton(isFavorite = isFavorite, onClick = onToggleFavorite)
 			}
-			IconButton(onClick = onCopy) {
+			IconButton(onClick = actions.onCopy) {
 				Icon(
 					imageVector = Icons.Default.ContentCopy,
 					contentDescription = stringResource(R.string.reference_copy_to_clipboard)
 				)
 			}
-			IconButton(onClick = onShare) {
+			IconButton(onClick = actions.onShare) {
 				Icon(
 					imageVector = Icons.Default.Share,
 					contentDescription = stringResource(R.string.reference_share)

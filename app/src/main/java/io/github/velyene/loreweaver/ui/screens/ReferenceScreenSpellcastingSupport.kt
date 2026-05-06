@@ -60,7 +60,7 @@ internal fun buildSpellcastingShareText(
 			slotTable.slot9
 		)
 			.mapIndexedNotNull { index, value ->
-				if (value > 0) "${SpellcastingReference.getSpellLevelName(index + 1)} Ã—$value" else null
+				if (value > 0) "${SpellcastingReference.getSpellLevelName(index + 1)} ×$value" else null
 			}
 			.forEach { appendLine(it) }
 	}

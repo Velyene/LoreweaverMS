@@ -36,43 +36,43 @@ internal fun filterEquipmentTables(query: String): List<ReferenceTable> {
 }
 
 internal fun filterEquipmentTools(query: String): List<ToolReferenceEntry> {
-	return EquipmentReference.ALL_TOOLS.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.ALL_TOOLS.filter { it.matchesQuery(query) }
 }
 
 internal fun filterEquipmentWeapons(query: String): List<WeaponReferenceEntry> {
-	return EquipmentReference.WEAPONS.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.WEAPONS.filter { it.matchesQuery(query) }
 }
 
 internal fun filterEquipmentArmor(query: String): List<ArmorReferenceEntry> {
-	return EquipmentReference.ARMOR.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.ARMOR.filter { it.matchesQuery(query) }
 }
 
 internal fun filterAdventuringGear(query: String): List<AdventuringGearEntry> {
-	return EquipmentReference.ADVENTURING_GEAR.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.ADVENTURING_GEAR.filter { it.matchesQuery(query) }
 }
 
 internal fun filterEquipmentMagicItems(query: String): List<MagicItemReferenceEntry> {
-	return EquipmentReference.MAGIC_ITEMS_A_TO_Z.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.MAGIC_ITEMS_A_TO_Z.filter { it.matchesQuery(query) }
 }
 
 internal fun filterEquipmentAmmunition(query: String): List<AmmunitionReferenceEntry> {
-	return EquipmentReference.AMMUNITION.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.AMMUNITION.filter { it.matchesQuery(query) }
 }
 
 internal fun filterEquipmentFocuses(query: String): List<FocusReferenceEntry> {
-	return EquipmentReference.FOCUSES.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.FOCUSES.filter { it.matchesQuery(query) }
 }
 
 internal fun filterEquipmentMounts(query: String): List<MountReferenceEntry> {
-	return EquipmentReference.MOUNTS.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.MOUNTS.filter { it.matchesQuery(query) }
 }
 
 internal fun filterEquipmentTackAndDrawn(query: String): List<TackDrawnReferenceEntry> {
-	return EquipmentReference.TACK_AND_DRAWN_ITEMS.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.TACK_AND_DRAWN_ITEMS.filter { it.matchesQuery(query) }
 }
 
 internal fun filterEquipmentLargeVehicles(query: String): List<LargeVehicleReferenceEntry> {
-	return EquipmentReference.LARGE_VEHICLES.filter { it.matchesSearchQuery(query) }
+	return EquipmentReference.LARGE_VEHICLES.filter { it.matchesQuery(query) }
 }
 
 internal fun visibleEquipmentTools(
@@ -160,87 +160,4 @@ private inline fun <T> visibleSearchOnlyEntries(
 		return emptyList()
 	}
 	return filter(normalizedQuery)
-}
-
-internal fun ToolReferenceEntry.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(
-		query,
-		name,
-		category.canonicalLabel,
-		ability,
-		weight,
-		cost,
-		*utilize.toTypedArray(),
-		*craft.toTypedArray(),
-		*variants.toTypedArray(),
-		*notes.toTypedArray()
-	)
-}
-
-internal fun WeaponReferenceEntry.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(
-		query,
-		name,
-		category,
-		damage,
-		mastery,
-		weight,
-		cost,
-		*properties.toTypedArray()
-	)
-}
-
-internal fun ArmorReferenceEntry.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(
-		query,
-		name,
-		categoryDonDoff,
-		armorClass,
-		strength,
-		stealth,
-		weight,
-		cost
-	)
-}
-
-internal fun AdventuringGearEntry.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(query, name, weight, cost, body.orEmpty())
-}
-
-internal fun MagicItemReferenceEntry.matchesSearchQuery(query: String): Boolean {
-	val tableFields = tables.flatMap { table ->
-		listOf(table.title) + table.columns + table.rows.flatten()
-	}
-	return matchesQuery(query, name, subtitle, body, *tableFields.toTypedArray())
-}
-
-internal fun AmmunitionReferenceEntry.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(query, type, amount, storage, weight, cost)
-}
-
-internal fun FocusReferenceEntry.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(query, group.canonicalLabel, name, weight, cost, usage, *notes.toTypedArray())
-}
-
-internal fun MountReferenceEntry.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(query, item, carryingCapacity, cost)
-}
-
-internal fun TackDrawnReferenceEntry.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(query, item, weight, cost)
-}
-
-internal fun LargeVehicleReferenceEntry.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(
-		query,
-		ship,
-		speed,
-		crew,
-		passengers,
-		cargoTons,
-		ac,
-		hp,
-		damageThreshold,
-		cost
-	)
 }

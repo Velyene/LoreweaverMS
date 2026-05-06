@@ -64,7 +64,7 @@ internal fun CoreRulesContent(searchQuery: String, listState: LazyListState) {
 			options = CoreRulesSubtab.entries,
 			selectedOption = state.effectiveSubtab,
 			onOptionSelected = { selectedSubtabName = it.name },
-			label = { stringResource(it.labelResId) }
+			label = { it.label }
 		)
 
 		LazyColumn(
@@ -362,8 +362,4 @@ private fun <T> ReferenceSubtabRow(
 			)
 		}
 	}
-}
-
-private fun CoreRuleSection.matchesQuery(query: String): Boolean {
-	return matchesQuery(query, title, summary, *bullets.toTypedArray(), *keywords.toTypedArray())
 }

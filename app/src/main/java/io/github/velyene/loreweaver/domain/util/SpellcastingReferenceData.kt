@@ -24,7 +24,7 @@ internal object SpellcastingReferenceData {
 
 	val spellPreparationByClassTable = ReferenceTable(
 		title = "Spell Preparation by Class",
-		columns = listOf("Class", "Change When Youâ€¦", "Number of Spells"),
+		columns = listOf("Class", "Change When You…", "Number of Spells"),
 		rows = spellPreparationByClass.map { entry ->
 			listOf(entry.className, entry.changeWhenYou, entry.numberOfSpells)
 		}

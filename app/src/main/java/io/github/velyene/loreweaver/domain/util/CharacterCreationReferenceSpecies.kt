@@ -20,7 +20,7 @@ internal object CharacterCreationReferenceSpeciesData {
 			body = (
 				"The great cities of many fantasy worlds bring many peoples together: dwarves, elves, " +
 					"halflings, humans, and rarer folk such as dragonborn, goliaths, orcs, and tieflings. " +
-					"Your ancestry shapes your characterâ€™s natural gifts, appearance, culture, and place in the world.\n\n" +
+					"Your ancestry shapes your character’s natural gifts, appearance, culture, and place in the world.\n\n" +
 					"Most adventuring parties are built from the common peoples, but less common species can add unusual " +
 					"history, social tension, or magical flavor to a campaign. Adventurers often stand apart from the " +
 					"usual expectations of their people, so a species choice is also a prompt for backstory and personality."
@@ -44,7 +44,7 @@ internal object CharacterCreationReferenceSpeciesData {
 					"speed, languages, and sometimes notable variants. Those traits define the baseline assumptions " +
 					"for your character, while your class and background build on top of them.\n\n" +
 					"Some peoples also present recognizable cultural or mystical branches. These variants keep the " +
-					"parent speciesâ€™ broad identity while adding a few details that nudge a character toward a " +
+					"parent species’ broad identity while adding a few details that nudge a character toward a " +
 					"particular fantasy archetype."
 				)
 		),
@@ -95,7 +95,7 @@ internal object CharacterCreationReferenceSpeciesData {
 				),
 				RacialTraitReference(
 					"Tool Proficiency",
-					"Choose smithâ€™s tools, brewerâ€™s supplies, or masonâ€™s tools."
+					"Choose smith’s tools, brewer’s supplies, or mason’s tools."
 				),
 				RacialTraitReference(
 					"Stonecunning",
@@ -158,7 +158,7 @@ internal object CharacterCreationReferenceSpeciesData {
 				RacialTraitReference("Keen Senses", "You are proficient in the Perception skill."),
 				RacialTraitReference(
 					"Fey Ancestry",
-					"You have advantage on saves against being charmed, and magic canâ€™t put you to sleep."
+					"You have advantage on saves against being charmed, and magic can’t put you to sleep."
 				),
 				RacialTraitReference(
 					"Trance",
@@ -348,7 +348,7 @@ internal object CharacterCreationReferenceSpeciesData {
 			traits = listOf(
 				RacialTraitReference(
 					"Draconic Ancestry",
-					"Choose a dragon type. It determines your breath weaponâ€™s damage type, shape, and saving throw, as well as your damage resistance."
+					"Choose a dragon type. It determines your breath weapon’s damage type, shape, and saving throw, as well as your damage resistance."
 				),
 				RacialTraitReference(
 					"Breath Weapon",
@@ -410,12 +410,12 @@ internal object CharacterCreationReferenceSpeciesData {
 					abilityScoreIncrease = "Constitution +1",
 					traits = listOf(
 						RacialTraitReference(
-							"Artificerâ€™s Lore",
+							"Artificer’s Lore",
 							"History checks related to magic items, alchemy, or technological devices can add double your proficiency bonus."
 						),
 						RacialTraitReference(
 							"Tinker",
-							"With tinkerâ€™s tools, time, and materials, you can build tiny clockwork toys, fire starters, or music boxes."
+							"With tinker’s tools, time, and materials, you can build tiny clockwork toys, fire starters, or music boxes."
 						)
 					)
 				)

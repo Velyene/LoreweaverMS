@@ -21,9 +21,7 @@ import io.github.velyene.loreweaver.domain.util.CharacterCreationTextSection
 import io.github.velyene.loreweaver.domain.util.FeatReference
 import io.github.velyene.loreweaver.domain.util.LanguageReference
 import io.github.velyene.loreweaver.domain.util.RaceReference
-import io.github.velyene.loreweaver.domain.util.RacialTraitReference
 import io.github.velyene.loreweaver.domain.util.ReferenceTable
-import io.github.velyene.loreweaver.domain.util.SubraceReference
 
 internal data class CharacterCreationContentState(
 	val normalizedQuery: String,
@@ -259,29 +257,17 @@ internal fun rememberCharacterCreationContentState(
 	)
 }
 
-private fun CharacterCreationTextSection.matchesQuery(query: String): Boolean {
-	return matchesQuery(query, title, body)
-}
-
-private fun CharacterCreationStep.matchesQuery(query: String): Boolean {
-	return matchesQuery(query, number.toString(), title, content, example.orEmpty())
-}
-
-private fun AbilityScoreSummary.matchesQuery(query: String): Boolean {
-	return matchesQuery(query, ability, measures, importantFor, racialIncreases)
-}
-
 internal fun filterCharacterCreationBackgrounds(query: String): List<BackgroundReference> {
-	return CharacterCreationReference.BACKGROUNDS.filter { it.matchesSearchQuery(query) }
+	return CharacterCreationReference.BACKGROUNDS.filter { it.matchesQuery(query) }
 }
 
 internal fun filterCharacterCreationFeats(query: String): List<FeatReference> {
-	return CharacterCreationReference.FEATS.filter { it.matchesSearchQuery(query) }
+	return CharacterCreationReference.FEATS.filter { it.matchesQuery(query) }
 }
 
 internal fun filterCharacterCreationLanguages(query: String): List<LanguageReference> {
 	return (CharacterCreationReference.STANDARD_LANGUAGES + CharacterCreationReference.RARE_LANGUAGES)
-		.filter { it.matchesSearchQuery(query) }
+		.filter { it.matchesQuery(query) }
 }
 
 internal fun visibleCharacterCreationBackgrounds(
@@ -313,67 +299,5 @@ internal fun visibleCharacterCreationLanguages(
 		return emptyList()
 	}
 	return filterCharacterCreationLanguages(normalizedQuery)
-}
-
-internal fun BackgroundReference.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(
-		query,
-		name,
-		feat,
-		toolProficiency,
-		*backgroundSearchAliases().toTypedArray(),
-		*abilityScores.toTypedArray(),
-		*skillProficiencies.toTypedArray(),
-		*equipmentOptions.toTypedArray()
-	)
-}
-
-private fun BackgroundReference.backgroundSearchAliases(): List<String> = when (name) {
-	"Acolyte" -> listOf("Magic Initiate", "Cleric")
-	"Sage" -> listOf("Magic Initiate", "Wizard")
-	else -> emptyList()
-}
-
-internal fun FeatReference.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(
-		query,
-		name,
-		category,
-		prerequisite.orEmpty(),
-		*benefits.toTypedArray(),
-		if (repeatable) "Repeatable" else ""
-	)
-}
-
-internal fun LanguageReference.matchesSearchQuery(query: String): Boolean {
-	return matchesQuery(query, name, group, roll.orEmpty())
-}
-
-private fun RaceReference.matchesQuery(query: String): Boolean {
-	return matchesQuery(
-		query,
-		name,
-		overview,
-		personality,
-		society,
-		adventurers,
-		names,
-		abilityScoreIncrease,
-		age,
-		size,
-		speed,
-		languages
-	) || traits.any { it.matchesQuery(query) } ||
-		subraces.any { it.matchesQuery(query) } ||
-		notes.any { it.contains(query, ignoreCase = true) }
-}
-
-private fun SubraceReference.matchesQuery(query: String): Boolean {
-	return matchesQuery(query, name, overview, abilityScoreIncrease.orEmpty()) ||
-		traits.any { it.matchesQuery(query) }
-}
-
-private fun RacialTraitReference.matchesQuery(query: String): Boolean {
-	return matchesQuery(query, name, description)
 }
 

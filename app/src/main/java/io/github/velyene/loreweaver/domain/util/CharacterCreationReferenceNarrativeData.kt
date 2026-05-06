@@ -121,8 +121,8 @@ internal object CharacterCreationReferenceNarrativeData {
 			body =
 				"Multiclassing lets a character gain levels in more than one class. To qualify, the " +
 					"character must meet the primary-ability prerequisites for both the current class and " +
-					"the new class, and some benefitsâ€”such as proficiencies, Extra Attack, spell slots, " +
-					"and alternative Armor Class formulasâ€”follow special multiclass rules."
+					"the new class, and some benefits—such as proficiencies, Extra Attack, spell slots, " +
+					"and alternative Armor Class formulas—follow special multiclass rules."
 		),
 		CharacterCreationTextSection(
 			title = "Spellcasting Across Classes",
@@ -290,7 +290,7 @@ internal object CharacterCreationReferenceNarrativeData {
 		When your character gains a level, his or her class often grants additional features, as
 		detailed in the class description. Some of these features allow you to increase your
 		ability scores, either increasing two scores by 1 each or increasing one score by 2. You
-		canâ€™t increase an ability score above 20. In addition, every character's proficiency bonus
+		can’t increase an ability score above 20. In addition, every character's proficiency bonus
 		increases at certain levels.
 
 		Each time you gain a level, you gain 1 additional Hit Die. Roll that Hit Die, add your

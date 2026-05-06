@@ -3,9 +3,9 @@ package io.github.velyene.loreweaver.ui.screens
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 
-internal fun assertMatchesAll(matchesSearchQuery: (String) -> Boolean, vararg queries: String) {
+internal fun assertMatchesAll(matchesQuery: (String) -> Boolean, vararg queries: String) {
 	queries.forEach { query ->
-		assertTrue("Expected query to match: $query", matchesSearchQuery(query))
+		assertTrue("Expected query to match: $query", matchesQuery(query))
 	}
 }
 
