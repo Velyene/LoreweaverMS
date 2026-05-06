@@ -141,7 +141,11 @@ fun StatusEffectChip(
 	val persistentSuffix = stringResource(R.string.condition_persistent_chip_suffix)
 	val referenceAvailableDescription = stringResource(R.string.status_chip_reference_available)
 	val statusOnlyDescription = stringResource(R.string.status_chip_status_only)
-	val chipLabel = statusChipDisplayLabel(status, persistentSuffix)
+	val chipLabel = statusChipDisplayText(
+		status = status,
+		persistentSuffix = persistentSuffix,
+		includeIconGlyph = true
+	)
 	val announcement = statusChipAnnouncement(
 		status = status,
 		persistentSuffix = persistentSuffix,
@@ -209,26 +213,35 @@ fun StatusEffectChip(
 
 @Composable
 private fun statusChipLabel(status: StatusChipModel): String {
-	return statusChipDisplayLabel(
+	return statusChipDisplayText(
 		status = status,
-		persistentSuffix = stringResource(R.string.condition_persistent_chip_suffix)
+		persistentSuffix = stringResource(R.string.condition_persistent_chip_suffix),
+		includeIconGlyph = true
 	)
 }
 
-private fun statusChipDisplayLabel(status: StatusChipModel, persistentSuffix: String): String {
+internal fun statusChipDisplayText(
+	status: StatusChipModel,
+	persistentSuffix: String,
+	includeIconGlyph: Boolean
+): String {
 	val metadata = ConditionConstants.metadataFor(status.name)
-	return buildString {
-		metadata.iconGlyph?.takeIf(String::isNotBlank)?.let {
-			append(it)
-			append(' ')
+	val baseLabel = buildString {
+		if (includeIconGlyph) {
+			metadata.iconGlyph?.takeIf(String::isNotBlank)?.let {
+				append(it)
+				append(' ')
+			}
 		}
 		append(status.name)
-		if (status.isPersistent) {
-			append(' ')
-			append(persistentSuffix)
-		} else if (status.durationText.isNotBlank()) {
+		if (status.durationText.isNotBlank()) {
 			append(status.durationText)
 		}
+	}
+	return if (status.isPersistent) {
+		"$baseLabel • $persistentSuffix"
+	} else {
+		baseLabel
 	}
 }
 
@@ -238,7 +251,11 @@ internal fun statusChipAnnouncement(
 	referenceAvailableDescription: String,
 	statusOnlyDescription: String
 ): String {
-	val chipLabel = statusChipDisplayLabel(status, persistentSuffix)
+	val chipLabel = statusChipDisplayText(
+		status = status,
+		persistentSuffix = persistentSuffix,
+		includeIconGlyph = true
+	)
 	val suffix = if (status.isInteractive) {
 		referenceAvailableDescription
 	} else {
